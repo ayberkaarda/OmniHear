@@ -9,7 +9,7 @@ import {
   readInput, isEditLike, getFilePath, getContent, absolutePath, normalizePath,
   projectDir, deny, pass,
 } from './_lib.mjs';
-import { tmpdir } from 'node:os';
+import { tmpdir, homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 const SECRET_EXTENSIONS = ['.pem', '.key', '.p12', '.pfx'];
@@ -47,17 +47,57 @@ function isUnder(child, parent) {
 
 /**
  * Roots that sit outside the project yet are legitimately writable:
- * the harness scratchpad. Only the project-root rule is relaxed for these —
- * .env / key-material / secret-content rules still apply inside them.
+ * the harness scratchpad and the per-project memory store. Only the
+ * project-root rule is relaxed for these — .env / key-material /
+ * secret-content rules still apply inside them.
+ *
+ * The memory exemption is deliberately narrow. It grants
+ * <config>/projects/<slug>/memory and nothing above it, so credential
+ * bearing files in the config root (~/.claude.json, keychain caches)
+ * stay unwritable.
  */
 function exemptRoots() {
   const roots = [];
-  const declared = process.env.CLAUDE_SCRATCHPAD_DIR;
-  if (declared && declared.trim()) {
-    try { roots.push(normalizePath(resolve(declared.trim()))); } catch { /* ignore */ }
+  const add = (p) => {
+    if (!p || !String(p).trim()) return;
+    try { roots.push(normalizePath(resolve(String(p).trim()))); } catch { /* ignore */ }
+  };
+
+  add(process.env.CLAUDE_SCRATCHPAD_DIR);
+  add(join(tmpdir(), 'claude'));
+
+  // Auto-memory: <config>/projects/<project-slug>/memory
+  const configDir = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude');
+  const memoryOverride = process.env.CLAUDE_MEMORY_DIR;
+  if (memoryOverride) {
+    add(memoryOverride);
+  } else {
+    const projectsRoot = normalizePath(resolve(join(configDir, 'projects')));
+    // Only a path shaped <projectsRoot>/<slug>/memory qualifies; registered
+    // as a marker so isMemoryPath() can check the shape per candidate.
+    roots.push({ memoryProjectsRoot: projectsRoot });
   }
-  try { roots.push(normalizePath(resolve(join(tmpdir(), 'claude')))); } catch { /* ignore */ }
-  return roots.filter(Boolean);
+  return roots;
+}
+
+/** True when abs sits inside <projectsRoot>/<slug>/memory (any depth below). */
+function isMemoryPath(abs, projectsRoot) {
+  if (!isUnder(abs, projectsRoot)) return false;
+  const rest = trimSlash(abs.toLowerCase()).slice(trimSlash(projectsRoot.toLowerCase()).length + 1);
+  const parts = rest.split('/');
+  return parts.length >= 2 && parts[1] === 'memory';
+}
+
+/** True when abs is inside any exempt root. */
+function inExemptRoot(abs) {
+  for (const r of exemptRoots()) {
+    if (typeof r === 'string') {
+      if (isUnder(abs, r)) return true;
+    } else if (r && r.memoryProjectsRoot) {
+      if (isMemoryPath(abs, r.memoryProjectsRoot)) return true;
+    }
+  }
+  return false;
 }
 
 /** Reason for a path level block, or null. */
@@ -71,7 +111,7 @@ function checkPath(rawPath) {
   // only; every other path rule below (.env, key material) still applies there,
   // and so does the content-level secret scan in checkContent().
   const root = projectDir();
-  if (!isUnder(abs, root) && !exemptRoots().some((r) => isUnder(abs, r))) {
+  if (!isUnder(abs, root) && !inExemptRoot(abs)) {
     return (
       'Proje kökü dışına yazma engellendi: ' + abs + '. ' +
       'İzin verilen kök: ' + root + ' (ayrıca harness tarafından tahsis edilen scratchpad dizini). ' +

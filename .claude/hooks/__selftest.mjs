@@ -13,6 +13,7 @@
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { tmpdir } from 'node:os'
 
 const HOOKS = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HOOKS, '..', '..')
@@ -126,6 +127,18 @@ check('FP: test dosyasi -> pass', 'sensitive-log-guard.mjs', write(join(ROOT, 'a
 console.log('--- format-on-write (arac yokken sessiz) ---')
 check('php, arac yok -> pass', 'format-on-write.mjs', write(join(ROOT, 'backend', 'app', 'X.php'), '<?php'), 'pass')
 check('ts, arac yok -> pass', 'format-on-write.mjs', write(join(ROOT, 'frontend', 'src', 'x.ts'), 'const a=1'), 'pass')
+
+console.log('--- scratchpad muafiyeti (yalniz yol kurali gevser) ---')
+// Exempt root: <tmpdir>/claude. The exemption must relax ONLY the project-root
+// rule — key material, .env and secret content stay blocked inside it.
+const SCRATCH = join(tmpdir(), 'claude', 'probe')
+check('scratchpad + normal dosya -> pass', 'guard-protected-paths.mjs', write(join(SCRATCH, 'runner.mjs'), 'const a = 1'), 'pass')
+check('scratchpad + env dosyasi -> deny', 'guard-protected-paths.mjs', write(join(SCRATCH, '.env'), 'APP_ENV=local'), 'deny')
+check('scratchpad + pem -> deny', 'guard-protected-paths.mjs', write(join(SCRATCH, 'server.pem'), 'x'), 'deny')
+check('scratchpad + canli anahtar icerigi -> deny', 'guard-protected-paths.mjs', write(join(SCRATCH, 'note.txt'), `secret=${FAKE_STRIPE_LIVE}`), 'deny')
+check('segment tuzagi (claudeXYZ) -> deny', 'guard-protected-paths.mjs', write(join(tmpdir(), 'claude' + 'XYZ', 'x.ts'), 'const a = 1'), 'deny')
+check('muaf koktan .. ile kacis -> deny', 'guard-protected-paths.mjs', write(join(SCRATCH, '..', '..', '..', 'evil.ts'), 'const a = 1'), 'deny')
+check('rastgele proje disi yol -> deny', 'guard-protected-paths.mjs', write(join(tmpdir(), 'unrelated', 'x.ts'), 'const a = 1'), 'deny')
 
 console.log('--- bozuk girdi dayanikliligi ---')
 const HOOK_FILES = [

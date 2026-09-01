@@ -1,0 +1,114 @@
+# OmniHear — monorepo .gitignore
+# Spec §8: "Secrets: .env dışında Vault/parameter store; repo'da asla credential bulunmaz."
+
+# ---------- Secrets and key material (highest priority) ----------
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_ed25519
+auth.json
+oauth-private.key
+oauth-public.key
+
+# ---------- Dependencies ----------
+/backend/vendor/
+/frontend/node_modules/
+/ai-service/.venv/
+/ai-service/venv/
+node_modules/
+vendor/
+.venv/
+__pycache__/
+*.py[cod]
+.Python
+
+# ---------- Laravel (backend/) ----------
+/backend/storage/*.key
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/testing/*
+/backend/storage/framework/views/*
+/backend/storage/logs/*
+!/backend/storage/framework/cache/.gitignore
+!/backend/storage/framework/sessions/.gitignore
+!/backend/storage/framework/testing/.gitignore
+!/backend/storage/framework/views/.gitignore
+!/backend/storage/logs/.gitignore
+/backend/public/hot
+/backend/public/storage
+/backend/bootstrap/cache/*.php
+/backend/.phpunit.result.cache
+/backend/.phpunit.cache/
+/backend/coverage/
+/backend/clover.xml
+/backend/.php-cs-fixer.cache
+Homestead.json
+Homestead.yaml
+
+# ---------- Angular (frontend/) ----------
+/frontend/dist/
+/frontend/tmp/
+/frontend/out-tsc/
+/frontend/.angular/
+/frontend/coverage/
+/frontend/.nx/
+/frontend/playwright-report/
+/frontend/test-results/
+/frontend/blob-report/
+/frontend/.playwright/
+*.tsbuildinfo
+
+# ---------- FastAPI / Python (ai-service/) ----------
+/ai-service/.pytest_cache/
+/ai-service/.ruff_cache/
+/ai-service/.mypy_cache/
+/ai-service/htmlcov/
+/ai-service/.coverage
+/ai-service/dist/
+/ai-service/*.egg-info/
+
+# ---------- Infra ----------
+/infra/**/*.local.yml
+/infra/**/secrets/
+docker-compose.override.yml
+
+# ---------- Editor / OS ----------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.fleet/
+.nova/
+.zed/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Obsidian: only relevant if a vault is opened on docs/ (see CLAUDE.md discussion).
+.obsidian/
+
+# ---------- Claude Code ----------
+# .claude/settings.json and .claude/{hooks,skills}/ ARE committed on purpose —
+# they are the team-wide guard and workflow configuration (CLAUDE.md §10).
+.claude/settings.local.json
+.claude/worktrees/
+.claude/plans/
+
+# ---------- Build / logs / temp ----------
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+/logs/
+/tmp/
+*.tmp
