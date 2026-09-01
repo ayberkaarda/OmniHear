@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-git-write.mjs"],
+            "timeout": 10,
+            "statusMessage": "git yazma kontrolu"
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-destructive-ops.mjs"],
+            "timeout": 10,
+            "statusMessage": "yikici komut kontrolu"
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-test-db-target.mjs"],
+            "timeout": 10,
+            "statusMessage": "test veritabani hedefi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-protected-paths.mjs"],
+            "timeout": 10,
+            "statusMessage": "korumali yol / secret kontrolu"
+          }
+        ]
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/tenant-scope-guard.mjs"],
+            "timeout": 10,
+            "statusMessage": "tenant scope kontrolu"
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/sensitive-log-guard.mjs"],
+            "timeout": 10,
+            "statusMessage": "hassas log kontrolu"
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/format-on-write.mjs"],
+            "timeout": 25,
+            "statusMessage": "formatlaniyor"
+          }
+        ]
+      }
+    ]
+  },
+
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git ls-files*)",
+      "Bash(git show*)",
+      "Bash(git blame*)",
+      "Bash(git rev-parse*)",
+
+      "Bash(php artisan test*)",
+      "Bash(php artisan route:list*)",
+      "Bash(php artisan migrate:status*)",
+      "Bash(php artisan make:*)",
+      "Bash(php artisan config:clear*)",
+      "Bash(php artisan optimize:clear*)",
+      "Bash(php artisan horizon:status*)",
+      "Bash(php artisan schedule:list*)",
+      "Bash(php artisan queue:failed*)",
+      "Bash(php artisan about*)",
+      "Bash(vendor/bin/pest*)",
+      "Bash(./vendor/bin/pest*)",
+      "Bash(vendor/bin/pint*)",
+      "Bash(./vendor/bin/pint*)",
+      "Bash(vendor/bin/phpunit*)",
+      "Bash(composer dump-autoload*)",
+      "Bash(composer show*)",
+      "Bash(composer validate*)",
+
+      "Bash(npm run *)",
+      "Bash(npm test*)",
+      "Bash(npm ci*)",
+      "Bash(npx ng build*)",
+      "Bash(npx ng test*)",
+      "Bash(npx ng lint*)",
+      "Bash(npx ng extract-i18n*)",
+      "Bash(npx ng generate*)",
+      "Bash(npx tsc*)",
+      "Bash(npx eslint*)",
+      "Bash(npx prettier*)",
+      "Bash(npx jest*)",
+      "Bash(npx playwright test*)",
+
+      "Bash(pytest*)",
+      "Bash(python -m pytest*)",
+      "Bash(uv run *)",
+      "Bash(uv sync*)",
+      "Bash(ruff*)",
+
+      "Bash(docker compose ps*)",
+      "Bash(docker compose logs*)",
+      "Bash(docker compose config*)",
+      "Bash(docker compose up -d*)",
+      "Bash(redis-cli ping*)",
+      "Bash(pg_isready*)"
+    ],
+
+    "ask": [
+      "Bash(php artisan migrate*)",
+      "Bash(composer install*)",
+      "Bash(composer require*)",
+      "Bash(composer update*)",
+      "Bash(npm install*)",
+      "Bash(npm update*)",
+      "Bash(pip install*)",
+      "Bash(uv add*)",
+      "Bash(docker compose down*)"
+    ],
+
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git reset*)",
+      "Bash(git checkout*)",
+      "Bash(git rebase*)",
+      "Bash(git merge*)",
+      "Bash(git worktree*)",
+
+      "Read(./.env)",
+      "Read(./**/.env)",
+      "Read(./**/.env.local)",
+      "Read(./**/.env.production)",
+      "Read(./**/.env.staging)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./**/storage/framework/**)",
+      "Edit(./**/.env)",
+      "Edit(./**/.env.local)",
+      "Edit(./**/.env.production)",
+      "Write(./**/.env)",
+      "Write(./**/.env.local)",
+      "Write(./**/.env.production)"
+    ]
+  },
+
+  "env": {
+    "CI": "true",
+    "NG_CLI_ANALYTICS": "false",
+    "COMPOSER_NO_INTERACTION": "1",
+    "NO_COLOR": "1",
+    "FORCE_COLOR": "0",
+    "PYTEST_ADDOPTS": "-q --tb=short",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "BROWSER": "none",
+    "PLAYWRIGHT_HTML_REPORT_OPEN": "never"
+  }
+}
