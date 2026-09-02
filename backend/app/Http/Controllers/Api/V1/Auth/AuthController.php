@@ -10,15 +10,21 @@ use App\Http\Resources\Api\V1\CompanyResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\Audit\AuditAction;
+use App\Support\Audit\AuditLogger;
 use App\Support\DisposableEmailDomains;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    public function __construct(private readonly AuditLogger $audit) {}
+
     /**
      * POST /api/v1/auth/register
      *
@@ -28,7 +34,10 @@ class AuthController extends Controller
     {
         $email = (string) $request->string('email');
 
-        if ($disposable->blocks($email)) {
+        // Both halves of the spec 7.1 blocklist: throwaway mailboxes and free
+        // consumer providers. Same code either way — DISPOSABLE_EMAIL already
+        // reads "use your work address", which is the instruction in both cases.
+        if ($disposable->refuses($email)) {
             throw ApiException::disposableEmail();
         }
 
@@ -76,14 +85,27 @@ class AuthController extends Controller
             // Burn a comparable amount of time before failing.
             Hash::make((string) $request->string('password'));
 
+            // No tenant to file this under — audit_logs.company_id is NOT NULL,
+            // and inventing a row would be worse than the gap. The address
+            // itself is never logged: it is PII, and the failure is meaningful
+            // without it (invariant I5).
+            Log::warning('auth.login_failed', [
+                'reason' => 'unknown_account',
+                'ip' => $request->ip(),
+            ]);
+
             throw ApiException::invalidCredentials();
         }
 
         if (! Hash::check((string) $request->string('password'), $user->getAuthPassword())) {
+            $this->audit->record(AuditAction::LoginFailed, actor: $user);
+
             throw ApiException::invalidCredentials();
         }
 
         $user->forceFill(['last_login_ip' => $request->ip()])->save();
+
+        $this->audit->record(AuditAction::LoginSucceeded, actor: $user);
 
         return response()->json([
             'token' => $user->createToken($request->deviceName())->plainTextToken,
@@ -97,7 +119,19 @@ class AuthController extends Controller
      */
     public function logout(Request $request): Response
     {
-        $request->user()?->currentAccessToken()?->delete();
+        $user = $request->user();
+        $token = $user?->currentAccessToken();
+
+        // Recorded before the delete, while the token still has an id to name.
+        // Sanctum hands back a TransientToken — not a model, and nothing to
+        // revoke — when the guard was faked in a test or driven by a session.
+        $this->audit->record(
+            AuditAction::LoggedOut,
+            actor: $user,
+            subject: $token instanceof Model ? $token : null,
+        );
+
+        $token?->delete();
 
         return response()->noContent();
     }

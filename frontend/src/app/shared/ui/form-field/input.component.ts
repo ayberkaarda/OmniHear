@@ -8,18 +8,17 @@ import { FormFieldSize, nextFieldId, SIZE_INPUT_CLASSES } from './form-field-bas
 export type InputType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
 
 @Component({
-  selector: 'app-input',
-  standalone: true,
-  imports: [IconComponent],
-  templateUrl: './input.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => InputComponent),
-      multi: true
-    }
-  ]
+    selector: 'app-input',
+    imports: [IconComponent],
+    templateUrl: './input.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => InputComponent),
+            multi: true
+        }
+    ]
 })
 export class InputComponent implements ControlValueAccessor {
   readonly label = input.required<string>();

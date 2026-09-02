@@ -58,6 +58,33 @@ function readPhpunitConfig() {
   return null;
 }
 
+/**
+ * The bootstrap file is the authority now, and it is a stronger one than
+ * phpunit.xml ever was.
+ *
+ * phpunit.xml could only ever set `<env force="true">`, which PHPUnit applies to
+ * the putenv() layer *after* the bootstrap runs — so a DB_DATABASE injected by
+ * compose `env_file` beat it, and an explicit one on the command line lost to it.
+ * tests/bootstrap.php writes putenv + $_ENV + $_SERVER before the autoloader,
+ * honours a `test_tmp_*` name, and forces everything else onto omnihear_test.
+ *
+ * Detection is deliberately shape-based rather than a parse: both the fallback
+ * name and the test_tmp_ branch must be present, so a file that merely mentions
+ * the string does not satisfy it.
+ */
+function bootstrapForcedDatabase() {
+  const file = join(projectDir(), 'backend', 'tests', 'bootstrap.php');
+  try {
+    if (!existsSync(file)) return null;
+    const php = readFileSync(file, 'utf8');
+    const forcesFallback = /['"]DB_DATABASE['"]\s*=>/.test(php) && /['"]omnihear_test['"]/.test(php);
+    const honoursScratch = /test_tmp_/.test(php);
+    return forcesFallback && honoursScratch ? 'omnihear_test' : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Find <env name="DB_DATABASE" value="..."/> or the <server> equivalent. */
 function phpunitDatabase(xml) {
   const re = /<\s*(?:env|server)\b[^>]*\bname\s*=\s*["']DB_DATABASE["'][^>]*>/gi;
@@ -98,6 +125,10 @@ try {
         const value = inline.toLowerCase();
         if (value === DEV_DB) deny(DEV_DB_REASON + ' (Komutta DB_DATABASE=' + inline + ' verilmiş.)');
         else pass(); // omnihear_test, test_tmp_* and any other isolated target are fine
+      } else if (bootstrapForcedDatabase()) {
+        // tests/bootstrap.php pins the target before anything else can, so the
+        // run cannot reach the dev database whatever phpunit.xml says.
+        pass();
       } else {
         const cfg = readPhpunitConfig();
         if (!cfg) {

@@ -14,20 +14,19 @@ import { ThemeToggleComponent } from './theme-toggle.component';
  * identity/quota rail and the single `<main>` the child routes render into.
  */
 @Component({
-  selector: 'app-app-shell',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    IconComponent,
-    ButtonComponent,
-    QuotaMeterComponent,
-    ThemeToggleComponent,
-    PaywallModalComponent
-  ],
-  templateUrl: './app-shell.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-app-shell',
+    imports: [
+        RouterOutlet,
+        RouterLink,
+        RouterLinkActive,
+        IconComponent,
+        ButtonComponent,
+        QuotaMeterComponent,
+        ThemeToggleComponent,
+        PaywallModalComponent
+    ],
+    templateUrl: './app-shell.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppShellComponent {
   private readonly authService = inject(AuthService);

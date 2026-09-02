@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.
  * otherwise.
  */
 @Component({
-  selector: 'app-integrations',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './integrations.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-integrations',
+    imports: [EmptyStateComponent],
+    templateUrl: './integrations.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IntegrationsComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.integrations.empty:No channel is connected yet`;

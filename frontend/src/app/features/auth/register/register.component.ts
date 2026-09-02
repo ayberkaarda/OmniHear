@@ -16,11 +16,10 @@ import { MIN_PASSWORD_LENGTH } from '../shared/form-errors';
  * straight on the verification screen rather than the login form.
  */
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
-  templateUrl: './register.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-register',
+    imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
+    templateUrl: './register.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterComponent extends AuthFormBase {
   private readonly auth = inject(AuthService);

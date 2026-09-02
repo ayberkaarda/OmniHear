@@ -20,11 +20,10 @@ import { MIN_PASSWORD_LENGTH } from '../shared/form-errors';
  * why there is no separate "link expired" state to guess at.
  */
 @Component({
-  selector: 'app-reset-password',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
-  templateUrl: './reset-password.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-reset-password',
+    imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
+    templateUrl: './reset-password.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResetPasswordComponent extends AuthFormBase implements OnInit {
   private readonly auth = inject(AuthService);

@@ -29,11 +29,10 @@ const FOCUSABLE_SELECTOR =
 let uniqueModalId = 0;
 
 @Component({
-  selector: 'app-modal',
-  standalone: true,
-  imports: [ButtonComponent, IconComponent],
-  templateUrl: './modal.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-modal',
+    imports: [ButtonComponent, IconComponent],
+    templateUrl: './modal.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModalComponent {
   readonly open = input(false);

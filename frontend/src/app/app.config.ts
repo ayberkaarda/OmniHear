@@ -1,5 +1,5 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -20,12 +20,13 @@ import { quotaInterceptor } from './core/http/quota.interceptor';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideExperimentalZonelessChangeDetection(),
+    provideZonelessChangeDetection(),
     provideRouter(
       routes,
       withComponentInputBinding()
     ),
     provideHttpClient(
+      withXhr(),
       withInterceptors([correlationIdInterceptor, authInterceptor, errorInterceptor, quotaInterceptor])
     )
   ]

@@ -19,11 +19,10 @@ const SPINNER_SIZE_CLASSES: Record<ButtonSize, string> = {
 };
 
 @Component({
-  selector: 'app-button',
-  standalone: true,
-  imports: [],
-  templateUrl: './button.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-button',
+    imports: [],
+    templateUrl: './button.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ButtonComponent {
   readonly variant = input<ButtonVariant>('primary');

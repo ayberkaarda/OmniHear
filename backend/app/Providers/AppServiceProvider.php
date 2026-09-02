@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Integration;
 use App\Models\User;
+use App\Observers\IntegrationObserver;
 use App\Support\EmailVerificationLink;
 use App\Support\Tenancy\TenantContext;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -26,6 +28,19 @@ class AppServiceProvider extends ServiceProvider
         $this->configurePasswordRules();
         $this->configureRateLimiting();
         $this->configureNotificationUrls();
+        $this->configureAuditing();
+    }
+
+    /**
+     * Integration lifecycle rows in `audit_logs` (spec 5).
+     *
+     * Registered as an observer rather than written into IntegrationController,
+     * so that every write path to the table leaves the same trail — including
+     * the ones later phases add.
+     */
+    private function configureAuditing(): void
+    {
+        Integration::observe(IntegrationObserver::class);
     }
 
     /**

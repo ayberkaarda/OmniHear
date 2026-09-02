@@ -14,11 +14,10 @@ import { IconComponent } from '../../shared/ui/icon/icon.component';
  * screen-reader semantics come for free and cost no bundle.
  */
 @Component({
-  selector: 'app-landing',
-  standalone: true,
-  imports: [RouterLink, ButtonStyleDirective, IconComponent],
-  templateUrl: './landing.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-landing',
+    imports: [RouterLink, ButtonStyleDirective, IconComponent],
+    templateUrl: './landing.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingComponent {
   /** Free-plan analysis allowance, spec 7.2. Mirrors backend `config/quota.php`. */

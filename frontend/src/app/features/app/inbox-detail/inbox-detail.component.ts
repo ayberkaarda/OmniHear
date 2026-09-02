@@ -9,11 +9,10 @@ import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.
  * wired even though the record itself is not fetched yet.
  */
 @Component({
-  selector: 'app-inbox-detail',
-  standalone: true,
-  imports: [RouterLink, EmptyStateComponent],
-  templateUrl: './inbox-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-inbox-detail',
+    imports: [RouterLink, EmptyStateComponent],
+    templateUrl: './inbox-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InboxDetailComponent {
   readonly id = input<string | undefined>(undefined);

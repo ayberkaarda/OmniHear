@@ -14,11 +14,10 @@ import { IconComponent } from '../../shared/ui/icon/icon.component';
  * Deliberately guard-free so it also renders for a signed-out visitor.
  */
 @Component({
-  selector: 'app-paywall-page',
-  standalone: true,
-  imports: [RouterLink, ButtonStyleDirective, IconComponent],
-  templateUrl: './paywall-page.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-paywall-page',
+    imports: [RouterLink, ButtonStyleDirective, IconComponent],
+    templateUrl: './paywall-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaywallPageComponent {
   private readonly quota = inject(QuotaStore);

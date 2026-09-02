@@ -22,6 +22,13 @@
  * they must agree. Raising it therefore requires editing both, which makes the
  * change impossible to slip past a diff. See CLAUDE.md Trap 2 for the procedure
  * a raise has to follow.
+ *
+ * Thresholds: ADR-0007 derived them from the measured framework floor;
+ * ADR-0008 re-based them across the Angular 18 -> 22 upgrade. The rule there is
+ * `previous threshold + ceil(delta of the full app)`, which keeps the application's
+ * headroom constant instead of re-deriving a fixed allowance — a floor measured
+ * on a single route cannot see the framework's per-instruction growth, so that
+ * growth would otherwise be billed to application code that never changed.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -31,8 +38,8 @@ import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-const RAW_MAX_BYTES = 320 * 1024; // 327680 — must equal angular.json's initial.maximumError
-const TRANSFER_MAX_KB = 100;
+const RAW_MAX_BYTES = 347 * 1024; // 355328 — must equal angular.json's initial.maximumError
+const TRANSFER_MAX_KB = 105;
 
 const KB = 1024;
 

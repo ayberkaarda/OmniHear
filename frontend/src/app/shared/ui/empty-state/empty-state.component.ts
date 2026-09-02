@@ -10,11 +10,10 @@ import { IconName } from '../icon/icon.types';
  * state that says so is preferable to mock rows that read as real data.
  */
 @Component({
-  selector: 'app-empty-state',
-  standalone: true,
-  imports: [IconComponent],
-  templateUrl: './empty-state.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-empty-state',
+    imports: [IconComponent],
+    templateUrl: './empty-state.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmptyStateComponent {
   readonly icon = input<IconName>('info');

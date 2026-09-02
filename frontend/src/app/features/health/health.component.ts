@@ -5,12 +5,11 @@ import { HealthService } from '../../core/health/health.service';
 type HealthState = 'loading' | 'success' | 'error';
 
 @Component({
-  selector: 'app-health',
-  standalone: true,
-  imports: [],
-  templateUrl: './health.component.html',
-  styleUrl: './health.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-health',
+    imports: [],
+    templateUrl: './health.component.html',
+    styleUrl: './health.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HealthComponent implements OnInit {
   private readonly healthService = inject(HealthService);

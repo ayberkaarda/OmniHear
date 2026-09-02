@@ -3,6 +3,8 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          colors="true"
+         failOnWarning="true"
+         failOnRisky="true"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -30,7 +32,20 @@
         <env name="BCRYPT_ROUNDS" value="4" force="true"/>
         <env name="CACHE_STORE" value="array" force="true"/>
         <env name="DB_CONNECTION" value="pgsql" force="true"/>
-        <env name="DB_DATABASE" value="omnihear_test" force="true"/>
+        <!--
+            DB_DATABASE is deliberately absent. tests/bootstrap.php is the single
+            authority: it honours a test_tmp_* name so parallel agents get their
+            own database (CLAUDE.md section 5) and forces everything else onto
+            omnihear_test, so the development database still cannot be reached.
+
+            Setting it here as well silently defeated that. PHPUnit's PhpHandler
+            applies <env force="true"> AFTER the bootstrap file has run, so the
+            bootstrap's choice was overwritten on every run and the test_tmp_
+            branch was dead code. Six agents across two waves believed they had
+            isolated databases and were all writing to omnihear_test at once.
+            Proven: a run with DB_DATABASE=test_tmp_doesnotexist passed, and
+            test_tmp_f2h finished the wave with zero tables.
+        -->
         <env name="MAIL_MAILER" value="array" force="true"/>
         <env name="PULSE_ENABLED" value="false" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>

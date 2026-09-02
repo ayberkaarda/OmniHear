@@ -12,11 +12,10 @@ import { IconName } from '../../shared/ui/icon/icon.types';
  * colour-blind reading (`omnihear-tokens` rule 4).
  */
 @Component({
-  selector: 'app-quota-meter',
-  standalone: true,
-  imports: [IconComponent],
-  templateUrl: './quota-meter.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-quota-meter',
+    imports: [IconComponent],
+    templateUrl: './quota-meter.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuotaMeterComponent {
   private readonly quota = inject(QuotaStore);

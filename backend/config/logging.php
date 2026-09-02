@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -16,9 +17,15 @@ return [
     | messages to your logs. The value provided here should match one of
     | the channels present in the list of "channels" configured below.
     |
+    | Spec 3.6 requires structured (JSON) logging with a correlation id carried
+    | across both services, so the default is `json` rather than Laravel's plain
+    | text `stack`. A line-oriented text log cannot be queried, and the
+    | correlation id CorrelationId middleware already puts on the log context
+    | only becomes useful once every line is a parseable object.
+    |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', 'json'),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,8 +61,46 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
+            'channels' => explode(',', env('LOG_STACK', 'json')),
             'ignore_exceptions' => false,
+        ],
+
+        /*
+        |----------------------------------------------------------------------
+        | json — the default channel (spec 3.6)
+        |----------------------------------------------------------------------
+        |
+        | One JSON object per line: message, level, timestamp, and the context
+        | array — which is where the correlation id, company id and user id
+        | live (CorrelationId and SetTenantContext put them there). That is what
+        | makes a request traceable across Laravel and the FastAPI service from
+        | a log query rather than by eye.
+        |
+        | The stream is configurable because the two runtimes want different
+        | answers: a container should write to stderr so the orchestrator
+        | collects it, a local checkout wants a file it can tail. The default is
+        | the file, so nothing pollutes test or console output by surprise;
+        | .env.example points the container at stderr.
+        |
+        | `includeStacktraces` stays off. A stack trace is not structured data,
+        | it is a wall of paths and arguments — and arguments are exactly where
+        | credentials and feedback PII would leak into the log (invariant I5).
+        |
+        */
+        'json' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'handler_with' => [
+                'stream' => env('LOG_JSON_STREAM', storage_path('logs/laravel.json')),
+            ],
+            'formatter' => JsonFormatter::class,
+            'formatter_with' => [
+                'batchMode' => JsonFormatter::BATCH_MODE_NEWLINES,
+                'appendNewline' => true,
+                'includeStacktraces' => false,
+            ],
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'single' => [

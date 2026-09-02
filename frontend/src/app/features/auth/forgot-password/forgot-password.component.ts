@@ -15,11 +15,10 @@ import { AuthLayoutComponent } from '../shared/auth-layout.component';
  * account-enumeration oracle (contract section 5).
  */
 @Component({
-  selector: 'app-forgot-password',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
-  templateUrl: './forgot-password.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-forgot-password',
+    imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
+    templateUrl: './forgot-password.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ForgotPasswordComponent extends AuthFormBase {
   private readonly auth = inject(AuthService);

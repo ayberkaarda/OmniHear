@@ -104,3 +104,131 @@ it('parses nothing out of a blank timestamp', function () {
         ->and(SyncCursor::parse(' '))->toBeNull()
         ->and(SyncCursor::parse('definitely not a date'))->toBeNull();
 });
+
+/*
+|--------------------------------------------------------------------------
+| pendingAdvancedTo — the in-run accumulator, never the watermark itself
+|--------------------------------------------------------------------------
+*/
+
+it('pendingAdvancedTo keeps the later of two candidates regardless of call order', function () {
+    $forward = (new SyncCursor(1))
+        ->pendingAdvancedTo('2026-08-30T00:00:00+00:00')
+        ->pendingAdvancedTo('2026-08-31T00:00:00+00:00');
+
+    $backward = (new SyncCursor(1))
+        ->pendingAdvancedTo('2026-08-31T00:00:00+00:00')
+        ->pendingAdvancedTo('2026-08-30T00:00:00+00:00');
+
+    expect($forward->pending)->toBe('2026-08-31T00:00:00+00:00')
+        ->and($backward->pending)->toBe('2026-08-31T00:00:00+00:00');
+});
+
+it('pendingAdvancedTo is monotonic across repeated calls in any order', function () {
+    $cursor = (new SyncCursor(1))
+        ->pendingAdvancedTo('2026-08-25T00:00:00+00:00')
+        ->pendingAdvancedTo('2026-08-31T00:00:00+00:00')
+        ->pendingAdvancedTo('2026-08-20T00:00:00+00:00')
+        ->pendingAdvancedTo('2026-08-28T00:00:00+00:00');
+
+    expect($cursor->pending)->toBe('2026-08-31T00:00:00+00:00');
+});
+
+it('pendingAdvancedTo ignores a null candidate', function () {
+    $cursor = (new SyncCursor(1, null, '2026-08-30T00:00:00+00:00'))->pendingAdvancedTo(null);
+
+    expect($cursor->pending)->toBe('2026-08-30T00:00:00+00:00');
+});
+
+it('pendingAdvancedTo ignores an unparseable candidate', function () {
+    $cursor = (new SyncCursor(1, null, '2026-08-30T00:00:00+00:00'))->pendingAdvancedTo('not-a-date');
+
+    expect($cursor->pending)->toBe('2026-08-30T00:00:00+00:00');
+});
+
+it('pendingAdvancedTo never moves the watermark itself', function () {
+    $cursor = (new SyncCursor(1, '2026-08-20T00:00:00+00:00'))
+        ->pendingAdvancedTo('2026-08-31T00:00:00+00:00');
+
+    expect($cursor->watermark)->toBe('2026-08-20T00:00:00+00:00')
+        ->and($cursor->pending)->toBe('2026-08-31T00:00:00+00:00');
+});
+
+/*
+|--------------------------------------------------------------------------
+| promoted() — end-of-run fold of pending into watermark
+|--------------------------------------------------------------------------
+*/
+
+it('promoted folds pending into watermark, clears pending, and rewinds to page one', function () {
+    $cursor = (new SyncCursor(4, null, '2026-08-31T00:00:00+00:00'))->promoted();
+
+    expect($cursor->page)->toBe(1)
+        ->and($cursor->watermark)->toBe('2026-08-31T00:00:00+00:00')
+        ->and($cursor->pending)->toBeNull();
+});
+
+it('promoted with no pending leaves the watermark untouched but still rewinds the page', function () {
+    $cursor = (new SyncCursor(3, '2026-08-31T00:00:00+00:00'))->promoted();
+
+    expect($cursor->page)->toBe(1)
+        ->and($cursor->watermark)->toBe('2026-08-31T00:00:00+00:00')
+        ->and($cursor->pending)->toBeNull();
+});
+
+it('promoted never moves the watermark backwards when it is already later than pending', function () {
+    $cursor = (new SyncCursor(3, '2026-08-31T00:00:00+00:00', '2026-08-20T00:00:00+00:00'))->promoted();
+
+    expect($cursor->watermark)->toBe('2026-08-31T00:00:00+00:00')
+        ->and($cursor->pending)->toBeNull();
+});
+
+it('promoted is idempotent', function () {
+    $once = (new SyncCursor(4, null, '2026-08-31T00:00:00+00:00'))->promoted();
+    $twice = $once->promoted();
+
+    expect($twice->page)->toBe($once->page)
+        ->and($twice->watermark)->toBe($once->watermark)
+        ->and($twice->pending)->toBeNull();
+});
+
+/*
+|--------------------------------------------------------------------------
+| encode/decode — round-tripping all three fields, including `pending`
+|--------------------------------------------------------------------------
+*/
+
+it('round-trips all three fields through encode and decode', function () {
+    $cursor = new SyncCursor(4, '2026-08-30T00:00:00+00:00', '2026-08-31T00:00:00+00:00');
+
+    $decoded = SyncCursor::decode($cursor->encode());
+
+    expect($decoded->page)->toBe(4)
+        ->and($decoded->watermark)->toBe('2026-08-30T00:00:00+00:00')
+        ->and($decoded->pending)->toBe('2026-08-31T00:00:00+00:00');
+});
+
+it('round-trips a null pending without fabricating one', function () {
+    $cursor = new SyncCursor(2, '2026-08-30T00:00:00+00:00', null);
+
+    $decoded = SyncCursor::decode($cursor->encode());
+
+    expect($decoded->pending)->toBeNull();
+});
+
+it('omits a null pending from the encoded form', function () {
+    expect((new SyncCursor(2, '2026-08-30T00:00:00+00:00'))->encode())
+        ->toBe('{"page":2,"watermark":"2026-08-30T00:00:00+00:00"}');
+});
+
+it('decodes a malformed pending field to a safe default rather than throwing', function () {
+    // The rest of an otherwise well-formed cursor must not be discarded just
+    // because one field is wrong-typed — decode() degrades per-field, not
+    // per-document, so an intra-run accumulator glitch cannot wedge the whole
+    // integration back to page one with its watermark erased too.
+    $decoded = SyncCursor::decode('{"page":2,"watermark":"2026-08-30T00:00:00+00:00","pending":42}');
+
+    expect($decoded->page)->toBe(2)
+        ->and($decoded->watermark)->toBe('2026-08-30T00:00:00+00:00')
+        ->and($decoded->pending)->toBeNull();
+});

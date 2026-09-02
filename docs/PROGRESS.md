@@ -7,58 +7,53 @@ Updated: 2026-09-02 · Current: **wave 2 integrated and green; awaiting approval
 
 ## Phases
 
-| # | Scope | Status | Gate evidence (numbers only) |
-|---|---|---|---|
-| F1 | monorepo skeleton + design-system layer | **closed, committed** (`24ac570`, `f45cece`) | guards 110/110 · tokens 63/2/0 · i18n PASSED · typecheck 0 · eslint 0 · jest 49/49 · build 240.53 kB exit 0 · compose 0 · audit clean · pint 30 files · pest 4/11 · ruff 0 · pytest 13/13 |
-| F2 | tenant core (full schema, global scope, policies, Sanctum auth) | **green, re-verified by main thread** | guards 116/116 · pint 107 files · composer validate/audit/platform-reqs 0 · pest **206 passed, 676 assertions**, 49.0 s · coverage **99.2%** |
-| F2-FE | app shell, auth flow, landing, interceptors, paywall modal | **green** (budget re-derived, ADR-0007) | tokens 63/2/0 · i18n PASSED 220/220, 0 empty · typecheck 0 · eslint 0 · jest **135/135** · build:gate PASS — raw **301.36 kB**/320, transfer **87.63 kB**/100 |
-| F3 | ai-service real analyzer (local pipeline) + contract artifacts | **green, re-verified by main thread** | ruff 0 · format 43 files · pytest **270 passed** 5.4 s · category held-out **83.8%** (TR 85.0 / EN 82.5) · sentiment ONNX **91.7%** · p95 **15.1 ms** · drift gates OK · live signed call 401/401/200 |
-| F4 | ingestion (FixtureConnector + AppStoreConnector) | **green** (agent cut off by rate limit; main thread finished) | see the combined backend gate below |
-| F5 | analysis pipeline + atomic quota + 402 | **green** (agent cut off by rate limit; main thread finished) | I4 race: 5 forked processes, limit 3 -> exactly 3 · contract test consumes `contracts/fixtures/analyze/` |
-| F6 | payments — Stripe | **green** (agent cut off by rate limit; main thread finished) | replay -> side effect exactly once |
-| F7 | payments — Iyzico | **green** (agent cut off by rate limit; main thread finished) | derived `event_id`; retries stop at 3 |
-| F8 | ingestion — Zendesk | not started | — |
+Closed phases collapse to one row (the 120-line cap). Full numbers live in the
+commit messages; `git log` is the archive.
 
-Note: the design-system token layer and the six UI components belong to F7 in the
-original plan. They landed in F1 at the user's request, after a design authored in
-Claude Design was imported. The phase order is otherwise unchanged.
+| # | Scope | Status |
+|---|---|---|
+| F1 | monorepo skeleton + design-system layer | closed — `24ac570`, `f45cece` |
+| F2 · F2-FE · F3 | tenant core + Sanctum auth · app shell, auth, landing, interceptors · ai-service ONNX pipeline + contract artifacts | closed — `24e38a2` |
+| F4 · F5 · F6 · F7 | ingestion · analysis, atomic quota, 402 · Stripe · Iyzico | closed — `24e38a2`, `e122c06` |
+| CI | first green run in the repo's history, then hardened so a green run means what it says | closed — `633e347`, `680aa39` + the `failOnWarning` / ONNX-in-CI change |
+| **W3-A** | D-08 Angular 18 -> 22, floor re-measured, thresholds re-based (ADR-0008) | **green** — jest 135/135 unchanged, `npm ls chokidar` 0, zoneless stable, build:gate raw 328.20/347, transfer 92.09/105 |
+| **W3-B** | F2.5 — `verified` enforced, device token revocation, erasure, audit writers, JSON logging, free-domain list | **green** — pest 694 passed, 2303 assertions, coverage 97.9% |
+| **W3-C** | cursor-model test hardening (test-only agent, no production code) | **green** — 39 passed, 81 assertions, no production defect found |
+| W4 | frontend data layer 1 (overview, inbox, inbox/:id, integrations) ∥ D-06 fixture synthesis + F8 Zendesk | planned |
+| W5 | frontend data layer 2 (realtime, settings, billing flow, SubscriptionGuard) ∥ settings endpoints + in-app notifications + Laravel OpenAPI + demo seeder | planned |
+| W6 | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, architecture diagram, docker build in CI | planned |
+| W7 | security review (OWASP), history rewrite, public flip | planned |
+
+Parallelism budget, measured rather than assumed: wave 1 finished with three opus
+tracks, wave 2 lost all three to a session rate limit. The difference was track
+size. From W3 on: **at most two writing opus tracks plus one narrow sonnet track**,
+each track under roughly 25 files, and every agent files a halfway report so a
+killed session still leaves a diagnosable tree.
 
 ## Now
 
-**Backend gate, whole tree, re-run by the main thread:** guards **116/116** · pint
-PASS 215 files · composer validate/audit/platform-reqs clean · pest **603 passed,
-2038 assertions** · coverage **97.9%** · compose config 0.
-**ai-service:** ruff 0 · format 43 files · pytest **270 passed**.
-**frontend:** tokens 63/2/0 · i18n PASSED · typecheck 0 · eslint 0 · jest 135/135 ·
-build:gate PASS (raw 301.36/320 kB, transfer 87.63/100 kB).
-Working tree: **151 changed/new paths**, uncommitted.
+**Last full gate, re-run by the main thread on a clean tree at `680aa39`:**
+guards 116/116 · pint 215 files · composer validate/audit/platform-reqs clean ·
+pest **603 passed, 2038 assertions**, coverage **97.9%** · ruff 0 · pytest **270
+passed** · tokens 63/2/0 · i18n PASSED 220/220 · typecheck 0 · eslint 0 · jest
+**135/135** · build:gate raw 301.36/320 kB, transfer 87.63/100 kB · compose 0.
+CI run `33644426386`: all five jobs green.
 
-All three wave-2 agents were killed mid-task by a session rate limit. Their work
-was left partially integrated (16 failing tests); the main thread diagnosed and
-finished it. Six of those failures were real defects, not loose ends — they are
-recorded under "Verified facts" because each one is a trap that will recur.
+**A green CI run is not automatically evidence.** That run reported *534 warnings,
+69 passed* for the backend (against 603 locally) because `.env` was missing and
+`phpunit.xml` had no `failOnWarning`, and *259 passed, 11 skipped* for the AI
+service because the ONNX weights are not in the repo — so the sentiment engine the
+product actually ships had zero coverage on the only machine that checks a clean
+tree. Both are closed: the backend job copies `.env.example`, `phpunit.xml` now
+sets `failOnWarning` and `failOnRisky`, the AI job caches and fetches the weights,
+and `pytest -rs` makes any remaining skip visible. **A phase report cites its CI
+run id, and a skip or a warning is reported, never absorbed.**
 
-Wave 1 ran three tracks in parallel. Ownership is disjoint by top-level directory,
-so they share one working tree rather than three git worktrees — three worktrees
-would each need their own `vendor/`, `node_modules/` and venv for no isolation the
-directory split does not already give.
-
-| track | owns | agent |
-|---|---|---|
-| F2 backend | `backend/` | opus |
-| F3 ai-service | `ai-service/`, `contracts/` | opus |
-| F2-FE frontend | `frontend/` | opus |
-
-`docs/`, `.claude/`, `.github/`, `infra/`, `CLAUDE.md` stay with the main thread.
-
-**Wave 2 (after F2 lands)** fans out wider: F4 ingestion, F5 quota pipeline, F6
-Stripe and F7 Iyzico are independent of each other but all need F2's schema and
-tenancy seam, so they cannot start earlier without writing code against classes
-that do not exist yet.
-
-Contracts written before dispatch, so no track has to guess at another's shape:
-`docs/contracts/http-api-v1.md` (Laravel <-> Angular) and
-`docs/contracts/backend-core.md` (schema + tenancy seam).
+Contracts are written before dispatch so no track guesses at another's shape:
+`docs/contracts/{http-api-v1,backend-core,wave2-seams}.md`. Ownership is disjoint
+by top-level directory — the one split that has held across three waves. Where two
+tracks must share a directory, the seams document assigns files and the crossing
+points are events, so neither side references a class the other has not written.
 
 ## Open decisions
 
@@ -77,10 +72,10 @@ Contracts written before dispatch, so no track has to guess at another's shape:
 | what | why | reconcile in |
 |---|---|---|
 | Laravel 13, not 11 | 11 security-EOL 2026-03-12; two unpatched advisories on §7.1 code paths | resolved — ADR-0003, user approved |
-| `provideExperimentalZonelessChangeDetection` is experimental in Angular 18 | stabilised unchanged in 19/20; one-line migration | whenever Angular is upgraded |
+| `provideExperimentalZonelessChangeDetection` was experimental | — | **resolved** — Angular 22 (ADR-0008); the symbol no longer exists, the stable one is in use |
 | `config/session.php`, `config/cache.php` lack Laravel 13 hardening defaults | `composer update` does not regenerate skeleton config | **F2, before auth work** |
 | Fonts load from Google Fonts CDN | self-hosting deferred | F9 (KVKK) |
-| initial bundle raw budget 250 -> 320kb | measured framework floor is 245.00 kB = 95.7% of the old threshold; spec §4 says "hedefi" and the page tree it mandates cannot be built under it | resolved — ADR-0007; transfer 87.63 kB is well under the spec figure |
+| initial bundle raw 250 -> 320 -> **347kb**, transfer -> **105 kB** | measured framework floor is 245.00 kB = 95.7% of the old threshold; spec §4 says "hedefi" and the page tree it mandates cannot be built under it | resolved — ADR-0007, re-based by ADR-0008 after the Angular 22 floor rose; transfer 92.09 kB still well under the spec figure |
 
 ## Verified facts (append-only, dated — do not rediscover)
 
@@ -105,7 +100,9 @@ Contracts written before dispatch, so no track has to guess at another's shape:
 - **2026-09-02** `pcntl_fork` + `DB::purge()` in the child **kills the parent's connection**: purge destructs the inherited PDO, whose destructor writes a termination packet down the socket the parent is still using, and the parent dies with "server closed the connection unexpectedly" while rolling back `RefreshDatabase`'s transaction. The child must never touch the inherited handles — point it at a connection name that has never been opened in the process tree, and end on SIGKILL so nothing destructs.
 - **2026-09-02** `CarbonImmutable::toDateTimeString()` **drops the offset**. App Store's `2026-08-27T23:40:59-07:00` therefore reached the `timestamptz` column as `23:40:59` UTC — the right wall clock in the wrong zone, **seven hours off the actual instant**, and it would have skewed every trend chart built on `published_at`. Use `toIso8601String()`.
 - **2026-09-02** **A cursor watermark must not advance between pages of the same run.** These feeds are newest-first, so a watermark written after page 1 makes every item on page 2 compare as already-seen and the run silently ingests only its first page (5 items became 3). `SyncCursor` now carries `pending` alongside `watermark`: `pending` accumulates during the run, `promoted()` folds it in when the run ends.
-- **2026-09-02** **PHPUnit `<env force="true">` cannot override an env var injected by compose `env_file:`.** Laravel's `Env` reader consults the `$_SERVER`/`$_ENV` adapters before the `putenv()` layer that PHPUnit writes. `DB_DATABASE=omnihear` from `backend/.env` therefore won, `RefreshDatabase` ran `migrate:fresh` **against the development database**, and the rate limiter wrote into the Redis instance that holds the Horizon queue. Damage was nil (schema only, no rows) and the schema is back. **`guard-test-db-target` did not catch this** — it inspects the command, and the command looked correct. Durable fix: `backend/tests/bootstrap.php` overwrites `putenv` + `$_ENV` + `$_SERVER` before the autoloader, and allows `test_tmp_*` through for parallel agents.
+- **2026-09-02** **`pusher-js@8.6.0` is 15.62 kB brotli and `laravel-echo@2.4.0` is 2.54 kB** (measured from jsDelivr, brotli-11; consistent with Bundlephobia's gzip figures). Together they exceed the entire post-ADR-0008 transfer headroom of 12.91 kB, so realtime cannot enter the initial bundle — W5 loads it through `import()` as its own lazy chunk, and `angular.json` gains an `anyScript` budget when it lands.
+- **2026-09-02** ADR-0007's ratchet clause was **unsatisfiable from the day it was written**. It required floor >= 90% of the threshold, but a threshold derived as `floor + allowance` gives `floor / threshold = 1 - allowance / threshold`, which is 75% at 80/320; the ratio at the time was 245.00/320 = **76.6%**. The rule rejected its own thresholds. Replaced (ADR-0008) with an attribution-based classification: a raise needs the per-source table to show the `src/` line did not grow.
+- **2026-09-02** **Test database isolation never worked, and the test meant to prove it passed anyway.** Two layers. First, compose injects `backend/.env` via `env_file:`, so `DB_DATABASE=omnihear` existed as a real environment variable and PHPUnit's `<env force="true">` could not beat it (Laravel's `Env` reader consults `$_SERVER`/`$_ENV` before the `putenv()` layer PHPUnit writes). `RefreshDatabase` ran `migrate:fresh` against the **development** database once (schema only, no rows). `tests/bootstrap.php` closed that by writing all three layers before the autoloader. Second — the part that hid for two waves — `phpunit.xml` *also* declared `DB_DATABASE`, and PHPUnit applies `<env force="true">` **after** the bootstrap runs, so the bootstrap's choice was overwritten every time and its `test_tmp_` branch was dead code. **Six agents across two waves each believed they had a private database and were all writing to `omnihear_test` at once.** Proven: `test_tmp_f2h` finished a full wave with **zero tables** while `omnihear_test` had 17. Fixed by deleting the line from `phpunit.xml`, leaving `tests/bootstrap.php` the single authority; verified with `-e DB_DATABASE=test_tmp_f4`, which took that database from 0 to 17 tables. `DatabaseIsolationTest` now asserts the connected database **equals the one requested** — asserting only the *shape* of the name is what let it pass through all of this. `guard-test-db-target` was taught that the bootstrap is the authority, since it had been checking `phpunit.xml` for the very line that had to go.
 - **2026-09-02** Middleware **appended** to the `api` group runs *after* `Authenticate`: Laravel sorts route middleware by `$middlewarePriority`, which puts `Authenticate` ahead of `SubstituteBindings` and therefore ahead of anything appended. A 401 with `Accept-Language: tr` silently came back in English. Use `prependToGroup`. Locked by `tests/Feature/Api/LocaleTest.php`.
 - **2026-09-02** The backend image shipped **no coverage driver** (`php -m`: neither xdebug nor pcov), so the mandated gate command `php artisan test --coverage --min=80` could not run. Installing at run time is impossible too — `apk del .build-deps` removes phpize, so `pecl install pcov` dies with "`phpize' failed". pcov is now baked into `infra/docker/backend.Dockerfile`.
 - **2026-09-02** **Lazy loading does not protect the Angular initial bundle from framework growth.** esbuild splits at *module* granularity: `@angular/core` and `@angular/router` are single fesm modules that live in the initial chunk, and every extra runtime instruction a lazy component uses (host bindings, `RouterLink`, `RouterLinkActive`, the `@defer` loader) survives tree-shaking and is added *there*. Measured in this tree: F1 skeleton alone **245.00 kB**; + one lazy landing page **261.37 kB**; full F2-FE **301.36 kB** raw / **87.63 kB** transfer, against a 250 kB (256.00 kB) budget. Core chunk grew 142.31 -> 151.17 kB and router 76.95 -> 82.90 kB. So the budget is not a code-volume problem and cannot be fixed by moving code into lazy chunks.

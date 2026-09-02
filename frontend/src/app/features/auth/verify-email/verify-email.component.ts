@@ -24,11 +24,10 @@ type VerifyState = 'awaiting' | 'verifying' | 'verified' | 'failed';
  * guard would bounce them straight back into a redirect loop.
  */
 @Component({
-  selector: 'app-verify-email',
-  standalone: true,
-  imports: [RouterLink, AuthLayoutComponent, ButtonComponent, ButtonStyleDirective],
-  templateUrl: './verify-email.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-verify-email',
+    imports: [RouterLink, AuthLayoutComponent, ButtonComponent, ButtonStyleDirective],
+    templateUrl: './verify-email.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VerifyEmailComponent implements OnInit {
   private readonly auth = inject(AuthService);

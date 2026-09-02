@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.
  * otherwise.
  */
 @Component({
-  selector: 'app-overview',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './overview.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-overview',
+    imports: [EmptyStateComponent],
+    templateUrl: './overview.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OverviewComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.overview.empty:No analysed feedback yet`;

@@ -6,5 +6,6 @@ return [
     'password_reset' => 'Şifreniz güncellendi.',
     'verification_link_sent' => 'Doğrulama bağlantısı e-posta adresinize gönderildi.',
     'verification_link_invalid' => 'Bu doğrulama bağlantısı geçersiz veya süresi dolmuş.',
+    'account_erased' => 'Hesabınız ve ilişkili tüm verileriniz silindi.',
 
 ];

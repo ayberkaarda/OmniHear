@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
  * otherwise.
  */
 @Component({
-  selector: 'app-notifications',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './notifications.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-notifications',
+    imports: [EmptyStateComponent],
+    templateUrl: './notifications.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotificationsComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.settings.notifications.empty:No notification rule yet`;

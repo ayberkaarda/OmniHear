@@ -7,11 +7,10 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
  * order stays correct however the user arrives.
  */
 @Component({
-  selector: 'app-settings-layout',
-  standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './settings-layout.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-settings-layout',
+    imports: [RouterOutlet, RouterLink, RouterLinkActive],
+    templateUrl: './settings-layout.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SettingsLayoutComponent {
   protected readonly navLabel = $localize`:Settings navigation landmark label@@app.settings.navLabel:Settings sections`;

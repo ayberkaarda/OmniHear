@@ -8,11 +8,10 @@ import { RouterLink } from '@angular/router';
  * be identical everywhere.
  */
 @Component({
-  selector: 'app-auth-layout',
-  standalone: true,
-  imports: [RouterLink],
-  templateUrl: './auth-layout.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-auth-layout',
+    imports: [RouterLink],
+    templateUrl: './auth-layout.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AuthLayoutComponent {
   readonly heading = input.required<string>();

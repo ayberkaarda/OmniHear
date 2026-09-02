@@ -54,6 +54,11 @@ jobs:
           coverage: xdebug
       - run: composer validate --strict
       - run: composer install --prefer-dist --no-progress
+      # Same reason as the compose job: .env is gitignored. Without it 534 of the
+      # 603 tests ran in a WARN state on file_get_contents(.env) and the job still
+      # went green, because phpunit.xml had no failOnWarning. A green run has to
+      # mean the same thing here as it does locally.
+      - run: cp .env.example .env
       - run: composer check-platform-reqs
       # The branch this project sits on must stay advisory-clean. There is no
       # suppression block in composer.json (see ADR-0003) — if this fails, a real
@@ -80,10 +85,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pip install -e ".[dev]"
+      - run: pip install -e ".[onnx,dev]"
+      # Weights are a build artifact (ADR-0004), fetched here and SHA-256 pinned by
+      # the script. Without them the ONNX path never runs in CI and 11 tests skip
+      # silently — the sentiment engine the product actually ships would have no
+      # coverage on the only machine that checks a clean tree.
+      - name: Cache sentiment weights
+        uses: actions/cache@v4
+        with:
+          path: ai-service/models
+          key: sentiment-onnx-${{ hashFiles('ai-service/scripts/fetch_sentiment_model.py') }}
+      - run: python -m scripts.fetch_sentiment_model --dest models/sentiment
       - run: ruff check .
       - run: ruff format --check .
-      - run: pytest -q
+      # -rs prints the reason for every skip, so a skip can never be invisible in
+      # the log the way those eleven were.
+      - run: pytest -rs
 
   frontend:
     name: Frontend (Angular 18, zoneless)
@@ -96,6 +113,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json }
       - run: npm ci
+      # A dependency whose requirement the installed tree does not satisfy.
+      # `npm ci` alone does not catch it: the Angular 18 tree carried an
+      # unsatisfiable chokidar ^5 from angular-eslint for weeks, and the local
+      # gate never ran a command that would have said so.
+      - run: npm ls chokidar
       # Token gate. tokens-check runs its calibration assertions first and aborts
       # everything if the colour-blindness simulator cannot reproduce known cases
       # — an uncalibrated simulator once produced wrong numbers here (ADR-0006).

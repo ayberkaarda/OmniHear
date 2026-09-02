@@ -10,11 +10,10 @@ import { AuthFormBase } from '../shared/auth-form-base';
 import { AuthLayoutComponent } from '../shared/auth-layout.component';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
-  templateUrl: './login.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-login',
+    imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, InputComponent, ButtonComponent],
+    templateUrl: './login.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent extends AuthFormBase {
   private readonly auth = inject(AuthService);

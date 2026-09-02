@@ -115,20 +115,21 @@ Bir bileşen henüz kurulmadıysa o satır atlanır ve **rapora "henüz yok" diy
 >
 > **Kapı komutu her zaman `npm run typecheck`** (`tsconfig.typecheck.json`, tüm `src/**/*.ts`, spec'ler hariç). `ng build` kendi config'ini kullanmaya devam eder, bundle çıktısı etkilenmez.
 >
-> **Tuzak 2:** Initial bundle **iki eşikle** denetlenir: raw (`angular.json` `budgets[type=initial].maximumError`, Angular ölçümü) ve **brotli transfer** (`frontend/scripts/bundle-check.mjs` içindeki `TRANSFER_MAX_KB`). Kapı komutu **yalnızca** `npm run build:gate`; çıktıdaki "Initial total" raw **ve** transfer değerleri rapora girer. Angular'ın budget hesaplayıcısı sıkıştırma bilmez (transfer-size budget talebi `angular/angular-cli#22293` "not planned" ile kapatıldı), o yüzden transfer eşiği script'in işidir. Script argüman kabul etmez ve build'i kendisi koşar — configuration değiştirilemez.
+> **Tuzak 2:** Initial bundle **iki eşikle** denetlenir: raw (`angular.json` `budgets[type=initial].maximumError`) ve **brotli transfer** (`frontend/scripts/bundle-check.mjs` `TRANSFER_MAX_KB`). Kapı komutu **yalnızca** `npm run build:gate`; çıktıdaki "Initial total" raw **ve** transfer değerleri rapora girer. Angular'ın budget hesaplayıcısı sıkıştırma bilmez (`angular/angular-cli#22293` "not planned"), o yüzden transfer eşiği script'in işidir. Script argüman kabul etmez ve build'i kendisi koşar. Raw eşik iki yerde birden durur ve script eşitliği doğrular; tek taraflı değişiklik **fail** verir *(negatif testi yapıldı: `angular.json`'ı tek başına oynatmak exit 1)*.
 >
-> Şunlar **hiçbir gerekçeyle** yapılmaz: `budgets` bloğunu taşımak/silmek, `production` dışı configuration, `--localize=false`, error'ı warning'e çevirmek, script'i atlayıp `ng build`'i doğrudan koşmak, chunk hariç tutmak. Raw eşik iki yerde birden durur (`angular.json` + script sabiti) ve script eşitliği doğrular; tek taraflı değişiklik **fail** verir. *(Negatif testi yapıldı: `angular.json`'ı tek başına 400kb'a çıkarmak exit 1 verdi.)*
+> Şunlar **hiçbir gerekçeyle** yapılmaz: `budgets` bloğunu taşımak/silmek, `production` dışı configuration, `--localize=false`, error'ı warning'e çevirmek, script'i atlayıp `ng build`'i doğrudan koşmak, chunk hariç tutmak.
 >
-> Eşik **aşağı** serbestçe iner. **Yukarı** çıkması için üçü birden gerekir:
-> 1. **Framework tabanı testi** — aynı ağaçta `app.routes.ts` tek bir `/health` route'una, `app.config.ts` ve `app.component.ts` F1 hâline indirilerek build alınır. Taban mevcut eşiğin **%90'ının altındaysa** aşım uygulama kodudur: eşik **değişmez**, kod düzeltilir.
-> 2. **ADR** — taban, tam uygulama, `@angular/*` chunk'ları ile uygulama chunk'larının **ayrı ayrı** raw delta tablosu, ve yeni eşiğin türetimi (taban + gerekçelendirilmiş uygulama payı).
-> 3. **Kullanıcı onayı** + PROGRESS "Known deviations" satırı. Rapor, değişiklik öncesi **kırmızı** ve sonrası **yeşil** build çıktısını birlikte gösterir.
+> Eşik **aşağı** serbestçe iner. **Yukarı** çıkması yalnızca kırmızı bir `build:gate` çıktısından sonra ve **atıf tablosuyla** yapılan bir sınıflandırmayla mümkündür. Tablo initial chunk'ların baytlarını kaynağa göre böler — `@angular/*`, diğer her `node_modules` paketi ayrı, `src/`, styles, polyfills — ve son yeşil commit ile şimdiki hâl için **iki kez** üretilir. Δ = şimdi − son yeşil. Sınıflar birbirini dışlar:
 >
-> Framework major yükseltmesinden sonra taban **yeniden ölçülür** ve düşüş eşiğe yansıtılır (ratchet).
+> **A — Framework büyümesi.** `@angular/*` sürümü değişti **ve** `src/` satırının Δ'sı ≤ max(1 kB, toplam Δ'nın %5'i). → Her iki eşik `eski eşik + ceil(Δ tam uygulama)` olur. Pay hesabı yok: uygulama değişmediyse uygulamanın **boşluğu** değişmez. Toplam düştüyse eşik aynı Δ kadar **iner**.
 >
-> Bu kural bugünkü durumu ADR-0005 dönemindekinden ayırt eder: bugün taban/eşik = 245.00/256.00 = **%95.7**, yani aşım framework'ün kendisi — yeniden türetme meşru. ADR-0005 zamanındaki 261.52 kB aşımında ise fazlalık polyfills chunk'ındaki 36.36 kB'lık zone.js'ti, yani **araç kodu**, ve doğru cevap eşiği değil kodu değiştirmekti. Kural her iki vakayı da doğru sınıflandırır.
+> **B — Uygulama büyümesi.** `src/` satırı o sınırı aşıyor. → Eşik **değişmez**, kod düzeltilir. Yeni bir lazy route'un initial'daki `@angular/*` satırını büyütmesi (`RouterLinkActive`, `@defer`, form direktifleri) de **B'dir** — framework değil, uygulamanın seçimi.
 >
-> Uygulama **zoneless** çalışır (`provideExperimentalZonelessChangeDetection()`, polyfills listesinde `zone.js` **yok**). zone.js'i geri eklemek bilinçli bir mimari karardır ve tek başına ~36 kB getirir — onaysız yapılmaz. Yeni bir üçüncü parti kütüphane eklenirken zoneless uyumluluğu **seçim kriteridir**: `NgZone`'a örtük bağımlı bir kütüphane sessizce bayat UI üretir (state değişir, görünüm güncellenmez), çünkü signal okumadığı sürece scheduler tetiklenmez.
+> **C — Araç/kütüphane.** `@angular/*` dışı bir paket belirdi/büyüdü, ya da polyfills büyüdü (zone.js, pusher-js, grafik kütüphanesi). → Eşik **değişmez**; kütüphane lazy chunk'a taşınır ya da çıkarılır (ADR-0005 vakası).
+>
+> A için üçü birden gerekir: **ADR** (iki atıf tablosu + türetim), **kullanıcı onayı**, PROGRESS "Known deviations" satırı; rapor önce kırmızı sonra yeşil `build:gate` çıktısını gösterir.
+>
+> **Neden eski %90 kuralı kaldırıldı:** eşik `taban + pay` diye türetildiği sürece `taban/eşik = 1 − pay/eşik`; 80/320 ile **%75**, yani kural %90'a hiçbir yolla ulaşamıyordu — ADR-0007 yazıldığı gün zaten %76.6 ile kendi eşiğini reddediyordu. Kastı doğruydu, ölçüsü yanlıştı: taban, framework'ün *talimat başına* şişmesini görmez, o şişme paya yazılır. Ayrıntı: ADR-0008.
 >
 > **Tuzak 3:** `npm run i18n:check` yeşil olsa bile `messages.tr.xlf` içinde boş `<target>` varsa çeviri eksiktir. Script bunu kontrol etmiyorsa script de güncellenir.
 >

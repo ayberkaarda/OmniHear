@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
  * otherwise.
  */
 @Component({
-  selector: 'app-billing',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './billing.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-billing',
+    imports: [EmptyStateComponent],
+    templateUrl: './billing.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BillingComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.settings.billing.empty:No billing history yet`;

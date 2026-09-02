@@ -26,7 +26,9 @@ class CorrelationId
         }
 
         $request->headers->set(self::HEADER, $correlationId);
-        Log::withContext(['correlation_id' => $correlationId]);
+        // shareContext, not withContext: the latter forwards to the *default*
+        // channel only, so a line written to any other channel would lose the id.
+        Log::shareContext(['correlation_id' => $correlationId]);
 
         $response = $next($request);
         $response->headers->set(self::HEADER, $correlationId);

@@ -8,11 +8,10 @@ import { ThemePreference, ThemeService } from '../../core/theme/theme.service';
  * the highlight colour alone.
  */
 @Component({
-  selector: 'app-theme-toggle',
-  standalone: true,
-  imports: [],
-  templateUrl: './theme-toggle.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-theme-toggle',
+    imports: [],
+    templateUrl: './theme-toggle.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThemeToggleComponent {
   private readonly theme = inject(ThemeService);

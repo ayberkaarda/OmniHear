@@ -8,6 +8,16 @@ it('runs against the isolated test database', function () {
     // scratch databases parallel agents get (CLAUDE.md section 5). Asserting the
     // shared name only would turn every parallel run red for the wrong reason.
     $database = DB::connection()->getDatabaseName();
+    $requested = getenv('DB_DATABASE');
+
+    // Asserting only the shape of the name proved nothing: this test passed while
+    // every agent's DB_DATABASE was being silently overridden back to the shared
+    // database by a <env force="true"> line in phpunit.xml that PHPUnit applies
+    // *after* tests/bootstrap.php has run. Six agents across two waves believed
+    // they had their own database. Compare against what was actually asked for.
+    if (is_string($requested) && $requested !== '') {
+        expect($database)->toBe($requested);
+    }
 
     expect($database === 'omnihear_test' || str_starts_with($database, 'test_tmp_'))->toBeTrue();
     expect(Schema::hasTable('users'))->toBeTrue();

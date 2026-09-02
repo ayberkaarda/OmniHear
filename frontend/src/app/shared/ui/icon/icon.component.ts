@@ -15,11 +15,10 @@ const SIZE_CLASSES: Record<IconSize, string> = {
  * consuming element (a visible label, or an explicit `aria-label`).
  */
 @Component({
-  selector: 'app-icon',
-  standalone: true,
-  imports: [],
-  templateUrl: './icon.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-icon',
+    imports: [],
+    templateUrl: './icon.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IconComponent {
   readonly name = input.required<IconName>();

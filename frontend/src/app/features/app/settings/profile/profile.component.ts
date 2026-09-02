@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
  * otherwise.
  */
 @Component({
-  selector: 'app-profile',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './profile.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-profile',
+    imports: [EmptyStateComponent],
+    templateUrl: './profile.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.settings.profile.empty:Nothing to edit here yet`;

@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
  * otherwise.
  */
 @Component({
-  selector: 'app-api-keys',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './api-keys.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-api-keys',
+    imports: [EmptyStateComponent],
+    templateUrl: './api-keys.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ApiKeysComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.settings.apiKeys.empty:No API key has been created`;

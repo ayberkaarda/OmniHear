@@ -1,6 +1,6 @@
 # ADR-0007 — Initial bundle budget re-derived from the measured framework floor
 
-- **Status:** Accepted
+- **Status:** Accepted — amended by ADR-0008 (the ratchet clause was unsatisfiable as written)
 - **Date:** 2026-09-02
 - **Phase:** F2-FE
 - **Related spec:** §4 "initial bundle < 250 KB hedefi" · §4 page tree · §0 (spec wins on conflict)

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscription;
+use App\Support\Audit\AuditAction;
+use App\Support\Audit\AuditLogger;
 use App\Support\Payments\PaidPlans;
 use App\Support\Payments\PaymentGatewayManager;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +20,10 @@ use Illuminate\Validation\Rule;
  */
 final class BillingController extends Controller
 {
-    public function __construct(private readonly PaymentGatewayManager $gateways) {}
+    public function __construct(
+        private readonly PaymentGatewayManager $gateways,
+        private readonly AuditLogger $audit,
+    ) {}
 
     /**
      * GET /api/v1/billing/subscription
@@ -70,6 +75,11 @@ final class BillingController extends Controller
             $request->user(),
             $validated['plan'],
         );
+
+        // After the gateway call, so a provider error leaves no row claiming a
+        // checkout that never started. The row names who began it; the plan and
+        // the provider are read back from the subscription the webhook writes.
+        $this->audit->record(AuditAction::CheckoutStarted, actor: $request->user());
 
         return response()->json($session->toArray());
     }

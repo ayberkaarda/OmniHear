@@ -14,11 +14,10 @@ import { Toast, ToastService } from './toast.service';
  * icon registry across the 250 kB budget line.
  */
 @Component({
-  selector: 'app-toast-host',
-  standalone: true,
-  imports: [],
-  templateUrl: './toast-host.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-toast-host',
+    imports: [],
+    templateUrl: './toast-host.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToastHostComponent {
   private readonly toastService = inject(ToastService);

@@ -204,6 +204,50 @@ Throttled to 6 / hour / user.
 
 ---
 
+## 5a. Sessions and account (F2.5)
+
+### Where `verified` applies
+
+Spec 7.1 makes email verification mandatory, so the **tenant surface** — everything
+under `routes/api/`: integrations, feedback, overview, billing — sits behind the
+`verified` middleware.
+
+Four routes are deliberately outside it, and the reason is not convenience:
+
+- `GET /auth/me`, `POST /auth/logout`, `POST /auth/email/resend` — the SPA is sent
+  to a "check your inbox" screen and has to be able to render it, resend from it,
+  and leave it.
+- `GET/DELETE /auth/tokens` and `DELETE /account` — revoking a stolen device token
+  must not require a mailbox the user may have lost control of, and gating erasure
+  behind verification would make an unverified account undeletable, which is
+  exactly the data that should be easiest to erase.
+
+### `GET /api/v1/auth/tokens` -> `200` (auth required)
+
+```json
+{ "data": [ { "id": 1, "name": "web", "last_used_at": "…|null", "created_at": "…" } ] }
+```
+
+Lists the caller's own tokens, one per device (spec 8: sessions are revocable per
+device). The token hash is never serialized.
+
+### `DELETE /api/v1/auth/tokens/{id}` -> `204` (auth required)
+
+Revoking the current token is allowed and ends the session.
+A token belonging to another user answers **404, not 403** — invariant I1's rule
+covers this surface too, and a 403 would confirm the token exists.
+
+### `DELETE /api/v1/account` -> `202` (auth required)
+
+Right to erasure (spec 8, KVKK/GDPR). `owner` only; anyone else gets
+`403 FORBIDDEN`. Deletes the company and everything cascading from it, revokes
+every token, and writes an audit entry **before** the deletion.
+
+No id in the path, on purpose: the company is read off the authenticated user, so
+there is no cross-tenant request to reject in the first place.
+
+---
+
 ## 6. Frontend obligations
 
 - `authInterceptor` attaches `Authorization: Bearer` from the auth store.

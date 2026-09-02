@@ -16,11 +16,10 @@ import { PaywallService } from './paywall.service';
  * dialog with no keyboard-reachable exit fails WCAG 2.1.
  */
 @Component({
-  selector: 'app-paywall-modal',
-  standalone: true,
-  imports: [ModalComponent, ButtonComponent],
-  templateUrl: './paywall-modal.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-paywall-modal',
+    imports: [ModalComponent, ButtonComponent],
+    templateUrl: './paywall-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaywallModalComponent {
   private readonly paywall = inject(PaywallService);

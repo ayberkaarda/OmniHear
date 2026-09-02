@@ -9,6 +9,8 @@ use App\Http\Requests\Api\V1\Integration\UpdateIntegrationRequest;
 use App\Http\Resources\Api\V1\IntegrationResource;
 use App\Jobs\FetchFeedbackJob;
 use App\Models\Integration;
+use App\Support\Audit\AuditAction;
+use App\Support\Audit\AuditLogger;
 use App\Support\Connectors\IntegrationSyncLock;
 use App\Support\Http\ApiErrorCode;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +29,10 @@ use Illuminate\Support\Facades\Gate;
  */
 class IntegrationController extends Controller
 {
-    public function __construct(private readonly IntegrationSyncLock $lock) {}
+    public function __construct(
+        private readonly IntegrationSyncLock $lock,
+        private readonly AuditLogger $audit,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -105,7 +110,7 @@ class IntegrationController extends Controller
      * endpoint answer 202 twice for the same integration and put two runs on
      * the queue. The job releases it.
      */
-    public function sync(string $integration): JsonResponse
+    public function sync(Request $request, string $integration): JsonResponse
     {
         $integration = $this->find($integration);
 
@@ -114,6 +119,15 @@ class IntegrationController extends Controller
         if (! $this->lock->acquire((int) $integration->id)) {
             throw new ApiException(ApiErrorCode::SyncInProgress);
         }
+
+        // Audited here rather than in the job: this records the human who asked
+        // for an out-of-band sync, which is the part a reviewer cares about.
+        // The scheduled runs are machine activity and stay out of the table.
+        $this->audit->record(
+            AuditAction::IntegrationSyncRequested,
+            actor: $request->user(),
+            subject: $integration,
+        );
 
         FetchFeedbackJob::dispatch((int) $integration->company_id, (int) $integration->id);
 

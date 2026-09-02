@@ -8,11 +8,10 @@ import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.
  * otherwise.
  */
 @Component({
-  selector: 'app-inbox',
-  standalone: true,
-  imports: [EmptyStateComponent],
-  templateUrl: './inbox.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-inbox',
+    imports: [EmptyStateComponent],
+    templateUrl: './inbox.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InboxComponent {
   protected readonly emptyHeading = $localize`:Empty state heading@@app.inbox.empty:Your inbox is empty`;

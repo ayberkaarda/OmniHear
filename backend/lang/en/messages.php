@@ -17,5 +17,6 @@ return [
     'password_reset' => 'Your password has been reset.',
     'verification_link_sent' => 'A verification link has been sent to your email address.',
     'verification_link_invalid' => 'This verification link is invalid or has expired.',
+    'account_erased' => 'Your account and all associated data have been deleted.',
 
 ];
