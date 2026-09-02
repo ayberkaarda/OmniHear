@@ -104,10 +104,6 @@ it('applies verified to every authenticated api route except the session surface
         'api/v1/auth/tokens',
         'api/v1/auth/tokens/{token}',
         'api/v1/account',
-        // Broadcast authorization is registered by withBroadcasting() in
-        // bootstrap/app.php with its own middleware array. Flagged as an open
-        // question in the phase report rather than changed here.
-        'api/v1/broadcasting/auth',
     ];
 
     $unguarded = collect(Route::getRoutes()->getRoutes())

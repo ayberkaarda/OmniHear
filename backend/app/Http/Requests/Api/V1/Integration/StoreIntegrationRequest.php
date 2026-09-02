@@ -40,16 +40,32 @@ class StoreIntegrationRequest extends FormRequest
             'settings.fixture_set' => ['sometimes', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],
         ];
 
-        $required = is_string($platform)
-            ? ($connectors->config($platform)['required_settings'] ?? [])
-            : [];
+        $config = is_string($platform) ? ($connectors->config($platform) ?? []) : [];
+        $required = $config['required_settings'] ?? [];
 
         if ($required !== []) {
             $rules['settings'] = ['required', 'array'];
         }
 
         foreach ($required as $key) {
-            $rules['settings.'.$key] = ['required', 'string', 'max:255'];
+            $rules['settings.'.$key] = array_merge(
+                ['required', 'string', 'max:255'],
+                IntegrationSettingFormats::for($key),
+            );
+        }
+
+        // A platform that needs credentials must be given them at create time.
+        // The connector would otherwise raise Misconfigured on the first
+        // scheduled run, which surfaces as a broken integration hours later
+        // instead of a 422 the user can act on.
+        $requiredCredentials = $config['required_credentials'] ?? [];
+
+        if ($requiredCredentials !== []) {
+            $rules['credentials'] = ['required', 'array'];
+        }
+
+        foreach ($requiredCredentials as $key) {
+            $rules['credentials.'.$key] = ['required', 'string', 'max:255'];
         }
 
         return $rules;

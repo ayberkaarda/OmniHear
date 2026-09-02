@@ -32,7 +32,7 @@ function appStoreIntegration(array $attributes = []): array
     $company = Company::factory()->create();
     $integration = Integration::factory()->for($company)->create(array_merge([
         'platform' => 'appstore',
-        'settings' => ['app_id' => '324684580', 'country' => 'tr'],
+        'settings' => ['app_id' => '999999999', 'country' => 'tr'],
         'credentials' => [],
     ], $attributes));
 

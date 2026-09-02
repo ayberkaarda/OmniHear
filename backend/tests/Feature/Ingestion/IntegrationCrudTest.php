@@ -16,7 +16,16 @@ use Illuminate\Support\Facades\Queue;
 
 function appStoreSettings(): array
 {
-    return ['app_id' => '324684580', 'country' => 'tr'];
+    return ['app_id' => '999999999', 'country' => 'tr'];
+}
+
+function zendeskPayload(array $overrides = []): array
+{
+    return array_replace_recursive([
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ], $overrides);
 }
 
 /*
@@ -111,7 +120,7 @@ it('creates an integration for the acting tenant', function () {
     $response->assertCreated()
         ->assertJsonPath('integration.platform', 'appstore')
         ->assertJsonPath('integration.status', 'active')
-        ->assertJsonPath('integration.settings.app_id', '324684580')
+        ->assertJsonPath('integration.settings.app_id', '999999999')
         ->assertJsonPath('integration.sync_error', null)
         ->assertJsonPath('integration.last_synced_at', null)
         ->assertJsonPath('integration.feedback_count', 0);
@@ -156,7 +165,40 @@ it('rejects a create it cannot connect', function (array $payload, string $field
 })->with([
     'no platform' => [[], 'platform'],
     'unknown platform' => [['platform' => 'myspace'], 'platform'],
-    'platform with no connector yet' => [['platform' => 'zendesk'], 'platform'],
+    'platform with no connector yet' => [['platform' => 'googleplay'], 'platform'],
+    // Zendesk is the first platform that needs credentials. Accepting a create
+    // without them would produce an integration the scheduler can only fail on,
+    // hours later, instead of a 422 the user can act on now.
+    'zendesk without credentials' => [[
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+    ], 'credentials'],
+    'zendesk without an api token' => [[
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+        'credentials' => ['email' => 'agent@example.invalid'],
+    ], 'credentials.api_token'],
+    'zendesk without an email' => [[
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+        'credentials' => ['api_token' => 'zdtok-abc'],
+    ], 'credentials.email'],
+    'zendesk without a subdomain' => [[
+        'platform' => 'zendesk',
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ], 'settings'],
+    // The subdomain is substituted into the host, so a value carrying `/`, `@`
+    // or `:` would send the Authorization header somewhere else entirely.
+    'zendesk subdomain with a path' => [[
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'evil.test/x'],
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ], 'settings.subdomain'],
+    'zendesk subdomain with userinfo' => [[
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'user@evil.test'],
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ], 'settings.subdomain'],
     'app store without settings' => [['platform' => 'appstore'], 'settings'],
     'app store without app id' => [['platform' => 'appstore', 'settings' => ['country' => 'tr']], 'settings.app_id'],
     'app store without country' => [['platform' => 'appstore', 'settings' => ['app_id' => '1']], 'settings.country'],
@@ -398,4 +440,63 @@ it('lets an admin trigger a sync but not a member', function () {
 
     $this->actingAs($admin, 'sanctum')->postJson('/api/v1/integrations/'.$integration->id.'/sync')
         ->assertStatus(202);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Zendesk — the first platform whose create carries a credential
+|--------------------------------------------------------------------------
+*/
+
+it('creates a zendesk integration and never echoes the token back', function () {
+    [$company, $user] = tenant();
+
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', zendeskPayload());
+
+    $response->assertCreated()
+        ->assertJsonPath('integration.platform', 'zendesk')
+        ->assertJsonPath('integration.settings.subdomain', 'example-help');
+
+    expect($response->getContent())->not->toContain('zdtok-abc')
+        ->and($response->json('integration'))->not->toHaveKey('credentials');
+
+    $created = asTenant($company, fn () => Integration::query()->findOrFail($response->json('integration.id')));
+
+    // Written, encrypted, and still readable by the connector — hidden, not lost.
+    expect($created->credentials)->toBe(['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc']);
+});
+
+it('refuses a credential rotation that would drop a key the connector needs', function () {
+    // A PATCH replaces the credentials object wholesale, so a partial one would
+    // leave the integration unable to authenticate at all.
+    [$company, $user] = tenant();
+    $integration = Integration::factory()->for($company)->create([
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ]);
+
+    $this->actingAs($user, 'sanctum')
+        ->patchJson('/api/v1/integrations/'.$integration->id, ['credentials' => ['api_token' => 'zdtok-new']])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('credentials.email');
+});
+
+it('rotates a zendesk token without disturbing the settings', function () {
+    [$company, $user] = tenant();
+    $integration = Integration::factory()->for($company)->create([
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ]);
+
+    $response = $this->actingAs($user, 'sanctum')->patchJson('/api/v1/integrations/'.$integration->id, [
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-new'],
+    ]);
+
+    $response->assertOk()->assertJsonPath('integration.settings.subdomain', 'example-help');
+
+    expect($response->getContent())->not->toContain('zdtok-new')
+        ->and(asTenant($company, fn () => Integration::query()->findOrFail($integration->id))->credentials)
+        ->toBe(['email' => 'agent@example.invalid', 'api_token' => 'zdtok-new']);
 });

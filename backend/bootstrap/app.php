@@ -27,9 +27,17 @@ return Application::configure(basePath: dirname(__DIR__))
     // subscription answers with Laravel's own HTML-ish 403 instead of the
     // {code, message} envelope every other client-facing failure uses.
     // routes/channels.php itself defines who may listen.
+    //
+    // `verified` is listed explicitly. withBroadcasting() builds its own
+    // middleware array and never sees the api group's defaults, so this route
+    // was the one authenticated /api/v1 endpoint reachable without a verified
+    // address - an unverified user could subscribe to their own company's
+    // private channel and receive every FeedbackAnalyzed and
+    // QuotaThresholdReached event on it. Spec 7.1 makes verification mandatory,
+    // and EmailVerificationEnforcementTest no longer exempts this uri.
     ->withBroadcasting(
         __DIR__.'/../routes/channels.php',
-        attributes: ['prefix' => 'api/v1', 'middleware' => ['api', 'auth:sanctum']],
+        attributes: ['prefix' => 'api/v1', 'middleware' => ['api', 'auth:sanctum', 'verified']],
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Both are prepended, not appended. Laravel sorts route middleware by

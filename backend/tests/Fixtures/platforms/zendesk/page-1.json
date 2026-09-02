@@ -1,0 +1,183 @@
+{
+  "tickets": [
+    {
+      "url": "https://example-help.zendesk.com/api/v2/tickets/1001.json",
+      "id": 1001,
+      "external_id": null,
+      "via": {
+        "channel": "email",
+        "source": {
+          "from": {
+            "address": "requester-1@example.invalid",
+            "name": "requester-1"
+          },
+          "to": {
+            "name": "OmniHear Support",
+            "address": "support@example-help.zendesk.com"
+          },
+          "rel": null
+        }
+      },
+      "created_at": "2026-08-30T09:12:44Z",
+      "updated_at": "2026-08-31T07:02:10Z",
+      "generated_timestamp": 1788160930,
+      "type": "problem",
+      "subject": "Uygulama açılışta kapanıyor",
+      "raw_subject": "Uygulama açılışta kapanıyor",
+      "description": "Son güncellemeden sonra uygulama açılır açılmaz kapanıyor. Telefonu yeniden başlattım, işe yaramadı.",
+      "priority": "normal",
+      "status": "open",
+      "recipient": "support@example-help.zendesk.com",
+      "requester_id": 900000000001,
+      "submitter_id": 900000000001,
+      "assignee_id": 360000000009,
+      "organization_id": null,
+      "group_id": 360000000001,
+      "collaborator_ids": [],
+      "follower_ids": [],
+      "email_cc_ids": [],
+      "forum_topic_id": null,
+      "problem_id": null,
+      "has_incidents": false,
+      "is_public": true,
+      "due_at": null,
+      "tags": [
+        "mobil",
+        "premium"
+      ],
+      "custom_fields": [],
+      "satisfaction_rating": {
+        "id": 5000000001,
+        "score": "bad",
+        "comment": "Sorun hâlâ çözülmedi."
+      },
+      "sharing_agreement_ids": [],
+      "fields": [],
+      "followup_ids": [],
+      "ticket_form_id": null,
+      "brand_id": 360000000001,
+      "allow_channelback": false,
+      "allow_attachments": true,
+      "from_messaging_channel": false
+    },
+    {
+      "url": "https://example-help.zendesk.com/api/v2/tickets/1002.json",
+      "id": 1002,
+      "external_id": null,
+      "via": {
+        "channel": "email",
+        "source": {
+          "from": {
+            "address": "requester-2@example.invalid",
+            "name": "requester-2"
+          },
+          "to": {
+            "name": "OmniHear Support",
+            "address": "support@example-help.zendesk.com"
+          },
+          "rel": null
+        }
+      },
+      "created_at": "2026-08-30T11:48:03Z",
+      "updated_at": "2026-08-30T12:30:00Z",
+      "generated_timestamp": 1788161001,
+      "type": "question",
+      "subject": "Abonelik iptali",
+      "raw_subject": "Abonelik iptali",
+      "description": "Aboneliğimi iptal etmek istiyorum ama ayarlarda ilgili bölümü bulamadım. Yardımcı olur musunuz? Bana destek.musteri@example.invalid adresinden dönebilirsiniz.",
+      "priority": "normal",
+      "status": "solved",
+      "recipient": "support@example-help.zendesk.com",
+      "requester_id": 900000000002,
+      "submitter_id": 900000000002,
+      "assignee_id": 360000000009,
+      "organization_id": null,
+      "group_id": 360000000001,
+      "collaborator_ids": [],
+      "follower_ids": [],
+      "email_cc_ids": [],
+      "forum_topic_id": null,
+      "problem_id": null,
+      "has_incidents": false,
+      "is_public": true,
+      "due_at": null,
+      "tags": [
+        "fatura"
+      ],
+      "custom_fields": [],
+      "satisfaction_rating": {
+        "id": 5000000002,
+        "score": "good",
+        "comment": "Hızlı dönüş için teşekkürler."
+      },
+      "sharing_agreement_ids": [],
+      "fields": [],
+      "followup_ids": [],
+      "ticket_form_id": null,
+      "brand_id": 360000000001,
+      "allow_channelback": false,
+      "allow_attachments": true,
+      "from_messaging_channel": false
+    },
+    {
+      "url": "https://example-help.zendesk.com/api/v2/tickets/1003.json",
+      "id": 1003,
+      "external_id": null,
+      "via": {
+        "channel": "email",
+        "source": {
+          "from": {
+            "address": "requester-3@example.invalid",
+            "name": "requester-3"
+          },
+          "to": {
+            "name": "OmniHear Support",
+            "address": "support@example-help.zendesk.com"
+          },
+          "rel": null
+        }
+      },
+      "created_at": "2026-08-30T15:05:19Z",
+      "updated_at": "2026-08-30T15:05:19Z",
+      "generated_timestamp": 1788161190,
+      "type": "incident",
+      "subject": "Çevrimdışı listeler kayboldu",
+      "raw_subject": "Çevrimdışı listeler kayboldu",
+      "description": "İndirdiğim çalma listeleri bir gecede kayboldu, geri getirmenin bir yolu var mı?",
+      "priority": "normal",
+      "status": "pending",
+      "recipient": "support@example-help.zendesk.com",
+      "requester_id": 900000000003,
+      "submitter_id": 900000000003,
+      "assignee_id": 360000000009,
+      "organization_id": null,
+      "group_id": 360000000001,
+      "collaborator_ids": [],
+      "follower_ids": [],
+      "email_cc_ids": [],
+      "forum_topic_id": null,
+      "problem_id": null,
+      "has_incidents": false,
+      "is_public": true,
+      "due_at": null,
+      "tags": [],
+      "custom_fields": [],
+      "satisfaction_rating": {
+        "score": "unoffered"
+      },
+      "sharing_agreement_ids": [],
+      "fields": [],
+      "followup_ids": [],
+      "ticket_form_id": null,
+      "brand_id": 360000000001,
+      "allow_channelback": false,
+      "allow_attachments": true,
+      "from_messaging_channel": false
+    }
+  ],
+  "after_url": "https://example-help.zendesk.com/api/v2/incremental/tickets/cursor.json?cursor=MTc4ODE2MTE5MC4wfHwxMDAzfA%3D%3D",
+  "after_cursor": "MTc4ODE2MTE5MC4wfHwxMDAzfA==",
+  "before_url": null,
+  "before_cursor": null,
+  "end_of_stream": false
+}

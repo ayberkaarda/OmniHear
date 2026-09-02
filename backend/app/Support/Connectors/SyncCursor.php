@@ -17,6 +17,14 @@ use JsonException;
  *    ingested. It is what makes the fetch incremental (spec 6.1) — a run stops
  *    as soon as it reaches an item at or below it, instead of walking the whole
  *    history again.
+ *  - `token` is the platform's own opaque continuation value, for connectors
+ *    whose incrementality is a cursor rather than a timestamp (Zendesk's
+ *    incremental export answers an `after_cursor` and an `end_of_stream` flag).
+ *    It is carried, never interpreted: only the connector that wrote it may
+ *    read it. It has to live here rather than in a connector-private encoding
+ *    because IngestionRunner decodes and re-encodes the cursor to promote the
+ *    watermark, and anything this class does not know about would be dropped on
+ *    that round trip.
  *  - `pending` is the watermark the *current* run has reached so far. It exists
  *    because these feeds are sorted newest-first: if the watermark advanced
  *    page by page, page 2 would be entirely at or below the value page 1 just
@@ -33,6 +41,7 @@ final readonly class SyncCursor
         public int $page = 1,
         public ?string $watermark = null,
         public ?string $pending = null,
+        public ?string $token = null,
     ) {}
 
     /**
@@ -68,14 +77,23 @@ final readonly class SyncCursor
             ? $decoded['pending']
             : null;
 
-        return new self($page, $watermark, $pending);
+        $token = isset($decoded['token']) && is_string($decoded['token']) && $decoded['token'] !== ''
+            ? $decoded['token']
+            : null;
+
+        return new self($page, $watermark, $pending, $token);
     }
 
     public function encode(): string
     {
         return (string) json_encode(
             array_filter(
-                ['page' => $this->page, 'watermark' => $this->watermark, 'pending' => $this->pending],
+                [
+                    'page' => $this->page,
+                    'watermark' => $this->watermark,
+                    'pending' => $this->pending,
+                    'token' => $this->token,
+                ],
                 static fn ($value) => $value !== null,
             ),
             JSON_UNESCAPED_SLASHES,
@@ -84,7 +102,17 @@ final readonly class SyncCursor
 
     public function withPage(int $page): self
     {
-        return new self($page, $this->watermark, $this->pending);
+        return new self($page, $this->watermark, $this->pending, $this->token);
+    }
+
+    /**
+     * Carry the platform's own continuation value. Opaque here on purpose: this
+     * class never parses it, it only makes sure the round trip through
+     * IngestionRunner does not lose it.
+     */
+    public function withToken(?string $token): self
+    {
+        return new self($this->page, $this->watermark, $this->pending, $token);
     }
 
     /**
@@ -96,7 +124,7 @@ final readonly class SyncCursor
     {
         $advanced = (new self($this->page, $this->pending))->advancedTo($candidate);
 
-        return new self($this->page, $this->watermark, $advanced->watermark);
+        return new self($this->page, $this->watermark, $advanced->watermark, $this->token);
     }
 
     /**
@@ -106,7 +134,7 @@ final readonly class SyncCursor
      */
     public function promoted(): self
     {
-        return new self(1, $this->advancedTo($this->pending)->watermark, null);
+        return new self(1, $this->advancedTo($this->pending)->watermark, null, $this->token);
     }
 
     /**
@@ -132,7 +160,7 @@ final readonly class SyncCursor
             return $this;
         }
 
-        return new self($this->page, $candidate, $this->pending);
+        return new self($this->page, $candidate, $this->pending, $this->token);
     }
 
     /**

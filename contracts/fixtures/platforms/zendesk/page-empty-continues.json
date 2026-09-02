@@ -1,0 +1,8 @@
+{
+  "tickets": [],
+  "after_url": "https://example-help.zendesk.com/api/v2/incremental/tickets/cursor.json?cursor=MTc4ODI0NzYwMC4wfHwwfA%3D%3D",
+  "after_cursor": "MTc4ODI0NzYwMC4wfHwwfA==",
+  "before_url": "https://example-help.zendesk.com/api/v2/incremental/tickets/cursor.json?cursor=MTc4ODE2MTE5MC4wfHwxMDAzfA%3D%3D",
+  "before_cursor": "MTc4ODE2MTE5MC4wfHwxMDAzfA==",
+  "end_of_stream": false
+}

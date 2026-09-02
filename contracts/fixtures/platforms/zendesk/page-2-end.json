@@ -1,0 +1,117 @@
+{
+  "tickets": [
+    {
+      "url": "https://example-help.zendesk.com/api/v2/tickets/1004.json",
+      "id": 1004,
+      "external_id": null,
+      "via": {
+        "channel": "email",
+        "source": {
+          "from": {
+            "address": "requester-4@example.invalid",
+            "name": "requester-4"
+          },
+          "to": {
+            "name": "OmniHear Support",
+            "address": "support@example-help.zendesk.com"
+          },
+          "rel": null
+        }
+      },
+      "created_at": "2026-08-31T08:20:55Z",
+      "updated_at": "2026-08-31T09:01:12Z",
+      "generated_timestamp": 1788247272,
+      "type": "question",
+      "subject": "Karanlık tema isteği",
+      "raw_subject": "Karanlık tema isteği",
+      "description": "Karanlık tema eklerseniz gece kullanımı çok daha rahat olur, şimdiden teşekkürler.",
+      "priority": "normal",
+      "status": "closed",
+      "recipient": "support@example-help.zendesk.com",
+      "requester_id": 900000000004,
+      "submitter_id": 900000000004,
+      "assignee_id": 360000000009,
+      "organization_id": null,
+      "group_id": 360000000001,
+      "collaborator_ids": [],
+      "follower_ids": [],
+      "email_cc_ids": [],
+      "forum_topic_id": null,
+      "problem_id": null,
+      "has_incidents": false,
+      "is_public": true,
+      "due_at": null,
+      "tags": [
+        "oneri"
+      ],
+      "custom_fields": [],
+      "satisfaction_rating": null,
+      "sharing_agreement_ids": [],
+      "fields": [],
+      "followup_ids": [],
+      "ticket_form_id": null,
+      "brand_id": 360000000001,
+      "allow_channelback": false,
+      "allow_attachments": true,
+      "from_messaging_channel": false
+    },
+    {
+      "url": "https://example-help.zendesk.com/api/v2/tickets/1005.json",
+      "id": 1005,
+      "external_id": null,
+      "via": {
+        "channel": "email",
+        "source": {
+          "from": {
+            "address": "requester-5@example.invalid",
+            "name": "requester-5"
+          },
+          "to": {
+            "name": "OmniHear Support",
+            "address": "support@example-help.zendesk.com"
+          },
+          "rel": null
+        }
+      },
+      "created_at": "2026-08-31T08:44:02Z",
+      "updated_at": "2026-08-31T10:15:40Z",
+      "generated_timestamp": 1788247540,
+      "type": "question",
+      "subject": null,
+      "raw_subject": null,
+      "description": null,
+      "priority": "normal",
+      "status": "deleted",
+      "recipient": "support@example-help.zendesk.com",
+      "requester_id": 900000000005,
+      "submitter_id": 900000000005,
+      "assignee_id": 360000000009,
+      "organization_id": null,
+      "group_id": 360000000001,
+      "collaborator_ids": [],
+      "follower_ids": [],
+      "email_cc_ids": [],
+      "forum_topic_id": null,
+      "problem_id": null,
+      "has_incidents": false,
+      "is_public": true,
+      "due_at": null,
+      "tags": [],
+      "custom_fields": [],
+      "satisfaction_rating": null,
+      "sharing_agreement_ids": [],
+      "fields": [],
+      "followup_ids": [],
+      "ticket_form_id": null,
+      "brand_id": 360000000001,
+      "allow_channelback": false,
+      "allow_attachments": true,
+      "from_messaging_channel": false
+    }
+  ],
+  "after_url": "https://example-help.zendesk.com/api/v2/incremental/tickets/cursor.json?cursor=MTc4ODI0NzU0MC4wfHwxMDA1fA%3D%3D",
+  "after_cursor": "MTc4ODI0NzU0MC4wfHwxMDA1fA==",
+  "before_url": "https://example-help.zendesk.com/api/v2/incremental/tickets/cursor.json?cursor=MTc4ODE2MTE5MC4wfHwxMDAzfA%3D%3D",
+  "before_cursor": "MTc4ODE2MTE5MC4wfHwxMDAzfA==",
+  "end_of_stream": true
+}

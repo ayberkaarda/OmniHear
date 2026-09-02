@@ -25,7 +25,7 @@ uses(TestCase::class);
 |
 */
 
-const APPSTORE_APP_ID = '324684580';
+const APPSTORE_APP_ID = '999999999';
 
 function appStoreConnector(int $maxPages = 10): AppStoreConnector
 {
@@ -363,4 +363,70 @@ it('exposes the measured platform ceilings', function () {
 
     expect($limits->maxPagesPerRun)->toBe(10)
         ->and($limits->maxConsecutiveEmptyPages)->toBe(3);
+});
+
+/*
+|--------------------------------------------------------------------------
+| The recorded pages themselves
+|--------------------------------------------------------------------------
+|
+| The envelope of these fixtures is the captured original and the review
+| content is synthetic (contracts/fixtures/platforms/appstore/README.md). Both
+| halves of that promise are asserted here: the measured shape has to survive
+| any future re-capture, and no real reviewer may re-enter the repository.
+|
+*/
+
+it('keeps the measured page size of the recorded feed', function (string $file, int $expected) {
+    expect(PlatformFixture::appStoreEntries($file))->toHaveCount($expected);
+})->with([
+    ['page-full.json', 50],
+    ['page-full-2.json', 50],
+    ['page-empty-transient.json', 0],
+]);
+
+it('keeps the recorded entry key set and the offset on every timestamp', function (string $file) {
+    $entries = PlatformFixture::appStoreEntries($file);
+
+    expect($entries)->not->toBeEmpty();
+
+    foreach ($entries as $entry) {
+        expect(array_keys($entry))->toBe([
+            'author', 'updated', 'im:rating', 'im:version', 'id',
+            'title', 'content', 'link', 'im:voteSum', 'im:contentType', 'im:voteCount',
+        ])
+            // The -07:00 offset is the whole reason toDateTimeString() was
+            // seven hours wrong; a fixture normalised to UTC would stop
+            // proving it.
+            ->and($entry['updated']['label'])->toEndWith('-07:00')
+            ->and($entry['link']['attributes']['rel'])->toBe('related')
+            ->and($entry['im:contentType']['attributes']['term'])->toBe('Application');
+    }
+})->with(['page-full.json', 'page-full-2.json']);
+
+it('holds no real reviewer identity in any recorded page', function (string $file) {
+    foreach (PlatformFixture::appStoreEntries($file) as $entry) {
+        expect($entry['author']['name']['label'])->toMatch('/^reviewer-\d{3}$/')
+            // RFC 2606 reserves .invalid, so the profile URI cannot resolve.
+            ->and($entry['author']['uri']['label'])->toStartWith('https://example.invalid/')
+            ->and($entry['id']['label'])->toMatch('/^\d{11}$/');
+    }
+})->with(['page-full.json', 'page-full-2.json']);
+
+it('keeps the recorded pages ordered newest-first with the newer page ahead of the older one', function () {
+    $timestamps = fn (string $file) => array_map(
+        fn (string $t) => SyncCursor::parse($t)?->getTimestamp(),
+        appStoreTimestamps($file),
+    );
+
+    $newer = $timestamps('page-full-2.json');
+    $older = $timestamps('page-full.json');
+
+    $descending = fn (array $values) => $values === array_values(array_reverse(collect($values)->sort()->values()->all()));
+
+    // The incremental-watermark tests serve page-full-2 as page 1 and
+    // page-full behind it, so this relation is load-bearing.
+    expect($descending($newer))->toBeTrue()
+        ->and($descending($older))->toBeTrue()
+        ->and(min($newer))->toBeGreaterThan(max($older));
 });

@@ -1,0 +1,4 @@
+{
+  "error": "RateLimited",
+  "description": "Number of allowed API requests per minute exceeded"
+}

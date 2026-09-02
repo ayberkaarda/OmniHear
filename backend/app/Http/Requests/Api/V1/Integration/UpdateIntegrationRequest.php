@@ -41,10 +41,22 @@ class UpdateIntegrationRequest extends FormRequest
             'settings.fixture_set' => ['sometimes', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],
         ];
 
-        foreach ($connectors->config($platform)['required_settings'] ?? [] as $key) {
+        $config = $connectors->config($platform) ?? [];
+
+        foreach ($config['required_settings'] ?? [] as $key) {
             // A PATCH replaces the settings object wholesale, so a partial one
             // would silently drop the keys the connector cannot run without.
-            $rules['settings.'.$key] = ['required_with:settings', 'string', 'max:255'];
+            $rules['settings.'.$key] = array_merge(
+                ['required_with:settings', 'string', 'max:255'],
+                IntegrationSettingFormats::for($key),
+            );
+        }
+
+        // Same reasoning for a credential rotation: sending `credentials` at
+        // all replaces the stored object, so every key the connector needs has
+        // to be present in the new one.
+        foreach ($config['required_credentials'] ?? [] as $key) {
+            $rules['credentials.'.$key] = ['required_with:credentials', 'string', 'max:255'];
         }
 
         return $rules;

@@ -43,6 +43,46 @@ it('registers a company with its first owner', function () {
     expect($user->getAttribute('company_id'))->toBe(Company::query()->value('id'));
 });
 
+it('starts the quota counter at a real zero, not at null', function () {
+    // The column has a database default, but a default is applied during the
+    // insert and never read back into the model, so the counter reached the
+    // response as null while http-api-v1.md section 4 says int.
+    //
+    // toBe(), not assertJsonPath alone: null == 0 under a loose comparison, and
+    // quota_remaining was right for the wrong reason the whole time --
+    // max(0, 200 - null) is 200, so nothing downstream ever complained.
+    Notification::fake();
+
+    $response = $this->postJson('/api/v1/auth/register', registrationPayload());
+
+    $count = $response->json('company.analyzed_feedback_count');
+    $remaining = $response->json('company.quota_remaining');
+    $limit = $response->json('company.quota_limit');
+
+    expect($count)->toBe(0)
+        ->and($count)->toBeInt()
+        ->and($remaining)->toBe(200)
+        ->and($remaining)->toBeInt()
+        ->and($limit)->toBeInt()
+        // The stored row and the model that was serialized have to agree: the
+        // bug was invisible in the database and existed only in the instance.
+        ->and(Company::query()->firstOrFail()->analyzed_feedback_count)->toBe(0);
+});
+
+it('reports the same company shape from register and from me', function () {
+    // The register response is built from a model that was just constructed;
+    // /auth/me builds it from one read back out of the database. Any field the
+    // first path leaves unpopulated shows up as a difference here.
+    Notification::fake();
+
+    $registered = $this->postJson('/api/v1/auth/register', registrationPayload());
+    $token = $registered->json('token');
+
+    $me = $this->withToken($token)->getJson('/api/v1/auth/me');
+
+    expect($me->json('company'))->toBe($registered->json('company'));
+});
+
 it('never serializes the sensitive user columns', function () {
     Notification::fake();
 

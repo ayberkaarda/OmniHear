@@ -232,3 +232,57 @@ it('decodes a malformed pending field to a safe default rather than throwing', f
         ->and($decoded->watermark)->toBe('2026-08-30T00:00:00+00:00')
         ->and($decoded->pending)->toBeNull();
 });
+
+/*
+|--------------------------------------------------------------------------
+| The connector-owned token
+|--------------------------------------------------------------------------
+|
+| Zendesk's incrementality is its own opaque cursor, not a timestamp. It has to
+| ride in this class rather than in a connector-private encoding, because
+| IngestionRunner decodes the connector's cursor and re-encodes it to promote
+| the watermark — and anything this class does not know about is dropped on that
+| round trip. For Zendesk that would mean restarting the export from start_time
+| on every single run, which is the full re-scan spec 6.1 forbids.
+|
+*/
+
+it('round-trips an opaque token through encode and decode', function () {
+    $encoded = (new SyncCursor)->withToken('MTc4ODE2MTE5MC4wfHwxMDAzfA==')->encode();
+
+    expect(SyncCursor::decode($encoded)->token)->toBe('MTc4ODE2MTE5MC4wfHwxMDAzfA==');
+});
+
+it('omits a null token from the encoded form', function () {
+    expect((new SyncCursor(2))->encode())->toBe('{"page":2}');
+});
+
+it('decodes a malformed token to null rather than throwing', function (string $cursor) {
+    expect(SyncCursor::decode($cursor)->token)->toBeNull();
+})->with(['{"page":1,"token":42}', '{"page":1,"token":""}', '{"page":1,"token":{"a":1}}', '{"page":1}']);
+
+it('keeps the token through every transformation the runner performs', function () {
+    $cursor = (new SyncCursor)->withToken('tok-1');
+
+    expect($cursor->withPage(4)->token)->toBe('tok-1')
+        ->and($cursor->advancedTo('2026-08-31T00:00:00+00:00')->token)->toBe('tok-1')
+        ->and($cursor->pendingAdvancedTo('2026-08-31T00:00:00+00:00')->token)->toBe('tok-1')
+        // promoted() is the one the runner calls at the end of a complete run.
+        ->and($cursor->pendingAdvancedTo('2026-08-31T00:00:00+00:00')->promoted()->token)->toBe('tok-1');
+});
+
+it('replaces rather than merges a token', function () {
+    expect((new SyncCursor)->withToken('tok-1')->withToken('tok-2')->token)->toBe('tok-2')
+        ->and((new SyncCursor)->withToken('tok-1')->withToken(null)->token)->toBeNull();
+});
+
+it('encodes a token alongside every other field and still fits varchar(255)', function () {
+    $encoded = (new SyncCursor(10, '2026-08-31T09:21:00-07:00', '2026-09-01T09:21:00-07:00'))
+        ->withToken(str_repeat('x', 120))
+        ->encode();
+
+    // 120 is ZendeskConnector::MAX_TOKEN_LENGTH, the longest token that
+    // connector will accept, and this is the fullest cursor that can hold one:
+    // page, watermark, pending and token together.
+    expect(strlen($encoded))->toBeLessThan(255);
+});

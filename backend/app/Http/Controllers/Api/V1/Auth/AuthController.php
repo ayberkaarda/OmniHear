@@ -43,11 +43,26 @@ class AuthController extends Controller
 
         /** @var array{company: Company, user: User} $created */
         $created = DB::transaction(function () use ($request, $email): array {
-            $company = Company::create([
+            $company = new Company([
                 'name' => (string) $request->string('company_name'),
                 'plan' => 'free',
                 'quota_limit' => (int) config('quota.plans.free.quota_limit'),
             ]);
+
+            // Set here rather than left to the column default. The default is
+            // applied by the database during the insert and never read back
+            // into the model, so this response serialized
+            // `analyzed_feedback_count: null` where http-api-v1.md section 4
+            // says int. quotaRemaining() hid it: null in arithmetic is 0, so
+            // `max(0, 200 - null)` came out at the right number for the wrong
+            // reason, and X-Quota-Remaining looked correct too.
+            //
+            // Assigned directly instead of through the constructor array: the
+            // counter is deliberately outside $fillable so that no request body
+            // can ever move it, and a refresh() would buy the same correctness
+            // with an extra query and leave the starting value invisible here.
+            $company->analyzed_feedback_count = 0;
+            $company->save();
 
             $user = User::create([
                 'company_id' => $company->id,

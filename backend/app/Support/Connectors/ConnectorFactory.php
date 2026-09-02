@@ -34,6 +34,19 @@ class ConnectorFactory
             }
         }
 
+        // Read once, into local variables that are handed to the connector
+        // constructor and never stored anywhere else. Invariant I5: nothing
+        // below puts a credential into an exception, a log line or a URL — the
+        // only failure this can raise is the fixed Misconfigured sentence, which
+        // says a key is missing without saying anything about its value.
+        $credentials = is_array($integration->credentials) ? $integration->credentials : [];
+
+        foreach ($config['required_credentials'] ?? [] as $key) {
+            if (! isset($credentials[$key]) || ! is_string($credentials[$key]) || $credentials[$key] === '') {
+                throw ConnectorException::of(ConnectorFailure::Misconfigured);
+            }
+        }
+
         $limits = new ConnectorLimits(
             maxPagesPerRun: (int) ($config['max_pages_per_run'] ?? 10),
             maxConsecutiveEmptyPages: (int) ($config['max_consecutive_empty_pages'] ?? 3),
@@ -43,6 +56,16 @@ class ConnectorFactory
             FixtureConnector::class => new FixtureConnector(
                 directory: $this->fixtureDirectory($settings),
                 limits: $limits,
+            ),
+            ZendeskConnector::class => new ZendeskConnector(
+                subdomain: $this->subdomain($settings),
+                email: (string) $credentials['email'],
+                apiToken: (string) $credentials['api_token'],
+                baseUrlTemplate: (string) ($config['base_url'] ?? 'https://{subdomain}.zendesk.com'),
+                limits: $limits,
+                timeout: (int) ($config['timeout'] ?? 30),
+                initialLookbackDays: (int) ($config['initial_lookback_days'] ?? 30),
+                startTimeLagSeconds: (int) ($config['start_time_lag_seconds'] ?? 300),
             ),
             AppStoreConnector::class => new AppStoreConnector(
                 appId: (string) $settings['app_id'],
@@ -97,6 +120,25 @@ class ConnectorFactory
             'max_attempts' => (int) ($limit['max_attempts'] ?? 60),
             'decay_seconds' => (int) ($limit['decay_seconds'] ?? 60),
         ];
+    }
+
+    /**
+     * The subdomain is substituted into the base URL, so it is whitelisted
+     * rather than escaped — the same reasoning as the fixture set below. A
+     * value carrying `/`, `@`, `:` or a dot could redirect every request, and
+     * the Authorization header with it, at a host of the caller's choosing.
+     *
+     * @param  array<string, mixed>  $settings
+     */
+    private function subdomain(array $settings): string
+    {
+        $subdomain = $settings['subdomain'] ?? null;
+
+        if (! is_string($subdomain) || preg_match('/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i', $subdomain) !== 1) {
+            throw ConnectorException::of(ConnectorFailure::Misconfigured);
+        }
+
+        return $subdomain;
     }
 
     /**

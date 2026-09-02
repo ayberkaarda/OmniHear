@@ -96,3 +96,21 @@ it('compares the tenant discriminator, not the string', function () {
         ->and($channel->join($foreign, (string) $company->id))->toBeFalse()
         ->and($channel->join($user, $company->id.'-anything'))->toBeFalse();
 });
+
+it('rejects a subscription from a user who has not verified their address', function () {
+    // withBroadcasting() in bootstrap/app.php builds its own middleware array
+    // and never inherits the api group's defaults, so `verified` has to be
+    // listed there by hand. Without it this was the one authenticated /api/v1
+    // route an unverified user could reach - and it hands out every
+    // FeedbackAnalyzed and QuotaThresholdReached event for the company.
+    $company = Company::factory()->create();
+    $user = User::factory()->for($company)->unverified()->create();
+
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/broadcasting/auth', [
+            'socket_id' => '1234.5678',
+            'channel_name' => 'private-company.'.$company->id,
+        ])
+        ->assertForbidden()
+        ->assertJsonPath('code', 'EMAIL_NOT_VERIFIED');
+});

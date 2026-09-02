@@ -2,6 +2,7 @@
 
 use App\Support\Connectors\AppStoreConnector;
 use App\Support\Connectors\FixtureConnector;
+use App\Support\Connectors\ZendeskConnector;
 
 return [
 
@@ -95,6 +96,36 @@ return [
             'timeout' => (int) env('APPSTORE_TIMEOUT', 15),
             'rate_limit' => ['max_attempts' => 20, 'decay_seconds' => 60],
             'retry_after' => 60,
+        ],
+
+        'zendesk' => [
+            'connector' => ZendeskConnector::class,
+            // The subdomain is substituted in ConnectorFactory, which whitelists
+            // it first: it is part of the host, so a value carrying `/`, `@` or
+            // `:` would point every authenticated request somewhere else.
+            'base_url' => env('ZENDESK_BASE_URL', 'https://{subdomain}.zendesk.com'),
+            'required_settings' => ['subdomain'],
+            // The first connector with credentials. `email` plus `api_token`
+            // are Zendesk's API-token scheme; both are stored encrypted and
+            // neither is ever read back out (invariant I5).
+            'required_credentials' => ['email', 'api_token'],
+            // A runaway-loop ceiling, not a platform limit: the incremental
+            // export has no depth cap, it ends when end_of_stream says so. At
+            // up to 1000 tickets a page this still lets one run cover 20k
+            // tickets, and a run cut short here resumes from the stored cursor.
+            'max_pages_per_run' => 20,
+            'max_consecutive_empty_pages' => 3,
+            'timeout' => (int) env('ZENDESK_TIMEOUT', 30),
+            // Documented as its own budget for the incremental export
+            // endpoints, well below the account-wide API limit.
+            'rate_limit' => ['max_attempts' => 10, 'decay_seconds' => 60],
+            'retry_after' => 60,
+            // How far back the very first run reaches when there is no cursor
+            // yet. Everything after that is driven by Zendesk's own cursor.
+            'initial_lookback_days' => (int) env('ZENDESK_INITIAL_LOOKBACK_DAYS', 30),
+            // Zendesk refuses a start_time too close to now, so the first
+            // request is held this far behind the clock.
+            'start_time_lag_seconds' => (int) env('ZENDESK_START_TIME_LAG', 300),
         ],
 
     ],

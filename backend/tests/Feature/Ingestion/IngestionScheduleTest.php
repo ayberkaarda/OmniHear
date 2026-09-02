@@ -71,11 +71,35 @@ it('skips a platform that has no connector yet', function () {
     Queue::fake();
 
     $company = Company::factory()->create();
-    Integration::factory()->for($company)->create(['platform' => 'zendesk']);
+    // googleplay, not zendesk: zendesk gained a connector in F8, and a test that
+    // names a platform on its way to being implemented stops meaning anything
+    // the moment it lands.
+    Integration::factory()->for($company)->create(['platform' => 'googleplay']);
 
     runIngestionSweep();
 
     Queue::assertNothingPushed();
+});
+
+it('sweeps an active integration of every platform that has a connector', function () {
+    Queue::fake();
+
+    $company = Company::factory()->create();
+
+    Integration::factory()->for($company)->create(['platform' => 'fixture']);
+    Integration::factory()->for($company)->create([
+        'platform' => 'appstore',
+        'settings' => ['app_id' => '999999999', 'country' => 'tr'],
+    ]);
+    Integration::factory()->for($company)->create([
+        'platform' => 'zendesk',
+        'settings' => ['subdomain' => 'example-help'],
+        'credentials' => ['email' => 'agent@example.invalid', 'api_token' => 'zdtok-abc'],
+    ]);
+
+    runIngestionSweep();
+
+    Queue::assertPushed(FetchFeedbackJob::class, 3);
 });
 
 it('does not queue a second run for an integration that is already syncing', function () {
