@@ -1,19 +1,335 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
+import { errorMessageForCode } from '../../../core/errors/error-messages';
+import {
+  CONNECTABLE_PLATFORMS,
+  Integration,
+  IntegrationWriteBody,
+  Platform,
+  REQUIRED_CREDENTIALS,
+  REQUIRED_SETTINGS
+} from '../../../core/integrations/integration.models';
+import { IntegrationsStore } from '../../../core/integrations/integrations.store';
+import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
+import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { InputComponent } from '../../../shared/ui/form-field/input.component';
+import { SelectComponent, SelectOption } from '../../../shared/ui/form-field/select.component';
+import { ModalComponent } from '../../../shared/ui/modal/modal.component';
+import { formatCount, formatDateTime } from '../../../shared/format/format';
+import { credentialLabel, platformLabel, settingLabel } from '../../../shared/labels/domain-labels';
+
+const SETTING_PREFIX = 's_';
+const CREDENTIAL_PREFIX = 'c_';
+
+export interface ConnectorField {
+  /** Form control name — prefixed so a setting and a credential cannot collide. */
+  readonly control: string;
+  /** The key the API expects inside `settings` / `credentials`. */
+  readonly key: string;
+  readonly label: string;
+  readonly secret: boolean;
+}
+
+type DialogMode = 'none' | 'create' | 'edit' | 'delete';
 
 /**
- * Placeholder screen. The heading, the landmark structure and the empty state
- * are real; the data is not fetched yet, and nothing on this page pretends
- * otherwise.
+ * `/app/integrations` — connect a channel, watch its health, sync it on demand.
+ *
+ * **Credentials go one way.** `Integration` has no `credentials` field because
+ * the API never serializes one (invariant I5), so there is nothing on this
+ * screen that could display a stored secret even by accident. The edit form
+ * leaves the credential inputs blank and says so: submitting them empty keeps
+ * what is stored, and filling them in rotates it.
+ *
+ * Which platforms can be connected, and what each one needs, mirrors
+ * `config/connectors.php`. No endpoint publishes that list, so the mirror in
+ * `integration.models.ts` is the frontend's copy of it — see the phase report's
+ * open questions.
  */
 @Component({
-    selector: 'app-integrations',
-    imports: [EmptyStateComponent],
-    templateUrl: './integrations.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-integrations',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    BadgeComponent,
+    ButtonComponent,
+    EmptyStateComponent,
+    InputComponent,
+    SelectComponent,
+    ModalComponent
+  ],
+  templateUrl: './integrations.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IntegrationsComponent {
-  protected readonly emptyHeading = $localize`:Empty state heading@@app.integrations.empty:No channel is connected yet`;
-  protected readonly placeholderDescription = $localize`:Placeholder screen description@@app.placeholder.description:This screen is in place; it fills with real data once the matching API is connected.`;
+export class IntegrationsComponent implements OnInit, OnDestroy {
+  private readonly store = inject(IntegrationsStore);
+  private readonly fb = inject(NonNullableFormBuilder);
+
+  private readonly subscriptions = new Subscription();
+
+  protected readonly items = this.store.items;
+  protected readonly saving = this.store.saving;
+  protected readonly syncingIds = this.store.syncingIds;
+  protected readonly deletingId = this.store.deletingId;
+  protected readonly isEmpty = this.store.isEmpty;
+
+  protected readonly dialog = signal<DialogMode>('none');
+  protected readonly selected = signal<Integration | null>(null);
+  protected readonly platform = signal<Platform>(CONNECTABLE_PLATFORMS[0]);
+
+  /** Rebuilt whenever the platform changes: each connector asks for different fields. */
+  protected readonly form = signal<FormGroup>(new FormGroup({}));
+
+  protected readonly loading = computed(() => {
+    const state = this.store.state();
+    return state === 'idle' || state === 'loading';
+  });
+
+  protected readonly errorMessage = computed(() => {
+    const code = this.store.errorCode();
+    return code === null ? null : errorMessageForCode(code);
+  });
+
+  protected readonly platformControl = this.fb.control<string>(CONNECTABLE_PLATFORMS[0]);
+  protected readonly statusControl = this.fb.control<string>('active');
+
+  protected readonly platformOptions: SelectOption[] = CONNECTABLE_PLATFORMS.map((value) => ({
+    value,
+    label: platformLabel(value)
+  }));
+
+  protected readonly statusOptions = computed<SelectOption[]>(() => [
+    { value: 'active', label: this.statusActiveLabel },
+    { value: 'paused', label: this.statusPausedLabel }
+  ]);
+
+  protected readonly settingFields = computed<readonly ConnectorField[]>(() =>
+    (REQUIRED_SETTINGS[this.platform()] ?? []).map((key) => ({
+      control: SETTING_PREFIX + key,
+      key,
+      label: settingLabel(key),
+      secret: false
+    }))
+  );
+
+  protected readonly credentialFields = computed<readonly ConnectorField[]>(() =>
+    (REQUIRED_CREDENTIALS[this.platform()] ?? []).map((key) => ({
+      control: CREDENTIAL_PREFIX + key,
+      key,
+      label: credentialLabel(key),
+      secret: true
+    }))
+  );
+
+  protected readonly dialogTitle = computed(() => {
+    switch (this.dialog()) {
+      case 'create':
+        return this.connectTitle;
+      case 'edit':
+        return this.editTitle;
+      case 'delete':
+        return this.deleteTitle;
+      default:
+        return '';
+    }
+  });
+
+  protected readonly deletePrompt = computed(() => {
+    const target = this.selected();
+    if (target === null) {
+      return '';
+    }
+    const name = platformLabel(target.platform);
+    const count = formatCount(target.feedback_count);
+    return $localize`:Confirmation before deleting a connection@@integrations.delete.prompt:Disconnect ${name}:platform:? Its ${count}:count: collected comments are removed with it, and this cannot be undone.`;
+  });
+
+  protected readonly connectLabel = $localize`:Open the connect-a-channel dialog@@integrations.connect:Connect a channel`;
+  protected readonly connectTitle = $localize`:Connect dialog title@@integrations.dialog.createTitle:Connect a channel`;
+  protected readonly editTitle = $localize`:Edit dialog title@@integrations.dialog.editTitle:Edit connection`;
+  protected readonly deleteTitle = $localize`:Delete dialog title@@integrations.dialog.deleteTitle:Disconnect channel`;
+  protected readonly platformFieldLabel = $localize`:Platform picker label@@integrations.field.platform:Platform`;
+  protected readonly statusFieldLabel = $localize`:Connection status picker label@@integrations.field.status:Connection state`;
+  protected readonly statusActiveLabel = $localize`:Connection state option@@integrations.status.active:Active — sync on schedule`;
+  protected readonly statusPausedLabel = $localize`:Connection state option@@integrations.status.paused:Paused — do not sync`;
+  protected readonly credentialsKeepHint = $localize`:Hint above the credential inputs when editing@@integrations.credentials.keepHint:Leave blank to keep the stored credentials. Filling a field replaces it.`;
+  protected readonly credentialsWriteOnlyHint = $localize`:Hint explaining credentials are never shown again@@integrations.credentials.writeOnly:Credentials are stored encrypted and are never shown again, not even to you.`;
+  protected readonly saveLabel = $localize`:Save the connection dialog@@integrations.action.save:Save`;
+  protected readonly cancelLabel = $localize`:Dismiss a dialog@@common.cancel:Cancel`;
+  protected readonly deleteConfirmLabel = $localize`:Confirm disconnecting a channel@@integrations.action.delete:Disconnect`;
+  protected readonly syncLabel = $localize`:Trigger a sync run@@integrations.action.sync:Sync now`;
+  protected readonly editLabel = $localize`:Edit a connection@@integrations.action.edit:Edit`;
+  protected readonly removeLabel = $localize`:Remove a connection@@integrations.action.remove:Disconnect`;
+  protected readonly retryLabel = $localize`:Retry a failed load@@common.retry:Try again`;
+  protected readonly emptyHeading = $localize`:Integrations empty state@@app.integrations.empty:No channel is connected yet`;
+  protected readonly emptyDescription = $localize`:Integrations empty state@@integrations.empty.description:Connect App Store or Zendesk and OmniHear starts collecting comments on a schedule.`;
+
+  ngOnInit(): void {
+    this.rebuildForm();
+    this.subscriptions.add(
+      this.platformControl.valueChanges.subscribe((value) => {
+        this.platform.set(value as Platform);
+        this.rebuildForm();
+      })
+    );
+    this.store.loadIfNeeded();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  protected reload(): void {
+    this.store.load();
+  }
+
+  protected platformLabelOf(integration: Integration): string {
+    return platformLabel(integration.platform);
+  }
+
+  protected isSyncing(integration: Integration): boolean {
+    return this.syncingIds().has(integration.id);
+  }
+
+  protected settingsOf(integration: Integration): readonly { key: string; label: string; value: string }[] {
+    return Object.entries(integration.settings).map(([key, value]) => ({
+      key,
+      label: settingLabel(key),
+      value: String(value)
+    }));
+  }
+
+  protected lastSynced(integration: Integration): string {
+    return formatDateTime(integration.last_synced_at);
+  }
+
+  protected feedbackCount(integration: Integration): string {
+    return formatCount(integration.feedback_count);
+  }
+
+  protected openCreate(): void {
+    this.store.clearSaveErrors();
+    this.selected.set(null);
+    this.platformControl.setValue(CONNECTABLE_PLATFORMS[0]);
+    this.platform.set(CONNECTABLE_PLATFORMS[0]);
+    this.statusControl.setValue('active');
+    this.rebuildForm();
+    this.dialog.set('create');
+  }
+
+  protected openEdit(integration: Integration): void {
+    this.store.clearSaveErrors();
+    this.selected.set(integration);
+    this.platform.set(integration.platform);
+    this.platformControl.setValue(integration.platform, { emitEvent: false });
+    this.statusControl.setValue(integration.status === 'paused' ? 'paused' : 'active');
+    this.rebuildForm(integration);
+    this.dialog.set('edit');
+  }
+
+  protected openDelete(integration: Integration): void {
+    this.selected.set(integration);
+    this.dialog.set('delete');
+  }
+
+  protected closeDialog(): void {
+    this.dialog.set('none');
+    this.selected.set(null);
+    this.store.clearSaveErrors();
+  }
+
+  protected onSync(integration: Integration): void {
+    this.store.sync(integration.id);
+  }
+
+  protected confirmDelete(): void {
+    const target = this.selected();
+    if (target === null) {
+      return;
+    }
+    this.store.remove(target.id, () => this.closeDialog());
+  }
+
+  protected submit(): void {
+    const form = this.form();
+    if (form.invalid) {
+      form.markAllAsTouched();
+      return;
+    }
+
+    const body = this.buildBody(form);
+    const target = this.selected();
+
+    if (this.dialog() === 'edit' && target !== null) {
+      this.store.update(target.id, body, () => this.closeDialog());
+    } else {
+      this.store.create(body, () => this.closeDialog());
+    }
+  }
+
+  /**
+   * Server-side field error for one control.
+   *
+   * The server names them `settings.app_id` / `credentials.api_token`, which is
+   * why the controls carry the prefix in the first place — the mapping back is
+   * mechanical rather than a lookup table that can drift.
+   */
+  protected serverError(field: ConnectorField): string | undefined {
+    const errors = this.store.saveErrors();
+    if (errors === null) {
+      return undefined;
+    }
+    const path = `${field.secret ? 'credentials' : 'settings'}.${field.key}`;
+    return errors[path]?.[0] ?? errors[field.secret ? 'credentials' : 'settings']?.[0];
+  }
+
+  protected platformError(): string | undefined {
+    return this.store.saveErrors()?.['platform']?.[0];
+  }
+
+  private rebuildForm(integration?: Integration): void {
+    const controls: Record<string, FormControl<string>> = {};
+
+    for (const key of REQUIRED_SETTINGS[this.platform()] ?? []) {
+      controls[SETTING_PREFIX + key] = this.fb.control(String(integration?.settings[key] ?? ''), [Validators.required]);
+    }
+
+    for (const key of REQUIRED_CREDENTIALS[this.platform()] ?? []) {
+      // Required on create, optional on edit: an empty credential field on an
+      // existing connection means "keep what is stored", and there is no way to
+      // pre-fill it because the value is never sent to the browser.
+      controls[CREDENTIAL_PREFIX + key] = this.fb.control('', integration === undefined ? [Validators.required] : []);
+    }
+
+    this.form.set(new FormGroup(controls));
+  }
+
+  private buildBody(form: FormGroup): IntegrationWriteBody {
+    const raw = form.getRawValue() as Record<string, string>;
+    const settings: Record<string, string> = {};
+    const credentials: Record<string, string> = {};
+
+    for (const [name, value] of Object.entries(raw)) {
+      if (name.startsWith(SETTING_PREFIX)) {
+        settings[name.slice(SETTING_PREFIX.length)] = value.trim();
+      } else if (name.startsWith(CREDENTIAL_PREFIX) && value.trim() !== '') {
+        credentials[name.slice(CREDENTIAL_PREFIX.length)] = value.trim();
+      }
+    }
+
+    if (this.dialog() === 'edit') {
+      const body: IntegrationWriteBody = {
+        settings,
+        status: this.statusControl.value === 'paused' ? 'paused' : 'active'
+      };
+      // `platform` is `prohibited` on PATCH, and an omitted `credentials` is
+      // what keeps the stored secret in place.
+      return Object.keys(credentials).length > 0 ? { ...body, credentials } : body;
+    }
+
+    return { platform: this.platform(), settings, credentials };
+  }
 }

@@ -117,14 +117,26 @@ describe('application route tree', () => {
     }
   });
 
-  it('gives every `/app` screen a heading and an honest empty state', async () => {
-    const placeholders = flat.filter(
-      (entry) => entry.path.startsWith('app/') && entry.route.loadComponent !== undefined
-    );
-    // overview, inbox, inbox/:id, integrations, the settings layout and its five children.
-    expect(placeholders.length).toBe(10);
+  /**
+   * The four data screens no longer render a placeholder empty state, because
+   * they are no longer placeholders: with `provideHttpClientTesting` their read
+   * is in flight, so what they must render is a *loading* state. The assertion
+   * is the same one it always was — the screen states what it actually knows —
+   * only the honest answer has changed for those four.
+   */
+  const LIVE_SCREEN_BUSY_SELECTOR: Readonly<Record<string, string>> = {
+    'app/overview': '[data-testid="kpi-skeleton"]',
+    'app/inbox': '[data-testid="data-table-loading"]',
+    'app/inbox/:id': '[data-testid="detail-skeleton"]',
+    'app/integrations': '[data-testid="integrations-skeleton"]'
+  };
 
-    for (const entry of placeholders) {
+  it('gives every `/app` screen a heading and an honest state for what it knows', async () => {
+    const screens = flat.filter((entry) => entry.path.startsWith('app/') && entry.route.loadComponent !== undefined);
+    // overview, inbox, inbox/:id, integrations, the settings layout and its five children.
+    expect(screens.length).toBe(10);
+
+    for (const entry of screens) {
       const component = (await componentOf(entry.route)) as Type<unknown>;
 
       TestBed.resetTestingModule();
@@ -137,7 +149,11 @@ describe('application route tree', () => {
       const element = fixture.nativeElement as HTMLElement;
 
       expect(element.querySelector('h1, h2')).toBeTruthy();
-      if (entry.path !== 'app/settings') {
+
+      const busySelector = LIVE_SCREEN_BUSY_SELECTOR[entry.path];
+      if (busySelector !== undefined) {
+        expect(element.querySelector(busySelector)).toBeTruthy();
+      } else if (entry.path !== 'app/settings') {
         expect(element.querySelector('[data-testid="empty-state"]')).toBeTruthy();
       }
     }

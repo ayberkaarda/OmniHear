@@ -1,0 +1,132 @@
+<section class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+  <header class="flex flex-wrap items-baseline justify-between gap-2">
+    <div class="flex flex-col gap-0.5">
+      <h2 class="text-sm font-semibold text-[var(--text-primary)]" i18n="Overview trend chart heading@@overview.trend.title">
+        Sentiment over time
+      </h2>
+      <p class="text-xs text-[var(--text-muted)]" i18n="Overview trend chart caption@@overview.trend.caption">
+        Daily average of every analysed comment, over the last 30 days.
+      </p>
+    </div>
+
+    @if (hasData()) {
+      <button
+        type="button"
+        class="rounded-md border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        [attr.aria-pressed]="showTable()"
+        (click)="toggleTable()"
+      >
+        {{ toggleLabel() }}
+      </button>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="h-40 w-full animate-pulse rounded bg-[var(--bg-surface-sunken)]" data-testid="trend-skeleton">
+      <span class="sr-only" i18n="Trend chart loading announcement@@overview.trend.loading">Loading the sentiment trend…</span>
+    </div>
+  } @else if (!hasData()) {
+    <p class="py-10 text-center text-sm text-[var(--text-muted)]" data-testid="trend-empty" i18n="Trend chart empty state@@overview.trend.empty">
+      Nothing has been analysed in the last 30 days, so there is no trend to draw yet.
+    </p>
+  } @else if (showTable()) {
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-sm" data-testid="trend-table">
+        <caption class="sr-only" i18n="Trend data table caption@@overview.trend.tableCaption">
+          Daily average sentiment and the number of comments behind each average.
+        </caption>
+        <thead>
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-secondary)]">
+            <th scope="col" class="px-2 py-1.5 font-medium" i18n="Trend table column@@overview.trend.column.day">Day</th>
+            <th scope="col" class="px-2 py-1.5 font-medium" i18n="Trend table column@@overview.trend.column.average">
+              Average sentiment
+            </th>
+            <th scope="col" class="px-2 py-1.5 font-medium" i18n="Trend table column@@overview.trend.column.count">
+              Comments
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (point of ordered(); track point.date) {
+            <tr class="border-b border-[var(--border)] last:border-b-0">
+              <th scope="row" class="px-2 py-1.5 text-left font-normal text-[var(--text-primary)]">{{ day(point) }}</th>
+              <td class="px-2 py-1.5 tabular-nums text-[var(--text-primary)]">{{ score(point) }}</td>
+              <td class="px-2 py-1.5 tabular-nums text-[var(--text-secondary)]">{{ count(point) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="flex gap-2" data-testid="trend-chart">
+      <!-- Scale captions live in HTML rather than inside the SVG: the drawing is
+           stretched with preserveAspectRatio="none" and any text in it would be
+           stretched with it. -->
+      <div class="flex w-16 shrink-0 flex-col justify-between py-1 text-right text-[10px] text-[var(--text-muted)]">
+        <span i18n="Sentiment scale top of axis@@overview.trend.axis.positive">+1 positive</span>
+        <span i18n="Sentiment scale middle of axis@@overview.trend.axis.neutral">0 neutral</span>
+        <span i18n="Sentiment scale bottom of axis@@overview.trend.axis.negative">−1 negative</span>
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <svg
+          [attr.viewBox]="viewBox"
+          class="h-40 w-full"
+          preserveAspectRatio="none"
+          role="img"
+          [attr.aria-label]="summary()"
+        >
+          <line
+            x1="0"
+            [attr.x2]="viewWidth"
+            [attr.y1]="zeroY"
+            [attr.y2]="zeroY"
+            stroke="var(--border-strong)"
+            stroke-width="1"
+            stroke-dasharray="4 4"
+            vector-effect="non-scaling-stroke"
+          />
+
+          @if (linePath(); as path) {
+            <path
+              [attr.d]="path"
+              fill="none"
+              stroke="var(--brand)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              vector-effect="non-scaling-stroke"
+            />
+          }
+
+          @for (mark of marks(); track mark.key) {
+            <!-- A vertical tick rather than a circle: under a non-uniform
+                 stretch a circle becomes an ellipse, while a vertical line
+                 stays a vertical line. -->
+            <line
+              [attr.x1]="mark.x"
+              [attr.x2]="mark.x"
+              [attr.y1]="mark.y - 4"
+              [attr.y2]="mark.y + 4"
+              [attr.stroke]="mark.toneVar"
+              stroke-width="3"
+              stroke-linecap="round"
+              vector-effect="non-scaling-stroke"
+            />
+          }
+        </svg>
+
+        <div class="flex justify-between pt-1 text-[10px] tabular-nums text-[var(--text-muted)]">
+          <span>{{ firstDateLabel() }}</span>
+          <span>{{ lastDateLabel() }}</span>
+        </div>
+
+        @if (hasGaps()) {
+          <p class="pt-1 text-[10px] text-[var(--text-muted)]" i18n="Note under the trend chart when days are missing@@overview.trend.gaps">
+            Days with no analysed comment are left out; the line joins the days that have one.
+          </p>
+        }
+      </div>
+    </div>
+  }
+</section>

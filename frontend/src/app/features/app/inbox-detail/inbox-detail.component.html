@@ -1,4 +1,4 @@
-<section class="flex flex-col gap-4">
+<section class="flex max-w-3xl flex-col gap-4">
   <header class="flex flex-col gap-1">
     <a
       routerLink="/app/inbox"
@@ -12,13 +12,128 @@
     <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.inboxDetail.subtitle">
       The comment itself, next to the reasoning behind its analysis.
     </p>
-    @if (id()) {
-      <p class="font-mono text-xs tabular-nums text-[var(--text-muted)]">
-        <span i18n="@@app.inboxDetail.recordId">Record:</span>
-        <span>{{ id() }}</span>
-      </p>
-    }
   </header>
 
-  <app-empty-state icon="search" [heading]="emptyHeading" [description]="placeholderDescription" />
+  @if (errorMessage(); as message) {
+    <div
+      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      role="alert"
+      data-testid="detail-error"
+    >
+      <span class="flex-1">{{ message }}</span>
+      <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
+    </div>
+  } @else if (loading()) {
+    <div class="flex flex-col gap-3" data-testid="detail-skeleton" aria-busy="true">
+      <span class="sr-only" i18n="Feedback detail loading announcement@@inboxDetail.loading">Loading this comment…</span>
+      <span class="h-24 w-full animate-pulse rounded-lg bg-[var(--bg-surface-sunken)]"></span>
+      <span class="h-40 w-full animate-pulse rounded-lg bg-[var(--bg-surface-sunken)]"></span>
+    </div>
+  } @else if (feedback(); as record) {
+    <article class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <app-badge kind="source" [value]="sourceLabel()" size="sm" />
+        <span class="text-sm font-medium text-[var(--text-primary)]">{{ authorName() }}</span>
+        <span class="text-xs tabular-nums text-[var(--text-muted)]">{{ publishedAt() }}</span>
+      </div>
+
+      <p class="whitespace-pre-line text-sm leading-relaxed text-[var(--text-primary)]" data-testid="detail-body">
+        {{ record.body }}
+      </p>
+
+      <dl class="grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
+        <div class="flex gap-2">
+          <dt class="text-[var(--text-muted)]" i18n="Feedback metadata label@@inboxDetail.meta.externalId">Source ID</dt>
+          <dd class="min-w-0 truncate font-mono text-[var(--text-secondary)]">{{ record.external_id }}</dd>
+        </div>
+        <div class="flex gap-2">
+          <dt class="text-[var(--text-muted)]" i18n="Feedback metadata label@@inboxDetail.meta.status">Status</dt>
+          <dd class="text-[var(--text-secondary)]">{{ statusLabel() }}</dd>
+        </div>
+      </dl>
+
+      @if (record.source_url) {
+        <a
+          [href]="record.source_url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-fit rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          >{{ openSourceLabel }}</a
+        >
+      }
+    </article>
+
+    <section class="flex flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <h2 class="text-sm font-semibold text-[var(--text-primary)]" i18n="Analysis panel heading@@inboxDetail.analysis.title">
+        What the analyser found
+      </h2>
+
+      @if (analysis(); as result) {
+        <div class="flex flex-wrap items-center gap-2" data-testid="detail-analysis">
+          <app-badge kind="sentiment" [value]="result.sentiment_label" [score]="result.sentiment_score" />
+          <app-badge kind="category" [value]="result.category" />
+        </div>
+
+        <dl class="flex flex-col gap-3 text-sm">
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.score">
+              Sentiment score
+            </dt>
+            <dd class="tabular-nums text-[var(--text-primary)]">
+              {{ sentimentScore() }}
+              <span class="text-xs text-[var(--text-muted)]" i18n="Scale note next to the sentiment score@@inboxDetail.analysis.scoreScale">
+                on a scale from −1 to +1
+              </span>
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.confidence">
+              Confidence
+            </dt>
+            <dd class="flex items-center gap-2">
+              <span class="tabular-nums text-[var(--text-primary)]">{{ confidencePercent() }}</span>
+              <!-- Deliberately colourless: confidence is a magnitude, not a
+                   verdict, and a red-to-green bar here would read as sentiment. -->
+              <span class="h-1.5 w-32 overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]" aria-hidden="true">
+                <span class="block h-full rounded-full bg-[var(--brand)]" [style.width.%]="confidenceWidth()"></span>
+              </span>
+            </dd>
+          </div>
+
+          @if (result.keywords.length > 0) {
+            <div class="flex flex-col gap-1">
+              <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.keywords">
+                Keywords it keyed on
+              </dt>
+              <dd class="flex flex-wrap gap-1.5">
+                @for (keyword of result.keywords; track keyword) {
+                  <span
+                    class="rounded-full border border-[var(--border)] bg-[var(--bg-surface-sunken)] px-2 py-0.5 text-xs text-[var(--text-secondary)]"
+                    >{{ keyword }}</span
+                  >
+                }
+              </dd>
+            </div>
+          }
+
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.model">
+              Model version
+            </dt>
+            <dd class="font-mono text-xs text-[var(--text-secondary)]">{{ result.model_version }}</dd>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.analysedAt">
+              Analysed at
+            </dt>
+            <dd class="tabular-nums text-xs text-[var(--text-secondary)]">{{ analyzedAt() }}</dd>
+          </div>
+        </dl>
+      } @else {
+        <p class="text-sm text-[var(--text-secondary)]" data-testid="detail-no-analysis">{{ pendingExplanation() }}</p>
+      }
+    </section>
+  }
 </section>

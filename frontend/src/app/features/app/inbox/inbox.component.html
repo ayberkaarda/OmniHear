@@ -1,8 +1,110 @@
 <section class="flex flex-col gap-4">
   <header class="flex flex-col gap-1">
     <h1 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.inbox.title">Inbox</h1>
-    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.inbox.subtitle">Every collected comment with its sentiment, category and source.</p>
+    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.inbox.subtitle">
+      Every collected comment with its sentiment, category and source.
+    </p>
   </header>
 
-  <app-empty-state icon="mail" [heading]="emptyHeading" [description]="placeholderDescription" />
+  <form
+    [formGroup]="form"
+    class="grid gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 sm:grid-cols-2 xl:grid-cols-4"
+    [attr.aria-label]="searchLabel"
+    (submit)="$event.preventDefault()"
+  >
+    <div class="sm:col-span-2 xl:col-span-2">
+      <app-input
+        formControlName="q"
+        type="search"
+        prefixIcon="search"
+        [label]="searchLabel"
+        [helper]="searchHelper"
+      />
+    </div>
+
+    <app-select formControlName="sentiment" [label]="sentimentFilterLabel" [options]="sentimentOptions()" />
+    <app-select formControlName="category" [label]="categoryFilterLabel" [options]="categoryOptions()" />
+    <app-select formControlName="platform" [label]="platformFilterLabel" [options]="platformOptions()" />
+    <app-select formControlName="analysis_status" [label]="statusFilterLabel" [options]="statusOptions()" />
+    <app-select formControlName="integration_id" [label]="integrationFilterLabel" [options]="integrationOptions()" />
+
+    <div class="flex flex-col gap-1">
+      <label for="inbox-filter-from" class="text-sm font-medium text-[var(--text-primary)]" i18n="Inbox date filter label@@inbox.filters.from">
+        Published from
+      </label>
+      <input
+        id="inbox-filter-from"
+        type="date"
+        formControlName="from"
+        class="h-9 w-full rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="inbox-filter-to" class="text-sm font-medium text-[var(--text-primary)]" i18n="Inbox date filter label@@inbox.filters.to">
+        Published until
+      </label>
+      <input
+        id="inbox-filter-to"
+        type="date"
+        formControlName="to"
+        class="h-9 w-full rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]"
+      />
+    </div>
+
+    @if (hasFilters()) {
+      <div class="flex items-end sm:col-span-2 xl:col-span-4">
+        <app-button variant="ghost" size="sm" (pressed)="onClearFilters()">{{ clearFiltersLabel }}</app-button>
+      </div>
+    }
+  </form>
+
+  @if (errorMessage(); as message) {
+    <div
+      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      role="alert"
+      data-testid="inbox-error"
+    >
+      <span class="flex-1">{{ message }}</span>
+      <app-button variant="secondary" size="sm" (pressed)="onRetry()">{{ retryLabel }}</app-button>
+    </div>
+  }
+
+  <div [attr.aria-busy]="refreshing() ? 'true' : null">
+    @if (refreshing()) {
+      <p class="pb-1 text-xs text-[var(--text-muted)]" role="status" data-testid="inbox-refreshing" i18n="Inbox background refresh notice@@inbox.refreshing">
+        Updating the list…
+      </p>
+    }
+
+    <app-data-table
+      [columns]="columns()"
+      [rows]="rows()"
+      [state]="tableState()"
+      [selectable]="false"
+      [emptyState]="emptyState()"
+      (rowActivate)="onRowActivate($event)"
+      (retry)="onRetry()"
+      (emptyStateAction)="onClearFilters()"
+    />
+  </div>
+
+  <nav class="flex flex-wrap items-center justify-between gap-3" [attr.aria-label]="paginationLabel">
+    <p class="text-xs tabular-nums text-[var(--text-secondary)]" data-testid="inbox-pagination-summary">
+      {{ pageSummary() }}
+    </p>
+
+    <div class="flex items-center gap-3">
+      <form [formGroup]="paginationForm" class="w-28">
+        <app-select formControlName="perPage" [label]="perPageLabel" size="sm" [options]="perPageOptions" />
+      </form>
+
+      <app-button variant="secondary" size="sm" [disabled]="!canPrevious()" (pressed)="onPreviousPage()">
+        <span i18n="Pagination control@@inbox.pagination.previous">Previous</span>
+      </app-button>
+      <app-button variant="secondary" size="sm" [disabled]="!canNext()" (pressed)="onNextPage()">
+        <span i18n="Pagination control@@inbox.pagination.next">Next</span>
+      </app-button>
+    </div>
+  </nav>
 </section>
