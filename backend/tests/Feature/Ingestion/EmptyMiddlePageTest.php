@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\FeedbackIngested;
 use App\Models\Feedback;
 use App\Support\Connectors\ConnectorHealth;
 use App\Support\Connectors\ConnectorItem;
@@ -7,6 +8,7 @@ use App\Support\Connectors\ConnectorLimits;
 use App\Support\Connectors\ConnectorPage;
 use App\Support\Connectors\PlatformConnector;
 use App\Support\Connectors\SyncCursor;
+use Illuminate\Support\Facades\Event;
 
 /**
  * A page that comes back empty in the *middle* of a run must not cost its items
@@ -84,6 +86,13 @@ final class FlakyMiddlePageConnector implements PlatformConnector
 }
 
 it('does not lose the items of a page that was transiently empty', function () {
+    // Faked because the queue runs sync in tests: without it FeedbackIngested
+    // reaches the analysis listener, which calls the real analyzer over HTTP.
+    // That service is up in the dev stack and absent in CI, so the test passed
+    // locally and failed there with AiServiceUnavailableException. What is under
+    // test here is which rows exist, not what happens to them afterwards.
+    Event::fake([FeedbackIngested::class]);
+
     [$company, $integration] = fixtureIntegration();
 
     FlakyMiddlePageConnector::$run = 1;

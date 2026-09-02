@@ -36,6 +36,12 @@ const TRANSFER_MAX_KB = 100;
 
 const KB = 1024;
 
+/**
+ * CSI colour sequences, written as an explicit escape rather than a literal
+ * control byte so the source survives an editor, a diff and a text encoding.
+ */
+const ANSI = /\u001b\[[0-9;]*m/g;
+
 function fail(message) {
   console.error(`\n[bundle-check] FAIL — ${message}`);
   process.exit(1);
@@ -94,11 +100,25 @@ console.log('[bundle-check] running: ng build --configuration production\n');
 const build = spawnSync(
   process.execPath,
   [join(ROOT, 'node_modules', '@angular', 'cli', 'bin', 'ng.js'), 'build', '--configuration', 'production'],
-  { cwd: ROOT, encoding: 'utf8' },
+  // maxBuffer well above the default 1 MB: without a TTY the CLI stops collapsing
+  // the lazy-chunk list, and a truncated capture would fail this check for a
+  // reason that has nothing to do with the bundle.
+  { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
 );
 
-const output = `${build.stdout ?? ''}${build.stderr ?? ''}`;
-process.stdout.write(output);
+const captured = `${build.stdout ?? ''}${build.stderr ?? ''}`;
+process.stdout.write(captured);
+
+// Strip colour before matching. On a GitHub runner the CLI colourises every cell
+// of the size table, so "| Initial total |" arrives with escape sequences between
+// the pipe, the label and the numbers, and a pattern written against the plain
+// local output matches nothing. That is exactly how this check first failed in
+// CI — reporting a parser error while the bundle was comfortably inside budget.
+const output = captured.replace(ANSI, '');
+
+if (build.error) {
+  fail(`could not run ng build: ${build.error.message}`);
+}
 
 if (build.status !== 0) {
   // The Angular budget itself already failed, or compilation did. Either way the
