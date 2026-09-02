@@ -65,6 +65,30 @@ jobs:
       # advisory landed and needs a decision, not a silencer.
       - run: composer audit
       - run: vendor/bin/pint --test
+      # The analyzer, running for real, so the live cross-service tests execute
+      # instead of skipping. PROGRESS has carried this gap since F1: "three
+      # defects survived a fully green gate because nothing in it connects two
+      # services", and the first genuinely signed request between them returned
+      # 401. Four tests were still skipping here as of run 33670011911.
+      #
+      # SENTIMENT_BACKEND=lexicon on purpose: these tests prove the contract —
+      # HMAC over the raw bytes, the correlation id, the response shape — not
+      # model quality, which the ai_service job covers with the real ONNX weights.
+      # Fetching 171 MB of weights again here would buy nothing and cost minutes.
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Start the analyzer
+        working-directory: ai-service
+        env:
+          AI_SERVICE_HMAC_SECRET: ci-only-not-a-real-secret
+          SENTIMENT_BACKEND: lexicon
+        run: |
+          pip install -e ".[dev]"
+          nohup uvicorn app.main:app --host 127.0.0.1 --port 8001 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8001/health && break || sleep 1
+          done
+          curl -sf http://127.0.0.1:8001/health
       - name: Tests
         env:
           DB_CONNECTION: pgsql
@@ -72,6 +96,9 @@ jobs:
           DB_DATABASE: omnihear_test
           DB_USERNAME: omnihear
           DB_PASSWORD: omnihear
+          AI_SERVICE_URL: http://127.0.0.1:8001
+          AI_SERVICE_HMAC_SECRET: ci-only-not-a-real-secret
+          CONTRACT_FIXTURES_PATH: ${{ github.workspace }}/contracts/fixtures/analyze
           REDIS_HOST: 127.0.0.1
         run: php artisan test --coverage --min=80
 

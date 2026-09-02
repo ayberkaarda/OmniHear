@@ -10,7 +10,9 @@
 
 **Oturum başında oku** (var olanlar):
 - `omnihear-engineering-prompt (1).md` — bağlayıcı spec
-- `docs/PROGRESS.md` — faz durumu *(oluşturulacak)*
+- `docs/PROGRESS.md` — faz durumu, açık kararlar, bilinen sapmalar
+- `docs/LESSONS.md` — **ölçülmüş olgular, append-only.** Buradaki her madde bir hata ayıklama
+  oturumuna mal oldu; okumadan başlama, yeniden keşfetme.
 - `docs/adr/` — mimari karar kayıtları *(oluşturulacak, spec §10)*
 - `contracts/ai-openapi.json` — Laravel ↔ FastAPI sözleşmesi *(oluşturulacak)*
 
