@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22' }
+        with: { node-version-file: '.nvmrc' }
       - run: node .claude/hooks/__selftest.mjs
 
   backend:
@@ -102,8 +102,13 @@ jobs:
       # the log the way those eleven were.
       - run: pytest -rs
 
+  # Node is pinned by .nvmrc rather than written here, because the two sides
+  # disagreeing is not cosmetic: the lockfile is authored by whatever npm the
+  # developer runs and validated by whatever npm CI runs. A lock written by npm 11
+  # (Node 26) was rejected by npm 10 (Node 22) with "Missing: ... from lock file",
+  # twice, for packages that were perfectly present locally.
   frontend:
-    name: Frontend (Angular 18, zoneless)
+    name: Frontend (Angular 22, zoneless)
     runs-on: ubuntu-latest
     needs: guards
     defaults:
@@ -111,7 +116,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json }
+        with: { node-version-file: '.nvmrc', cache: npm, cache-dependency-path: frontend/package-lock.json }
       - run: npm ci
       # A dependency whose requirement the installed tree does not satisfy.
       # `npm ci` alone does not catch it: the Angular 18 tree carried an

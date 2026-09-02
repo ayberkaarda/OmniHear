@@ -83,6 +83,8 @@ cd backend    && vendor/bin/pint --test
 cd backend    && php artisan test --coverage --min=80
 cd ai-service && ruff check . && ruff format --check .
 cd ai-service && pytest
+cd frontend   && npm ci --dry-run                            # lock <-> package.json senkron mu (1.5 sn)
+cd frontend   && npm ls chokidar                             # karsilanmamis bagimlilik var mi
 cd frontend   && npx eslint .
 cd frontend   && npm run typecheck                          # tsconfig.typecheck.json — Tuzak 1'e bak
 cd frontend   && npm run build:gate                          # raw + transfer, ikisi de rapora girer
@@ -96,6 +98,12 @@ cd frontend   && npx playwright test                        # E2E fazından itib
 
 Bir bileşen henüz kurulmadıysa o satır atlanır ve **rapora "henüz yok" diye yazılır** — sessizce atlanmaz.
 
+> **Node sürümü `.nvmrc` ile sabit.** Lock dosyasını geliştiricinin npm'i yazar, CI'nınki
+> doğrular; ikisi farklı major ise npm 11'in yazdığı bir lock npm 10 tarafından
+> "Missing: … from lock file" ile reddedilir — yerelde var olan paketler için, iki kez
+> oldu. CI `node-version-file: '.nvmrc'` okur, `frontend/package.json` `engines` ile
+> aynı şeyi beyan eder. Node sürümünü değiştiren, ikisini birlikte değiştirir.
+>
 > **CI şu anda karanlık.** Repo private kalıyor (kullanıcı kararı, 2026-09-02: proje
 > bitince public olacak) ve GitHub Actions faturalandırma nedeniyle bloke. Bu, kapıda
 > yalnızca CI'de koşan üç komutun sessizce kaybolması demekti; üçü de yukarıdaki listeye
