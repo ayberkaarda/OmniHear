@@ -32,6 +32,12 @@ $database = is_string($requested) && str_starts_with($requested, 'test_tmp_')
 
 $overrides = [
     'APP_ENV' => 'testing',
+    // Derived, not a literal: the suite must not depend on a .env that is
+    // gitignored. Without a key the encrypted casts throw MissingAppKeyException
+    // and every test that touches integrations.credentials — the mechanism
+    // invariant I5 rests on — fails on any clean checkout. CI proved that the
+    // first time it ran.
+    'APP_KEY' => 'base64:'.base64_encode('omnihear-testing-key-not-secret!'),
     'APP_MAINTENANCE_DRIVER' => 'file',
     'BCRYPT_ROUNDS' => '4',
     'CACHE_STORE' => 'array',

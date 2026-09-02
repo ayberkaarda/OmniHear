@@ -124,4 +124,10 @@ jobs:
     needs: guards
     steps:
       - uses: actions/checkout@v4
+      # compose declares `env_file: ../backend/.env`, which is gitignored, so on a
+      # clean checkout `config` fails with "env file not found" — as this job did
+      # the first time it ever ran. Creating it from the example is not a
+      # workaround: it is the documented onboarding path, and running it here is
+      # what proves .env.example still covers everything compose reads.
+      - run: cp backend/.env.example backend/.env
       - run: docker compose -f infra/docker-compose.dev.yml config -q
