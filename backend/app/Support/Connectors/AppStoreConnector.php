@@ -78,7 +78,11 @@ final readonly class AppStoreConnector implements PlatformConnector
         // On the last page the cursor promotes pending and rewinds to page 1:
         // the next run starts at the top of the feed and stops at the watermark
         // this one just established.
-        $nextCursor = $hasMore ? $reached->withPage($page + 1) : $reached->promoted();
+        // Promotion is the runner's call, not this method's: only the runner
+        // knows whether an earlier page of the same run came back empty, and
+        // promoting after a skipped page buries its items below the watermark
+        // forever. Here the cursor only advances `pending` and the page number.
+        $nextCursor = $reached->withPage($hasMore ? $page + 1 : 1);
 
         return new ConnectorPage(
             items: $items,

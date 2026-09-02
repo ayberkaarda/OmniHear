@@ -69,7 +69,11 @@ it('ends the run on the last file and rewinds the cursor for the next one', func
     expect($page->items)->toHaveCount(count(fixturePage('page-2.json')))
         ->and($page->hasMore)->toBeFalse()
         ->and(SyncCursor::decode($page->nextCursor)->page)->toBe(1)
-        ->and(SyncCursor::decode($page->nextCursor)->watermark)->not->toBeNull();
+        // Promotion moved to the runner, which is the only party that knows
+        // whether an earlier page of this run came back empty. The connector
+        // reports how far it reached in `pending`; `watermark` is still the
+        // value the run started from.
+        ->and(SyncCursor::decode($page->nextCursor)->pending)->not->toBeNull();
 });
 
 it('returns an empty final page past the last file', function () {

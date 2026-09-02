@@ -43,6 +43,7 @@ class IngestionRunner
         $cursor = $integration->sync_cursor;
         $pages = 0;
         $emptyStreak = 0;
+        $sawEmptyPage = false;
         $itemsSeen = 0;
         $created = 0;
         $capped = false;
@@ -56,6 +57,7 @@ class IngestionRunner
                 // feed returns them intermittently (PROGRESS, 2026-09-02).
                 // Only the streak is counted; stopping is hasMore's decision.
                 $emptyStreak++;
+                $sawEmptyPage = true;
             } else {
                 $emptyStreak = 0;
                 $itemsSeen += count($page->items);
@@ -71,6 +73,30 @@ class IngestionRunner
         if ($capped && $page->hasMore) {
             $this->logCapped($integration, $pages, $emptyStreak);
         }
+
+        // The watermark is a high-water mark on published_at, so promoting it
+        // buries everything older than the newest item this run saw. That is
+        // only safe when the run actually reached the end of the stream: if a
+        // page came back empty, or the page cap cut the run short, the items
+        // that were missed are older than the new watermark and alreadySeen()
+        // would reject them on every future run — erased, not retried.
+        //
+        // This feed returns empty pages intermittently (PROGRESS, 2026-09-02),
+        // so it is not a hypothetical. An incomplete run keeps the old
+        // watermark and the next one walks the same ground again; invariant I2
+        // turns the re-fetch into no new rows, which is exactly what the unique
+        // index is for.
+        // `$capped` alone is not the test: a connector that reports hasMore=false
+        // exactly as it reaches its own ceiling (the App Store feed caps page
+        // depth at 10 and has nothing beyond it) trips the runner's cap in the
+        // same iteration, and that run is complete. What must block promotion is
+        // the runner cutting a run short *while the connector still had more* —
+        // then the cursor's page number is what resumes it, and the watermark
+        // has to stay where it was or the unreached pages fall below it.
+        $reached = SyncCursor::decode($cursor);
+        $complete = ! $page->hasMore && ! $sawEmptyPage;
+
+        $cursor = ($complete ? $reached->promoted() : $reached)->encode();
 
         $attributes = [
             'sync_cursor' => $cursor,

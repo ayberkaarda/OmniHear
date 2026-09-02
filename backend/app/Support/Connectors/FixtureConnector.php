@@ -63,7 +63,11 @@ final readonly class FixtureConnector implements PlatformConnector
         // Mid-run the watermark is left exactly where the run started and only
         // `pending` moves; promoting it here would make every older page look
         // already-seen and cut the run short after page 1.
-        $nextCursor = $hasMore ? $reached->withPage($page + 1) : $reached->promoted();
+        // Promotion is the runner's call, not this method's: only the runner
+        // knows whether an earlier page of the same run came back empty, and
+        // promoting after a skipped page buries its items below the watermark
+        // forever. Here the cursor only advances `pending` and the page number.
+        $nextCursor = $reached->withPage($hasMore ? $page + 1 : 1);
 
         return new ConnectorPage(
             items: $items,
