@@ -66,6 +66,9 @@ services:
       DB_HOST: postgres
       REDIS_HOST: redis
       AI_SERVICE_URL: http://ai-service:8001
+      # Same value as the ai-service below. compose `environment` overrides
+      # `env_file`, so backend/.env cannot drift out of sync with the analyzer.
+      AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
     ports:
       - "8000:8000"
     depends_on:
@@ -76,8 +79,10 @@ services:
       ai-service:
         condition: service_started
     volumes:
+      # No named volume over vendor/: an empty one shadows the host directory and
+      # artisan dies on a missing autoload.php. vendor/ is installed from the 8.3
+      # container anyway, so the bind mount is the correct source.
       - ../backend:/srv/backend
-      - backend-vendor:/srv/backend/vendor
 
   horizon:
     build:
@@ -90,12 +95,17 @@ services:
       DB_HOST: postgres
       REDIS_HOST: redis
       AI_SERVICE_URL: http://ai-service:8001
+      # Same value as the ai-service below. compose `environment` overrides
+      # `env_file`, so backend/.env cannot drift out of sync with the analyzer.
+      AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
     depends_on:
       backend:
         condition: service_started
     volumes:
+      # No named volume over vendor/: an empty one shadows the host directory and
+      # artisan dies on a missing autoload.php. vendor/ is installed from the 8.3
+      # container anyway, so the bind mount is the correct source.
       - ../backend:/srv/backend
-      - backend-vendor:/srv/backend/vendor
 
   reverb:
     build:
@@ -107,14 +117,20 @@ services:
     environment:
       DB_HOST: postgres
       REDIS_HOST: redis
+      # Reverb does not call the analyzer today, but leaving the placeholder from
+      # backend/.env in place here is the same footgun that produced a 401 between
+      # backend and ai-service: one service silently holding a different secret.
+      AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
     ports:
       - "8080:8080"
     depends_on:
       backend:
         condition: service_started
     volumes:
+      # No named volume over vendor/: an empty one shadows the host directory and
+      # artisan dies on a missing autoload.php. vendor/ is installed from the 8.3
+      # container anyway, so the bind mount is the correct source.
       - ../backend:/srv/backend
-      - backend-vendor:/srv/backend/vendor
 
   frontend:
     image: node:22-alpine
@@ -125,11 +141,10 @@ services:
     ports:
       - "4200:4200"
     volumes:
+      # Same reasoning as backend/vendor: an empty named volume would hide
+      # the installed node_modules and ng serve would fail.
       - ../frontend:/srv/frontend
-      - frontend-node-modules:/srv/frontend/node_modules
 
 volumes:
   postgres-data:
   redis-data:
-  backend-vendor:
-  frontend-node-modules:

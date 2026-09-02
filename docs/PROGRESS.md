@@ -53,6 +53,8 @@ Claude Design was imported. The phase order is otherwise unchanged.
 - **2026-09-02** Host differs from spec: PHP 8.2.12 (no `pcntl`/`posix` on Windows, so Horizon cannot run there), Python 3.14.7, no local `psql`. Containers are authoritative (ADR-0002).
 - **2026-09-02** Removing zone.js: 261.52 kB → 226.52 kB initial (polyfills 36.36 → 1.84 kB). `--localize=false` was worth 0.65 kB, `withFetch()` nothing.
 - **2026-09-02** An **uncalibrated** colour-blindness simulation produced wrong numbers and nearly drove the opposite palette decision. `tokens-check` now runs calibration assertions first and aborts everything if they fail. Do not remove them.
+- **2026-09-02** Three defects survived a fully green gate because **nothing in it connects two services**. An empty named volume over `backend/vendor` shadowed the host directory and killed every `artisan` command; `docker compose config -q` passed anyway (valid syntax, broken behaviour). The HMAC secret differed between backend (`REPLACE_ME` from `.env`) and ai-service (compose default), so the first real signed request returned **401 INVALID_SIGNATURE** — both sides were green in isolation and the contract test uses fixtures, not a live call. Verified by hand afterwards: unsigned → 401, mismatched → 401, matched → 200 with the correct response shape. **A live smoke test belongs in the gate** (proposed, not yet added — needs approval).
+- **2026-09-02** Host `php artisan` no longer runs at all: `composer.json` requires PHP ^8.3 and `vendor/composer/platform_check.php` aborts on the 8.2 host before autoload. Every backend command goes through `docker compose -f infra/docker-compose.dev.yml run --rm backend …`.
 
 ## ADRs
 
