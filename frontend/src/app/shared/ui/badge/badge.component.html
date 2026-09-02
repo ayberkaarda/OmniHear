@@ -1,0 +1,75 @@
+<span [class]="classes()" [attr.data-kind]="kind()" [attr.data-value]="value()">
+  @if (shouldShowIcon() && iconName()) {
+    <app-icon [name]="iconName()!" [size]="size()" />
+  }
+
+  @switch (kind()) {
+    @case ('sentiment') {
+      @switch (value()) {
+        @case ('positive') {
+          <span i18n="Sentiment badge label@@badge.sentiment.positive">Positive</span>
+        }
+        @case ('neutral') {
+          <span i18n="Sentiment badge label@@badge.sentiment.neutral">Neutral</span>
+        }
+        @case ('negative') {
+          <span i18n="Sentiment badge label@@badge.sentiment.negative">Negative</span>
+        }
+        @default {
+          <span>{{ value() }}</span>
+        }
+      }
+    }
+    @case ('category') {
+      @switch (value()) {
+        @case ('complaint') {
+          <span i18n="Category badge label@@badge.category.complaint">Complaint</span>
+        }
+        @case ('praise') {
+          <span i18n="Category badge label@@badge.category.praise">Praise</span>
+        }
+        @case ('bug') {
+          <span i18n="Category badge label@@badge.category.bug">Bug</span>
+        }
+        @case ('feature_request') {
+          <span i18n="Category badge label@@badge.category.featureRequest">Feature request</span>
+        }
+        @default {
+          <span>{{ value() }}</span>
+        }
+      }
+    }
+    @case ('status') {
+      @switch (value()) {
+        @case ('active') {
+          <span i18n="Status badge label@@badge.status.active">Active</span>
+        }
+        @case ('success') {
+          <span i18n="Status badge label@@badge.status.success">Active</span>
+        }
+        @case ('error') {
+          <span i18n="Status badge label@@badge.status.error">Error</span>
+        }
+        @case ('paused') {
+          <span i18n="Status badge label@@badge.status.paused">Paused</span>
+        }
+        @case ('warning') {
+          <span i18n="Status badge label@@badge.status.warning">Warning</span>
+        }
+        @case ('info') {
+          <span i18n="Status badge label@@badge.status.info">Info</span>
+        }
+        @default {
+          <span>{{ value() }}</span>
+        }
+      }
+    }
+    @default {
+      <span>{{ value() }}</span>
+    }
+  }
+
+  @if (formattedScore()) {
+    <span class="tabular-nums opacity-80">{{ formattedScore() }}</span>
+  }
+</span>

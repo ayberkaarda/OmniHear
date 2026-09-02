@@ -1,0 +1,44 @@
+@if (open()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-[var(--bg-overlay)]" tabindex="-1" (click)="onBackdropClick()" aria-hidden="true"></div>
+
+    <div
+      #dialogEl
+      [class]="sizeClasses() + ' relative flex max-h-[calc(100vh-2rem)] flex-col rounded-lg bg-[var(--bg-surface-raised)] shadow-[var(--shadow-md)]'"
+      [attr.role]="role()"
+      aria-modal="true"
+      [attr.aria-labelledby]="titleId"
+      tabindex="-1"
+      (keydown)="onKeydown($event)"
+    >
+      <div class="flex items-center justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+        <h2
+          #titleEl
+          [id]="titleId"
+          tabindex="-1"
+          class="text-base font-semibold text-[var(--text-primary)] focus:outline-none"
+        >
+          {{ title() }}
+        </h2>
+        <app-button
+          variant="ghost"
+          size="sm"
+          [iconOnly]="true"
+          ariaLabel="Close"
+          i18n-ariaLabel="Modal close button label@@modal.close"
+          (pressed)="onCloseButtonClick()"
+        >
+          <app-icon name="x" size="sm" />
+        </app-button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-5 py-4">
+        <ng-content select="[modalBody]"></ng-content>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 border-t border-[var(--border)] px-5 py-4">
+        <ng-content select="[modalFooter]"></ng-content>
+      </div>
+    </div>
+  </div>
+}

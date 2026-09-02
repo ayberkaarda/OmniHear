@@ -11,6 +11,7 @@
 // Exit 0 = all assertions passed, 1 = at least one failed.
 
 import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -22,12 +23,12 @@ let pass = 0
 let fail = 0
 const failures = []
 
-function invoke(hook, payload) {
+function invoke(hook, payload, projectDir = ROOT) {
   const r = spawnSync(process.execPath, [join(HOOKS, hook)], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
     timeout: 15000,
-    env: { ...process.env, CLAUDE_PROJECT_DIR: ROOT },
+    env: { ...process.env, CLAUDE_PROJECT_DIR: projectDir },
   })
   let json = null
   const out = (r.stdout || '').trim()
@@ -42,8 +43,8 @@ function verdictOf(res) {
   return 'pass'
 }
 
-function check(label, hook, payload, expected) {
-  const res = invoke(hook, payload)
+function check(label, hook, payload, expected, projectDir) {
+  const res = invoke(hook, payload, projectDir)
   const got = verdictOf(res)
   if (got === expected && res.exit === 0) {
     pass++
@@ -96,9 +97,33 @@ check('FP: DELETE + WHERE -> pass', 'guard-destructive-ops.mjs', cmd('psql -c "D
 console.log('--- guard-test-db-target ---')
 check('dev DB hedefi -> deny', 'guard-test-db-target.mjs', cmd(`DB_DATABASE=${DEVDB} php artisan test`), 'deny')
 check('izole test DB -> pass', 'guard-test-db-target.mjs', cmd('DB_DATABASE=test_tmp_a1 php artisan test'), 'pass')
-check('phpunit.xml yok -> ask', 'guard-test-db-target.mjs', cmd('php artisan test'), 'ask')
-check('pest, hedef belirsiz -> ask', 'guard-test-db-target.mjs', cmd('vendor/bin/pest'), 'ask')
 check('FP: test disi komut -> pass', 'guard-test-db-target.mjs', cmd('php artisan route:list'), 'pass')
+
+// Repo'da artik backend/phpunit.xml var ve omnihear_test'i dogru hedefliyor, bu yuzden
+// hedefi belirtmeyen bir komut dogru olarak PASS alir. "Yapilandirma eksik" senaryosunu
+// gercek repoya bagli birakmak testi kirilgan yapar (bir kez kirildi), o yuzden bu iki
+// vaka izole gecici bir proje kokunde kosuluyor.
+const NO_CFG = mkdtempSync(join(tmpdir(), 'oh-nocfg-'))
+mkdirSync(join(NO_CFG, 'backend'), { recursive: true })
+check('phpunit.xml yok -> ask', 'guard-test-db-target.mjs', cmd('php artisan test'), 'ask', NO_CFG)
+check('pest, hedef belirsiz -> ask', 'guard-test-db-target.mjs', cmd('vendor/bin/pest'), 'ask', NO_CFG)
+
+// phpunit.xml var ama DB_DATABASE override'i yok -> yine ask
+const NO_OVERRIDE = mkdtempSync(join(tmpdir(), 'oh-nooverride-'))
+mkdirSync(join(NO_OVERRIDE, 'backend'), { recursive: true })
+writeFileSync(join(NO_OVERRIDE, 'backend', 'phpunit.xml'),
+  '<?xml version="1.0"?><phpunit><php><env name="APP_ENV" value="testing"/></php></phpunit>')
+check('phpunit.xml var, override yok -> ask', 'guard-test-db-target.mjs', cmd('php artisan test'), 'ask', NO_OVERRIDE)
+
+// phpunit.xml dev veritabanini hedefliyor -> deny (Tuzak 4'un tam senaryosu)
+const DEV_TARGET = mkdtempSync(join(tmpdir(), 'oh-devtarget-'))
+mkdirSync(join(DEV_TARGET, 'backend'), { recursive: true })
+writeFileSync(join(DEV_TARGET, 'backend', 'phpunit.xml'),
+  `<?xml version="1.0"?><phpunit><php><env name="DB_DATABASE" value="${DEVDB}"/></php></phpunit>`)
+check('phpunit.xml dev DB hedefliyor -> deny', 'guard-test-db-target.mjs', cmd('php artisan test'), 'deny', DEV_TARGET)
+
+// Gercek repo: phpunit.xml var ve omnihear_test hedefliyor -> pass
+check('gercek repo, dogru yapilandirma -> pass', 'guard-test-db-target.mjs', cmd('php artisan test'), 'pass')
 
 console.log('--- guard-protected-paths ---')
 check('env dosyasi -> deny', 'guard-protected-paths.mjs', write(join(ROOT, 'backend', '.env'), 'APP_ENV=local'), 'deny')

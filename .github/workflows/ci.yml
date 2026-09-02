@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Guard hooks first: they enforce tenant isolation (I1) and the no-secret-logging
+  # rule (I5). If a guard is silently broken, every later "the guard would have
+  # caught it" claim in this run is worthless — so fail fast, before anything slow.
+  guards:
+    name: Guard hooks self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: node .claude/hooks/__selftest.mjs
+
+  backend:
+    name: Backend (Laravel 13 / PHP 8.3)
+    runs-on: ubuntu-latest
+    needs: guards
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: omnihear
+          POSTGRES_PASSWORD: omnihear
+          POSTGRES_DB: omnihear_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U omnihear"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    defaults:
+      run: { working-directory: backend }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_pgsql, redis, pcntl, posix, bcmath, intl, zip
+          coverage: xdebug
+      - run: composer validate --strict
+      - run: composer install --prefer-dist --no-progress
+      - run: composer check-platform-reqs
+      # The branch this project sits on must stay advisory-clean. There is no
+      # suppression block in composer.json (see ADR-0003) — if this fails, a real
+      # advisory landed and needs a decision, not a silencer.
+      - run: composer audit
+      - run: vendor/bin/pint --test
+      - name: Tests
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: omnihear_test
+          DB_USERNAME: omnihear
+          DB_PASSWORD: omnihear
+          REDIS_HOST: 127.0.0.1
+        run: php artisan test --coverage --min=80
+
+  ai_service:
+    name: AI service (Python 3.12)
+    runs-on: ubuntu-latest
+    needs: guards
+    defaults:
+      run: { working-directory: ai-service }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest -q
+
+  frontend:
+    name: Frontend (Angular 18, zoneless)
+    runs-on: ubuntu-latest
+    needs: guards
+    defaults:
+      run: { working-directory: frontend }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      # Token gate. tokens-check runs its calibration assertions first and aborts
+      # everything if the colour-blindness simulator cannot reproduce known cases
+      # — an uncalibrated simulator once produced wrong numbers here (ADR-0006).
+      - run: npm run tokens:check
+      # i18n gate. Rule 5 compares the @@id count in source against the trans-unit
+      # count in messages.xlf — 23 marked strings once existed with no extracted
+      # units and nothing caught it.
+      - run: npm run i18n:check
+      # NOT `tsc -p tsconfig.app.json`: that config only checks files reachable from
+      # src/main.ts, so anything not yet routed is skipped and it exits 0 anyway
+      # (demonstrated with a deliberate type error). tsconfig.typecheck.json covers
+      # all of src/.
+      - run: npm run typecheck
+      - run: npx eslint .
+      - run: npx jest
+      # Budget is enforced by angular.json and must not be relaxed. Zoneless keeps
+      # initial under 250 kB (ADR-0005); a regression here is a real regression.
+      - run: npx ng build --configuration production
+
+  compose:
+    name: Compose config
+    runs-on: ubuntu-latest
+    needs: guards
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose -f infra/docker-compose.dev.yml config -q

@@ -1,0 +1,29 @@
+/* Type-checking config for the regression gate — NOT used by the build.
+ *
+ * Why this file exists: tsconfig.app.json declares `files: ["src/main.ts"]`, so
+ * `tsc -p tsconfig.app.json --noEmit` only type-checks what is reachable from the
+ * application entry point. Anything not yet wired to a route — a shared component
+ * library, for example — is silently skipped and the command exits 0 while the
+ * files contain real type errors. This was demonstrated: a deliberate
+ * `const x: number = "string"` in shared/ui went completely unreported.
+ *
+ * This config includes every source file so the gate actually checks them.
+ * Spec files are excluded because they rely on Jest globals supplied by
+ * tsconfig.spec.json; Jest type-checks them separately.
+ *
+ * The build keeps using tsconfig.app.json, so bundle output is unaffected.
+ */
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/typecheck",
+    "noEmit": true
+  },
+  "files": [],
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
+}

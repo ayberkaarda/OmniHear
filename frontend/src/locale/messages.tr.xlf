@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="tr" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="health.title" datatype="html">
+        <source>OmniHear system status</source>
+        <target>OmniHear sistem durumu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/health/health.component.html</context>
+          <context context-type="linenumber">2,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="health.loading" datatype="html">
+        <source> Checking system status… </source>
+        <target> Sistem durumu kontrol ediliyor… </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/health/health.component.html</context>
+          <context context-type="linenumber">7,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="health.success" datatype="html">
+        <source> System is healthy: <x id="INTERPOLATION" equiv-text="{{ status() }}"/> </source>
+        <target> Sistem çalışıyor: <x id="INTERPOLATION" equiv-text="{{ status() }}"/> </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/health/health.component.html</context>
+          <context context-type="linenumber">12,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="health.error" datatype="html">
+        <source> Unable to reach the system. Please try again later. </source>
+        <target> Sisteme ulaşılamıyor. Lütfen daha sonra tekrar deneyin. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/health/health.component.html</context>
+          <context context-type="linenumber">17,20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.sentiment.positive" datatype="html">
+        <source>Positive</source>
+        <target>Pozitif</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.sentiment.neutral" datatype="html">
+        <source>Neutral</source>
+        <target>Nötr</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.sentiment.negative" datatype="html">
+        <source>Negative</source>
+        <target>Negatif</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.category.complaint" datatype="html">
+        <source>Complaint</source>
+        <target>Şikayet</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.category.praise" datatype="html">
+        <source>Praise</source>
+        <target>Övgü</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.category.bug" datatype="html">
+        <source>Bug</source>
+        <target>Hata</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.category.featureRequest" datatype="html">
+        <source>Feature request</source>
+        <target>Özellik talebi</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.status.active" datatype="html">
+        <source>Active</source>
+        <target>Aktif</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.status.success" datatype="html">
+        <source>Active</source>
+        <target>Aktif</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.status.error" datatype="html">
+        <source>Error</source>
+        <target>Hata</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.status.paused" datatype="html">
+        <source>Paused</source>
+        <target>Duraklatıldı</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.status.warning" datatype="html">
+        <source>Warning</source>
+        <target>Uyarı</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="badge.status.info" datatype="html">
+        <source>Info</source>
+        <target>Bilgi</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/badge/badge.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.loading" datatype="html">
+        <source>Loading data…</source>
+        <target>Veriler yükleniyor…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.error.title" datatype="html">
+        <source> Something went wrong </source>
+        <target> Bir şeyler ters gitti </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">13,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.error.description" datatype="html">
+        <source> We couldn't load this data. Please try again. </source>
+        <target> Bu verileri yükleyemedik. Lütfen tekrar deneyin. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">16,18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.error.retry" datatype="html">
+        <source>Retry</source>
+        <target>Yeniden dene</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.empty.title" datatype="html">
+        <source>No data yet</source>
+        <target>Henüz veri yok</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.selectAll" datatype="html">
+        <source>Select all rows</source>
+        <target>Tüm satırları seç</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">57,64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dataTable.selectRow" datatype="html">
+        <source>Select row</source>
+        <target>Satırı seç</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
+          <context context-type="linenumber">108,115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="kpiCard.delta.increase" datatype="html">
+        <source>Increased</source>
+        <target>Arttı</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="kpiCard.delta.decrease" datatype="html">
+        <source>Decreased</source>
+        <target>Azaldı</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="modal.close" datatype="html">
+        <source>Close</source>
+        <target>Kapat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/modal/modal.component.html</context>
+          <context context-type="linenumber">23,30</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

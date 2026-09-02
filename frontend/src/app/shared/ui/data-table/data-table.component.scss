@@ -1,0 +1,21 @@
+// Scoped to app-data-table only. Transient real-time row highlight — fades
+// from the shared --highlight token to transparent, and is skipped entirely
+// under prefers-reduced-motion.
+.row-highlight {
+  animation: app-data-table-highlight-fade 1.6s ease-out;
+}
+
+@keyframes app-data-table-highlight-fade {
+  0% {
+    background-color: var(--highlight);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row-highlight {
+    animation: none;
+  }
+}

@@ -1,0 +1,135 @@
+# OmniHear — development stack.
+#
+# Run from the repository root:
+#   docker compose -f infra/docker-compose.dev.yml up -d
+#
+# The host toolchain is NOT authoritative. Spec §2 fixes PHP 8.3,
+# Python 3.12 and PostgreSQL 16; these images pin exactly that, so the
+# regression gate run inside containers is what proves compliance.
+#
+# WARNING: `docker compose down -v` destroys the postgres volume, taking
+# the dev database with it (integrations.credentials included). Plain
+# `down` stops containers and keeps the data.
+
+name: omnihear
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: omnihear
+      POSTGRES_PASSWORD: omnihear
+      POSTGRES_DB: omnihear
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Creates omnihear_test alongside omnihear on first initialisation.
+      - ./postgres/init-test-db.sh:/docker-entrypoint-initdb.d/10-init-test-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U omnihear -d omnihear"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ai-service:
+    build:
+      context: ../ai-service
+      dockerfile: ../infra/docker/ai-service.Dockerfile
+    environment:
+      AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
+      MODEL_VERSION: ${MODEL_VERSION:-stub-0.1.0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8001:8001"
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../infra/docker/backend.Dockerfile
+    env_file:
+      - ../backend/.env
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+      AI_SERVICE_URL: http://ai-service:8001
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    volumes:
+      - ../backend:/srv/backend
+      - backend-vendor:/srv/backend/vendor
+
+  horizon:
+    build:
+      context: ../backend
+      dockerfile: ../infra/docker/backend.Dockerfile
+    command: ["php", "artisan", "horizon"]
+    env_file:
+      - ../backend/.env
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+      AI_SERVICE_URL: http://ai-service:8001
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - ../backend:/srv/backend
+      - backend-vendor:/srv/backend/vendor
+
+  reverb:
+    build:
+      context: ../backend
+      dockerfile: ../infra/docker/backend.Dockerfile
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    env_file:
+      - ../backend/.env
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - ../backend:/srv/backend
+      - backend-vendor:/srv/backend/vendor
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /srv/frontend
+    command: ["npx", "ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
+    environment:
+      NG_CLI_ANALYTICS: "false"
+    ports:
+      - "4200:4200"
+    volumes:
+      - ../frontend:/srv/frontend
+      - frontend-node-modules:/srv/frontend/node_modules
+
+volumes:
+  postgres-data:
+  redis-data:
+  backend-vendor:
+  frontend-node-modules:

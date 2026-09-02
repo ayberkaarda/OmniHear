@@ -1,0 +1,42 @@
+<svg
+  [attr.viewBox]="def().viewBox"
+  [class]="svgClass()"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  @for (shape of def().shapes; track $index) {
+    @switch (shape.tag) {
+      @case ('path') {
+        <path [attr.d]="shape.attrs['d']" />
+      }
+      @case ('circle') {
+        <circle [attr.cx]="shape.attrs['cx']" [attr.cy]="shape.attrs['cy']" [attr.r]="shape.attrs['r']" />
+      }
+      @case ('line') {
+        <line
+          [attr.x1]="shape.attrs['x1']"
+          [attr.y1]="shape.attrs['y1']"
+          [attr.x2]="shape.attrs['x2']"
+          [attr.y2]="shape.attrs['y2']"
+        />
+      }
+      @case ('polyline') {
+        <polyline [attr.points]="shape.attrs['points']" />
+      }
+      @case ('rect') {
+        <rect
+          [attr.x]="shape.attrs['x']"
+          [attr.y]="shape.attrs['y']"
+          [attr.width]="shape.attrs['width']"
+          [attr.height]="shape.attrs['height']"
+          [attr.rx]="shape.attrs['rx']"
+        />
+      }
+    }
+  }
+</svg>

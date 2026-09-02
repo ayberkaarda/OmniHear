@@ -21,7 +21,7 @@ cd backend      && php artisan test --coverage --min=80
 cd ai-service   && ruff check . && ruff format --check .
 cd ai-service   && pytest
 cd frontend     && npx eslint .
-cd frontend     && npx tsc -p tsconfig.app.json --noEmit
+cd frontend     && npm run typecheck
 cd frontend     && npx ng build --configuration production
 cd frontend     && npx jest
 cd frontend     && npm run i18n:check
@@ -33,7 +33,7 @@ cd frontend     && npx playwright test
 ```
 
 2. **Tuzaklara dikkat et:**
-   - Kökteki `tsconfig.json` solution-style'dır. Çıplak `tsc --noEmit` **hiçbir dosyayı** kontrol etmeden sessizce 0 döner. Her zaman `npx tsc -p tsconfig.app.json --noEmit` kullan.
+   - Tip denetimi iki katmanlı sessizlik barındırır. Çıplak `tsc --noEmit` solution-style kök config'de hiçbir şey denetlemez. **`tsconfig.app.json` de yetmez** — `files: ["src/main.ts"]` olduğu için yalnız giriş noktasından erişilebilen dosyaları görür; route'a bağlanmamış her şey sessizce atlanır ve komut 0 döner (kasıtlı bir tip hatasıyla kanıtlandı). Her zaman **`npm run typecheck`** (`tsconfig.typecheck.json`) kullan.
    - `angular.json` içindeki `budgets.initial.maximumError` değeri gevşetilerek build "yeşile boyanamaz". `ng build --configuration production` çıktısında initial bundle 250KB'ı aşarsa faz **kırmızıdır** — budget dosyasını değiştirmek çözüm değildir.
    - `messages.tr.xlf` içinde boş `<target></target>` bulunması i18n'in eksik olduğu anlamına gelir. Şu komutla tara:
      ```bash

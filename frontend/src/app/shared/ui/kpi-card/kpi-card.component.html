@@ -1,0 +1,43 @@
+<button
+  type="button"
+  class="flex w-full flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 text-left transition-colors hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 disabled:cursor-default disabled:hover:bg-[var(--bg-surface)]"
+  [disabled]="isSkeleton()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  (click)="onActivate()"
+>
+  <span class="text-sm font-medium text-[var(--text-secondary)]">{{ title() }}</span>
+
+  @if (isSkeleton()) {
+    <span class="h-7 w-24 animate-pulse rounded bg-[var(--bg-surface-sunken)]" data-testid="kpi-skeleton"></span>
+  } @else {
+    <span class="text-2xl font-semibold tabular-nums text-[var(--text-primary)]">{{ displayValue() }}</span>
+  }
+
+  @if (!isSkeleton() && (formattedDelta() || deltaLabel())) {
+    <span class="flex items-center gap-1 text-xs" [class]="deltaToneClass()">
+      @if (deltaIcon()) {
+        <app-icon [name]="deltaIcon()!" size="sm" />
+      }
+      @if (formattedDelta()) {
+        <span class="tabular-nums">{{ formattedDelta() }}</span>
+      }
+      @if (deltaLabel()) {
+        <span class="text-[var(--text-muted)]">{{ deltaLabel() }}</span>
+      }
+      @switch (deltaTone()) {
+        @case ('positive') {
+          <span class="sr-only" i18n="Screen-reader only KPI delta direction@@kpiCard.delta.increase">Increased</span>
+        }
+        @case ('negative') {
+          <span class="sr-only" i18n="Screen-reader only KPI delta direction@@kpiCard.delta.decrease">Decreased</span>
+        }
+      }
+    </span>
+  }
+
+  @if (!isSkeleton() && sparkPoints()) {
+    <svg [attr.viewBox]="sparkViewBox" class="h-7 w-full text-[var(--text-muted)]" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <polyline [attr.points]="sparkPoints()" fill="none" stroke="currentColor" stroke-width="1.5" />
+    </svg>
+  }
+</button>

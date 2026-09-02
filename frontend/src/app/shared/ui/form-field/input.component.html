@@ -1,0 +1,41 @@
+<div class="flex flex-col gap-1">
+  <label [for]="fieldId" class="text-sm font-medium text-[var(--text-primary)]">
+    {{ label() }}
+    @if (required()) {
+      <span class="text-[var(--sentiment-negative-text)]" aria-hidden="true">*</span>
+    }
+  </label>
+
+  <div class="relative flex items-center">
+    @if (prefixIconName()) {
+      <span class="pointer-events-none absolute left-2.5 flex items-center text-[var(--text-muted)]">
+        <app-icon [name]="prefixIconName()!" size="sm" />
+      </span>
+    }
+
+    <input
+      [id]="fieldId"
+      [type]="type()"
+      [class]="inputClasses()"
+      [value]="value() ?? ''"
+      [disabled]="isDisabled"
+      [required]="required()"
+      [attr.aria-invalid]="error() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      (input)="onInput($event)"
+      (blur)="handleBlur()"
+    />
+
+    @if (suffixIconName()) {
+      <span class="pointer-events-none absolute right-2.5 flex items-center text-[var(--text-muted)]">
+        <app-icon [name]="suffixIconName()!" size="sm" />
+      </span>
+    }
+  </div>
+
+  @if (error()) {
+    <p [id]="errorId" class="text-xs text-[var(--sentiment-negative-text)]">{{ error() }}</p>
+  } @else if (helper()) {
+    <p [id]="helperId" class="text-xs text-[var(--text-muted)]">{{ helper() }}</p>
+  }
+</div>

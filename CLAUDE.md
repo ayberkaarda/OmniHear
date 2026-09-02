@@ -75,24 +75,37 @@ Bunlar spec'ten gelir ve her fazda korunur. Her birinin bir testi vardır; test 
 ### Regresyon kapısı — her faz sonunda yeşil olmalı, çıktılar rapora girer
 
 ```
+node .claude/hooks/__selftest.mjs                            # guard hook'ları önce — <1 sn, hızlı-fail
+cd backend    && composer validate --strict
 cd backend    && vendor/bin/pint --test
 cd backend    && php artisan test --coverage --min=80
 cd ai-service && ruff check . && ruff format --check .
 cd ai-service && pytest
 cd frontend   && npx eslint .
-cd frontend   && npx tsc -p tsconfig.app.json --noEmit      # çıplak `tsc --noEmit` YASAK
+cd frontend   && npm run typecheck                          # tsconfig.typecheck.json — Tuzak 1'e bak
 cd frontend   && npx ng build --configuration production    # budget çıktısı rapora girer
 cd frontend   && npx jest
 cd frontend   && npm run i18n:check
 contract test (backend Pest + ai-service pytest, contracts/ şemasından)
+docker compose -f infra/docker-compose.dev.yml config -q    # compose + Dockerfile referansları geçerli mi
 cd frontend   && npx playwright test                        # E2E fazından itibaren
 ```
 
 Bir bileşen henüz kurulmadıysa o satır atlanır ve **rapora "henüz yok" diye yazılır** — sessizce atlanmaz.
 
-> **Tuzak 1:** Solution-style `tsconfig.json` kullanılıyorsa çıplak `tsc --noEmit` hiçbir şey kontrol etmeden sessizce 0 döner. Her zaman `-p tsconfig.app.json` ver.
+> **Tuzak 1 — iki katmanlı, ikisi de sessiz:**
 >
-> **Tuzak 2:** `angular.json` içindeki `budgets[type=initial].maximumError` gevşetilerek build yeşile boyanamaz. Spec §4 hedefi initial bundle **< 250 KB**; eşiği yükseltmek fazı kırmızı yapar.
+> (a) Solution-style kök `tsconfig.json` ile çıplak `tsc --noEmit` hiçbir şey kontrol etmeden 0 döner.
+>
+> (b) **`tsconfig.app.json` de yetmez.** Angular CLI onu `files: ["src/main.ts"]` + `include: ["src/**/*.d.ts"]` olarak üretir; yani yalnızca **giriş noktasından erişilebilen** dosyalar denetlenir. Henüz bir route'a bağlanmamış her şey — paylaşılan bileşen kütüphanesi, yeni bir servis — sessizce atlanır ve komut 0 döner.
+>
+> Bu teorik değil: `shared/ui/` altına kasıtlı bir `const x: number = "string"` konuldu ve `tsc -p tsconfig.app.json --noEmit` **exit 0** verdi. Aynı hata `tsconfig.typecheck.json` ile `error TS2322` olarak yakalandı.
+>
+> **Kapı komutu her zaman `npm run typecheck`** (`tsconfig.typecheck.json`, tüm `src/**/*.ts`, spec'ler hariç). `ng build` kendi config'ini kullanmaya devam eder, bundle çıktısı etkilenmez.
+>
+> **Tuzak 2:** `angular.json` içindeki `budgets[type=initial].maximumError` gevşetilerek, `budgets` bloğu başka bir configuration'a taşınarak, `--localize=false` veya `production` dışı bir configuration ile koşularak build yeşile boyanamaz. Spec §4 hedefi initial bundle **< 250 kB** (raw, Angular budget ölçümü); eşiği yükseltmek veya ölçümü yumuşatmak fazı kırmızı yapar. Kapı komutu her zaman `ng build --configuration production` ve çıktıdaki "Initial total" değeri rapora girer.
+>
+> Uygulama **zoneless** çalışır (`provideExperimentalZonelessChangeDetection()`, polyfills listesinde `zone.js` **yok**). zone.js'i geri eklemek bilinçli bir mimari karardır ve tek başına ~36 kB getirir — onaysız yapılmaz. Yeni bir üçüncü parti kütüphane eklenirken zoneless uyumluluğu **seçim kriteridir**: `NgZone`'a örtük bağımlı bir kütüphane sessizce bayat UI üretir (state değişir, görünüm güncellenmez), çünkü signal okumadığı sürece scheduler tetiklenmez.
 >
 > **Tuzak 3:** `npm run i18n:check` yeşil olsa bile `messages.tr.xlf` içinde boş `<target>` varsa çeviri eksiktir. Script bunu kontrol etmiyorsa script de güncellenir.
 >
@@ -200,6 +213,8 @@ Agent tool'unun bu ortamda kabul ettiği `model` değerleri yalnızca: **`opus` 
 | `sensitive-log-guard` | PostToolUse · Edit\|Write | I5 ihlallerinde (credentials/PII loglama, `dd()`/`print()`) uyarı döndürür |
 | `format-on-write` | PostToolUse · Edit\|Write | Dokunulan tek dosyayı Pint/Prettier+ESLint/Ruff ile formatlar; araç yoksa sessiz geçer |
 
-**Skill'ler** (`.claude/skills/`): `phase-gate-report` · `laravel-tenant-resource` · `payment-webhook` · `quota-paywall-flow` · `ai-contract-sync` · `angular-feature-route` · `platform-connector` · `adr-write`
+**Skill'ler** (`.claude/skills/`, 9 adet): `phase-gate-report` · `laravel-tenant-resource` · `payment-webhook` · `quota-paywall-flow` · `ai-contract-sync` · `angular-feature-route` · `platform-connector` · `adr-write` · `omnihear-tokens`
+
+**Self-test:** `node .claude/hooks/__selftest.mjs` — guard hook'larının davranışını doğrulayan 107 assertion. Regresyon kapısının ilk komutu; kırmızıysa faz kırmızıdır. Yasak literal'leri (`'drop'+'db'` gibi) parça birleştirmeyle kurar, çünkü aksi hâlde test dosyasının kendisi guard'lara takılır.
 
 Bir hook yanlış pozitif üretiyorsa **hook'u atlatma** — hook'u düzelt veya kullanıcıya bildir.

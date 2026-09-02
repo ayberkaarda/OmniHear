@@ -1,0 +1,133 @@
+<div class="w-full overflow-x-auto rounded-lg border border-[var(--border)]">
+  @switch (state()) {
+    @case ('loading') {
+      <div class="flex flex-col gap-2 p-4" data-testid="data-table-loading">
+        <span class="sr-only" i18n="Data table loading announcement@@dataTable.loading">Loading data…</span>
+        @for (row of [0, 1, 2, 3, 4]; track row) {
+          <span class="h-9 w-full animate-pulse rounded bg-[var(--bg-surface-sunken)]" aria-hidden="true"></span>
+        }
+      </div>
+    }
+    @case ('error') {
+      <div class="flex flex-col items-center gap-3 p-10 text-center" data-testid="data-table-error">
+        <p class="text-sm font-medium text-[var(--text-primary)]" i18n="Data table error title@@dataTable.error.title">
+          Something went wrong
+        </p>
+        <p class="text-sm text-[var(--text-muted)]" i18n="Data table error description@@dataTable.error.description">
+          We couldn't load this data. Please try again.
+        </p>
+        <button
+          type="button"
+          class="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          (click)="onRetry()"
+        >
+          <span i18n="Data table retry action@@dataTable.error.retry">Retry</span>
+        </button>
+      </div>
+    }
+    @case ('empty') {
+      <div class="flex flex-col items-center gap-2 p-10 text-center" data-testid="data-table-empty">
+        <p class="text-sm font-medium text-[var(--text-primary)]">
+          @if (emptyState()?.title) {
+            {{ emptyState()!.title }}
+          } @else {
+            <span i18n="Data table default empty title@@dataTable.empty.title">No data yet</span>
+          }
+        </p>
+        @if (emptyState()?.description) {
+          <p class="text-sm text-[var(--text-muted)]">{{ emptyState()!.description }}</p>
+        }
+        @if (emptyState()?.actionLabel) {
+          <button
+            type="button"
+            class="mt-2 rounded-md bg-[var(--brand)] px-3 py-1.5 text-sm font-medium text-[var(--brand-on)] hover:bg-[var(--brand-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            (click)="onEmptyStateAction()"
+          >
+            {{ emptyState()!.actionLabel }}
+          </button>
+        }
+      </div>
+    }
+    @case ('ready') {
+      <table class="w-full border-collapse text-sm" data-testid="data-table-ready">
+        <thead [class]="stickyHeader() ? 'sticky top-0 z-10 bg-[var(--bg-surface)]' : ''">
+          <tr class="border-b border-[var(--border)]">
+            @if (selectable()) {
+              <th class="w-10 px-3 py-2 text-left">
+                <input
+                  type="checkbox"
+                  [checked]="allSelected()"
+                  [indeterminate]="someSelected()"
+                  (change)="onToggleAll($any($event.target).checked)"
+                  aria-label="Select all rows"
+                  i18n-aria-label="Select-all checkbox label@@dataTable.selectAll"
+                />
+              </th>
+            }
+            @for (column of columns(); track column.key) {
+              <th
+                class="relative px-3 py-2 text-left font-medium text-[var(--text-secondary)]"
+                scope="col"
+                [style.width.px]="columnWidth(column)"
+                [style.minWidth.px]="column.min ?? null"
+                [attr.aria-sort]="ariaSort(column)"
+              >
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+                  [class.cursor-default]="!column.sortable"
+                  (click)="onHeaderClick(column)"
+                >
+                  {{ column.header }}
+                  @if (column.sortable && ariaSort(column) !== 'none') {
+                    <app-icon [name]="ariaSort(column) === 'ascending' ? 'chevron-up' : 'chevron-down'" size="sm" />
+                  }
+                </button>
+                @if (column.resizable) {
+                  <span
+                    class="absolute right-0 top-0 h-full w-1 cursor-col-resize select-none"
+                    data-testid="column-resize-handle"
+                    aria-hidden="true"
+                    (mousedown)="startResize($event, column)"
+                  ></span>
+                }
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track rowId()(row)) {
+            <tr
+              [class]="rowHeightClass() + ' border-b border-[var(--border)] last:border-b-0 cursor-pointer hover:bg-[var(--bg-surface-hover)]' + (isSelected(row) ? ' bg-[var(--bg-surface-selected)]' : '') + (isHighlighted(row) ? ' row-highlight' : '')"
+              tabindex="0"
+              (click)="onRowActivate(row)"
+              (keydown.enter)="onRowActivate(row)"
+            >
+              @if (selectable()) {
+                <td class="px-3 py-1">
+                  <input
+                    type="checkbox"
+                    [checked]="isSelected(row)"
+                    (click)="$event.stopPropagation()"
+                    (change)="onToggleRow(row, $any($event.target).checked)"
+                    aria-label="Select row"
+                    i18n-aria-label="Row selection checkbox label@@dataTable.selectRow"
+                  />
+                </td>
+              }
+              @for (column of columns(); track column.key) {
+                <td
+                  class="truncate px-3 py-1 text-[var(--text-primary)]"
+                  [style.width.px]="columnWidth(column)"
+                  [style.minWidth.px]="column.min ?? null"
+                >
+                  {{ cellValue(column, row) }}
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>
