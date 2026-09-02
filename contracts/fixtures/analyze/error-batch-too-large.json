@@ -1,0 +1,221 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "51 items exceeds the documented maximum of 50 -> 422 BATCH_TOO_LARGE.",
+  "endpoint": "/v1/analyze/batch",
+  "name": "error-batch-too-large",
+  "request": {
+    "items": [
+      {
+        "id": "0",
+        "text": "item"
+      },
+      {
+        "id": "1",
+        "text": "item"
+      },
+      {
+        "id": "2",
+        "text": "item"
+      },
+      {
+        "id": "3",
+        "text": "item"
+      },
+      {
+        "id": "4",
+        "text": "item"
+      },
+      {
+        "id": "5",
+        "text": "item"
+      },
+      {
+        "id": "6",
+        "text": "item"
+      },
+      {
+        "id": "7",
+        "text": "item"
+      },
+      {
+        "id": "8",
+        "text": "item"
+      },
+      {
+        "id": "9",
+        "text": "item"
+      },
+      {
+        "id": "10",
+        "text": "item"
+      },
+      {
+        "id": "11",
+        "text": "item"
+      },
+      {
+        "id": "12",
+        "text": "item"
+      },
+      {
+        "id": "13",
+        "text": "item"
+      },
+      {
+        "id": "14",
+        "text": "item"
+      },
+      {
+        "id": "15",
+        "text": "item"
+      },
+      {
+        "id": "16",
+        "text": "item"
+      },
+      {
+        "id": "17",
+        "text": "item"
+      },
+      {
+        "id": "18",
+        "text": "item"
+      },
+      {
+        "id": "19",
+        "text": "item"
+      },
+      {
+        "id": "20",
+        "text": "item"
+      },
+      {
+        "id": "21",
+        "text": "item"
+      },
+      {
+        "id": "22",
+        "text": "item"
+      },
+      {
+        "id": "23",
+        "text": "item"
+      },
+      {
+        "id": "24",
+        "text": "item"
+      },
+      {
+        "id": "25",
+        "text": "item"
+      },
+      {
+        "id": "26",
+        "text": "item"
+      },
+      {
+        "id": "27",
+        "text": "item"
+      },
+      {
+        "id": "28",
+        "text": "item"
+      },
+      {
+        "id": "29",
+        "text": "item"
+      },
+      {
+        "id": "30",
+        "text": "item"
+      },
+      {
+        "id": "31",
+        "text": "item"
+      },
+      {
+        "id": "32",
+        "text": "item"
+      },
+      {
+        "id": "33",
+        "text": "item"
+      },
+      {
+        "id": "34",
+        "text": "item"
+      },
+      {
+        "id": "35",
+        "text": "item"
+      },
+      {
+        "id": "36",
+        "text": "item"
+      },
+      {
+        "id": "37",
+        "text": "item"
+      },
+      {
+        "id": "38",
+        "text": "item"
+      },
+      {
+        "id": "39",
+        "text": "item"
+      },
+      {
+        "id": "40",
+        "text": "item"
+      },
+      {
+        "id": "41",
+        "text": "item"
+      },
+      {
+        "id": "42",
+        "text": "item"
+      },
+      {
+        "id": "43",
+        "text": "item"
+      },
+      {
+        "id": "44",
+        "text": "item"
+      },
+      {
+        "id": "45",
+        "text": "item"
+      },
+      {
+        "id": "46",
+        "text": "item"
+      },
+      {
+        "id": "47",
+        "text": "item"
+      },
+      {
+        "id": "48",
+        "text": "item"
+      },
+      {
+        "id": "49",
+        "text": "item"
+      },
+      {
+        "id": "50",
+        "text": "item"
+      }
+    ]
+  },
+  "response": {
+    "code": "BATCH_TOO_LARGE",
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "message": "items must not contain more than 50 entries"
+  },
+  "signature": "valid",
+  "status": 422
+}

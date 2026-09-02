@@ -111,9 +111,12 @@ jobs:
       - run: npm run typecheck
       - run: npx eslint .
       - run: npx jest
-      # Budget is enforced by angular.json and must not be relaxed. Zoneless keeps
-      # initial under 250 kB (ADR-0005); a regression here is a real regression.
-      - run: npx ng build --configuration production
+      # Two thresholds, both derived from the measured framework floor (ADR-0007):
+      # raw via angular.json, brotli transfer via the script. The script runs the
+      # production build itself and refuses arguments, so the configuration cannot
+      # be swapped; it also fails if angular.json's raw threshold and its own
+      # constant disagree. Raising either needs the procedure in CLAUDE.md Trap 2.
+      - run: npm run build:gate
 
   compose:
     name: Compose config

@@ -1,0 +1,22 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Edge case: emoji-only body. No letters, so language falls back to the hint and keywords must be an empty list.",
+  "endpoint": "/v1/analyze",
+  "name": "single-edge-emoji-only",
+  "request": {
+    "language_hint": "tr",
+    "text": "👍👍👍"
+  },
+  "response": {
+    "category": "complaint",
+    "confidence": 0.1156,
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "keywords": [],
+    "language": "tr",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "sentiment_label": "positive",
+    "sentiment_score": 0.2854
+  },
+  "signature": "valid",
+  "status": 200
+}

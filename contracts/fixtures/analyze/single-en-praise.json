@@ -1,0 +1,29 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "English positive praise with an explicit language hint.",
+  "endpoint": "/v1/analyze",
+  "name": "single-en-praise",
+  "request": {
+    "language_hint": "en",
+    "text": "Absolutely love this app, the interface is clean and it is a joy to use."
+  },
+  "response": {
+    "category": "praise",
+    "confidence": 0.9457,
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "keywords": [
+      "absolutely love",
+      "app",
+      "interface",
+      "clean",
+      "joy",
+      "use"
+    ],
+    "language": "en",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "sentiment_label": "positive",
+    "sentiment_score": 0.9702
+  },
+  "signature": "valid",
+  "status": 200
+}

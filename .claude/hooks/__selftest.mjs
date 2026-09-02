@@ -148,6 +148,17 @@ check('credentials loglama -> block', 'sensitive-log-guard.mjs', write(join(ROOT
 check('python govde loglama -> block', 'sensitive-log-guard.mjs', write(join(ROOT, 'ai-service', 'app', 'main.py'), 'logger.info(f"analyzing {body}")'), 'block')
 check('FP: correlation_id -> pass', 'sensitive-log-guard.mjs', write(join(ROOT, 'ai-service', 'app', 'main.py'), 'logger.info(f"correlation_id={cid}")'), 'pass')
 check('FP: test dosyasi -> pass', 'sensitive-log-guard.mjs', write(join(ROOT, 'ai-service', 'tests', 'test_analyze.py'), 'print(f"payload={payload}")'), 'pass')
+// Debug-call detection used plain substring matching, so `ray(` fired on `toArray(`
+// and `dd(` on `add(`. `toArray(Request $request)` is the mandatory signature of
+// every Laravel API Resource, so the guard warned on files that cannot avoid it.
+// These six lock the boundary fix in both directions: real calls still block.
+check('FP: toArray imzasi -> pass', 'sensitive-log-guard.mjs', write(join(ROOT, 'backend', 'app', 'Http', 'Resources', 'UserResource.php'), '<?php public function toArray(Request $request): array { return []; }'), 'pass')
+check('FP: in_array -> pass', 'sensitive-log-guard.mjs', write(join(ROOT, 'backend', 'app', 'Support', 'Roles.php'), '<?php return in_array($role, $allowed, true);'), 'pass')
+check('FP: Context::add -> pass', 'sensitive-log-guard.mjs', write(join(ROOT, 'backend', 'app', 'Support', 'Ctx.php'), '<?php Context::add("correlation_id", $cid);'), 'pass')
+check('gercek dd() -> block', 'sensitive-log-guard.mjs', write(join(ROOT, 'backend', 'app', 'Jobs', 'Sync.php'), '<?php ' + 'd' + 'd($user);'), 'block')
+check('gercek ray() -> block', 'sensitive-log-guard.mjs', write(join(ROOT, 'backend', 'app', 'Jobs', 'Sync.php'), '<?php ' + 'r' + 'ay($payload);'), 'block')
+// The lookbehind excludes \w and $ but NOT `>`, so an instance logger still trips.
+check('->info + credentials -> block', 'sensitive-log-guard.mjs', write(join(ROOT, 'backend', 'app', 'Jobs', 'Sync.php'), '<?php $this->logger->info($integration->credentials);'), 'block')
 
 console.log('--- format-on-write (arac yokken sessiz) ---')
 check('php, arac yok -> pass', 'format-on-write.mjs', write(join(ROOT, 'backend', 'app', 'X.php'), '<?php'), 'pass')

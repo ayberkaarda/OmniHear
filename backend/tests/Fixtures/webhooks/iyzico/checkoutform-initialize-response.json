@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "systemTime": 1756799940000,
+  "data": {
+    "referenceCode": "ce4b1e4e-EXAMPLE-ref-0001",
+    "token": "iyz-token-EXAMPLE-0001",
+    "tokenExpireTime": 1800,
+    "checkoutFormContent": "<script type=\"text/javascript\">/* iyzico form */</script>",
+    "payWithIyzicoPageUrl": "https://sandbox-cpp.iyzipay.com/?token=iyz-token-EXAMPLE-0001&lang=tr"
+  }
+}

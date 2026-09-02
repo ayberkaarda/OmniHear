@@ -1,0 +1,30 @@
+<div
+  class="inline-flex items-center gap-0.5 rounded-md border border-[var(--border)] bg-[var(--bg-surface)] p-0.5"
+  role="group"
+  [attr.aria-label]="groupLabel"
+>
+  <button
+    type="button"
+    [class]="classesFor('light')"
+    [attr.aria-pressed]="preference() === 'light'"
+    (click)="select('light')"
+  >
+    {{ lightLabel }}
+  </button>
+  <button
+    type="button"
+    [class]="classesFor('dark')"
+    [attr.aria-pressed]="preference() === 'dark'"
+    (click)="select('dark')"
+  >
+    {{ darkLabel }}
+  </button>
+  <button
+    type="button"
+    [class]="classesFor('system')"
+    [attr.aria-pressed]="preference() === 'system'"
+    (click)="select('system')"
+  >
+    {{ systemLabel }}
+  </button>
+</div>

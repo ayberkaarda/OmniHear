@@ -1,0 +1,8 @@
+<section class="flex flex-col gap-4">
+  <header class="flex flex-col gap-1">
+    <h1 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.inbox.title">Inbox</h1>
+    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.inbox.subtitle">Every collected comment with its sentiment, category and source.</p>
+  </header>
+
+  <app-empty-state icon="mail" [heading]="emptyHeading" [description]="placeholderDescription" />
+</section>

@@ -1,0 +1,19 @@
+{
+  "id": "cs_test_a1EXAMPLEsession0001",
+  "object": "checkout.session",
+  "cancel_url": "http://localhost:4200/billing/cancel",
+  "client_reference_id": "omnihear-1-0f1e2d3c4b5a6978",
+  "created": 1756799940,
+  "currency": "try",
+  "expires_at": 1756886340,
+  "livemode": false,
+  "metadata": {
+    "company_id": "1",
+    "plan": "pro"
+  },
+  "mode": "subscription",
+  "payment_status": "unpaid",
+  "status": "open",
+  "success_url": "http://localhost:4200/billing/success",
+  "url": "https://checkout.stripe.com/c/pay/cs_test_a1EXAMPLEsession0001"
+}

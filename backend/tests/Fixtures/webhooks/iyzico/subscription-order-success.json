@@ -1,0 +1,17 @@
+{
+  "iyziEventType": "SUBSCRIPTION_ORDER_SUCCESS",
+  "iyziEventTime": 1756800000000,
+  "iyziReferenceCode": "ce4b1e4e-EXAMPLE-ref-0001",
+  "conversationId": "omnihear-1-0f1e2d3c4b5a6978",
+  "customerReferenceCode": "cust-EXAMPLE-0001",
+  "subscriptionReferenceCode": "sub-EXAMPLE-0001",
+  "orderReferenceCode": "order-EXAMPLE-0001",
+  "pricingPlanReferenceCode": "plan-EXAMPLE-pro",
+  "productReferenceCode": "product-EXAMPLE-0001",
+  "subscriptionStatus": "ACTIVE",
+  "orderStatus": "SUCCESS",
+  "startPeriod": 1756800000000,
+  "endPeriod": 1759392000000,
+  "currencyCode": "TRY",
+  "price": 499.0
+}

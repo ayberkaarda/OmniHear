@@ -1,0 +1,16 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Empty text violates min_length=1 -> 422 VALIDATION_ERROR. The message is a Pydantic rendering and is NOT part of the contract; only 'code' is.",
+  "endpoint": "/v1/analyze",
+  "name": "error-validation-error",
+  "request": {
+    "text": ""
+  },
+  "response": {
+    "code": "VALIDATION_ERROR",
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "message": "1 validation error for AnalyzeRequest\ntext\n  String should have at least 1 character [type=string_too_short, input_value='', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_too_short"
+  },
+  "signature": "valid",
+  "status": 422
+}

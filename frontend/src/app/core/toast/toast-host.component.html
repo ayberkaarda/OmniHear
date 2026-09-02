@@ -1,0 +1,103 @@
+<div class="pointer-events-none fixed bottom-4 right-4 z-[var(--z-toast)] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">
+  <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
+    @for (toast of errorToasts(); track toast.id) {
+      <div
+        [class]="
+          toneClasses(toast) +
+          ' pointer-events-auto flex items-start gap-2 rounded-md border bg-[var(--bg-surface-raised)] p-3 text-sm shadow-[var(--shadow-md)]'
+        "
+      >
+        <svg
+          class="mt-0.5 h-4 w-4 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <p class="flex-1">{{ toast.message }}</p>
+        <button
+          type="button"
+          class="rounded-sm p-0.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          i18n-aria-label="Toast dismiss button label@@toast.dismiss"
+          aria-label="Dismiss notification"
+          (click)="dismiss(toast.id)"
+        >
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div role="status" aria-live="polite" class="flex flex-col gap-2">
+    @for (toast of politeToasts(); track toast.id) {
+      <div
+        [class]="
+          toneClasses(toast) +
+          ' pointer-events-auto flex items-start gap-2 rounded-md border bg-[var(--bg-surface-raised)] p-3 text-sm shadow-[var(--shadow-md)]'
+        "
+      >
+        <svg
+          class="mt-0.5 h-4 w-4 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="12" cy="12" r="10" />
+          @if (toast.tone === 'success') {
+            <path d="m9 12 2 2 4-4" />
+          } @else {
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          }
+        </svg>
+        <p class="flex-1">{{ toast.message }}</p>
+        <button
+          type="button"
+          class="rounded-sm p-0.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          i18n-aria-label="Toast dismiss button label@@toast.dismiss"
+          aria-label="Dismiss notification"
+          (click)="dismiss(toast.id)"
+        >
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    }
+  </div>
+</div>

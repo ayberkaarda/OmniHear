@@ -18,14 +18,14 @@ from fastapi import APIRouter, Depends, status
 from pydantic import ValidationError
 
 from app.analyzers.base import SentimentAnalyzer
-from app.analyzers.stub import StubAnalyzer
-from app.config import settings
+from app.analyzers.registry import get_pipeline
 from app.schemas import (
     AnalyzeRequest,
     AnalyzeResponse,
     BatchAnalyzeRequest,
     BatchAnalyzeResponse,
     BatchResultItem,
+    ErrorResponse,
 )
 from app.security import ApiError, verify_signature
 
@@ -33,17 +33,32 @@ logger = logging.getLogger("ai_service.analyze")
 
 router = APIRouter()
 
-_default_analyzer = StubAnalyzer()
-
 _BATCH_MAX_ITEMS = 50
+
+# Declared on both routes so the exported contract carries the error shape
+# the Laravel client has to handle, and so FastAPI stops advertising its
+# own HTTPValidationError for a 422 these endpoints never emit.
+_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    401: {
+        "model": ErrorResponse,
+        "description": "INVALID_SIGNATURE - X-Signature missing or does not match the body",
+    },
+    422: {
+        "model": ErrorResponse,
+        "description": "VALIDATION_ERROR, or BATCH_TOO_LARGE when items exceeds "
+        f"{_BATCH_MAX_ITEMS}",
+    },
+}
 
 
 def get_analyzer() -> SentimentAnalyzer:
     """FastAPI dependency provider for the active analyzer.
 
-    Overridden in tests (via `app.dependency_overrides`) to inject fakes.
+    Returns the real local inference pipeline (ADR-0004), built once at
+    start-up by app.analyzers.registry. Overridden in tests (via
+    `app.dependency_overrides`) to inject fakes such as StubAnalyzer.
     """
-    return _default_analyzer
+    return get_pipeline()
 
 
 def _validation_error(exc: ValidationError, correlation_id: str | None) -> ApiError:
@@ -66,7 +81,7 @@ def _validation_error(exc: ValidationError, correlation_id: str | None) -> ApiEr
     )
 
 
-@router.post("/v1/analyze", response_model=AnalyzeResponse)
+@router.post("/v1/analyze", response_model=AnalyzeResponse, responses=_ERROR_RESPONSES)
 def analyze(
     verified: tuple[bytes, str] = Depends(verify_signature),
     analyzer: SentimentAnalyzer = Depends(get_analyzer),  # noqa: B008
@@ -95,7 +110,7 @@ def analyze(
     return AnalyzeResponse(correlation_id=correlation_id, **result.model_dump())
 
 
-@router.post("/v1/analyze/batch", response_model=BatchAnalyzeResponse)
+@router.post("/v1/analyze/batch", response_model=BatchAnalyzeResponse, responses=_ERROR_RESPONSES)
 def analyze_batch(
     verified: tuple[bytes, str] = Depends(verify_signature),
     analyzer: SentimentAnalyzer = Depends(get_analyzer),  # noqa: B008
@@ -123,8 +138,11 @@ def analyze_batch(
         },
     )
 
+    # Taken from the results rather than from a global, so the envelope's
+    # model_version can never disagree with the items it wraps — including
+    # when a test injects a different analyzer.
     return BatchAnalyzeResponse(
         results=results,
-        model_version=settings.model_version,
+        model_version=results[0].model_version,
         correlation_id=correlation_id,
     )

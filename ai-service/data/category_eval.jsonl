@@ -1,0 +1,80 @@
+{"language": "tr", "category": "bug", "text": "Sepet ekranı açılmıyor, dokununca hiçbir şey olmuyor."}
+{"language": "tr", "category": "bug", "text": "Güncellemeden sonra bildirim ayarları kendiliğinden sıfırlandı."}
+{"language": "tr", "category": "bug", "text": "Uygulama iPhone 12 modelinde sürekli kapanıyor."}
+{"language": "tr", "category": "bug", "text": "Yorum yazarken metin kutusu aniden kayboluyor."}
+{"language": "tr", "category": "bug", "text": "QR kod okuyucu hiçbir kodu tanımıyor."}
+{"language": "tr", "category": "bug", "text": "Oturum açma ekranı sonsuz döngüde kalıyor."}
+{"language": "tr", "category": "bug", "text": "Grafikler tamamen yanlış rakamlar gösteriyor."}
+{"language": "tr", "category": "bug", "text": "Uygulamayi acinca hemen donuyor ve kapaniyor."}
+{"language": "tr", "category": "bug", "text": "Adres kaydetme işlemi her seferinde hata veriyor."}
+{"language": "tr", "category": "bug", "text": "Zil sesi ayarı kaydedilmiyor, her seferinde sıfırlanıyor."}
+{"language": "en", "category": "bug", "text": "The cart screen does not open, tapping it does nothing."}
+{"language": "en", "category": "bug", "text": "My notification settings reset themselves after the update."}
+{"language": "en", "category": "bug", "text": "The app keeps closing on an iPhone 12."}
+{"language": "en", "category": "bug", "text": "The text box disappears while I am writing a review."}
+{"language": "en", "category": "bug", "text": "The QR scanner does not recognise any code."}
+{"language": "en", "category": "bug", "text": "The login screen is stuck in an infinite loop."}
+{"language": "en", "category": "bug", "text": "The charts display completely wrong numbers."}
+{"language": "en", "category": "bug", "text": "It freezes and closes right after I open it."}
+{"language": "en", "category": "bug", "text": "Saving an address throws an error every time."}
+{"language": "en", "category": "bug", "text": "The ringtone setting is never saved and resets every time."}
+{"language": "tr", "category": "complaint", "text": "Bu fiyata bu kadar az özellik olması kabul edilemez."}
+{"language": "tr", "category": "complaint", "text": "Destek talebime on gündür cevap yok."}
+{"language": "tr", "category": "complaint", "text": "Her yerde reklam var, kullanılmaz hale geldi."}
+{"language": "tr", "category": "complaint", "text": "Yeni menü düzeni işimi çok zorlaştırdı."}
+{"language": "tr", "category": "complaint", "text": "İadeyi onaylamıyorsunuz, gerçekten çok kötü bir hizmet."}
+{"language": "tr", "category": "complaint", "text": "Ücretsiz denemede kredi kartı istemeniz hiç güven vermiyor."}
+{"language": "tr", "category": "complaint", "text": "Sürekli bildirim yağdırıyorsunuz, iyice bunaldım."}
+{"language": "tr", "category": "complaint", "text": "Aboneligi iptal ettim ama para cekilmeye devam ediyor."}
+{"language": "tr", "category": "complaint", "text": "Kampanya şartlarını hiçbir yerde açıkça yazmıyorsunuz."}
+{"language": "tr", "category": "complaint", "text": "Uygulama telefonda gereksiz yere çok yer kaplıyor."}
+{"language": "en", "category": "complaint", "text": "So few features for this price is simply unacceptable."}
+{"language": "en", "category": "complaint", "text": "No answer to my support ticket for ten days now."}
+{"language": "en", "category": "complaint", "text": "Ads everywhere, it has become unusable."}
+{"language": "en", "category": "complaint", "text": "The new menu layout made my workflow much harder."}
+{"language": "en", "category": "complaint", "text": "You refuse to approve my return, terrible service."}
+{"language": "en", "category": "complaint", "text": "Asking for a credit card for a free trial feels dishonest."}
+{"language": "en", "category": "complaint", "text": "You bombard me with notifications, it is overwhelming."}
+{"language": "en", "category": "complaint", "text": "I cancelled the subscription but you keep charging me."}
+{"language": "en", "category": "complaint", "text": "The promotion terms are never written clearly anywhere."}
+{"language": "en", "category": "complaint", "text": "The app takes up an absurd amount of space on my phone."}
+{"language": "tr", "category": "praise", "text": "Gerçekten çok başarılı, uzun zamandır aradığım şeydi."}
+{"language": "tr", "category": "praise", "text": "Hızlı ve stabil, hiç takılma yaşamadım."}
+{"language": "tr", "category": "praise", "text": "Destek ekibine ayrıca teşekkürler, çok yardımcı oldular."}
+{"language": "tr", "category": "praise", "text": "Yeni arayüz göz alıcı olmuş, çok beğendim."}
+{"language": "tr", "category": "praise", "text": "Kullanmaya başladığımdan beri işlerim çok kolaylaştı."}
+{"language": "tr", "category": "praise", "text": "Her güncelleme ile daha da iyileşiyor, tebrikler."}
+{"language": "tr", "category": "praise", "text": "Ücretsiz olmasına inanamıyorum, çok değerli bir uygulama."}
+{"language": "tr", "category": "praise", "text": "Cok hizli ve gayet stabil calisiyor, memnunum."}
+{"language": "tr", "category": "praise", "text": "Detaylara verdiğiniz önem belli oluyor, harika bir iş."}
+{"language": "tr", "category": "praise", "text": "Aylardır kullanıyorum ve hâlâ çok memnunum."}
+{"language": "en", "category": "praise", "text": "Really well made, exactly what I had been looking for."}
+{"language": "en", "category": "praise", "text": "Fast and stable, I have never seen it stutter."}
+{"language": "en", "category": "praise", "text": "Special thanks to the support team, they were very helpful."}
+{"language": "en", "category": "praise", "text": "The new interface looks stunning, I like it a lot."}
+{"language": "en", "category": "praise", "text": "My work got much easier since I started using this."}
+{"language": "en", "category": "praise", "text": "It gets better with every update, congratulations."}
+{"language": "en", "category": "praise", "text": "I cannot believe this is free, it is genuinely valuable."}
+{"language": "en", "category": "praise", "text": "Runs very fast and stays stable, I am happy with it."}
+{"language": "en", "category": "praise", "text": "The attention to detail really shows, great job."}
+{"language": "en", "category": "praise", "text": "I have used it for months and I am still delighted."}
+{"language": "tr", "category": "feature_request", "text": "Bildirimleri erteleme özelliği ekler misiniz?"}
+{"language": "tr", "category": "feature_request", "text": "Koyu tema seçeneğini bekliyoruz, lütfen ekleyin."}
+{"language": "tr", "category": "feature_request", "text": "Verileri CSV olarak indirebilmek isterdim."}
+{"language": "tr", "category": "feature_request", "text": "Etiket ekleyebilme özelliği olsa çok iyi olurdu."}
+{"language": "tr", "category": "feature_request", "text": "Android widget desteği de yaparsanız harika olur."}
+{"language": "tr", "category": "feature_request", "text": "Arama sonuçlarını sıralama seçeneği ekleyin lütfen."}
+{"language": "tr", "category": "feature_request", "text": "Birden fazla dil arasında geçiş yapabilmeyi öneriyorum."}
+{"language": "tr", "category": "feature_request", "text": "Otomatik yedekleme secenegi eklenmesini istiyorum."}
+{"language": "tr", "category": "feature_request", "text": "Haftalık hatırlatma göndermeyi düşünür müsünüz?"}
+{"language": "tr", "category": "feature_request", "text": "Hesap silme seçeneğini uygulama içine eklemelisiniz."}
+{"language": "en", "category": "feature_request", "text": "Could you add an option to snooze notifications?"}
+{"language": "en", "category": "feature_request", "text": "We are waiting for a dark theme, please add it."}
+{"language": "en", "category": "feature_request", "text": "I would like to download my data as CSV."}
+{"language": "en", "category": "feature_request", "text": "Being able to add tags would be really good."}
+{"language": "en", "category": "feature_request", "text": "It would be great if you made an Android widget too."}
+{"language": "en", "category": "feature_request", "text": "Please add an option to sort the search results."}
+{"language": "en", "category": "feature_request", "text": "I suggest letting us switch between multiple languages."}
+{"language": "en", "category": "feature_request", "text": "I would like an automatic backup option to be added."}
+{"language": "en", "category": "feature_request", "text": "Would you consider sending a weekly reminder?"}
+{"language": "en", "category": "feature_request", "text": "You should add an in-app account deletion option."}

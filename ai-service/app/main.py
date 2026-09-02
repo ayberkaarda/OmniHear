@@ -11,14 +11,21 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import settings
+from app.openapi import build_openapi
 from app.routers import analyze, health
 
 logging.basicConfig(level=settings.log_level)
 
-app = FastAPI(title="OmniHear AI Service", version=settings.model_version)
+# The OpenAPI export normalises info.version away (see
+# scripts/export_openapi.py), so this string is documentation metadata
+# only; the value that matters travels in every response's model_version.
+app = FastAPI(title="OmniHear AI Service", version="1.0.0")
 
 app.include_router(health.router)
 app.include_router(analyze.router)
+
+# Adds the manually-parsed request bodies to the schema; see app.openapi.
+app.openapi = lambda: build_openapi(app)
 
 
 @app.exception_handler(StarletteHTTPException)

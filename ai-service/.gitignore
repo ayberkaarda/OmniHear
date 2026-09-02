@@ -1,0 +1,14 @@
+# Model weights are a BUILD ARTIFACT, never a repository artifact
+# (ADR-0004). scripts/fetch_sentiment_model.py downloads and
+# checksum-verifies them; the container image runs that at build time.
+# The int8 graph alone is 168 MB, which has no business in git history.
+/models/
+
+# Local tooling caches
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local wheel/sdist build byproducts
+/build/
+/dist/

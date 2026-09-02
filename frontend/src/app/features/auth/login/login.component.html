@@ -1,0 +1,46 @@
+<app-auth-layout [heading]="heading" [lead]="lead">
+  <form [formGroup]="form" class="flex flex-col gap-4" novalidate (ngSubmit)="onSubmit()">
+    <app-input
+      formControlName="email"
+      type="email"
+      [label]="emailLabel"
+      [required]="true"
+      prefixIcon="mail"
+      [error]="errorFor('email')"
+      (blurred)="onFieldBlur()"
+    />
+
+    <app-input
+      formControlName="password"
+      type="password"
+      [label]="passwordLabel"
+      [required]="true"
+      prefixIcon="lock"
+      [error]="errorFor('password')"
+      (blurred)="onFieldBlur()"
+    />
+
+    <div class="flex justify-end">
+      <a
+        routerLink="/auth/forgot-password"
+        class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@auth.login.forgotLink"
+        >Forgot your password?</a
+      >
+    </div>
+
+    <app-button type="submit" variant="primary" size="lg" [loading]="submitting()">
+      <span i18n="@@auth.login.submit">Sign in</span>
+    </app-button>
+  </form>
+
+  <p authFooter>
+    <span i18n="@@auth.login.noAccount">Do not have an account yet?</span>
+    <a
+      routerLink="/auth/register"
+      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      i18n="@@auth.login.registerLink"
+      >Create one</a
+    >
+  </p>
+</app-auth-layout>

@@ -1,0 +1,8 @@
+<section class="flex flex-col gap-4">
+  <header class="flex flex-col gap-1">
+    <h2 class="text-lg font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.settings.profile.title">Profile</h2>
+    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.settings.profile.subtitle">Your name, email address and password.</p>
+  </header>
+
+  <app-empty-state icon="user" [heading]="emptyHeading" [description]="placeholderDescription" />
+</section>

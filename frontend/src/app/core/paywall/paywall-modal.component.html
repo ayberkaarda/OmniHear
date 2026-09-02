@@ -1,0 +1,33 @@
+<app-modal
+  [open]="isOpen()"
+  [title]="title"
+  [role]="'alertdialog'"
+  size="md"
+  [dismissible]="false"
+  (closed)="onClose()"
+>
+  <div modalBody class="flex flex-col gap-3 text-sm text-[var(--text-secondary)]">
+    <p i18n="Paywall modal body@@paywall.body">
+      You have used every analysis included in your current plan, so new feedback is no longer being analysed.
+    </p>
+    @if (quotaLimit() !== null) {
+      <p class="rounded-md bg-[var(--quota-exceeded-bg)] p-3 text-[var(--quota-exceeded-text)]">
+        <span i18n="Paywall quota line@@paywall.quotaUsed">Plan limit reached:</span>
+        <span class="tabular-nums font-medium">{{ quotaLimit() }} / {{ quotaLimit() }}</span>
+      </p>
+    }
+    <p i18n="Paywall reassurance@@paywall.pendingKept">
+      Nothing is lost. Incoming feedback keeps arriving and waits in the queue; as soon as your plan is upgraded, the
+      waiting items are analysed automatically.
+    </p>
+  </div>
+
+  <ng-container modalFooter>
+    <app-button variant="ghost" (pressed)="onClose()">
+      <span i18n="Paywall secondary action@@paywall.later">Not now</span>
+    </app-button>
+    <app-button variant="primary" (pressed)="onUpgrade()">
+      <span i18n="Paywall primary action@@paywall.upgrade">Upgrade plan</span>
+    </app-button>
+  </ng-container>
+</app-modal>

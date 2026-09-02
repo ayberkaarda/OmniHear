@@ -1,0 +1,27 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Turkish feature request; polite request wording, not a complaint.",
+  "endpoint": "/v1/analyze",
+  "name": "single-tr-feature-request",
+  "request": {
+    "language_hint": "tr",
+    "text": "Karanlik mod ve widget destegi eklerseniz cok sevinirim, tesekkurler."
+  },
+  "response": {
+    "category": "feature_request",
+    "confidence": 0.8452,
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "keywords": [
+      "widget destegi eklerseniz",
+      "karanlik mod",
+      "sevinirim",
+      "tesekkurler"
+    ],
+    "language": "tr",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "sentiment_label": "positive",
+    "sentiment_score": 0.7441
+  },
+  "signature": "valid",
+  "status": 200
+}

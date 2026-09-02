@@ -83,6 +83,12 @@ services:
       # artisan dies on a missing autoload.php. vendor/ is installed from the 8.3
       # container anyway, so the bind mount is the correct source.
       - ../backend:/srv/backend
+      # The Laravel↔FastAPI contract test reads contracts/fixtures/analyze/ — the
+      # same files ai-service/tests/test_contract_fixtures.py reads. Without this
+      # mount the directory does not exist inside the container and the invariant
+      # I7 tests silently skip, which is the one outcome a contract test must not
+      # have. Read-only: the backend consumes these fixtures, it never writes them.
+      - ../contracts:/srv/contracts:ro
 
   horizon:
     build:

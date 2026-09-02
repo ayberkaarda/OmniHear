@@ -1,0 +1,26 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Turkish text carrying an 'en' hint from platform metadata. Detection wins: the response language must be 'tr'.",
+  "endpoint": "/v1/analyze",
+  "name": "single-wrong-language-hint",
+  "request": {
+    "language_hint": "en",
+    "text": "Uygulama surekli cokuyor ve hicbir sey calismiyor, cok kotu."
+  },
+  "response": {
+    "category": "bug",
+    "confidence": 0.6396,
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "keywords": [
+      "uygulama surekli cokuyor",
+      "hicbir sey calismiyor",
+      "kotu"
+    ],
+    "language": "tr",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "sentiment_label": "negative",
+    "sentiment_score": -0.858
+  },
+  "signature": "valid",
+  "status": 200
+}

@@ -1,18 +1,11 @@
 <?php
 
+use App\Models\Company;
+use App\Models\User;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
-
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "pest()" function to bind a different classes or traits.
-|
-*/
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
@@ -20,31 +13,38 @@ pest()->extend(TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
-| Expectations
+| Helpers
 |--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
-
-function something()
+/**
+ * A company plus its owner, ready to act as a tenant.
+ *
+ * @return array{0: Company, 1: User}
+ */
+function tenant(string $role = User::ROLE_OWNER): array
 {
-    // ..
+    $company = Company::factory()->create();
+    $user = User::factory()->for($company)->state(['role' => $role])->create();
+
+    return [$company, $user];
+}
+
+/**
+ * Run a callback with the given company established as the tenant.
+ */
+function asTenant(Company $company, Closure $callback): mixed
+{
+    return app(TenantContext::class)->runFor($company->id, $callback);
+}
+
+/**
+ * Register an ad-hoc route under /api/v1 so middleware, policies and the error
+ * envelope can be exercised without inventing production endpoints.
+ */
+function testApiRoute(string $method, string $uri, Closure $handler, array $middleware = []): void
+{
+    Route::middleware(array_merge(['api'], $middleware))
+        ->prefix('api/v1')
+        ->group(fn () => Route::{$method}($uri, $handler));
 }

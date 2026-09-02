@@ -1,0 +1,24 @@
+<section class="flex flex-col gap-4">
+  <header class="flex flex-col gap-1">
+    <a
+      routerLink="/app/inbox"
+      class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      i18n="@@app.inboxDetail.back"
+      >Back to the inbox</a
+    >
+    <h1 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.inboxDetail.title">
+      Feedback detail
+    </h1>
+    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.inboxDetail.subtitle">
+      The comment itself, next to the reasoning behind its analysis.
+    </p>
+    @if (id()) {
+      <p class="font-mono text-xs tabular-nums text-[var(--text-muted)]">
+        <span i18n="@@app.inboxDetail.recordId">Record:</span>
+        <span>{{ id() }}</span>
+      </p>
+    }
+  </header>
+
+  <app-empty-state icon="search" [heading]="emptyHeading" [description]="placeholderDescription" />
+</section>

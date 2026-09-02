@@ -1,0 +1,12 @@
+<div
+  class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--bg-surface)] px-6 py-12 text-center"
+  data-testid="empty-state"
+>
+  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-surface-sunken)] text-[var(--text-muted)]">
+    <app-icon [name]="icon()" size="md" />
+  </span>
+  <p class="text-sm font-medium text-[var(--text-primary)]">{{ heading() }}</p>
+  @if (description()) {
+    <p class="max-w-prose text-sm text-[var(--text-secondary)]">{{ description() }}</p>
+  }
+</div>

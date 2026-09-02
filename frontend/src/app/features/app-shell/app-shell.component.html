@@ -1,0 +1,105 @@
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[var(--z-sticky)] focus:rounded-md focus:bg-[var(--bg-surface-raised)] focus:px-3 focus:py-2 focus:text-sm focus:text-[var(--text-primary)] focus:shadow-[var(--shadow-md)]"
+  i18n="Skip link@@common.skipToContent"
+  >Skip to main content</a
+>
+
+<div class="flex min-h-screen flex-col bg-[var(--bg-canvas)] lg:flex-row">
+  <aside class="flex flex-col gap-4 border-b border-[var(--border)] bg-[var(--bg-surface)] p-4 lg:w-64 lg:border-b-0 lg:border-r">
+    <a routerLink="/app/overview" class="text-base font-semibold tracking-tight text-[var(--text-primary)]">OmniHear</a>
+
+    @if (company(); as activeCompany) {
+      <p class="truncate text-xs text-[var(--text-muted)]">{{ activeCompany.name }}</p>
+    }
+
+    <nav class="flex flex-col gap-0.5" [attr.aria-label]="primaryNavLabel">
+      <a
+        routerLink="/app/overview"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      >
+        <app-icon name="arrow-up" size="sm" />
+        <span i18n="@@shell.nav.overview">Overview</span>
+      </a>
+      <a
+        routerLink="/app/inbox"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      >
+        <app-icon name="mail" size="sm" />
+        <span i18n="@@shell.nav.inbox">Inbox</span>
+      </a>
+      <a
+        routerLink="/app/integrations"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      >
+        <app-icon name="link" size="sm" />
+        <span i18n="@@shell.nav.integrations">Integrations</span>
+      </a>
+      <a
+        routerLink="/app/settings/profile"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      >
+        <app-icon name="user" size="sm" />
+        <span i18n="@@shell.nav.settings">Settings</span>
+      </a>
+    </nav>
+
+    <div class="mt-auto flex flex-col gap-3">
+      <app-quota-meter />
+      <app-theme-toggle />
+
+      @if (user(); as activeUser) {
+        <div class="flex items-center gap-2 border-t border-[var(--border)] pt-3">
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-xs font-medium text-[var(--brand-text)]"
+            aria-hidden="true"
+            >{{ userInitial() }}</span
+          >
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm text-[var(--text-primary)]">{{ activeUser.name }}</span>
+            <span class="block truncate text-xs text-[var(--text-muted)]">{{ activeUser.email }}</span>
+          </span>
+          <app-button
+            variant="ghost"
+            size="sm"
+            [iconOnly]="true"
+            [ariaLabel]="signOutLabel"
+            [loading]="signingOut()"
+            (pressed)="onSignOut()"
+          >
+            <app-icon name="x" size="sm" />
+          </app-button>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    @if (user() && !emailVerified()) {
+      <div
+        class="flex flex-wrap items-center gap-2 border-b border-[var(--category-complaint-border)] bg-[var(--category-complaint-bg)] px-4 py-2 text-sm text-[var(--category-complaint-text)]"
+        role="status"
+        data-testid="verify-banner"
+      >
+        <app-icon name="alert-triangle" size="sm" />
+        <span i18n="@@shell.verifyBanner">Your email address is not confirmed yet.</span>
+        <a
+          routerLink="/auth/verify-email"
+          class="rounded-sm font-medium underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          i18n="@@shell.verifyBannerAction"
+          >Confirm now</a
+        >
+      </div>
+    }
+
+    <main id="main-content" class="flex-1 px-4 py-6 lg:px-8">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<app-paywall-modal />

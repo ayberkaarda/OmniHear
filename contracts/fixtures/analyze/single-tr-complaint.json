@@ -1,0 +1,27 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Turkish negative complaint about pricing and support; no technical defect.",
+  "endpoint": "/v1/analyze",
+  "name": "single-tr-complaint",
+  "request": {
+    "language_hint": "tr",
+    "text": "Aylik ucret cok pahali ve destek ekibi bir haftadir donus yapmadi."
+  },
+  "response": {
+    "category": "complaint",
+    "confidence": 0.8197,
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "keywords": [
+      "haftadir donus yapmadi",
+      "aylik ucret",
+      "destek ekibi",
+      "pahali"
+    ],
+    "language": "tr",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "sentiment_label": "negative",
+    "sentiment_score": -0.7052
+  },
+  "signature": "valid",
+  "status": 200
+}

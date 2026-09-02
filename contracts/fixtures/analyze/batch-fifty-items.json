@@ -1,0 +1,878 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Batch request at the maximum allowed size (50 items).",
+  "endpoint": "/v1/analyze/batch",
+  "name": "batch-fifty-items",
+  "request": {
+    "items": [
+      {
+        "id": "fb_000",
+        "text": "Uygulama surekli cokuyor."
+      },
+      {
+        "id": "fb_001",
+        "text": "Great app, works perfectly."
+      },
+      {
+        "id": "fb_002",
+        "text": "Please add a dark mode."
+      },
+      {
+        "id": "fb_003",
+        "text": "Reklamlar cok fazla, rahatsiz edici."
+      },
+      {
+        "id": "fb_004",
+        "text": "The checkout screen throws an error."
+      },
+      {
+        "id": "fb_005",
+        "text": "Karanlik mod eklerseniz sevinirim."
+      },
+      {
+        "id": "fb_006",
+        "text": "Support never replied to my ticket."
+      },
+      {
+        "id": "fb_007",
+        "text": "Harika bir uygulama, tebrikler."
+      },
+      {
+        "id": "fb_008",
+        "text": "It freezes when I open the camera."
+      },
+      {
+        "id": "fb_009",
+        "text": "Fiyat cok pahali bence."
+      },
+      {
+        "id": "fb_010",
+        "text": "Uygulama surekli cokuyor."
+      },
+      {
+        "id": "fb_011",
+        "text": "Great app, works perfectly."
+      },
+      {
+        "id": "fb_012",
+        "text": "Please add a dark mode."
+      },
+      {
+        "id": "fb_013",
+        "text": "Reklamlar cok fazla, rahatsiz edici."
+      },
+      {
+        "id": "fb_014",
+        "text": "The checkout screen throws an error."
+      },
+      {
+        "id": "fb_015",
+        "text": "Karanlik mod eklerseniz sevinirim."
+      },
+      {
+        "id": "fb_016",
+        "text": "Support never replied to my ticket."
+      },
+      {
+        "id": "fb_017",
+        "text": "Harika bir uygulama, tebrikler."
+      },
+      {
+        "id": "fb_018",
+        "text": "It freezes when I open the camera."
+      },
+      {
+        "id": "fb_019",
+        "text": "Fiyat cok pahali bence."
+      },
+      {
+        "id": "fb_020",
+        "text": "Uygulama surekli cokuyor."
+      },
+      {
+        "id": "fb_021",
+        "text": "Great app, works perfectly."
+      },
+      {
+        "id": "fb_022",
+        "text": "Please add a dark mode."
+      },
+      {
+        "id": "fb_023",
+        "text": "Reklamlar cok fazla, rahatsiz edici."
+      },
+      {
+        "id": "fb_024",
+        "text": "The checkout screen throws an error."
+      },
+      {
+        "id": "fb_025",
+        "text": "Karanlik mod eklerseniz sevinirim."
+      },
+      {
+        "id": "fb_026",
+        "text": "Support never replied to my ticket."
+      },
+      {
+        "id": "fb_027",
+        "text": "Harika bir uygulama, tebrikler."
+      },
+      {
+        "id": "fb_028",
+        "text": "It freezes when I open the camera."
+      },
+      {
+        "id": "fb_029",
+        "text": "Fiyat cok pahali bence."
+      },
+      {
+        "id": "fb_030",
+        "text": "Uygulama surekli cokuyor."
+      },
+      {
+        "id": "fb_031",
+        "text": "Great app, works perfectly."
+      },
+      {
+        "id": "fb_032",
+        "text": "Please add a dark mode."
+      },
+      {
+        "id": "fb_033",
+        "text": "Reklamlar cok fazla, rahatsiz edici."
+      },
+      {
+        "id": "fb_034",
+        "text": "The checkout screen throws an error."
+      },
+      {
+        "id": "fb_035",
+        "text": "Karanlik mod eklerseniz sevinirim."
+      },
+      {
+        "id": "fb_036",
+        "text": "Support never replied to my ticket."
+      },
+      {
+        "id": "fb_037",
+        "text": "Harika bir uygulama, tebrikler."
+      },
+      {
+        "id": "fb_038",
+        "text": "It freezes when I open the camera."
+      },
+      {
+        "id": "fb_039",
+        "text": "Fiyat cok pahali bence."
+      },
+      {
+        "id": "fb_040",
+        "text": "Uygulama surekli cokuyor."
+      },
+      {
+        "id": "fb_041",
+        "text": "Great app, works perfectly."
+      },
+      {
+        "id": "fb_042",
+        "text": "Please add a dark mode."
+      },
+      {
+        "id": "fb_043",
+        "text": "Reklamlar cok fazla, rahatsiz edici."
+      },
+      {
+        "id": "fb_044",
+        "text": "The checkout screen throws an error."
+      },
+      {
+        "id": "fb_045",
+        "text": "Karanlik mod eklerseniz sevinirim."
+      },
+      {
+        "id": "fb_046",
+        "text": "Support never replied to my ticket."
+      },
+      {
+        "id": "fb_047",
+        "text": "Harika bir uygulama, tebrikler."
+      },
+      {
+        "id": "fb_048",
+        "text": "It freezes when I open the camera."
+      },
+      {
+        "id": "fb_049",
+        "text": "Fiyat cok pahali bence."
+      }
+    ]
+  },
+  "response": {
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "results": [
+      {
+        "category": "bug",
+        "confidence": 0.6521,
+        "id": "fb_000",
+        "keywords": [
+          "uygulama surekli cokuyor"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4541
+      },
+      {
+        "category": "bug",
+        "confidence": 0.4962,
+        "id": "fb_001",
+        "keywords": [
+          "great app",
+          "works perfectly"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.9301
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.3749,
+        "id": "fb_002",
+        "keywords": [
+          "please add",
+          "dark mode"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "neutral",
+        "sentiment_score": -0.0348
+      },
+      {
+        "category": "complaint",
+        "confidence": 0.7746,
+        "id": "fb_003",
+        "keywords": [
+          "rahatsiz edici",
+          "reklamlar",
+          "fazla"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.6188
+      },
+      {
+        "category": "bug",
+        "confidence": 0.83,
+        "id": "fb_004",
+        "keywords": [
+          "checkout screen throws",
+          "error"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.7563
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.5415,
+        "id": "fb_005",
+        "keywords": [
+          "mod eklerseniz sevinirim"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.3054
+      },
+      {
+        "category": "praise",
+        "confidence": 0.3419,
+        "id": "fb_006",
+        "keywords": [
+          "support",
+          "replied",
+          "ticket"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4786
+      },
+      {
+        "category": "praise",
+        "confidence": 0.4846,
+        "id": "fb_007",
+        "keywords": [
+          "harika",
+          "uygulama",
+          "tebrikler"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.2178
+      },
+      {
+        "category": "bug",
+        "confidence": 0.7031,
+        "id": "fb_008",
+        "keywords": [
+          "freezes",
+          "open",
+          "camera"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.5552
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.2784,
+        "id": "fb_009",
+        "keywords": [
+          "pahali bence",
+          "fiyat"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4707
+      },
+      {
+        "category": "bug",
+        "confidence": 0.6521,
+        "id": "fb_010",
+        "keywords": [
+          "uygulama surekli cokuyor"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4541
+      },
+      {
+        "category": "bug",
+        "confidence": 0.4962,
+        "id": "fb_011",
+        "keywords": [
+          "great app",
+          "works perfectly"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.9301
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.3749,
+        "id": "fb_012",
+        "keywords": [
+          "please add",
+          "dark mode"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "neutral",
+        "sentiment_score": -0.0348
+      },
+      {
+        "category": "complaint",
+        "confidence": 0.7746,
+        "id": "fb_013",
+        "keywords": [
+          "rahatsiz edici",
+          "reklamlar",
+          "fazla"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.6188
+      },
+      {
+        "category": "bug",
+        "confidence": 0.83,
+        "id": "fb_014",
+        "keywords": [
+          "checkout screen throws",
+          "error"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.7563
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.5415,
+        "id": "fb_015",
+        "keywords": [
+          "mod eklerseniz sevinirim"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.3054
+      },
+      {
+        "category": "praise",
+        "confidence": 0.3419,
+        "id": "fb_016",
+        "keywords": [
+          "support",
+          "replied",
+          "ticket"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4786
+      },
+      {
+        "category": "praise",
+        "confidence": 0.4846,
+        "id": "fb_017",
+        "keywords": [
+          "harika",
+          "uygulama",
+          "tebrikler"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.2178
+      },
+      {
+        "category": "bug",
+        "confidence": 0.7031,
+        "id": "fb_018",
+        "keywords": [
+          "freezes",
+          "open",
+          "camera"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.5552
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.2784,
+        "id": "fb_019",
+        "keywords": [
+          "pahali bence",
+          "fiyat"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4707
+      },
+      {
+        "category": "bug",
+        "confidence": 0.6521,
+        "id": "fb_020",
+        "keywords": [
+          "uygulama surekli cokuyor"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4541
+      },
+      {
+        "category": "bug",
+        "confidence": 0.4962,
+        "id": "fb_021",
+        "keywords": [
+          "great app",
+          "works perfectly"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.9301
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.3749,
+        "id": "fb_022",
+        "keywords": [
+          "please add",
+          "dark mode"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "neutral",
+        "sentiment_score": -0.0348
+      },
+      {
+        "category": "complaint",
+        "confidence": 0.7746,
+        "id": "fb_023",
+        "keywords": [
+          "rahatsiz edici",
+          "reklamlar",
+          "fazla"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.6188
+      },
+      {
+        "category": "bug",
+        "confidence": 0.83,
+        "id": "fb_024",
+        "keywords": [
+          "checkout screen throws",
+          "error"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.7563
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.5415,
+        "id": "fb_025",
+        "keywords": [
+          "mod eklerseniz sevinirim"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.3054
+      },
+      {
+        "category": "praise",
+        "confidence": 0.3419,
+        "id": "fb_026",
+        "keywords": [
+          "support",
+          "replied",
+          "ticket"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4786
+      },
+      {
+        "category": "praise",
+        "confidence": 0.4846,
+        "id": "fb_027",
+        "keywords": [
+          "harika",
+          "uygulama",
+          "tebrikler"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.2178
+      },
+      {
+        "category": "bug",
+        "confidence": 0.7031,
+        "id": "fb_028",
+        "keywords": [
+          "freezes",
+          "open",
+          "camera"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.5552
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.2784,
+        "id": "fb_029",
+        "keywords": [
+          "pahali bence",
+          "fiyat"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4707
+      },
+      {
+        "category": "bug",
+        "confidence": 0.6521,
+        "id": "fb_030",
+        "keywords": [
+          "uygulama surekli cokuyor"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4541
+      },
+      {
+        "category": "bug",
+        "confidence": 0.4962,
+        "id": "fb_031",
+        "keywords": [
+          "great app",
+          "works perfectly"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.9301
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.3749,
+        "id": "fb_032",
+        "keywords": [
+          "please add",
+          "dark mode"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "neutral",
+        "sentiment_score": -0.0348
+      },
+      {
+        "category": "complaint",
+        "confidence": 0.7746,
+        "id": "fb_033",
+        "keywords": [
+          "rahatsiz edici",
+          "reklamlar",
+          "fazla"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.6188
+      },
+      {
+        "category": "bug",
+        "confidence": 0.83,
+        "id": "fb_034",
+        "keywords": [
+          "checkout screen throws",
+          "error"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.7563
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.5415,
+        "id": "fb_035",
+        "keywords": [
+          "mod eklerseniz sevinirim"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.3054
+      },
+      {
+        "category": "praise",
+        "confidence": 0.3419,
+        "id": "fb_036",
+        "keywords": [
+          "support",
+          "replied",
+          "ticket"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4786
+      },
+      {
+        "category": "praise",
+        "confidence": 0.4846,
+        "id": "fb_037",
+        "keywords": [
+          "harika",
+          "uygulama",
+          "tebrikler"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.2178
+      },
+      {
+        "category": "bug",
+        "confidence": 0.7031,
+        "id": "fb_038",
+        "keywords": [
+          "freezes",
+          "open",
+          "camera"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.5552
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.2784,
+        "id": "fb_039",
+        "keywords": [
+          "pahali bence",
+          "fiyat"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4707
+      },
+      {
+        "category": "bug",
+        "confidence": 0.6521,
+        "id": "fb_040",
+        "keywords": [
+          "uygulama surekli cokuyor"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4541
+      },
+      {
+        "category": "bug",
+        "confidence": 0.4962,
+        "id": "fb_041",
+        "keywords": [
+          "great app",
+          "works perfectly"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.9301
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.3749,
+        "id": "fb_042",
+        "keywords": [
+          "please add",
+          "dark mode"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "neutral",
+        "sentiment_score": -0.0348
+      },
+      {
+        "category": "complaint",
+        "confidence": 0.7746,
+        "id": "fb_043",
+        "keywords": [
+          "rahatsiz edici",
+          "reklamlar",
+          "fazla"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.6188
+      },
+      {
+        "category": "bug",
+        "confidence": 0.83,
+        "id": "fb_044",
+        "keywords": [
+          "checkout screen throws",
+          "error"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.7563
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.5415,
+        "id": "fb_045",
+        "keywords": [
+          "mod eklerseniz sevinirim"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.3054
+      },
+      {
+        "category": "praise",
+        "confidence": 0.3419,
+        "id": "fb_046",
+        "keywords": [
+          "support",
+          "replied",
+          "ticket"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4786
+      },
+      {
+        "category": "praise",
+        "confidence": 0.4846,
+        "id": "fb_047",
+        "keywords": [
+          "harika",
+          "uygulama",
+          "tebrikler"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "positive",
+        "sentiment_score": 0.2178
+      },
+      {
+        "category": "bug",
+        "confidence": 0.7031,
+        "id": "fb_048",
+        "keywords": [
+          "freezes",
+          "open",
+          "camera"
+        ],
+        "language": "en",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.5552
+      },
+      {
+        "category": "feature_request",
+        "confidence": 0.2784,
+        "id": "fb_049",
+        "keywords": [
+          "pahali bence",
+          "fiyat"
+        ],
+        "language": "tr",
+        "model_version": "omnihear-onnx-f50df013ccc9",
+        "sentiment_label": "negative",
+        "sentiment_score": -0.4707
+      }
+    ]
+  },
+  "signature": "valid",
+  "status": 200
+}

@@ -56,6 +56,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URL
+    |--------------------------------------------------------------------------
+    |
+    | Root of the Angular SPA. Verification and password-reset links in e-mails
+    | point at the SPA, which forwards the signed parameters to the API, so the
+    | backend never renders HTML for those flows.
+    |
+    */
+
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:4200'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported locales
+    |--------------------------------------------------------------------------
+    |
+    | Locales the API will honour in an `Accept-Language` header. Anything else
+    | falls back to `locale` below.
+    |
+    */
+
+    'supported_locales' => ['en', 'tr'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

@@ -15,8 +15,31 @@ const SPEC_NOTE =
   '$hidden yalnızca serileştirmeyi gizler, ham attribute dizisini değil. ' +
   'Kimliklendirme için ham veri yerine id / correlation_id logla.';
 
-const PHP_LOG_CALLS = ['Log::', 'logger(', 'report(', 'dd(', 'dump(', 'var_dump(', 'ray(', 'info(', 'error_log('];
-const PHP_DEBUG_CALLS = ['dd(', 'dump(', 'var_dump(', 'ray('];
+// Call sites need a boundary, not a substring test. Plain `.includes('ray(')`
+// matches `toArray(`, `in_array(` and `array(`; `.includes('dd(')` matches `add(`.
+// That is not hypothetical: `toArray(Request $request)` is the mandatory signature
+// of every Laravel API Resource, so the substring form fired an unavoidable warning
+// on every write to those files. The lookbehind excludes word characters and `$`
+// only — `$logger->info(...)` must still be caught, so `>` is deliberately absent.
+const call = (name) => new RegExp('(?<![\\w$])' + name + '\\s*\\(');
+
+const PHP_LOG_CALLS = [
+  { re: /\bLog::/, label: 'Log::' },
+  { re: call('logger'), label: 'logger(' },
+  { re: call('report'), label: 'report(' },
+  { re: call('dd'), label: 'dd(' },
+  { re: call('dump'), label: 'dump(' },
+  { re: call('var_dump'), label: 'var_dump(' },
+  { re: call('ray'), label: 'ray(' },
+  { re: call('info'), label: 'info(' },
+  { re: call('error_log'), label: 'error_log(' },
+];
+const PHP_DEBUG_CALLS = [
+  { re: call('dd'), label: 'dd(' },
+  { re: call('dump'), label: 'dump(' },
+  { re: call('var_dump'), label: 'var_dump(' },
+  { re: call('ray'), label: 'ray(' },
+];
 
 // Sensitive markers matched with word boundaries so `context` does not trip `text`.
 const PHP_SENSITIVE = [
@@ -31,7 +54,11 @@ const PHP_SENSITIVE = [
   { re: /\$integration\b/i, label: '$integration' },
 ];
 
-const PY_LOG_CALLS = ['logger.', 'logging.', 'print('];
+const PY_LOG_CALLS = [
+  { re: /\blogger\./, label: 'logger.' },
+  { re: /\blogging\./, label: 'logging.' },
+  { re: /(?<![\w.])print\s*\(/, label: 'print(' },
+];
 const PY_SENSITIVE = [
   { re: /\btext\b/i, label: 'text' },
   { re: /\bbody\b/i, label: 'body' },
@@ -58,13 +85,13 @@ function scan(lines, logCalls, sensitive) {
   const findings = [];
   for (const line of lines) {
     const text = line.text;
-    const call = logCalls.find((c) => text.includes(c));
+    const call = logCalls.find((c) => c.re.test(text));
     if (!call) continue;
     for (const marker of sensitive) {
       // Strip known false-positive neighbours before testing this marker.
       const probe = marker.softenBy ? text.replace(new RegExp(marker.softenBy, 'gi'), '') : text;
       if (marker.re.test(probe)) {
-        findings.push('satır ' + line.n + ': "' + call + '" çağrısı "' + marker.label + '" ile birlikte');
+        findings.push('satır ' + line.n + ': "' + call.label + '" çağrısı "' + marker.label + '" ile birlikte');
         break;
       }
     }
@@ -76,8 +103,8 @@ function scanPhpDebug(lines, pathLower) {
   if (!pathLower.includes('app/')) return [];
   const findings = [];
   for (const line of lines) {
-    const call = PHP_DEBUG_CALLS.find((c) => line.text.includes(c));
-    if (call) findings.push('satır ' + line.n + ': "' + call + '" hata ayıklama çağrısı üretim koduna sızmış');
+    const call = PHP_DEBUG_CALLS.find((c) => c.re.test(line.text));
+    if (call) findings.push('satır ' + line.n + ': "' + call.label + '" hata ayıklama çağrısı üretim koduna sızmış');
   }
   return findings;
 }

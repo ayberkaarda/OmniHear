@@ -1,0 +1,462 @@
+{
+  "components": {
+    "schemas": {
+      "AnalyzeRequest": {
+        "properties": {
+          "language_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Language Hint"
+          },
+          "text": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "AnalyzeRequest",
+        "type": "object"
+      },
+      "AnalyzeResponse": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Keywords",
+            "type": "array"
+          },
+          "language": {
+            "maxLength": 2,
+            "minLength": 2,
+            "title": "Language",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "sentiment_label": {
+            "$ref": "#/components/schemas/SentimentLabel"
+          },
+          "sentiment_score": {
+            "maximum": 1.0,
+            "minimum": -1.0,
+            "title": "Sentiment Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "sentiment_score",
+          "sentiment_label",
+          "category",
+          "confidence",
+          "keywords",
+          "language",
+          "model_version",
+          "correlation_id"
+        ],
+        "title": "AnalyzeResponse",
+        "type": "object"
+      },
+      "BatchAnalyzeRequest": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BatchItem"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "BatchAnalyzeRequest",
+        "type": "object"
+      },
+      "BatchAnalyzeResponse": {
+        "properties": {
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BatchResultItem"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "results",
+          "model_version",
+          "correlation_id"
+        ],
+        "title": "BatchAnalyzeResponse",
+        "type": "object"
+      },
+      "BatchItem": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "language_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Language Hint"
+          },
+          "text": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "BatchItem",
+        "type": "object"
+      },
+      "BatchResultItem": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Keywords",
+            "type": "array"
+          },
+          "language": {
+            "maxLength": 2,
+            "minLength": 2,
+            "title": "Language",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "sentiment_label": {
+            "$ref": "#/components/schemas/SentimentLabel"
+          },
+          "sentiment_score": {
+            "maximum": 1.0,
+            "minimum": -1.0,
+            "title": "Sentiment Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "sentiment_score",
+          "sentiment_label",
+          "category",
+          "confidence",
+          "keywords",
+          "language",
+          "model_version",
+          "id"
+        ],
+        "title": "BatchResultItem",
+        "type": "object"
+      },
+      "Category": {
+        "enum": [
+          "complaint",
+          "praise",
+          "bug",
+          "feature_request"
+        ],
+        "title": "Category",
+        "type": "string"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "SentimentLabel": {
+        "enum": [
+          "positive",
+          "neutral",
+          "negative"
+        ],
+        "title": "SentimentLabel",
+        "type": "string"
+      }
+    }
+  },
+  "info": {
+    "title": "OmniHear AI Service"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "Liveness plus the two facts an operator needs to identify a build.\n\n`sentiment_backend` is surfaced because the ONNX and lexicon backends\nare not equivalent in quality (see app.analyzers.sentiment): a\ncontainer that silently came up on the fallback is a real incident,\nand this is where it becomes visible.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/v1/analyze": {
+      "post": {
+        "operationId": "analyze_v1_analyze_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Correlation-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Correlation-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Signature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Signature"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "INVALID_SIGNATURE - X-Signature missing or does not match the body"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "VALIDATION_ERROR, or BATCH_TOO_LARGE when items exceeds 50"
+          }
+        },
+        "summary": "Analyze"
+      }
+    },
+    "/v1/analyze/batch": {
+      "post": {
+        "operationId": "analyze_batch_v1_analyze_batch_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Correlation-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Correlation-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Signature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Signature"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchAnalyzeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchAnalyzeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "INVALID_SIGNATURE - X-Signature missing or does not match the body"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "VALIDATION_ERROR, or BATCH_TOO_LARGE when items exceeds 50"
+          }
+        },
+        "summary": "Analyze Batch"
+      }
+    }
+  }
+}

@@ -1,18 +1,25 @@
-"""Deterministic stub analyzer.
+"""Deterministic stub analyzer — a test fake, not a production path.
+
+F1 wired this as the default analyzer. F3 replaced it with
+app.analyzers.pipeline.PipelineAnalyzer (ADR-0004); the stub is kept
+because the test suite uses it as a cheap, fully deterministic fake when
+exercising the routing and error-handling layers.
 
 Produces contract-valid AnalysisResult values derived from a SHA-256 hash
 of the input text. No randomness: identical input always yields identical
-output. This is a placeholder for F1 only — a real analysis engine (ML
-model or LLM API integration) will replace it in a later phase behind the
-same SentimentAnalyzer Protocol (see base.py). Do not add real inference
-logic here.
+output. Do not add real inference logic here — the pipeline is the place
+for that, and the stub's value is precisely that it has none.
 """
 
 import hashlib
 import re
 
-from app.config import settings
 from app.schemas import AnalysisResult, Category, SentimentLabel
+
+# Fixed, not read from settings: the stub is a test fake, and a fake that
+# reports the production model_version would let a misconfigured deployment
+# masquerade as the real pipeline in stored data.
+STUB_MODEL_VERSION = "stub-0.1.0"
 
 _CATEGORIES = (
     Category.COMPLAINT,
@@ -57,7 +64,7 @@ class StubAnalyzer:
             confidence=confidence,
             keywords=keywords,
             language=language,
-            model_version=settings.model_version,
+            model_version=STUB_MODEL_VERSION,
         )
 
     @staticmethod

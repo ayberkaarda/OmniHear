@@ -26,7 +26,7 @@ class AnalyzeRequest(BaseModel):
 class AnalyzeResult(BaseModel):
     sentiment_score: float = Field(..., ge=-1.0, le=1.0)
     sentiment_label: Literal["positive", "neutral", "negative"]
-    category: Literal["bug", "feature_request", "praise", "complaint", "other"]
+    category: Literal["bug", "feature_request", "praise", "complaint"]
     confidence: float = Field(..., ge=0.0, le=1.0)
     keywords: list[str] = Field(default_factory=list)
     model_version: str
@@ -90,7 +90,7 @@ class AnalyzeResultRequest extends FormRequest
         return [
             'sentiment_score' => ['required', 'numeric', 'between:-1,1'],
             'sentiment_label' => ['required', Rule::in(['positive', 'neutral', 'negative'])],
-            'category' => ['required', Rule::in(['bug', 'feature_request', 'praise', 'complaint', 'other'])],
+            'category' => ['required', Rule::in(['bug', 'feature_request', 'praise', 'complaint'])],
             'confidence' => ['required', 'numeric', 'between:0,1'],
             'model_version' => ['required', 'string'],
             'keywords' => ['required', 'array'],

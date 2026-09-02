@@ -1,0 +1,406 @@
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[var(--z-sticky)] focus:rounded-md focus:bg-[var(--bg-surface-raised)] focus:px-3 focus:py-2 focus:text-sm focus:text-[var(--text-primary)] focus:shadow-[var(--shadow-md)]"
+  i18n="Skip link@@common.skipToContent"
+  >Skip to main content</a
+>
+
+<header class="sticky top-0 z-[var(--z-sticky)] border-b border-[var(--border)] bg-[var(--bg-surface)]">
+  <div class="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
+    <a routerLink="/" class="text-base font-semibold tracking-tight text-[var(--text-primary)]">OmniHear</a>
+
+    <nav
+      class="ml-auto hidden items-center gap-1 md:flex"
+      i18n-aria-label="Landing section nav label@@landing.nav.label"
+      aria-label="Page sections"
+    >
+      <a
+        href="#features"
+        class="rounded-md px-2.5 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@landing.nav.features"
+        >Features</a
+      >
+      <a
+        href="#integrations"
+        class="rounded-md px-2.5 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@landing.nav.integrations"
+        >Integrations</a
+      >
+      <a
+        href="#pricing"
+        class="rounded-md px-2.5 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@landing.nav.pricing"
+        >Pricing</a
+      >
+      <a
+        href="#faq"
+        class="rounded-md px-2.5 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@landing.nav.faq"
+        >FAQ</a
+      >
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2 md:ml-0">
+      <a routerLink="/auth/login" appButtonStyle variant="ghost" size="sm" i18n="@@landing.nav.signIn">Sign in</a>
+      <a routerLink="/auth/register" appButtonStyle variant="primary" size="sm" i18n="@@landing.nav.getStarted"
+        >Get started</a
+      >
+    </div>
+  </div>
+</header>
+
+<main id="main-content" class="bg-[var(--bg-canvas)]">
+  <section class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+    <div class="max-w-3xl">
+      <p
+        class="mb-3 inline-flex items-center gap-1.5 rounded-full border border-[var(--source-border)] bg-[var(--source-bg)] px-2.5 py-1 text-xs text-[var(--source-text)]"
+      >
+        <app-icon name="megaphone" size="sm" />
+        <span i18n="@@landing.hero.eyebrow">Customer feedback intelligence</span>
+      </p>
+      <h1
+        class="text-3xl font-semibold leading-tight tracking-tight text-[var(--text-primary)] md:text-4xl"
+        i18n="@@landing.hero.title"
+      >
+        Every customer comment, in one place, already read
+      </h1>
+      <p class="mt-4 max-w-2xl text-base text-[var(--text-secondary)]" i18n="@@landing.hero.subtitle">
+        OmniHear collects reviews and support messages from every channel you sell on, then classifies each one by
+        sentiment and by topic, so your team starts the day with the answer instead of the backlog.
+      </p>
+      <div class="mt-7 flex flex-wrap items-center gap-3">
+        <a routerLink="/auth/register" appButtonStyle variant="primary" size="lg" i18n="@@landing.hero.primaryCta"
+          >Create a free account</a
+        >
+        <a href="#features" appButtonStyle variant="secondary" size="lg" i18n="@@landing.hero.secondaryCta"
+          >See how it works</a
+        >
+      </div>
+      <p class="mt-3 text-xs text-[var(--text-muted)]" i18n="@@landing.hero.note">
+        No card required. The free plan includes {{ freePlanQuota }} analyses.
+      </p>
+    </div>
+  </section>
+
+  <section id="features" class="border-t border-[var(--border)] bg-[var(--bg-surface)]">
+    <div class="mx-auto max-w-6xl px-4 py-16">
+      <h2 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@landing.features.title">
+        What OmniHear does
+      </h2>
+      <p class="mt-2 max-w-2xl text-sm text-[var(--text-secondary)]" i18n="@@landing.features.subtitle">
+        Collection, analysis and reporting are one pipeline, so nothing is retyped between tools.
+      </p>
+
+      <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <li class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-5">
+          <span
+            class="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--brand-soft)] text-[var(--brand-text)]"
+            ><app-icon name="link" size="md"
+          /></span>
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.feature.collect.title">
+            One inbox for every channel
+          </h3>
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]" i18n="@@landing.feature.collect.body">
+            Store reviews, support tickets, ratings and social mentions arrive in a single stream, pulled incrementally
+            so nothing is fetched twice.
+          </p>
+        </li>
+        <li class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-5">
+          <span
+            class="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--brand-soft)] text-[var(--brand-text)]"
+            ><app-icon name="smile" size="md"
+          /></span>
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.feature.sentiment.title">
+            Sentiment on every message
+          </h3>
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]" i18n="@@landing.feature.sentiment.body">
+            Each comment gets a positive, neutral or negative label together with a numeric score, so a shift in mood is
+            visible before it reaches your ratings.
+          </p>
+        </li>
+        <li class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-5">
+          <span
+            class="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--brand-soft)] text-[var(--brand-text)]"
+            ><app-icon name="tag" size="md"
+          /></span>
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.feature.category.title">
+            Sorted into what you can act on
+          </h3>
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]" i18n="@@landing.feature.category.body">
+            Complaint, praise, bug report or feature request: the classification routes each comment to the team that
+            can do something about it.
+          </p>
+        </li>
+        <li class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-5">
+          <span
+            class="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--brand-soft)] text-[var(--brand-text)]"
+            ><app-icon name="arrow-up" size="md"
+          /></span>
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.feature.realtime.title">
+            Results appear as they land
+          </h3>
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]" i18n="@@landing.feature.realtime.body">
+            Analysis runs in the background and the dashboard updates itself. No refresh, no waiting on a nightly batch.
+          </p>
+        </li>
+        <li class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-5">
+          <span
+            class="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--brand-soft)] text-[var(--brand-text)]"
+            ><app-icon name="lock" size="md"
+          /></span>
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.feature.isolation.title">
+            Your data stays yours
+          </h3>
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]" i18n="@@landing.feature.isolation.body">
+            Every record is scoped to your company at the database level, and integration credentials are stored
+            encrypted and never written to a log.
+          </p>
+        </li>
+        <li class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-5">
+          <span
+            class="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--brand-soft)] text-[var(--brand-text)]"
+            ><app-icon name="info" size="md"
+          /></span>
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.feature.quota.title">
+            Usage you can see
+          </h3>
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]" i18n="@@landing.feature.quota.body">
+            Remaining analyses are shown on every screen. If the allowance runs out, incoming feedback waits in the
+            queue rather than being dropped.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="integrations" class="border-t border-[var(--border)]">
+    <div class="mx-auto max-w-6xl px-4 py-16">
+      <h2 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@landing.integrations.title">
+        Where the feedback comes from
+      </h2>
+      <p class="mt-2 max-w-2xl text-sm text-[var(--text-secondary)]" i18n="@@landing.integrations.subtitle">
+        Connect a channel once with an API key or an OAuth grant; collection then runs on a schedule.
+      </p>
+
+      <ul class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <li class="flex items-center gap-3 rounded-lg border border-[var(--source-border)] bg-[var(--source-bg)] px-4 py-3">
+          <app-icon name="phone" size="md" />
+          <span class="text-sm font-medium text-[var(--source-text)]" i18n="@@landing.integration.appStore"
+            >App Store reviews</span
+          >
+        </li>
+        <li class="flex items-center gap-3 rounded-lg border border-[var(--source-border)] bg-[var(--source-bg)] px-4 py-3">
+          <app-icon name="phone" size="md" />
+          <span class="text-sm font-medium text-[var(--source-text)]" i18n="@@landing.integration.googlePlay"
+            >Google Play reviews</span
+          >
+        </li>
+        <li class="flex items-center gap-3 rounded-lg border border-[var(--source-border)] bg-[var(--source-bg)] px-4 py-3">
+          <app-icon name="user" size="md" />
+          <span class="text-sm font-medium text-[var(--source-text)]">Zendesk</span>
+        </li>
+        <li class="flex items-center gap-3 rounded-lg border border-[var(--source-border)] bg-[var(--source-bg)] px-4 py-3">
+          <app-icon name="check-circle" size="md" />
+          <span class="text-sm font-medium text-[var(--source-text)]">Trustpilot</span>
+        </li>
+        <li class="flex items-center gap-3 rounded-lg border border-[var(--source-border)] bg-[var(--source-bg)] px-4 py-3">
+          <app-icon name="mail" size="md" />
+          <span class="text-sm font-medium text-[var(--source-text)]" i18n="@@landing.integration.email"
+            >Email inbox</span
+          >
+        </li>
+        <li class="flex items-center gap-3 rounded-lg border border-[var(--source-border)] bg-[var(--source-bg)] px-4 py-3">
+          <app-icon name="megaphone" size="md" />
+          <span class="text-sm font-medium text-[var(--source-text)]" i18n="@@landing.integration.social"
+            >Social media mentions</span
+          >
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pricing" class="border-t border-[var(--border)] bg-[var(--bg-surface)]">
+    <div class="mx-auto max-w-6xl px-4 py-16">
+      <h2 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@landing.pricing.title">
+        Pricing
+      </h2>
+      <p class="mt-2 max-w-2xl text-sm text-[var(--text-secondary)]" i18n="@@landing.pricing.subtitle">
+        Start on the free plan. One analysis is counted once per comment, never twice.
+      </p>
+
+      <div class="mt-8 grid gap-4 md:grid-cols-2">
+        <div class="flex flex-col rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-6">
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.pricing.free.name">Free</h3>
+          <p class="mt-2 text-2xl font-semibold tabular-nums text-[var(--text-primary)]">{{ freePlanQuota }}</p>
+          <p class="text-xs text-[var(--text-muted)]" i18n="@@landing.pricing.free.unit">analyses included</p>
+          <ul class="mt-4 flex flex-col gap-2 text-sm text-[var(--text-secondary)]">
+            <li class="flex items-start gap-2">
+              <app-icon name="check" size="sm" /><span i18n="@@landing.pricing.free.item1"
+                >All channel integrations</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <app-icon name="check" size="sm" /><span i18n="@@landing.pricing.free.item2"
+                >Sentiment and category analysis</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <app-icon name="check" size="sm" /><span i18n="@@landing.pricing.free.item3"
+                >Unlimited team members</span
+              >
+            </li>
+          </ul>
+          <a
+            routerLink="/auth/register"
+            appButtonStyle
+            variant="primary"
+            class="mt-6"
+            i18n="@@landing.pricing.free.cta"
+            >Start for free</a
+          >
+        </div>
+
+        <div class="flex flex-col rounded-lg border border-[var(--border-strong)] bg-[var(--bg-surface-raised)] p-6">
+          <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@landing.pricing.pro.name">Pro</h3>
+          <p class="mt-2 text-2xl font-semibold text-[var(--text-primary)]" i18n="@@landing.pricing.pro.price">
+            Announced at launch
+          </p>
+          <p class="text-xs text-[var(--text-muted)]" i18n="@@landing.pricing.pro.unit">billing is not open yet</p>
+          <ul class="mt-4 flex flex-col gap-2 text-sm text-[var(--text-secondary)]">
+            <li class="flex items-start gap-2">
+              <app-icon name="check" size="sm" /><span i18n="@@landing.pricing.pro.item1"
+                >A larger analysis allowance</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <app-icon name="check" size="sm" /><span i18n="@@landing.pricing.pro.item2"
+                >Queued feedback analysed automatically after an upgrade</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <app-icon name="check" size="sm" /><span i18n="@@landing.pricing.pro.item3"
+                >Everything in the free plan</span
+              >
+            </li>
+          </ul>
+          <a
+            routerLink="/auth/register"
+            appButtonStyle
+            variant="secondary"
+            class="mt-6"
+            i18n="@@landing.pricing.pro.cta"
+            >Create an account to be notified</a
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="border-t border-[var(--border)]">
+    <div class="mx-auto max-w-3xl px-4 py-16">
+      <h2 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@landing.faq.title">
+        Frequently asked questions
+      </h2>
+
+      <div class="mt-6 flex flex-col gap-2">
+        <details class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3">
+          <summary
+            class="cursor-pointer list-none text-sm font-medium text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            i18n="@@landing.faq.q1"
+          >
+            Which channels can I connect?
+          </summary>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]" i18n="@@landing.faq.a1">
+            App Store, Google Play, Zendesk, Trustpilot, an email inbox and social media mentions. Each connection is
+            configured separately and can be paused without losing the comments already collected.
+          </p>
+        </details>
+        <details class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3">
+          <summary
+            class="cursor-pointer list-none text-sm font-medium text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            i18n="@@landing.faq.q2"
+          >
+            How is a comment analysed?
+          </summary>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]" i18n="@@landing.faq.a2">
+            Its language is detected first, then the text is scored for sentiment and classified into a topic. The
+            result is stored with the confidence value and the model version that produced it, so an old analysis can
+            always be traced.
+          </p>
+        </details>
+        <details class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3">
+          <summary
+            class="cursor-pointer list-none text-sm font-medium text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            i18n="@@landing.faq.q3"
+          >
+            Can another company see my feedback?
+          </summary>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]" i18n="@@landing.faq.a3">
+            No. Every record carries your company identifier and every query is filtered by it, so a request for a
+            record that belongs to someone else is answered as if it did not exist.
+          </p>
+        </details>
+        <details class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3">
+          <summary
+            class="cursor-pointer list-none text-sm font-medium text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            i18n="@@landing.faq.q4"
+          >
+            What happens when the allowance runs out?
+          </summary>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]" i18n="@@landing.faq.a4">
+            Collection continues and new comments are kept, waiting to be analysed. Nothing is deleted; once the plan is
+            upgraded the waiting comments are analysed automatically.
+          </p>
+        </details>
+        <details class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3">
+          <summary
+            class="cursor-pointer list-none text-sm font-medium text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            i18n="@@landing.faq.q5"
+          >
+            Which languages are supported?
+          </summary>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]" i18n="@@landing.faq.a5">
+            Comments are analysed in the language they were written in, detected automatically. The interface itself is
+            available in Turkish and English.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-[var(--border)] bg-[var(--bg-surface)]">
+    <div class="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-16 text-center">
+      <h2 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@landing.cta.title">
+        Start listening to every channel today
+      </h2>
+      <p class="max-w-xl text-sm text-[var(--text-secondary)]" i18n="@@landing.cta.body">
+        Connect your first channel in a few minutes and see what your customers have already told you.
+      </p>
+      <a routerLink="/auth/register" appButtonStyle variant="primary" size="lg" i18n="@@landing.cta.button"
+        >Create a free account</a
+      >
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-[var(--border)] bg-[var(--bg-canvas)]">
+  <div
+    class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between"
+  >
+    <p i18n="@@landing.footer.tagline">OmniHear - customer feedback intelligence</p>
+    <nav class="flex items-center gap-4" i18n-aria-label="Footer nav label@@landing.footer.navLabel" aria-label="Footer">
+      <a
+        routerLink="/auth/login"
+        class="hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@landing.footer.signIn"
+        >Sign in</a
+      >
+      <a
+        routerLink="/auth/register"
+        class="hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@landing.footer.register"
+        >Create account</a
+      >
+    </nav>
+  </div>
+</footer>

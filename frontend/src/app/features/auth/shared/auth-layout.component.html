@@ -1,0 +1,26 @@
+<div class="flex min-h-screen flex-col bg-[var(--bg-canvas)]">
+  <header class="border-b border-[var(--border)] bg-[var(--bg-surface)]">
+    <div class="mx-auto flex h-14 max-w-6xl items-center px-4">
+      <a routerLink="/" class="text-base font-semibold tracking-tight text-[var(--text-primary)]">OmniHear</a>
+    </div>
+  </header>
+
+  <main id="main-content" class="flex flex-1 items-start justify-center px-4 py-10 sm:py-16">
+    <div class="w-full max-w-md">
+      <div class="rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-6 shadow-[var(--shadow-sm)]">
+        <h1 class="text-lg font-semibold tracking-tight text-[var(--text-primary)]">{{ heading() }}</h1>
+        @if (lead()) {
+          <p class="mt-1.5 text-sm text-[var(--text-secondary)]">{{ lead() }}</p>
+        }
+
+        <div class="mt-6">
+          <ng-content></ng-content>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center text-sm text-[var(--text-secondary)]">
+        <ng-content select="[authFooter]"></ng-content>
+      </div>
+    </div>
+  </main>
+</div>

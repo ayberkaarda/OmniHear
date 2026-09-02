@@ -77,21 +77,33 @@ Bunlar spec'ten gelir ve her fazda korunur. Her birinin bir testi vardır; test 
 ```
 node .claude/hooks/__selftest.mjs                            # guard hook'ları önce — <1 sn, hızlı-fail
 cd backend    && composer validate --strict
+cd backend    && composer audit                                # CI-only until 2026-09-02; see below
+cd backend    && composer check-platform-reqs                  # CI-only until 2026-09-02; see below
 cd backend    && vendor/bin/pint --test
 cd backend    && php artisan test --coverage --min=80
 cd ai-service && ruff check . && ruff format --check .
 cd ai-service && pytest
 cd frontend   && npx eslint .
 cd frontend   && npm run typecheck                          # tsconfig.typecheck.json — Tuzak 1'e bak
-cd frontend   && npx ng build --configuration production    # budget çıktısı rapora girer
+cd frontend   && npm run build:gate                          # raw + transfer, ikisi de rapora girer
 cd frontend   && npx jest
 cd frontend   && npm run i18n:check
+cd frontend   && npm run tokens:check                          # CI-only until 2026-09-02; see below
 contract test (backend Pest + ai-service pytest, contracts/ şemasından)
 docker compose -f infra/docker-compose.dev.yml config -q    # compose + Dockerfile referansları geçerli mi
 cd frontend   && npx playwright test                        # E2E fazından itibaren
 ```
 
 Bir bileşen henüz kurulmadıysa o satır atlanır ve **rapora "henüz yok" diye yazılır** — sessizce atlanmaz.
+
+> **CI şu anda karanlık.** Repo private kalıyor (kullanıcı kararı, 2026-09-02: proje
+> bitince public olacak) ve GitHub Actions faturalandırma nedeniyle bloke. Bu, kapıda
+> yalnızca CI'de koşan üç komutun sessizce kaybolması demekti; üçü de yukarıdaki listeye
+> alındı. CI geri geldiğinde `.github/workflows/ci.yml` ile bu liste arasındaki fark
+> yeniden gözden geçirilir. Kalan gerçek boşluk: CI **temiz bir checkout'ta** koşar,
+> yerel kapı ise untracked dosyaların bulunduğu çalışma ağacında — yerel yeşil, henüz
+> commit edilmemiş bir dosyaya bağımlı olabilir. Faz kapanışında `git status`
+> çıktısı rapora girer ki bu fark görünür kalsın.
 
 > **Tuzak 1 — iki katmanlı, ikisi de sessiz:**
 >
@@ -103,7 +115,18 @@ Bir bileşen henüz kurulmadıysa o satır atlanır ve **rapora "henüz yok" diy
 >
 > **Kapı komutu her zaman `npm run typecheck`** (`tsconfig.typecheck.json`, tüm `src/**/*.ts`, spec'ler hariç). `ng build` kendi config'ini kullanmaya devam eder, bundle çıktısı etkilenmez.
 >
-> **Tuzak 2:** `angular.json` içindeki `budgets[type=initial].maximumError` gevşetilerek, `budgets` bloğu başka bir configuration'a taşınarak, `--localize=false` veya `production` dışı bir configuration ile koşularak build yeşile boyanamaz. Spec §4 hedefi initial bundle **< 250 kB** (raw, Angular budget ölçümü); eşiği yükseltmek veya ölçümü yumuşatmak fazı kırmızı yapar. Kapı komutu her zaman `ng build --configuration production` ve çıktıdaki "Initial total" değeri rapora girer.
+> **Tuzak 2:** Initial bundle **iki eşikle** denetlenir: raw (`angular.json` `budgets[type=initial].maximumError`, Angular ölçümü) ve **brotli transfer** (`frontend/scripts/bundle-check.mjs` içindeki `TRANSFER_MAX_KB`). Kapı komutu **yalnızca** `npm run build:gate`; çıktıdaki "Initial total" raw **ve** transfer değerleri rapora girer. Angular'ın budget hesaplayıcısı sıkıştırma bilmez (transfer-size budget talebi `angular/angular-cli#22293` "not planned" ile kapatıldı), o yüzden transfer eşiği script'in işidir. Script argüman kabul etmez ve build'i kendisi koşar — configuration değiştirilemez.
+>
+> Şunlar **hiçbir gerekçeyle** yapılmaz: `budgets` bloğunu taşımak/silmek, `production` dışı configuration, `--localize=false`, error'ı warning'e çevirmek, script'i atlayıp `ng build`'i doğrudan koşmak, chunk hariç tutmak. Raw eşik iki yerde birden durur (`angular.json` + script sabiti) ve script eşitliği doğrular; tek taraflı değişiklik **fail** verir. *(Negatif testi yapıldı: `angular.json`'ı tek başına 400kb'a çıkarmak exit 1 verdi.)*
+>
+> Eşik **aşağı** serbestçe iner. **Yukarı** çıkması için üçü birden gerekir:
+> 1. **Framework tabanı testi** — aynı ağaçta `app.routes.ts` tek bir `/health` route'una, `app.config.ts` ve `app.component.ts` F1 hâline indirilerek build alınır. Taban mevcut eşiğin **%90'ının altındaysa** aşım uygulama kodudur: eşik **değişmez**, kod düzeltilir.
+> 2. **ADR** — taban, tam uygulama, `@angular/*` chunk'ları ile uygulama chunk'larının **ayrı ayrı** raw delta tablosu, ve yeni eşiğin türetimi (taban + gerekçelendirilmiş uygulama payı).
+> 3. **Kullanıcı onayı** + PROGRESS "Known deviations" satırı. Rapor, değişiklik öncesi **kırmızı** ve sonrası **yeşil** build çıktısını birlikte gösterir.
+>
+> Framework major yükseltmesinden sonra taban **yeniden ölçülür** ve düşüş eşiğe yansıtılır (ratchet).
+>
+> Bu kural bugünkü durumu ADR-0005 dönemindekinden ayırt eder: bugün taban/eşik = 245.00/256.00 = **%95.7**, yani aşım framework'ün kendisi — yeniden türetme meşru. ADR-0005 zamanındaki 261.52 kB aşımında ise fazlalık polyfills chunk'ındaki 36.36 kB'lık zone.js'ti, yani **araç kodu**, ve doğru cevap eşiği değil kodu değiştirmekti. Kural her iki vakayı da doğru sınıflandırır.
 >
 > Uygulama **zoneless** çalışır (`provideExperimentalZonelessChangeDetection()`, polyfills listesinde `zone.js` **yok**). zone.js'i geri eklemek bilinçli bir mimari karardır ve tek başına ~36 kB getirir — onaysız yapılmaz. Yeni bir üçüncü parti kütüphane eklenirken zoneless uyumluluğu **seçim kriteridir**: `NgZone`'a örtük bağımlı bir kütüphane sessizce bayat UI üretir (state değişir, görünüm güncellenmez), çünkü signal okumadığı sürece scheduler tetiklenmez.
 >
@@ -215,6 +238,6 @@ Agent tool'unun bu ortamda kabul ettiği `model` değerleri yalnızca: **`opus` 
 
 **Skill'ler** (`.claude/skills/`, 9 adet): `phase-gate-report` · `laravel-tenant-resource` · `payment-webhook` · `quota-paywall-flow` · `ai-contract-sync` · `angular-feature-route` · `platform-connector` · `adr-write` · `omnihear-tokens`
 
-**Self-test:** `node .claude/hooks/__selftest.mjs` — guard hook'larının davranışını doğrulayan 107 assertion. Regresyon kapısının ilk komutu; kırmızıysa faz kırmızıdır. Yasak literal'leri (`'drop'+'db'` gibi) parça birleştirmeyle kurar, çünkü aksi hâlde test dosyasının kendisi guard'lara takılır.
+**Self-test:** `node .claude/hooks/__selftest.mjs` — guard hook'larının davranışını doğrulayan 116 assertion. Regresyon kapısının ilk komutu; kırmızıysa faz kırmızıdır. Yasak literal'leri (`'drop'+'db'` gibi) parça birleştirmeyle kurar, çünkü aksi hâlde test dosyasının kendisi guard'lara takılır.
 
 Bir hook yanlış pozitif üretiyorsa **hook'u atlatma** — hook'u düzelt veya kullanıcıya bildir.

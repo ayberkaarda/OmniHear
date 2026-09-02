@@ -1,0 +1,25 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "Mildly ambiguous text that should land near the neutral band.",
+  "endpoint": "/v1/analyze",
+  "name": "single-neutral-ambiguous",
+  "request": {
+    "language_hint": "en",
+    "text": "It works. Nothing special either way."
+  },
+  "response": {
+    "category": "bug",
+    "confidence": 0.3309,
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "keywords": [
+      "special either way",
+      "works"
+    ],
+    "language": "en",
+    "model_version": "omnihear-onnx-f50df013ccc9",
+    "sentiment_label": "positive",
+    "sentiment_score": 0.2081
+  },
+  "signature": "valid",
+  "status": 200
+}

@@ -1,0 +1,46 @@
+<main id="main-content" class="flex min-h-screen items-center justify-center bg-[var(--bg-canvas)] px-4 py-12">
+  <div class="w-full max-w-lg rounded-lg border border-[var(--border)] bg-[var(--bg-surface-raised)] p-6">
+    <span
+      class="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--quota-exceeded-bg)] text-[var(--quota-exceeded-text)]"
+    >
+      <app-icon name="lock" size="md" />
+    </span>
+
+    <h1 class="mt-4 text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@paywallPage.title">
+      Your analysis quota is full
+    </h1>
+
+    <p class="mt-2 text-sm text-[var(--text-secondary)]" i18n="@@paywallPage.body">
+      Every analysis included in your current plan has been used, so new feedback is no longer being analysed.
+    </p>
+
+    @if (limit() !== null) {
+      <p
+        class="mt-4 rounded-md bg-[var(--quota-exceeded-bg)] px-3 py-2 text-sm text-[var(--quota-exceeded-text)]"
+        data-testid="paywall-page-quota"
+      >
+        <span i18n="@@paywallPage.quotaUsed">Plan limit reached:</span>
+        <span class="tabular-nums font-medium">{{ limit() }} / {{ limit() }}</span>
+      </p>
+    }
+
+    <p class="mt-4 text-sm text-[var(--text-secondary)]" i18n="@@paywallPage.pendingKept">
+      Nothing is lost. Collection keeps running and the waiting comments are analysed automatically once the plan is
+      upgraded.
+    </p>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      @if (isAuthenticated()) {
+        <a routerLink="/app/settings/billing" appButtonStyle variant="primary" i18n="@@paywallPage.upgrade"
+          >Upgrade plan</a
+        >
+        <a routerLink="/app/overview" appButtonStyle variant="secondary" i18n="@@paywallPage.backToApp"
+          >Back to the dashboard</a
+        >
+      } @else {
+        <a routerLink="/auth/login" appButtonStyle variant="primary" i18n="@@paywallPage.signIn">Sign in</a>
+        <a routerLink="/" appButtonStyle variant="secondary" i18n="@@paywallPage.backHome">Back to the home page</a>
+      }
+    </div>
+  </div>
+</main>

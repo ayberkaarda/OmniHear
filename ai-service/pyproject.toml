@@ -11,6 +11,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Production sentiment backend (ADR-0004). Kept out of the base install
+# because the three packages add roughly 120 MB to a virtualenv and the
+# service runs correctly without them on the lexicon fallback backend;
+# the container image installs ".[onnx]" and pins SENTIMENT_BACKEND=onnx.
+# numpy is pulled in by onnxruntime anyway and is listed for clarity.
+onnx = [
+    "onnxruntime>=1.18,<2.0",
+    "tokenizers>=0.19,<1.0",
+    "numpy>=1.26,<3.0",
+]
 dev = [
     "pytest>=8.0,<9.0",
     "httpx>=0.27,<1.0",
@@ -24,6 +34,14 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["app*"]
 
+# The trained category artifact is data, not code, so setuptools drops it
+# from the wheel unless it is named here. Verified by building a wheel and
+# listing it: without this block app/models/category_model.json is absent
+# and CategoryClassifier() raises FileNotFoundError on a non-editable
+# install — which is exactly how the container image installs the service.
+[tool.setuptools.package-data]
+app = ["models/*.json"]
+
 [tool.ruff]
 line-length = 100
 
@@ -32,3 +50,6 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# scripts/ is imported by the tests that verify the trained artifact and
+# the exported OpenAPI contract are not stale.
+pythonpath = ["."]

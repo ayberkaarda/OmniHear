@@ -1,0 +1,18 @@
+[
+  {
+    "external_id": "fixture-0002",
+    "author": "Selin K.",
+    "body": "Destek ekibi hizli donus yapti, memnun kaldim.",
+    "source_url": "https://example.test/reviews/fixture-0002",
+    "published_at": "2026-08-30T11:15:00+00:00",
+    "rating": 4
+  },
+  {
+    "external_id": "fixture-0001",
+    "author": "Onur T.",
+    "body": "Billing page keeps timing out on slow connections.",
+    "source_url": "https://example.test/reviews/fixture-0001",
+    "published_at": "2026-08-29T18:00:00+00:00",
+    "rating": 2
+  }
+]

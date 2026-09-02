@@ -1,0 +1,47 @@
+<div class="flex flex-col gap-6">
+  <h1 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.settings.title">Settings</h1>
+
+  <div class="flex flex-col gap-6 lg:flex-row lg:gap-10">
+    <nav class="flex flex-wrap gap-1 lg:w-52 lg:flex-col" [attr.aria-label]="navLabel">
+      <a
+        routerLink="/app/settings/profile"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@app.settings.nav.profile"
+        >Profile</a
+      >
+      <a
+        routerLink="/app/settings/team"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@app.settings.nav.team"
+        >Team</a
+      >
+      <a
+        routerLink="/app/settings/billing"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@app.settings.nav.billing"
+        >Billing</a
+      >
+      <a
+        routerLink="/app/settings/api-keys"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@app.settings.nav.apiKeys"
+        >API keys</a
+      >
+      <a
+        routerLink="/app/settings/notifications"
+        routerLinkActive="bg-[var(--bg-surface-selected)] text-[var(--text-primary)]"
+        class="rounded-md px-2.5 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@app.settings.nav.notifications"
+        >Notifications</a
+      >
+    </nav>
+
+    <div class="min-w-0 flex-1">
+      <router-outlet />
+    </div>
+  </div>
+</div>

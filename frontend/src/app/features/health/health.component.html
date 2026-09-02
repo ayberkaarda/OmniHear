@@ -1,19 +1,21 @@
-<section class="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50 px-4 text-center">
-  <h1 class="text-2xl font-semibold text-slate-900" i18n="@@health.title">OmniHear system status</h1>
+<section
+  class="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--bg-canvas)] px-4 text-center"
+>
+  <h1 class="text-2xl font-semibold text-[var(--text-primary)]" i18n="@@health.title">OmniHear system status</h1>
 
   @switch (state()) {
     @case ('loading') {
-      <p class="text-slate-500" data-testid="health-loading" i18n="@@health.loading">
+      <p class="text-[var(--text-muted)]" data-testid="health-loading" i18n="@@health.loading">
         Checking system status…
       </p>
     }
     @case ('success') {
-      <p class="text-emerald-600" data-testid="health-success" i18n="@@health.success">
+      <p class="text-[var(--sentiment-positive-text)]" data-testid="health-success" i18n="@@health.success">
         System is healthy: {{ status() }}
       </p>
     }
     @case ('error') {
-      <p class="text-red-600" data-testid="health-error" i18n="@@health.error">
+      <p class="text-[var(--sentiment-negative-text)]" data-testid="health-error" i18n="@@health.error">
         Unable to reach the system. Please try again later.
       </p>
     }

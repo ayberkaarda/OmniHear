@@ -2,33 +2,1524 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="error.validationError" datatype="html">
+        <source>Some of the details you entered are not valid. Please review the form and try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.invalidCredentials" datatype="html">
+        <source>That email and password combination did not match an account.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.unauthenticated" datatype="html">
+        <source>Your session has ended. Please sign in again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.emailNotVerified" datatype="html">
+        <source>Confirm your email address before you continue.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.forbidden" datatype="html">
+        <source>Your role does not allow this action.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.notFound" datatype="html">
+        <source>We could not find what you were looking for.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.quotaExceeded" datatype="html">
+        <source>Your analysis quota is used up. Upgrade to keep analysing feedback.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.tooManyRequests" datatype="html">
+        <source>Too many attempts. Please wait a moment and try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.disposableEmail" datatype="html">
+        <source>Please sign up with your work email address.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.serverError" datatype="html">
+        <source>Something went wrong on our side. Please try again shortly.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.network" datatype="html">
+        <source>We could not reach OmniHear. Check your connection and try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.unknown" datatype="html">
+        <source>Something went wrong. Please try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="paywall.body" datatype="html">
+        <source> You have used every analysis included in your current plan, so new feedback is no longer being analysed. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <note priority="1" from="description">Paywall modal body</note>
+      </trans-unit>
+      <trans-unit id="paywall.quotaUsed" datatype="html">
+        <source>Plan limit reached:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+        <note priority="1" from="description">Paywall quota line</note>
+      </trans-unit>
+      <trans-unit id="paywall.pendingKept" datatype="html">
+        <source> Nothing is lost. Incoming feedback keeps arriving and waits in the queue; as soon as your plan is upgraded, the waiting items are analysed automatically. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
+          <context context-type="linenumber">20,25</context>
+        </context-group>
+        <note priority="1" from="description">Paywall reassurance</note>
+      </trans-unit>
+      <trans-unit id="paywall.later" datatype="html">
+        <source>Not now</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
+          <context context-type="linenumber">27,29</context>
+        </context-group>
+        <note priority="1" from="description">Paywall secondary action</note>
+      </trans-unit>
+      <trans-unit id="paywall.upgrade" datatype="html">
+        <source>Upgrade plan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
+          <context context-type="linenumber">30,33</context>
+        </context-group>
+        <note priority="1" from="description">Paywall primary action</note>
+      </trans-unit>
+      <trans-unit id="paywall.title" datatype="html">
+        <source>Your analysis quota is full</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <note priority="1" from="description">Paywall modal title</note>
+      </trans-unit>
+      <trans-unit id="toast.dismiss" datatype="html">
+        <source>Dismiss notification</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/toast/toast-host.component.html</context>
+          <context context-type="linenumber">30,33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/toast/toast-host.component.html</context>
+          <context context-type="linenumber">83,86</context>
+        </context-group>
+        <note priority="1" from="description">Toast dismiss button label</note>
+      </trans-unit>
+      <trans-unit id="common.skipToContent" datatype="html">
+        <source>Skip to main content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+        <note priority="1" from="description">Skip link</note>
+      </trans-unit>
+      <trans-unit id="shell.nav.overview" datatype="html">
+        <source>Overview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">23,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.nav.inbox" datatype="html">
+        <source>Inbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">31,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.nav.integrations" datatype="html">
+        <source>Integrations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">39,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.nav.settings" datatype="html">
+        <source>Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">47,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.verifyBanner" datatype="html">
+        <source>Your email address is not confirmed yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">89,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.verifyBannerAction" datatype="html">
+        <source>Confirm now</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.html</context>
+          <context context-type="linenumber">94,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.nav.primary" datatype="html">
+        <source>Primary</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <note priority="1" from="description">Primary navigation landmark label</note>
+      </trans-unit>
+      <trans-unit id="shell.signOut" datatype="html">
+        <source>Sign out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <note priority="1" from="description">Sign out button label</note>
+      </trans-unit>
+      <trans-unit id="shell.quota.title" datatype="html">
+        <source>Analyses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/quota-meter.component.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.quota.remaining" datatype="html">
+        <source>Remaining:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/quota-meter.component.html</context>
+          <context context-type="linenumber">21,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="shell.quota.label" datatype="html">
+        <source>Analysis quota usage</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/quota-meter.component.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <note priority="1" from="description">Quota meter accessible label</note>
+      </trans-unit>
+      <trans-unit id="shell.theme.label" datatype="html">
+        <source>Colour theme</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/theme-toggle.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <note priority="1" from="description">Theme switch group label</note>
+      </trans-unit>
+      <trans-unit id="shell.theme.light" datatype="html">
+        <source>Light</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/theme-toggle.component.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <note priority="1" from="description">Theme option</note>
+      </trans-unit>
+      <trans-unit id="shell.theme.dark" datatype="html">
+        <source>Dark</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/theme-toggle.component.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <note priority="1" from="description">Theme option</note>
+      </trans-unit>
+      <trans-unit id="shell.theme.system" datatype="html">
+        <source>System</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app-shell/theme-toggle.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <note priority="1" from="description">Theme option</note>
+      </trans-unit>
+      <trans-unit id="app.inboxDetail.back" datatype="html">
+        <source>Back to the inbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox-detail/inbox-detail.component.html</context>
+          <context context-type="linenumber">7,9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.inboxDetail.title" datatype="html">
+        <source> Feedback detail </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox-detail/inbox-detail.component.html</context>
+          <context context-type="linenumber">10,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.inboxDetail.subtitle" datatype="html">
+        <source> The comment itself, next to the reasoning behind its analysis. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox-detail/inbox-detail.component.html</context>
+          <context context-type="linenumber">13,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.inboxDetail.recordId" datatype="html">
+        <source>Record:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox-detail/inbox-detail.component.html</context>
+          <context context-type="linenumber">17,18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.inboxDetail.empty" datatype="html">
+        <source>This comment is not loaded yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox-detail/inbox-detail.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.placeholder.description" datatype="html">
+        <source>This screen is in place; it fills with real data once the matching API is connected.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox-detail/inbox-detail.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">Placeholder screen description</note>
+      </trans-unit>
+      <trans-unit id="app.inbox.title" datatype="html">
+        <source>Inbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.inbox.subtitle" datatype="html">
+        <source>Every collected comment with its sentiment, category and source.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.inbox.empty" datatype="html">
+        <source>Your inbox is empty</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.integrations.title" datatype="html">
+        <source>Integrations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.integrations.subtitle" datatype="html">
+        <source>Connect a channel and follow the health of each connection.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.integrations.empty" datatype="html">
+        <source>No channel is connected yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.overview.title" datatype="html">
+        <source>Overview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/overview/overview.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.overview.subtitle" datatype="html">
+        <source>Sentiment and category trends across every connected channel.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/overview/overview.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.overview.empty" datatype="html">
+        <source>No analysed feedback yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.settings.apiKeys.title" datatype="html">
+        <source>API keys</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.apiKeys.subtitle" datatype="html">
+        <source>Tokens that let your own systems talk to OmniHear.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.apiKeys.empty" datatype="html">
+        <source>No API key has been created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.settings.billing.title" datatype="html">
+        <source>Billing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.billing.subtitle" datatype="html">
+        <source>Your plan, your analysis allowance and your invoices.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.billing.empty" datatype="html">
+        <source>No billing history yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.settings.notifications.title" datatype="html">
+        <source>Notifications</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.notifications.subtitle" datatype="html">
+        <source>Which events you want to hear about, and where.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.notifications.empty" datatype="html">
+        <source>No notification rule yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.settings.profile.title" datatype="html">
+        <source>Profile</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.profile.subtitle" datatype="html">
+        <source>Your name, email address and password.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.profile.empty" datatype="html">
+        <source>Nothing to edit here yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="app.settings.title" datatype="html">
+        <source>Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.html</context>
+          <context context-type="linenumber">2,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.nav.profile" datatype="html">
+        <source>Profile</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.html</context>
+          <context context-type="linenumber">11,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.nav.team" datatype="html">
+        <source>Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.html</context>
+          <context context-type="linenumber">19,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.nav.billing" datatype="html">
+        <source>Billing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.html</context>
+          <context context-type="linenumber">25,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.nav.apiKeys" datatype="html">
+        <source>API keys</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.html</context>
+          <context context-type="linenumber">32,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.nav.notifications" datatype="html">
+        <source>Notifications</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.html</context>
+          <context context-type="linenumber">39,43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.navLabel" datatype="html">
+        <source>Settings sections</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/settings-layout.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">Settings navigation landmark label</note>
+      </trans-unit>
+      <trans-unit id="app.settings.team.title" datatype="html">
+        <source>Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.team.subtitle" datatype="html">
+        <source>Invite colleagues and decide what each of them may do.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="app.settings.team.empty" datatype="html">
+        <source>You are the only member so far</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="auth.forgot.sent" datatype="html">
+        <source> If that address belongs to an account, a reset link is on its way. The link is valid for a limited time. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.forgot.submit" datatype="html">
+        <source>Send reset link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">25,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.forgot.backToLogin" datatype="html">
+        <source>Back to sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">35,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.forgot.heading" datatype="html">
+        <source>Reset your password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/forgot-password/forgot-password.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <note priority="1" from="description">Forgot password heading</note>
+      </trans-unit>
+      <trans-unit id="auth.forgot.lead" datatype="html">
+        <source>We will email you a link to choose a new password.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/forgot-password/forgot-password.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <note priority="1" from="description">Forgot password lead</note>
+      </trans-unit>
+      <trans-unit id="auth.field.email" datatype="html">
+        <source>Email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/forgot-password/forgot-password.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.login.forgotLink" datatype="html">
+        <source>Forgot your password?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">28,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.login.submit" datatype="html">
+        <source>Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">33,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.login.noAccount" datatype="html">
+        <source>Do not have an account yet?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">38,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.login.registerLink" datatype="html">
+        <source>Create one</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">43,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.login.heading" datatype="html">
+        <source>Sign in to OmniHear</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <note priority="1" from="description">Login page heading</note>
+      </trans-unit>
+      <trans-unit id="auth.login.lead" datatype="html">
+        <source>Use the email address you registered with.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <note priority="1" from="description">Login page lead</note>
+      </trans-unit>
+      <trans-unit id="auth.field.password" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.register.submit" datatype="html">
+        <source>Create account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.html</context>
+          <context context-type="linenumber">56,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.register.haveAccount" datatype="html">
+        <source>Already have an account?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.html</context>
+          <context context-type="linenumber">61,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.register.loginLink" datatype="html">
+        <source>Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.html</context>
+          <context context-type="linenumber">66,70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.register.heading" datatype="html">
+        <source>Create your OmniHear account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <note priority="1" from="description">Register page heading</note>
+      </trans-unit>
+      <trans-unit id="auth.register.lead" datatype="html">
+        <source>Your workspace is created together with your account.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <note priority="1" from="description">Register page lead</note>
+      </trans-unit>
+      <trans-unit id="auth.field.name" datatype="html">
+        <source>Your name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.field.companyName" datatype="html">
+        <source>Company name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.field.passwordConfirmation" datatype="html">
+        <source>Repeat password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.register.passwordHelper" datatype="html">
+        <source>At least 12 characters.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <note priority="1" from="description">Field helper</note>
+      </trans-unit>
+      <trans-unit id="auth.register.emailHelper" datatype="html">
+        <source>Use your work email address.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <note priority="1" from="description">Field helper</note>
+      </trans-unit>
+      <trans-unit id="auth.reset.linkIncomplete" datatype="html">
+        <source> This reset link is incomplete. Open the most recent link from your email, or request a new one. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.reset.submit" datatype="html">
+        <source>Save new password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.reset.requestAgain" datatype="html">
+        <source>Request a new link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.html</context>
+          <context context-type="linenumber">56,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.reset.heading" datatype="html">
+        <source>Choose a new password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <note priority="1" from="description">Reset password heading</note>
+      </trans-unit>
+      <trans-unit id="auth.reset.lead" datatype="html">
+        <source>Signing in again on your other devices will be required.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <note priority="1" from="description">Reset password lead</note>
+      </trans-unit>
+      <trans-unit id="auth.field.newPassword" datatype="html">
+        <source>New password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.reset.success" datatype="html">
+        <source>Your password has been changed. Sign in with the new one.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+        <note priority="1" from="description">Reset password success toast</note>
+      </trans-unit>
+      <trans-unit id="form.error.required" datatype="html">
+        <source>This field is required.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="form.error.email" datatype="html">
+        <source>Enter a valid email address.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="form.error.minLength" datatype="html">
+        <source>Use at least 12 characters.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="form.error.passwordMismatch" datatype="html">
+        <source>The two passwords do not match.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="form.error.generic" datatype="html">
+        <source>Check this field.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="auth.verify.pending" datatype="html">
+        <source> Checking your confirmation link… </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.success" datatype="html">
+        <source> Your email address is confirmed. Everything is ready. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">18,20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.continue" datatype="html">
+        <source>Go to your dashboard</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">21,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.failed" datatype="html">
+        <source> This confirmation link is no longer valid. Links expire after a while, and each one can be used once. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">31,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.resend" datatype="html">
+        <source>Send a new confirmation email</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">35,37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">52,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.awaiting" datatype="html">
+        <source> We sent you a confirmation link. Open it to activate your account. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">43,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.backToLogin" datatype="html">
+        <source>Back to sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.html</context>
+          <context context-type="linenumber">64,68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.verify.heading" datatype="html">
+        <source>Confirm your email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <note priority="1" from="description">Verify email heading</note>
+      </trans-unit>
+      <trans-unit id="auth.verify.resent" datatype="html">
+        <source>A new confirmation email is on its way.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/verify-email/verify-email.component.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <note priority="1" from="description">Verification email resent toast</note>
+      </trans-unit>
       <trans-unit id="health.title" datatype="html">
         <source>OmniHear system status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/health/health.component.html</context>
-          <context context-type="linenumber">2,4</context>
+          <context context-type="linenumber">4,6</context>
         </context-group>
       </trans-unit>
       <trans-unit id="health.loading" datatype="html">
         <source> Checking system status… </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/health/health.component.html</context>
-          <context context-type="linenumber">7,10</context>
+          <context context-type="linenumber">9,12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="health.success" datatype="html">
         <source> System is healthy: <x id="INTERPOLATION" equiv-text="{{ status() }}"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/health/health.component.html</context>
-          <context context-type="linenumber">12,15</context>
+          <context context-type="linenumber">14,17</context>
         </context-group>
       </trans-unit>
       <trans-unit id="health.error" datatype="html">
         <source> Unable to reach the system. Please try again later. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/health/health.component.html</context>
-          <context context-type="linenumber">17,20</context>
+          <context context-type="linenumber">19,22</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="landing.nav.label" datatype="html">
+        <source>Page sections</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">15,19</context>
+        </context-group>
+        <note priority="1" from="description">Landing section nav label</note>
+      </trans-unit>
+      <trans-unit id="landing.nav.features" datatype="html">
+        <source>Features</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">21,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.nav.integrations" datatype="html">
+        <source>Integrations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">27,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.nav.pricing" datatype="html">
+        <source>Pricing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">33,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.nav.faq" datatype="html">
+        <source>FAQ</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">40,43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.nav.signIn" datatype="html">
+        <source>Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">44,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.nav.getStarted" datatype="html">
+        <source>Get started</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">46,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.eyebrow" datatype="html">
+        <source>Customer feedback intelligence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">59,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.title" datatype="html">
+        <source> Every customer comment, in one place, already read </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">65,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.subtitle" datatype="html">
+        <source> OmniHear collects reviews and support messages from every channel you sell on, then classifies each one by sentiment and by topic, so your team starts the day with the answer instead of the backlog. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">68,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.primaryCta" datatype="html">
+        <source>Create a free account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">73,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.secondaryCta" datatype="html">
+        <source>See how it works</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">76,79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.note" datatype="html">
+        <source> No card required. The free plan includes <x id="INTERPOLATION" equiv-text="{{ freePlanQuota }}"/> analyses. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">80,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.features.title" datatype="html">
+        <source> What OmniHear does </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">88,90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.features.subtitle" datatype="html">
+        <source> Collection, analysis and reporting are one pipeline, so nothing is retyped between tools. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">91,94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.collect.title" datatype="html">
+        <source> One inbox for every channel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">101,103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.collect.body" datatype="html">
+        <source> Store reviews, support tickets, ratings and social mentions arrive in a single stream, pulled incrementally so nothing is fetched twice. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">104,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.sentiment.title" datatype="html">
+        <source> Sentiment on every message </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">114,116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.sentiment.body" datatype="html">
+        <source> Each comment gets a positive, neutral or negative label together with a numeric score, so a shift in mood is visible before it reaches your ratings. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">117,120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.category.title" datatype="html">
+        <source> Sorted into what you can act on </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">127,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.category.body" datatype="html">
+        <source> Complaint, praise, bug report or feature request: the classification routes each comment to the team that can do something about it. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">130,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.realtime.title" datatype="html">
+        <source> Results appear as they land </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">140,142</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.realtime.body" datatype="html">
+        <source> Analysis runs in the background and the dashboard updates itself. No refresh, no waiting on a nightly batch. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">143,146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.isolation.title" datatype="html">
+        <source> Your data stays yours </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">152,154</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.isolation.body" datatype="html">
+        <source> Every record is scoped to your company at the database level, and integration credentials are stored encrypted and never written to a log. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">155,158</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.quota.title" datatype="html">
+        <source> Usage you can see </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">165,167</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.feature.quota.body" datatype="html">
+        <source> Remaining analyses are shown on every screen. If the allowance runs out, incoming feedback waits in the queue rather than being dropped. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">168,171</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.integrations.title" datatype="html">
+        <source> Where the feedback comes from </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">179,181</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.integrations.subtitle" datatype="html">
+        <source> Connect a channel once with an API key or an OAuth grant; collection then runs on a schedule. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">182,185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.integration.appStore" datatype="html">
+        <source>App Store reviews</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">189,192</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.integration.googlePlay" datatype="html">
+        <source>Google Play reviews</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">195,198</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.integration.email" datatype="html">
+        <source>Email inbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">209,212</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.integration.social" datatype="html">
+        <source>Social media mentions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">215,218</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.title" datatype="html">
+        <source> Pricing </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">225,227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.subtitle" datatype="html">
+        <source> Start on the free plan. One analysis is counted once per comment, never twice. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">228,231</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.free.name" datatype="html">
+        <source>Free</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">233,234</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.free.unit" datatype="html">
+        <source>analyses included</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">235,236</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.free.item1" datatype="html">
+        <source>All channel integrations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">239,242</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.free.item2" datatype="html">
+        <source>Sentiment and category analysis</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">244,247</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.free.item3" datatype="html">
+        <source>Unlimited team members</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">249,252</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.free.cta" datatype="html">
+        <source>Start for free</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">259,263</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.name" datatype="html">
+        <source>Pro</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">265</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.price" datatype="html">
+        <source> Announced at launch </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">266,268</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.unit" datatype="html">
+        <source>billing is not open yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">268,269</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.item1" datatype="html">
+        <source>A larger analysis allowance</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">272,274</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.item2" datatype="html">
+        <source>Queued feedback analysed automatically after an upgrade</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">277,279</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.item3" datatype="html">
+        <source>Everything in the free plan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">282,284</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.pricing.pro.cta" datatype="html">
+        <source>Create an account to be notified</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">292,295</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.title" datatype="html">
+        <source> Frequently asked questions </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">302,305</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.q1" datatype="html">
+        <source> Which channels can I connect? </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">311,312</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.a1" datatype="html">
+        <source> App Store, Google Play, Zendesk, Trustpilot, an email inbox and social media mentions. Each connection is configured separately and can be paused without losing the comments already collected. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">314,316</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.q2" datatype="html">
+        <source> How is a comment analysed? </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">323,324</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.a2" datatype="html">
+        <source> Its language is detected first, then the text is scored for sentiment and classified into a topic. The result is stored with the confidence value and the model version that produced it, so an old analysis can always be traced. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">326,328</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.q3" datatype="html">
+        <source> Can another company see my feedback? </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">336,337</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.a3" datatype="html">
+        <source> No. Every record carries your company identifier and every query is filtered by it, so a request for a record that belongs to someone else is answered as if it did not exist. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">339,341</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.q4" datatype="html">
+        <source> What happens when the allowance runs out? </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">348,349</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.a4" datatype="html">
+        <source> Collection continues and new comments are kept, waiting to be analysed. Nothing is deleted; once the plan is upgraded the waiting comments are analysed automatically. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">351,353</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.q5" datatype="html">
+        <source> Which languages are supported? </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">360,361</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.faq.a5" datatype="html">
+        <source> Comments are analysed in the language they were written in, detected automatically. The interface itself is available in Turkish and English. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">363,365</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.cta.title" datatype="html">
+        <source> Start listening to every channel today </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">374,376</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.cta.body" datatype="html">
+        <source> Connect your first channel in a few minutes and see what your customers have already told you. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">377,379</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.cta.button" datatype="html">
+        <source>Create a free account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">380,383</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.footer.tagline" datatype="html">
+        <source>OmniHear - customer feedback intelligence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">390,391</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.footer.navLabel" datatype="html">
+        <source>Footer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">392,394</context>
+        </context-group>
+        <note priority="1" from="description">Footer nav label</note>
+      </trans-unit>
+      <trans-unit id="landing.footer.signIn" datatype="html">
+        <source>Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">396,399</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.footer.register" datatype="html">
+        <source>Create account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">402,406</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="notFound.title" datatype="html">
+        <source>This page does not exist</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/not-found/not-found.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="notFound.body" datatype="html">
+        <source> The address you followed may be out of date, or the page may have been moved. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/not-found/not-found.component.html</context>
+          <context context-type="linenumber">5,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="notFound.backHome" datatype="html">
+        <source>Back to the home page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/not-found/not-found.component.html</context>
+          <context context-type="linenumber">7,9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.title" datatype="html">
+        <source> Your analysis quota is full </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.body" datatype="html">
+        <source> Every analysis included in your current plan has been used, so new feedback is no longer being analysed. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">14,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.quotaUsed" datatype="html">
+        <source>Plan limit reached:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.pendingKept" datatype="html">
+        <source> Nothing is lost. Collection keeps running and the waiting comments are analysed automatically once the plan is upgraded. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">28,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.upgrade" datatype="html">
+        <source>Upgrade plan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">35,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.backToApp" datatype="html">
+        <source>Back to the dashboard</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.signIn" datatype="html">
+        <source>Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="paywallPage.backHome" datatype="html">
+        <source>Back to the home page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/paywall/paywall-page.component.html</context>
+          <context context-type="linenumber">42,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="modal.close" datatype="html">
+        <source>Close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/ui/modal/modal.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Modal close button label</note>
       </trans-unit>
       <trans-unit id="badge.sentiment.positive" datatype="html">
         <source>Positive</source>
@@ -182,13 +1673,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
           <context context-type="linenumber">32</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="modal.close" datatype="html">
-        <source>Close</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/modal/modal.component.html</context>
-          <context context-type="linenumber">23,30</context>
         </context-group>
       </trans-unit>
     </body>

@@ -1,0 +1,26 @@
+[
+  {
+    "external_id": "fixture-0005",
+    "author": "Deniz A.",
+    "body": "The new export screen is exactly what we needed. Thank you!",
+    "source_url": "https://example.test/reviews/fixture-0005",
+    "published_at": "2026-08-31T09:20:00+00:00",
+    "rating": 5
+  },
+  {
+    "external_id": "fixture-0004",
+    "author": "Kerem Y.",
+    "body": "Uygulama her acilista cokuyor, guncellemeden sonra hic acilmiyor.",
+    "source_url": "https://example.test/reviews/fixture-0004",
+    "published_at": "2026-08-31T07:05:00+00:00",
+    "rating": 1
+  },
+  {
+    "external_id": "fixture-0003",
+    "author": null,
+    "body": "Please add a dark mode. Write me back at reviewer@example.test if you need details.",
+    "source_url": "https://example.test/reviews/fixture-0003",
+    "published_at": "2026-08-30T22:40:00+00:00",
+    "rating": 3
+  }
+]

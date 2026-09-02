@@ -1,0 +1,16 @@
+{
+  "correlation_id": "11111111-1111-1111-1111-111111111111",
+  "description": "X-Signature present but does not match the body -> 401 INVALID_SIGNATURE.",
+  "endpoint": "/v1/analyze",
+  "name": "error-invalid-signature",
+  "request": {
+    "text": "any body at all"
+  },
+  "response": {
+    "code": "INVALID_SIGNATURE",
+    "correlation_id": "11111111-1111-1111-1111-111111111111",
+    "message": "X-Signature does not match the request body"
+  },
+  "signature": "tampered",
+  "status": 401
+}
