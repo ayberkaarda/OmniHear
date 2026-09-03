@@ -22,6 +22,45 @@
 |
 */
 
+/*
+|--------------------------------------------------------------------------
+| Memory
+|--------------------------------------------------------------------------
+|
+| The container's php.ini leaves memory_limit at 128M, which the suite itself
+| fits inside comfortably — but php-code-coverage serializes the whole coverage
+| object at the end of the run, and that step crossed 128M once the suite passed
+| ~950 tests: `php artisan test --coverage --min=80` died with
+|
+|   Allowed memory size of 134217728 bytes exhausted
+|   in vendor/phpunit/php-code-coverage/src/Report/PHP.php
+|
+| *after* printing "Tests: … passed", so the run looked green and the gate's
+| coverage number silently never appeared.
+|
+| Raised here rather than in infra/: `php artisan test` spawns the Pest process,
+| which does not inherit a `-d memory_limit` given to artisan, and this file is
+| the first thing that process runs. Only raised, never lowered, so a runner
+| that already has more (or no limit) keeps it.
+|
+*/
+
+$currentLimit = trim((string) ini_get('memory_limit'));
+
+if ($currentLimit !== '-1' && $currentLimit !== '') {
+    $unit = strtolower(substr($currentLimit, -1));
+    $bytes = (int) $currentLimit * match ($unit) {
+        'g' => 1024 ** 3,
+        'm' => 1024 ** 2,
+        'k' => 1024,
+        default => 1,
+    };
+
+    if ($bytes < 1024 ** 3) {
+        ini_set('memory_limit', '1G');
+    }
+}
+
 $requested = getenv('DB_DATABASE');
 
 // Parallel agents get their own scratch database (CLAUDE.md section 5); anything

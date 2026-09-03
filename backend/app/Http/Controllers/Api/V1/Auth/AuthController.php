@@ -12,6 +12,7 @@ use App\Models\Company;
 use App\Models\User;
 use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
+use App\Support\Auth\TokenAbility;
 use App\Support\DisposableEmailDomains;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -80,7 +81,11 @@ class AuthController extends Controller
         $created['user']->sendEmailVerificationNotification();
 
         return response()->json([
-            'token' => $created['user']->createToken('web')->plainTextToken,
+            // Minted as a device session, not as a wildcard token: an API key
+            // is the same kind of row in the same table, and the two screens
+            // that list them must not be able to revoke each other's
+            // credentials (docs/contracts/settings-api.md section 3).
+            'token' => $created['user']->createToken('web', TokenAbility::session())->plainTextToken,
             'user' => new UserResource($created['user']),
             'company' => new CompanyResource($created['company']),
         ], Response::HTTP_CREATED);
@@ -123,7 +128,9 @@ class AuthController extends Controller
         $this->audit->record(AuditAction::LoginSucceeded, actor: $user);
 
         return response()->json([
-            'token' => $user->createToken($request->deviceName())->plainTextToken,
+            // See register() above: sessions carry the `session` ability so
+            // /auth/tokens and /settings/api-keys stay disjoint.
+            'token' => $user->createToken($request->deviceName(), TokenAbility::session())->plainTextToken,
             'user' => new UserResource($user),
             'company' => new CompanyResource($user->company),
         ]);

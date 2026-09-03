@@ -72,19 +72,64 @@ it('lets owners and admins invite teammates', function (string $role, bool $allo
 it('lets a member update itself but not a teammate', function () {
     [$company, $member] = tenant(User::ROLE_MEMBER);
     $teammate = User::factory()->for($company)->create();
+    $owner = User::factory()->for($company)->owner()->create();
 
     expect(Gate::forUser($member)->allows('update', $member))->toBeTrue()
-        ->and(Gate::forUser($member)->allows('update', $teammate))->toBeFalse();
+        ->and(Gate::forUser($member)->allows('update', $teammate))->toBeFalse()
+        ->and(Gate::forUser($owner)->allows('update', $teammate))->toBeTrue();
 });
 
-it('lets only the owner delete a teammate, and never itself', function () {
+/**
+ * Widened in W5 from owner-only to owner-or-admin, because
+ * docs/contracts/settings-api.md section 2 makes DELETE /settings/team/{user}
+ * an owner-or-admin action. A member still cannot, nobody can remove
+ * themselves, and the last owner is protected — see the two tests below.
+ */
+it('lets owners and admins delete a teammate, and never themselves', function () {
     [$company, $owner] = tenant(User::ROLE_OWNER);
     $admin = User::factory()->for($company)->admin()->create();
     $member = User::factory()->for($company)->member()->create();
 
     expect(Gate::forUser($owner)->allows('delete', $member))->toBeTrue()
+        ->and(Gate::forUser($admin)->allows('delete', $member))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('delete', $owner))->toBeFalse()
-        ->and(Gate::forUser($admin)->allows('delete', $member))->toBeFalse();
+        ->and(Gate::forUser($admin)->allows('delete', $admin))->toBeFalse()
+        ->and(Gate::forUser($member)->allows('delete', $admin))->toBeFalse();
+});
+
+it('never lets the last owner be removed or demoted', function () {
+    [$company, $owner] = tenant(User::ROLE_OWNER);
+    $admin = User::factory()->for($company)->admin()->create();
+
+    expect(Gate::forUser($admin)->allows('delete', $owner))->toBeFalse();
+
+    // A second owner makes the first one no longer the last.
+    $second = User::factory()->for($company)->owner()->create();
+
+    expect(Gate::forUser($admin)->allows('delete', $owner))->toBeTrue()
+        ->and(Gate::forUser($second)->allows('changeRole', $owner))->toBeTrue();
+});
+
+it('lets only an owner change somebody else s role', function () {
+    [$company, $owner] = tenant(User::ROLE_OWNER);
+    $admin = User::factory()->for($company)->admin()->create();
+    $member = User::factory()->for($company)->member()->create();
+
+    expect(Gate::forUser($owner)->allows('changeRole', $member))->toBeTrue()
+        ->and(Gate::forUser($admin)->allows('changeRole', $member))->toBeFalse()
+        ->and(Gate::forUser($member)->allows('changeRole', $admin))->toBeFalse()
+        ->and(Gate::forUser($owner)->allows('changeRole', $owner))->toBeFalse();
+});
+
+it('never lets anybody invite above their own role', function () {
+    [$company, $owner] = tenant(User::ROLE_OWNER);
+    $admin = User::factory()->for($company)->admin()->create();
+    $member = User::factory()->for($company)->member()->create();
+
+    expect(Gate::forUser($owner)->allows('invite', [User::class, User::ROLE_OWNER]))->toBeTrue()
+        ->and(Gate::forUser($admin)->allows('invite', [User::class, User::ROLE_ADMIN]))->toBeTrue()
+        ->and(Gate::forUser($admin)->allows('invite', [User::class, User::ROLE_OWNER]))->toBeFalse()
+        ->and(Gate::forUser($member)->allows('invite', [User::class, User::ROLE_MEMBER]))->toBeFalse();
 });
 
 it('denies every user action across tenants as not found', function (string $ability) {
@@ -95,7 +140,7 @@ it('denies every user action across tenants as not found', function (string $abi
 
     expect($response->allowed())->toBeFalse()
         ->and($response->status())->toBe(404);
-})->with(['view', 'update', 'delete']);
+})->with(['view', 'update', 'delete', 'changeRole']);
 
 /*
 |--------------------------------------------------------------------------

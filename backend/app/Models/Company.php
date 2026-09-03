@@ -31,6 +31,10 @@ class Company extends Model
         return [
             'analyzed_feedback_count' => 'integer',
             'quota_limit' => 'integer',
+            // Shaped and defaulted by App\Support\Notifications\NotificationPreferences.
+            // Deliberately absent from $fillable so no request body can write an
+            // arbitrary document into it.
+            'notification_preferences' => 'array',
         ];
     }
 
@@ -66,5 +70,10 @@ class Company extends Model
     public function auditLogs(): HasMany
     {
         return $this->hasMany(AuditLog::class);
+    }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(Invitation::class);
     }
 }

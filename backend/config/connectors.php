@@ -77,6 +77,11 @@ return [
         'fixture' => [
             'connector' => FixtureConnector::class,
             'required_settings' => [],
+            // Accepted but not mandatory. Declared so that
+            // GET /integrations/platforms can publish the *whole* form and not
+            // only its required half; StoreIntegrationRequest already validates
+            // this key.
+            'optional_settings' => ['fixture_set'],
             'max_pages_per_run' => 10,
             'max_consecutive_empty_pages' => 3,
             'rate_limit' => ['max_attempts' => 600, 'decay_seconds' => 60],
@@ -87,6 +92,7 @@ return [
             'connector' => AppStoreConnector::class,
             'base_url' => env('APPSTORE_RSS_BASE_URL', 'https://itunes.apple.com'),
             'required_settings' => ['app_id', 'country'],
+            'optional_settings' => [],
             // Hard platform ceiling, measured 2026-09-02: page=11 answers HTTP
             // 400 "CustomerReviews RSS page depth is limited to 10".
             'max_pages_per_run' => 10,
@@ -105,6 +111,7 @@ return [
             // `:` would point every authenticated request somewhere else.
             'base_url' => env('ZENDESK_BASE_URL', 'https://{subdomain}.zendesk.com'),
             'required_settings' => ['subdomain'],
+            'optional_settings' => [],
             // The first connector with credentials. `email` plus `api_token`
             // are Zendesk's API-token scheme; both are stored encrypted and
             // neither is ever read back out (invariant I5).

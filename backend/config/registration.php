@@ -4,6 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Team invitation lifetime
+    |--------------------------------------------------------------------------
+    |
+    | How long an invitation row stays usable (docs/contracts/settings-api.md
+    | section 2). Short enough that a forwarded mail does not stay a standing
+    | key to the tenant, long enough to survive a holiday.
+    |
+    */
+
+    'invitation_ttl_days' => (int) env('INVITATION_TTL_DAYS', 7),
+
+    /*
+    |--------------------------------------------------------------------------
     | Disposable e-mail domain blocklist
     |--------------------------------------------------------------------------
     |

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\Http\Controllers\Controller;
 use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
+use App\Support\Auth\TokenAbility;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,7 +33,13 @@ class TokenController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $tokens = $request->user()->tokens()->orderBy('id')->get();
+        $tokens = $request->user()->tokens()->orderBy('id')->get()
+            // API keys are the same kind of row in the same table and belong to
+            // /settings/api-keys. Listing them here would let "end this device
+            // session" revoke a server-to-server credential
+            // (docs/contracts/settings-api.md section 3).
+            ->filter(fn (PersonalAccessToken $token): bool => TokenAbility::isSession($token))
+            ->values();
 
         return response()->json([
             'data' => $tokens->map(fn (PersonalAccessToken $token): array => $this->serialize($token))->all(),
@@ -52,6 +59,12 @@ class TokenController extends Controller
 
         /** @var PersonalAccessToken $model */
         $model = $user->tokens()->findOrFail($token);
+
+        // An API key addressed through the session route is a 404, not a 403:
+        // the two screens are disjoint by ability, and a 403 would confirm the
+        // row exists (invariant I1's rule, applied to the same table from the
+        // other side).
+        abort_unless(TokenAbility::isSession($model), 404);
 
         // Written before the delete: after it there is no id left to name.
         $this->audit->record(

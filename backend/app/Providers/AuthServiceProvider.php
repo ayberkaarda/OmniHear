@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Models\Company;
 use App\Models\User;
+use App\Policies\ApiKeyPolicy;
 use App\Policies\CompanyPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -15,6 +17,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::policy(Company::class, CompanyPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+        // Sanctum's model lives outside App\Models, so convention-based policy
+        // discovery never finds one for it.
+        Gate::policy(PersonalAccessToken::class, ApiKeyPolicy::class);
 
         $this->defineRoleGates();
     }

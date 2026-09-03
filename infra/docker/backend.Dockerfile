@@ -44,6 +44,14 @@ RUN apk add --no-cache \
 # this the gate command cannot run, and any coverage number reported against this
 # image is unreproducible.
 
+# php-code-coverage serializes the whole coverage object at the end of a run, and
+# that step crossed the 128M default once the suite passed ~950 tests — dying
+# *after* "Tests: … passed" was printed, so the run looked green while the gate's
+# coverage number silently never appeared. Set on the image rather than only in
+# tests/bootstrap.php because `php artisan test` spawns the Pest process, which
+# does not inherit a `-d memory_limit` passed to artisan; an ini applies to both.
+RUN echo "memory_limit=1G" > "$PHP_INI_DIR/conf.d/zz-memory.ini"
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 ENV COMPOSER_NO_INTERACTION=1 \

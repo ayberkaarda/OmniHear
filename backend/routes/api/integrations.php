@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\IntegrationController;
+use App\Http\Controllers\Api\V1\PlatformController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +23,14 @@ use Illuminate\Support\Facades\Route;
 | bigint column as a cast error.
 |
 */
+
+// The connector registry, served so the integration form does not have to
+// hand-copy config/connectors.php (docs/contracts/settings-api.md section 5).
+// Declared before the apiResource: `platforms` is not numeric and
+// {integration} is constrained to digits, so the two cannot collide — the
+// order is belt and braces, not the mechanism.
+Route::get('integrations/platforms', [PlatformController::class, 'index'])
+    ->name('integrations.platforms');
 
 Route::apiResource('integrations', IntegrationController::class)
     ->names('integrations')
