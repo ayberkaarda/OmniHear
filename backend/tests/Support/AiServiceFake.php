@@ -149,6 +149,22 @@ final class AiServiceFake
     }
 
     /**
+     * A fake analyzer still needs a configured shared secret.
+     *
+     * AiClient refuses to send when `ai.hmac_secret` is empty (it will not
+     * sign with the empty string), and the variable is not set in every
+     * environment the suite runs in - a clean checkout outside the compose
+     * stack has none. Pinning it here keeps the fake-backed tests about the
+     * pipeline instead of about the environment, and leaves
+     * LiveAiServiceTest, which never calls these helpers, using the real
+     * value it has to share with the running analyzer.
+     */
+    private static function configureSecret(): void
+    {
+        config(['ai.hmac_secret' => 'fixture-analyzer-secret']);
+    }
+
+    /**
      * Point the HTTP client at a fixture-backed analyzer.
      *
      * @return array<string, mixed> the response body that will be returned
@@ -156,6 +172,8 @@ final class AiServiceFake
     public static function fakeSuccess(string $name = 'single-bug-report'): array
     {
         $body = self::successBody($name);
+
+        self::configureSecret();
 
         Http::fake([
             '*/v1/analyze' => Http::response($body, 200),
@@ -171,6 +189,8 @@ final class AiServiceFake
     public static function fakeFailure(string $name = 'error-invalid-signature'): void
     {
         $fixture = self::fixture($name);
+
+        self::configureSecret();
 
         Http::fake([
             '*/v1/analyze' => Http::response($fixture['response'], (int) $fixture['status']),

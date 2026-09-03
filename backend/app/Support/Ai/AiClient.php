@@ -68,6 +68,23 @@ class AiClient
      */
     private function send(string $path, array $payload, string $correlationId): Response
     {
+        // Fail closed before anything leaves the process. `config/ai.php`
+        // falls back to an empty string when AI_SERVICE_HMAC_SECRET is unset,
+        // and hash_hmac() is perfectly happy to key on '' - so a
+        // misconfigured backend would have gone on posting customer feedback
+        // to whatever host `ai.base_url` names, signed with a key that is not
+        // a secret. Refusing to send is the only safe reading of an absent
+        // shared secret (invariant I7).
+        if (trim($this->secret) === '') {
+            Log::error('ai.request_refused', [
+                'correlation_id' => $correlationId,
+                'path' => $path,
+                'reason' => 'signing_secret_not_configured',
+            ]);
+
+            throw AiServiceUnavailableException::signingSecretNotConfigured();
+        }
+
         // The bytes that get signed and the bytes that get sent are this exact
         // string. JSON_UNESCAPED_UNICODE keeps Turkish text out of \uXXXX
         // escapes, which matters only for size - the signature covers whatever

@@ -28,6 +28,13 @@ return [
     | The dev compose stack sets the same value on both services so they cannot
     | drift apart.
     |
+    | The fallback is the empty string and stays that way, but it is no longer
+    | usable: App\Support\Ai\AiClient refuses to send at all rather than sign
+    | with it. An unset shared secret used to mean "sign with '' and post the
+    | customer's feedback anyway" - a signature only an equally misconfigured
+    | analyzer would accept. Fail closed, the same rule the inbound webhook
+    | verifiers already follow.
+    |
     */
 
     'hmac_secret' => env('AI_SERVICE_HMAC_SECRET', ''),

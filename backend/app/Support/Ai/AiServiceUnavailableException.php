@@ -29,6 +29,25 @@ final class AiServiceUnavailableException extends ApiException
     }
 
     /**
+     * The shared secret is not configured, so the request was never sent.
+     *
+     * Fail closed, exactly as StripeSignatureVerifier and
+     * IyzicoSignatureVerifier already do on the inbound side: an unset secret
+     * must never quietly become "sign with the empty string". It would produce
+     * a valid-looking HMAC that only an analyzer with the same missing
+     * configuration would accept - two halves agreeing on nothing.
+     *
+     * It is an AI_SERVICE_UNAVAILABLE rather than a bare crash so the job
+     * behaves the way every other analyzer failure does (spec 3.5): quota
+     * released, feedback back to `pending_analysis`, retried, then dead
+     * lettered with a `reason` a human can read.
+     */
+    public static function signingSecretNotConfigured(): self
+    {
+        return new self('signing_secret_not_configured');
+    }
+
+    /**
      * The request never produced an HTTP response: DNS, connection refused,
      * TLS, or the client-side timeout.
      */
