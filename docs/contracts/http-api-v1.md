@@ -4,7 +4,7 @@ Status: **binding for F2+**. Authored by the main thread before the F2 wave was
 dispatched, so backend and frontend can be built in parallel without either side
 guessing. Any change to this file is a contract change: both sides update together.
 
-Source of truth for behaviour: `omnihear-engineering-prompt (1).md` sections 4, 5, 7, 8.
+Source of truth for behaviour: `docs/OMNIHEAR-SPEC.md` sections 4, 5, 7, 8.
 
 ---
 

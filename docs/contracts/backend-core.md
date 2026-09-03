@@ -5,7 +5,7 @@ that F4 (ingestion), F5 (quota pipeline) and F6/F7 (payments) can be built
 against fixed table and class names without re-litigating the foundation.
 
 Companion: `docs/contracts/http-api-v1.md` (the wire contract).
-Source of truth for behaviour: `omnihear-engineering-prompt (1).md` sections 5, 6, 7.
+Source of truth for behaviour: `docs/OMNIHEAR-SPEC.md` sections 5, 6, 7.
 
 ---
 

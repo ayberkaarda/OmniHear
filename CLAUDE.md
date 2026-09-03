@@ -2,14 +2,12 @@
 
 ## 0. ÖNCELİK SIRASI
 
-1. **`omnihear-engineering-prompt (1).md` bağlayıcıdır.** Ürün tanımı, teknoloji yığını, veritabanı şeması, veri akışı, kota/paywall akışı ve güvenlik gereksinimleri oradan gelir. Bu dosya ile çelişirse **spec kazanır**.
+1. **`docs/OMNIHEAR-SPEC.md` bağlayıcıdır.** Sonundaki **Errata** bölümü spec'in parçasıdır ve çeliştiği orijinal satırı ezer. Ürün tanımı, teknoloji yığını, veritabanı şeması, veri akışı, kota/paywall akışı ve güvenlik gereksinimleri oradan gelir. Bu dosya ile çelişirse **spec kazanır**.
 2. Bu dosya (CLAUDE.md) çalışma biçimini düzenler.
 3. Kullanıcının o anki açık talimatı, ikisini de o çağrı için ezebilir.
 
-> **Not:** Spec dosyası hâlâ proje kökünde ham prompt adıyla duruyor. Hedef konumu `docs/OMNIHEAR-SPEC.md`; taşıma **kullanıcının onayıyla** yapılır (§8: dosya taşıma yıkıcı işlemdir). Taşındığında bu bölümdeki yol güncellenir.
-
 **Oturum başında oku** (var olanlar):
-- `omnihear-engineering-prompt (1).md` — bağlayıcı spec
+- `docs/OMNIHEAR-SPEC.md` — bağlayıcı spec
 - `docs/PROGRESS.md` — faz durumu, açık kararlar, bilinen sapmalar
 - `docs/LESSONS.md` — **ölçülmüş olgular, append-only.** Buradaki her madde bir hata ayıklama
   oturumuna mal oldu; okumadan başlama, yeniden keşfetme.
