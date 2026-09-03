@@ -136,7 +136,10 @@ class IngestionRunner
                 $companyId,
                 $integrationId,
                 $this->clamp($item->externalId),
-                $item->author === null ? null : $this->clamp($item->author),
+                // Masked as well as clamped. `author` is a display name, and
+                // on an e-mail channel the display name is routinely the
+                // address itself.
+                $item->author === null ? null : $this->maskPii($this->clamp($item->author)),
                 $this->maskPii($item->body),
                 $item->sourceUrl,
                 // toIso8601String, not toDateTimeString: the latter drops the
@@ -145,7 +148,15 @@ class IngestionRunner
                 // the wrong zone, seven hours off the actual instant. Silent, and
                 // it would have skewed every trend chart built on published_at.
                 SyncCursor::parse($item->publishedAt)?->toIso8601String(),
-                (string) json_encode($item->rawPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                // Masked over the encoded JSON rather than by walking the
+                // structure: every provider buries addresses somewhere
+                // different (Zendesk's is via.source.from.address, and the
+                // ticket body quotes more), so a field list would be a
+                // per-provider allow list that is wrong the day a provider
+                // adds a field. One pass over the text is provider-agnostic
+                // and cannot miss a nesting level. `[email]` contains no
+                // quote, backslash or brace, so the document stays valid JSON.
+                $this->maskPii((string) json_encode($item->rawPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)),
                 Feedback::STATUS_PENDING,
                 $now,
                 $now,
@@ -196,6 +207,24 @@ class IngestionRunner
      * Redact the obvious direct identifier before it is stored. Feedback bodies
      * are KVKK-protected personal data (spec 8) and reviewers routinely paste
      * their own address in asking for a reply.
+     *
+     * Applied to `body`, to `author` and to the encoded `raw_payload`. The last
+     * one is the reason this comment is longer than the method: `raw_payload`
+     * stores what the provider sent, whole, and for Zendesk that is the entire
+     * ticket — including `via.source.from.address`, the requester's real
+     * address. Nothing serializes the column (FeedbackResource omits it) and
+     * erasure cascades, so this was never a disclosure; it was retention of a
+     * direct identifier the product has no use for, which spec 8 requires to be
+     * maskable.
+     *
+     * **The trade-off is deliberate and it is one-way.** After this,
+     * `raw_payload` is no longer a byte-faithful archive of the provider
+     * response: an address that arrives masked can never be recovered, and a
+     * future feature that wants to reply to the author would need to re-fetch
+     * from the provider rather than read the column. That is the correct
+     * direction for a column whose only current purpose is debugging a mapping,
+     * and the alternative — keeping the identifier so it might be useful later
+     * — is exactly the retention KVKK is about.
      */
     private function maskPii(string $body): string
     {
