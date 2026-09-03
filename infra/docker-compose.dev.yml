@@ -56,10 +56,49 @@ services:
     ports:
       - "8001:8001"
 
+  # Mailpit - the development mailbox.
+  #
+  # The backend sends the spec 7.1 verification mail over SMTP to :1025 and it
+  # is readable over the HTTP API on :8025. Nothing leaves the stack, which is
+  # the point: a link addressed to a throwaway test mailbox has to be openable
+  # by the test that asked for it, and the alternative - a test-only endpoint
+  # that hands out verification links - would be a permanent authentication
+  # bypass living in production code for the convenience of a test.
+  #
+  # Deliberately no volume: the mailbox is in memory, so a restart is a clean
+  # inbox and no address ever outlives the run that used it.
+  mailpit:
+    image: axllent/mailpit:latest
+    environment:
+      MP_MAX_MESSAGES: "500"
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    ports:
+      # 1025 SMTP (backend -> mailpit), 8025 HTTP API (the E2E suite -> mailpit).
+      - "1025:1025"
+      - "8025:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build:
       context: ../backend
       dockerfile: ../infra/docker/backend.Dockerfile
+    # Same command as the image CMD plus --no-reload, and the flag is load
+    # bearing. `artisan serve` normally spawns `php -S` with every environment
+    # variable *except* its own passthrough list blanked out, so that an edited
+    # .env is picked up on the next request. The effect in a container is that
+    # nothing in the `environment:` block below reaches the process that serves
+    # HTTP - only backend/.env does. Measured: with the mailer pointed at
+    # mailpit here, POST /auth/register still wrote the verification mail to
+    # storage/logs (MAIL_MAILER fell back to the config default 'log') while
+    # `artisan tinker` in the same container delivered over SMTP. --no-reload
+    # passes the environment through unfiltered, which is what makes the
+    # overrides below true for the running application and not just for CLI.
+    command: [php, artisan, serve, --host=0.0.0.0, --port=8000, --no-reload]
     env_file:
       - ../backend/.env
     environment:
@@ -69,9 +108,61 @@ services:
       # Same value as the ai-service below. compose `environment` overrides
       # `env_file`, so backend/.env cannot drift out of sync with the analyzer.
       AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
+      # Mail goes to the mailpit service above, never to a real MTA. compose
+      # `environment` overrides `env_file`, so backend/.env cannot drift out of
+      # sync with the mailbox the E2E suite reads.
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_FROM_ADDRESS: no-reply@omnihear.test
+      MAIL_FROM_NAME: OmniHear
+      # backend/.env.example still ships REVERB_APP_KEY=REPLACE_ME. Same shape
+      # as AI_SERVICE_HMAC_SECRET above: a named, obviously-non-production
+      # default here, applied to backend, horizon and reverb alike, so the
+      # three cannot drift onto different values. REVERB_APP_KEY is a public
+      # client id, not a secret - the SPA ships it in its bundle - but
+      # REVERB_APP_SECRET signs the broadcasting auth response and must stay
+      # server-side only. This now reaches the running app: --no-reload above
+      # is what makes that true.
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-omnihear-dev-reverb-key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-dev-only-not-a-real-reverb-secret}
+      # Same reason as DB_HOST/REDIS_HOST above: `REVERB_HOST=localhost` in
+      # backend/.env.example is written for a process on the host, but this
+      # server-to-server publish (queued BroadcastEvent -> reverb's REST API,
+      # not the browser's websocket) runs inside the compose network, where
+      # "localhost" is this container, not the reverb one. REVERB_SCHEME
+      # likewise has no entry in .env.example, so Laravel's own default of
+      # "https" wins and the PHP Pusher SDK tries a TLS handshake against a
+      # plain-HTTP dev server. Measured: without this, `event()` queues, a
+      # worker picks it up, and no client ever receives the broadcast — no
+      # exception either, because BroadcastEvent swallows the failure per
+      # retry/backoff. The browser's own connection is unaffected: it dials
+      # ws://localhost:8080 directly from the host, which is a different
+      # network path from this one.
+      REVERB_HOST: reverb
+      REVERB_SCHEME: http
+      # STOPGAP, and it should be deleted rather than kept.
+      #
+      # AnalyzeFeedbackJob dispatches onto config('ai.queue'), which defaults to
+      # "analysis" so a burst of ingestion cannot starve it. Horizon, however,
+      # is running on the package's own defaults because backend/config/horizon.php
+      # has never been published, and those defaults watch ["default"] and
+      # nothing else. The measured effect in this stack: FetchFeedbackJob ran,
+      # five comments were ingested, five AnalyzeFeedbackJob payloads piled up in
+      # omnihear_database_queues:analysis, and not one of them was ever
+      # executed - so nothing is ever analysed in a `docker compose up` stack.
+      #
+      # The fix belongs in the backend: publish config/horizon.php and give a
+      # supervisor both queues. Until that lands, sending analysis to the queue
+      # Horizon does watch is what makes the pipeline run at all. Remove this
+      # line the moment the Horizon config exists, or the queue separation the
+      # backend deliberately designed will stay switched off in development.
+      AI_ANALYSIS_QUEUE: default
     ports:
       - "8000:8000"
     depends_on:
+      mailpit:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
@@ -95,6 +186,19 @@ services:
       context: ../backend
       dockerfile: ../infra/docker/backend.Dockerfile
     command: ["php", "artisan", "horizon"]
+    # The image's HEALTHCHECK probes :8000/api/health, which this role does not
+    # serve — so horizon reported "unhealthy" while its own log said it had
+    # started. Ask Horizon itself instead.
+    # 20s, not 5: the command is correct and exits 0 by hand, but booting Laravel
+    # and reaching Redis inside the container costs more than five seconds, so the
+    # probe was being killed rather than answered — reporting unhealthy for a
+    # worker whose own log said it had started.
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan horizon:status | grep -q running"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 40s
     env_file:
       - ../backend/.env
     environment:
@@ -104,6 +208,48 @@ services:
       # Same value as the ai-service below. compose `environment` overrides
       # `env_file`, so backend/.env cannot drift out of sync with the analyzer.
       AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
+      # Mail goes to the mailpit service above, never to a real MTA. compose
+      # `environment` overrides `env_file`, so backend/.env cannot drift out of
+      # sync with the mailbox the E2E suite reads.
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_FROM_ADDRESS: no-reply@omnihear.test
+      MAIL_FROM_NAME: OmniHear
+      # Same pair, same defaults, as the backend service above. This worker is
+      # what runs AnalyzeFeedbackJob and fires the `feedback.analyzed` broadcast
+      # on completion, publishing to the reverb service below - if this drifted
+      # from backend's value nothing here would fail loudly, the broadcast
+      # would just never reach a subscriber.
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-omnihear-dev-reverb-key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-dev-only-not-a-real-reverb-secret}
+      # Same fix as the backend service, and the one that actually matters here:
+      # this container is the one that executes the queued BroadcastEvent job
+      # and makes the REST call to Reverb's publish API. Without it the call
+      # goes to https://localhost:8080 - this container talking to itself over
+      # TLS - and every broadcast is silently lost. Measured directly: a
+      # websocket client that authorized and subscribed to
+      # `private-company.{id}` (200 from /broadcasting/auth) received nothing
+      # from `event(new FeedbackAnalyzed(...))` until this was added.
+      REVERB_HOST: reverb
+      REVERB_SCHEME: http
+      # STOPGAP, and it should be deleted rather than kept.
+      #
+      # AnalyzeFeedbackJob dispatches onto config('ai.queue'), which defaults to
+      # "analysis" so a burst of ingestion cannot starve it. Horizon, however,
+      # is running on the package's own defaults because backend/config/horizon.php
+      # has never been published, and those defaults watch ["default"] and
+      # nothing else. The measured effect in this stack: FetchFeedbackJob ran,
+      # five comments were ingested, five AnalyzeFeedbackJob payloads piled up in
+      # omnihear_database_queues:analysis, and not one of them was ever
+      # executed - so nothing is ever analysed in a `docker compose up` stack.
+      #
+      # The fix belongs in the backend: publish config/horizon.php and give a
+      # supervisor both queues. Until that lands, sending analysis to the queue
+      # Horizon does watch is what makes the pipeline run at all. Remove this
+      # line the moment the Horizon config exists, or the queue separation the
+      # backend deliberately designed will stay switched off in development.
+      AI_ANALYSIS_QUEUE: default
     depends_on:
       backend:
         condition: service_started
@@ -118,6 +264,13 @@ services:
       context: ../backend
       dockerfile: ../infra/docker/backend.Dockerfile
     command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    # Same reason as horizon: the image probes port 8000. Reverb serves 8080.
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@fsockopen('127.0.0.1', 8080) ? 0 : 1);\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     env_file:
       - ../backend/.env
     environment:
@@ -127,6 +280,13 @@ services:
       # backend/.env in place here is the same footgun that produced a 401 between
       # backend and ai-service: one service silently holding a different secret.
       AI_SERVICE_HMAC_SECRET: ${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}
+      # The pair the server actually needs to run: this is the app that
+      # authorizes `POST /api/v1/broadcasting/auth` subscriptions and accepts
+      # the publish connection from backend/horizon. Same defaults as those two
+      # services, on purpose - a mismatch here is silent, not an error, because
+      # each side just never confirms the other's PusherConnector handshake.
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-omnihear-dev-reverb-key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-dev-only-not-a-real-reverb-secret}
     ports:
       - "8080:8080"
     depends_on:
@@ -139,17 +299,28 @@ services:
       - ../backend:/srv/backend
 
   frontend:
-    image: node:22-alpine
+    # node:26 because .nvmrc says 26 and frontend/package.json declares
+    # engines >= 26 / npm >= 11. This service was left on node:22 when Node was
+    # pinned everywhere else, so the container ran npm 10 against a lockfile npm
+    # 11 wrote — the same version split that broke `npm ci` in CI.
+    image: node:26-alpine
     working_dir: /srv/frontend
-    command: ["npx", "ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
+    # node_modules is installed *inside* the container and the anonymous volume
+    # below keeps it there. This is the opposite of the vendor/ rule a few
+    # services up, and deliberately so: vendor/ is built by the 8.3 image and the
+    # host copy is the correct source, while node_modules holds native bindings
+    # compiled for the host OS. Bind-mounting a Windows-built node_modules into
+    # this image fails with "Cannot find native binding" — measured.
+    command: ["sh", "-c", "npm ci && npx ng serve --host 0.0.0.0 --port 4200"]
     environment:
       NG_CLI_ANALYTICS: "false"
     ports:
       - "4200:4200"
     volumes:
-      # Same reasoning as backend/vendor: an empty named volume would hide
-      # the installed node_modules and ng serve would fail.
       - ../frontend:/srv/frontend
+      # Anonymous volume: shadows the host node_modules so the container's own
+      # install survives, and is recreated from scratch whenever the service is.
+      - /srv/frontend/node_modules
 
 volumes:
   postgres-data:
