@@ -1,0 +1,21 @@
+/* Type-checking config for the Playwright suite.
+ *
+ * It is separate from tsconfig.typecheck.json for one reason: that project
+ * inherits tsconfig.app.json, whose `types` is `["@angular/localize"]`, so the
+ * Node globals every Playwright helper needs (`process`, `node:child_process`)
+ * do not exist in it. Merging the two would mean widening the application's
+ * ambient types to satisfy a test runner — the wrong direction.
+ *
+ * `npm run typecheck` runs both projects. The E2E code is not exempt from the
+ * gate just because it never reaches the browser bundle.
+ */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/e2e",
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "files": [],
+  "include": ["e2e/**/*.ts", "playwright.config.ts"]
+}
