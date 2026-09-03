@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-02 · Current: **wave 2 integrated and green; awaiting approval** · Spec: `omnihear-engineering-prompt (1).md`
+Updated: 2026-09-03 · Current: **W7 complete; every gate green** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -21,8 +21,8 @@ commit messages; `git log` is the archive.
 | **W3-C** | cursor-model test hardening (test-only agent, no production code) | **green** — 39 passed, 81 assertions, no production defect found |
 | **W4** | frontend data layer ∥ D-06 fixture synthesis + F8 Zendesk | **green** — jest **193/193**, build:gate raw 332.22/347, transfer 93.53/105 · pest **813 passed, 3299 assertions**, coverage **98.1%** |
 | **W5** | realtime, settings, billing flow, SubscriptionGuard ∥ settings endpoints, in-app notifications, Laravel OpenAPI, demo seeder | **green** — jest **284/284**, build:gate raw 335.75/347, transfer 94.09/105 · pest **969 passed, 4535 assertions**, coverage **98.9%** |
-| W6 | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, architecture diagram, docker build in CI | planned |
-| W7 | security review (OWASP), history rewrite, public flip | planned |
+| **W6** | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, ARCHITECTURE, ADR-0009/0010, ai-service JSON log | **green** — E2E 46.5 s, DB shows 3 analyzed / 2 pending_analysis · pytest 274 |
+| **W7** | history rewrite (done) · quota gate + invitations · security review + its seven findings + KVKK PII + self-hosted fonts | **green** — pest **1046 passed, 4870 assertions**, coverage **98.9%** · pytest **282** · jest **290** · build:gate raw 337.88/347, transfer 94.46/105 |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -62,27 +62,28 @@ top-level directory — the one split that has held across four waves. Where two
 must share a directory, the seams document assigns files and the crossing points are
 events, so neither side references a class the other has not written yet.
 
-### Open after W5
+### Still open
 
-- **Invitations can be created but not accepted.** The row, the token and the expiry exist and
-  are audited; no endpoint consumes them, because the contract never defined one and §6
-  forbids inventing scope. The team feature is half-built until `POST /auth/invitations/accept`
-  and its notification are specified.
-- `EnforceQuota` (the `quota` alias) is still applied to **no route**. The 402 path is tested
-  and the paywall is wired end to end, but which write endpoint the quota actually guards is
-  an unmade decision.
-- `REVERB_APP_KEY` is `REPLACE_ME` in both env files, so realtime reports `disabled` and the
-  `private-company.{id}` subscription has never run against a real Reverb. W6's E2E covers it.
-
-### Open after W4
-
-- **D-06's second half is still open.** The fixtures hold no real person's data any more
-  and a test enforces it, but `24ac570` still carries the original capture — the **history
-  rewrite remains required before the repository goes public**.
-- **Zendesk stores the requester's email** in `feedbacks.raw_payload`; the ingestion PII
-  mask only covers `body`. Spec §8 wants author PII maskable — F9's problem.
-- Zendesk's shape was synthesised from published documentation; **no part was verified
-  against a live account.** Its fixture README separates confirmed from inferred.
+- **Realtime has never run against a real Reverb.** `REVERB_APP_KEY` is `REPLACE_ME`
+  in both env files, so the client reports `disabled`. Three files away: compose env
+  for `reverb`/`backend`, the SPA's development environment, one E2E step. This is
+  the last item on the "done" line — a headline feature (spec §4 "Reaktif akış") that
+  has never been executed cannot be filed as a recorded limitation.
+- **Playwright was green for the implementing agent, not re-run by the main thread.**
+  It passed with the two new assertions — the browser reading `X-Quota-Remaining`
+  through CORS, and a guard that fails if any request leaves localhost — and emptying
+  `exposed_headers` was shown to turn it red. The re-run hit the 5-per-hour
+  registration limiter, which is the suite's own documented failure message.
+- **IBM Plex is self-hosted but unused.** `tailwind.config.js` never overrode
+  `fontFamily`, so the CDN request bought nothing. The faces cost no bytes until
+  something asks for them; either wire them into the theme or delete the six files.
+- **Tokens older than 90 days become invalid on deploy** — `expiration` counts from
+  creation. Deliberate, but it is a release note.
+- **Zendesk's shape was never verified against a live account.** Its fixture README
+  separates what the documentation confirms from what was inferred.
+- `infra/docker-compose.dev.yml` keeps `${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}`
+  on purpose: removing it breaks `docker compose up` for a fresh clone, and the value
+  names itself. The *application* no longer has a default — that was the finding.
 
 ## Open decisions
 
@@ -103,7 +104,7 @@ events, so neither side references a class the other has not written yet.
 | Laravel 13, not 11 | 11 security-EOL 2026-03-12; two unpatched advisories on §7.1 code paths | resolved — ADR-0003, user approved |
 | `provideExperimentalZonelessChangeDetection` was experimental | — | **resolved** — Angular 22 (ADR-0008); the symbol no longer exists, the stable one is in use |
 | `config/session.php`, `config/cache.php` lack Laravel 13 hardening defaults | `composer update` does not regenerate skeleton config | **F2, before auth work** |
-| Fonts load from Google Fonts CDN | self-hosting deferred | F9 (KVKK) |
+| Fonts load from Google Fonts CDN | — | **resolved** — self-hosted in W7; a Playwright listener fails the journey if any request leaves localhost |
 | initial bundle raw 250 -> 320 -> **347kb**, transfer -> **105 kB** | measured framework floor is 245.00 kB = 95.7% of the old threshold; spec §4 says "hedefi" and the page tree it mandates cannot be built under it | resolved — ADR-0007, re-based by ADR-0008 after the Angular 22 floor rose; transfer 92.09 kB still well under the spec figure |
 
 ## Verified facts
