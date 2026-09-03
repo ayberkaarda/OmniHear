@@ -65,5 +65,7 @@ shape and lack Laravel 13's hardening defaults (`session.serialization = 'json'`
 `cache.serializable_classes = false`). The framework falls back to its internal defaults,
 so nothing is broken, but these files should be reconciled before F2.
 
-**Spec erratum.** The spec's §2 line should read "Laravel 13 (PHP 8.3)". Editing the spec
-file requires user approval and has not been done.
+**Spec erratum.** Applied as **E-1** in `docs/OMNIHEAR-SPEC.md`'s Errata section on
+2026-09-03, with user approval. The original §2 line is left standing; the Errata
+overrides it, so the difference between what was asked and what was built stays
+readable side by side instead of being edited away.

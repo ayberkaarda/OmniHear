@@ -142,3 +142,70 @@ audit_logs       id, company_id, user_id, action, subject_type/id, ip, created_a
 ---
 
 **Çıktı formatı:** Geliştirmeye başlamadan önce (1) mimari diyagram, (2) sprint bazlı yol haritası, (3) riskler ve varsayımlar listesi sun; onay sonrası kod üretimine geç.
+
+---
+
+## Errata
+
+Bu bölüm spec'in parçasıdır ve çeliştiği orijinal satırı **ezer**. Orijinal metin
+bilerek olduğu gibi bırakılmıştır: ne istendiği ile ne yapıldığı arasındaki fark,
+üzeri çizilerek değil yan yana durarak okunur.
+
+Her madde bir ADR'ye ve kullanıcı onayına dayanır.
+
+### E-1 — §2: "Laravel 11 (PHP 8.3)" → **"Laravel 13 (PHP 8.3)"**
+
+*2026-09-02 · ADR-0003 · kullanıcı onaylı*
+
+Laravel 11'in güvenlik desteği 2026-03-12'de bitti ve §7.1'in zorunlu kıldığı
+e-posta doğrulama yollarında yamasız iki advisory duruyordu. §0'a göre spec
+çeliştiğinde spec kazandığı için, bu satır düzeltilmeden taze bir ajan spec'i
+okuyup 11'e dönmesi gerektiği sonucuna varabilirdi — bu aktif bir tuzaktı,
+doküman kozmetiği değil.
+
+### E-2 — §2: "Angular 18+" → **Angular 22**
+
+*2026-09-03 · ADR-0008 · kullanıcı onaylı*
+
+§2 zaten "18+" diyor, yani bu bir çelişki değil sabitlemedir: Angular 18 destek
+dışı (v2–v19 "no longer supported"), v20'nin LTS'i üç ay içinde bitiyor. E-1 ile
+aynı gerekçe, aynı karar.
+
+### E-3 — §4: "initial bundle < 250 KB hedefi" — ölçüm birimi
+
+*2026-09-03 · ADR-0007, ADR-0008 · kullanıcı onaylı*
+
+§4 "hedef" diyor, "kısıt" değil (§2 "Değiştirilemez Kısıtlar" başlığını taşır, §4
+taşımaz). Ölçüldü: §4'ün **kısıt** olan kısmı — sayfa ağacı — 250 kB raw altında
+kurulamıyor; tek bir `/health` route'lu iskelet Angular 18'de 245.00 kB, Angular
+22'de 261.29 kB. Yani eşik uygulama kodunu değil framework'ü ölçüyordu.
+
+Hedef **brotli transfer** üzerinden okunur (bugün **94.46 kB**, 250 KB'nin çok
+altında); raw eşik regresyon tripwire'ı olarak korunur ve yükseltilmesi CLAUDE.md
+Tuzak 2'nin atıf tablosu prosedürünü gerektirir.
+
+### E-4 — §5: `integrations.credentials` "encrypted JSONB" → **encrypted text**
+
+*2026-09-02 · `docs/contracts/backend-core.md` §1*
+
+Laravel'in `encrypted:array` cast'i base64 şifre metni yazar; `jsonb` kolonu bunu
+reddeder. Şifreleme daha sert gereksinim (invariant I5), o yüzden kolon tipi
+geri adım attı. Veri modeli aynı, saklama biçimi farklı.
+
+### E-5 — §5: `feedbacks` aylık partitioning — **ertelendi**
+
+*2026-09-03 · ADR-0009*
+
+Uygulanmadı. `(company_id, published_at DESC)` indeksi ara cevaptır; ADR-0009
+kararın hangi dört sinyalde gözden geçirileceğini yazıyor.
+
+### E-6 — Yapılmayanlar
+
+*2026-09-03 · ADR-0010*
+
+Spec'in istediği ama bilinçli olarak inşa edilmeyen dokuz madde (TOTP 2FA,
+IP/cihaz risk skorlaması, Sentry, Prometheus, Google Play / Trustpilot / e-posta /
+sosyal connector'ları, backend'in `/analyze/batch` kullanımı, `model_version`
+reprocess komutu, staging/prod deploy, K8s manifest'leri, Redis KPI cache) her
+biri gerekçesiyle ADR-0010'da listelidir. Her biri kodda doğrulanarak yazılmıştır.
+
