@@ -3,18 +3,21 @@ and exception handlers that enforce the uniform error contract
 {"code", "message", "correlation_id"}.
 """
 
-import logging
-
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import settings
+from app.logging_config import configure_logging
 from app.openapi import build_openapi
 from app.routers import analyze, health
 
-logging.basicConfig(level=settings.log_level)
+# JSON lines (spec 3.6), matching the backend's `json` log channel so a
+# correlation_id can be searched across both services. See
+# app.logging_config for the shape and app.routers.analyze's module
+# docstring for what is (and is not) permitted into a log line.
+configure_logging(settings.log_level)
 
 # The OpenAPI export normalises info.version away (see
 # scripts/export_openapi.py), so this string is documentation metadata
