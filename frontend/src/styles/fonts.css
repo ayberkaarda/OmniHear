@@ -1,0 +1,125 @@
+/*
+ * Self-hosted web fonts (KVKK).
+ *
+ * These faces are bound to the Tailwind theme in tailwind.config.js. Until that
+ * line existed the families were declared here and requested from a CDN, but
+ * nothing referenced them, so every screen rendered in the system stack and the
+ * third-party request bought exactly nothing.
+ *
+ * `index.html` used to pull these two families from fonts.googleapis.com,
+ * which put every visitor's IP address in front of a third party before the
+ * page had asked for anything, let alone consent. Nothing about the design
+ * needed the CDN: the files are static, and serving them from our own origin is
+ * one directory and this file.
+ *
+ * The .woff2 files sit beside this stylesheet in `styles/fonts/` rather than in
+ * `public/`. That is not a preference. `public/` is copied verbatim and would
+ * have to be reached with an absolute `/fonts/...`, which is wrong the moment
+ * the app is served from a sub-path - and it always is here, because the
+ * localized production build emits `browser/en/` and `browser/tr/` with
+ * `<base href="/en/">`. Referenced relatively from `src/`, the build hashes
+ * each file into `media/` and rewrites the url to `./media/<name>-<hash>.woff2`,
+ * which resolves under any base href and is immutable-cacheable as a bonus.
+ * Resolution is relative to *this* file, not to `styles.scss` - putting the
+ * files anywhere else fails the build with "Could not resolve".
+ *
+ * # What is loaded, and when
+ *
+ * Nothing, until something renders in one of these families. A `@font-face`
+ * rule is a declaration, not a request - the browser fetches a face only when
+ * a matched element needs it, and only the subsets whose `unicode-range`
+ * covers the characters on screen. So this file costs about a kilobyte of CSS
+ * and no font bytes at all on a page that does not use the families.
+ *
+ * That matters here more than usual: **nothing in the application currently
+ * asks for IBM Plex.** `tailwind.config.js` never overrides `fontFamily`, so
+ * the UI renders in Tailwind's default system stack, and the Google Fonts
+ * link in index.html was downloading a stylesheet whose faces were never
+ * matched. Wiring the families into the Tailwind theme is a typography
+ * decision, not a security fix, so it is left alone here - see the security
+ * report's suggestions.
+ *
+ * # Subsets
+ *
+ * `latin` and `latin-ext` only. Together they cover Turkish (ı in latin;
+ * ğ, ş, İ and the rest in latin-ext) and English, which are the two locales
+ * this product ships. Cyrillic, Greek and Vietnamese are deliberately absent:
+ * they were never rendered and each is another file to carry.
+ *
+ * The unicode-ranges below are Google's own, copied with the files so that a
+ * character just outside `latin` still resolves to `latin-ext` rather than
+ * dropping to the fallback mid-word.
+ *
+ * # Weights
+ *
+ * IBM Plex Sans is distributed as a variable font: one file per subset covers
+ * the whole 400-600 range the old link requested, which is why there are two
+ * Sans files rather than six. IBM Plex Mono is still static, so 400 and 500
+ * are separate faces.
+ *
+ * `font-display: swap` matches what the Google link asked for: text paints
+ * immediately in the fallback and is re-rendered when the face arrives, rather
+ * than being invisible for up to three seconds.
+ */
+
+/* IBM Plex Sans - variable, 400-600 */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('./fonts/ibm-plex-sans-variable-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('./fonts/ibm-plex-sans-variable-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* IBM Plex Mono - static 400 and 500 */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/ibm-plex-mono-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./fonts/ibm-plex-mono-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

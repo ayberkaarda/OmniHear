@@ -1,9 +1,21 @@
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
   content: ['./src/**/*.{html,ts}'],
   theme: {
     extend: {
+      // The families index.html has been loading since F1 — but nothing ever
+      // bound them, so every screen rendered in the system stack while the CDN
+      // request went out anyway. Self-hosting them (styles/fonts.css) fixed the
+      // privacy half; this line is the half that makes the request worth making.
+      // Tailwind's own defaults stay as the fallback chain.
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
+        mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
+      },
+
       colors: {
         // Surfaces / structure
         canvas: 'var(--bg-canvas)',

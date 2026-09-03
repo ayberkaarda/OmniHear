@@ -7,11 +7,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
-    rel="stylesheet">
+  <!--
+    No third-party font host. IBM Plex used to be pulled from
+    fonts.googleapis.com, which handed every visitor's IP address to a third
+    party before they had consented to anything (KVKK; docs/PROGRESS.md carried
+    this as a known deviation). The faces are now declared in
+    src/styles/fonts.css and served from this origin (the build emits them as
+    hashed files under media/).
+  -->
 
   <script>
     // FOUC guard: resolve the theme class before first paint, mirroring
