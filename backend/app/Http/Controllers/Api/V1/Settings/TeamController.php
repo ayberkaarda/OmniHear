@@ -9,12 +9,14 @@ use App\Http\Resources\Api\V1\InvitationResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\Invitation;
 use App\Models\User;
+use App\Notifications\InvitationNotification;
 use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 /**
@@ -103,8 +105,23 @@ class TeamController extends Controller
             subject: $invitation,
         );
 
+        // The one moment the plaintext token can be handed on. Sent to an
+        // AnonymousNotifiable because the invitee is not a User and must not
+        // become one until they accept — and sent *here*, inline, because
+        // queuing the notification would serialize the plaintext token into
+        // Redis (see the InvitationNotification docblock).
+        //
+        // An invitation that nothing delivers is a row, an audit entry and a
+        // button that lead nowhere: without this line a company can never get
+        // a second user, and the whole of spec 8's role model is unreachable
+        // in the running product.
+        $invitation->refresh()->loadMissing(['company', 'inviter']);
+
+        Notification::route('mail', $email)
+            ->notify(InvitationNotification::for($invitation, $plainToken));
+
         return response()->json(
-            ['invitation' => (new InvitationResource($invitation->refresh()))->resolve()],
+            ['invitation' => (new InvitationResource($invitation))->resolve()],
             Response::HTTP_CREATED,
         );
     }

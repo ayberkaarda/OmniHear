@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
+use App\Http\Controllers\Api\V1\InvitationController;
 use App\Http\Middleware\EnforceTokenAbility;
 use App\Http\Middleware\QuotaRemainingHeader;
 use App\Http\Middleware\SetTenantContext;
@@ -54,6 +55,33 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authenticated) {
         // Named because the verification signature is generated against it.
         Route::post('email/verify', [EmailVerificationController::class, 'verify'])
             ->name('email.verify');
+    });
+
+    // Accepting a team invitation (docs/contracts/settings-api.md section 3a).
+    //
+    // Declared here, beside the auth block, rather than in routes/api/: every
+    // file in that directory is required inside the authenticated + `verified`
+    // group, and the recipient of an invitation has no account at all — let
+    // alone a verified one. These two and the auth block are the only
+    // unauthenticated routes under /api/v1.
+    //
+    // The token in the path is the credential, so it gets `throttle:public`
+    // (30/min/IP) like every other public door: it is a 48-character random
+    // string looked up by SHA-256, and the limiter is what makes walking that
+    // space pointless rather than merely expensive.
+    //
+    // {token} is constrained to the alphabet Str::random() produces. Without
+    // it, a path segment containing a slash or a dot would miss the route and
+    // answer with a different-shaped 404 than an unknown token does — and the
+    // whole point of section 3a is that every failure looks the same.
+    Route::middleware('throttle:public')->name('invitations.')->group(function () {
+        Route::get('invitations/{token}', [InvitationController::class, 'show'])
+            ->whereAlphaNumeric('token')
+            ->name('show');
+
+        Route::post('invitations/{token}/accept', [InvitationController::class, 'accept'])
+            ->whereAlphaNumeric('token')
+            ->name('accept');
     });
 
     // Authenticated but deliberately *not* behind `verified`.

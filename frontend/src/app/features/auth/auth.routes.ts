@@ -31,6 +31,16 @@ export const authRoutes: Routes = [
     loadComponent: () => import('./reset-password/reset-password.component').then((m) => m.ResetPasswordComponent)
   },
   {
+    // Target of the emailed invitation link. `guestGuard` for the same reason
+    // reset-password carries it: accepting replaces whatever session the
+    // browser holds, and doing that silently under a signed-in user is worse
+    // than telling them to sign out first.
+    path: 'accept-invitation',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./accept-invitation/accept-invitation.component').then((m) => m.AcceptInvitationComponent)
+  },
+  {
     path: 'verify-email',
     loadComponent: () => import('./verify-email/verify-email.component').then((m) => m.VerifyEmailComponent)
   }

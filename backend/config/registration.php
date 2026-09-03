@@ -17,6 +17,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Invitations a single company may send per day
+    |--------------------------------------------------------------------------
+    |
+    | POST /settings/team/invitations is the only authenticated endpoint that
+    | mails an address nobody in the tenant controls, which makes it the one
+    | that can be turned into a spam cannon: `throttle:api` on its own allows
+    | 120 a minute from one admin.
+    |
+    | Keyed by company rather than by user (AppServiceProvider), because the
+    | abuse is a tenant mailing the world and an owner who has run the ceiling
+    | down must not be able to reset it by asking a colleague to send the next
+    | batch. A company that genuinely onboards more people than this in a day
+    | waits out the window; nothing is lost and the refusal is the catalogued
+    | 429 TOO_MANY_REQUESTS.
+    |
+    | Configurable so the limiter can be exercised in a test without sending
+    | fifty mails to prove arithmetic.
+    |
+    */
+
+    'invitations_per_day' => (int) env('INVITATIONS_PER_DAY', 50),
+
+    /*
+    |--------------------------------------------------------------------------
     | Disposable e-mail domain blocklist
     |--------------------------------------------------------------------------
     |

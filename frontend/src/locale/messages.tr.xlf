@@ -3787,6 +3787,80 @@
         </context-group>
         <note priority="1" from="description">Modal close button label</note>
       </trans-unit>
+      <trans-unit id="auth.invitation.loading" datatype="html">
+        <source> Checking your invitation… </source>
+        <target> Davetiniz kontrol ediliyor… </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.invalid" datatype="html">
+        <source> This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a teammate to send you a new one. </source>
+        <target> Bu davet bağlantısı artık kullanılamıyor. Davetlerin süresi dolar ve her biri yalnızca bir kez kabul edilebilir. Ekip arkadaşınızdan size yeni bir davet göndermesini isteyin. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">14,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.company" datatype="html">
+        <source>You have been invited to</source>
+        <target>Şu ekibe davet edildiniz:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.as" datatype="html">
+        <source>Joining as</source>
+        <target>Katılım rolünüz:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.lead" datatype="html">
+        <source> Choose a password to finish setting up your account. Your email address is already confirmed. </source>
+        <target> Hesabınızı tamamlamak için bir parola belirleyin. E-posta adresiniz zaten doğrulandı. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.submit" datatype="html">
+        <source>Accept and create my account</source>
+        <target>Kabul et ve hesabımı oluştur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">74,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.backToLogin" datatype="html">
+        <source>Already have an account? Sign in</source>
+        <target>Zaten hesabınız var mı? Giriş yapın</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">87,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.heading" datatype="html">
+        <source>Join your team</source>
+        <target>Ekibinize katılın</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <note priority="1" from="description">Accept invitation heading</note>
+      </trans-unit>
+      <trans-unit id="auth.invitation.success" datatype="html">
+        <source>Welcome aboard. Your account is ready.</source>
+        <target>Aramıza hoş geldiniz. Hesabınız hazır.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <note priority="1" from="description">Invitation accepted toast</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -100,6 +100,91 @@ Audited. The SPA must say plainly that the value cannot be retrieved again.
 
 **owner or admin.** Another company's key -> **404**.
 
+### What an API key may actually do
+
+Until a security review asked the question, nothing enforced an answer: an API
+key carried exactly the authority of a browser session, so a leaked one could
+mint more keys, revoke the owner's devices, change the email and call
+`DELETE /account`. It is now **default-deny** — a key reaches only the routes on
+an explicit machine list, and a route added tomorrow is closed until someone
+puts it there on purpose:
+
+| allowed | why |
+|---|---|
+| `auth/me`, `auth/logout` | identify and end the session it holds |
+| `feedbacks` index and show, `overview/kpis` | read the tenant's own data — the reason to hold a key |
+| `integrations` index, show, `platforms`, `sync` | see channels and trigger ingestion |
+
+Everything else is a session-only route: account erasure, device sessions, key
+minting and revocation, profile and password, team and roles, billing, and any
+endpoint that writes integration credentials. The private broadcast channel is
+session-only too — otherwise a key could subscribe and receive every
+`FeedbackAnalyzed` event the tenant produces.
+
+Tokens also expire now, which they never did: sessions after 14 days, API keys
+after 90, with a 90-day absolute ceiling in `config/sanctum.php`.
+
+## 3a. Accepting an invitation
+
+An invitation that nothing can accept is a row, an audit trail and a button that
+lead nowhere — and without it a company can never have a second user, which makes
+the whole of spec §8's role model unreachable in the running product. These two
+endpoints close it.
+
+Both are **public**: the recipient has no account yet. They carry
+`throttle:public` and are the only unauthenticated routes under `/api/v1` besides
+the auth block.
+
+### `GET /api/v1/invitations/{token}` -> `200`
+
+```json
+{ "invitation": { "email": "…", "company_name": "…", "role": "member", "expires_at": "…" } }
+```
+
+Lets the SPA render who invited whom before asking for a password. Returns the
+company name, never its id or anything else about the tenant.
+
+An expired, already-accepted or unknown token answers **404**, all three the same
+way. Distinguishing them would let an outsider probe which tokens ever existed,
+and the tenant-isolation rule applies here for the same reason it does elsewhere:
+absence and refusal must look identical.
+
+### `POST /api/v1/invitations/{token}/accept` -> `201`
+
+```json
+{ "name": "…", "password": "…", "password_confirmation": "…" }
+```
+
+Creates the user in the inviting company at the invited role, marks the
+invitation accepted, and returns `{ "token", "user", "company" }` exactly as
+`POST /auth/register` does — the SPA lands in the same authenticated state from
+either door.
+
+**The new user is created already verified.** Reaching this endpoint required a
+token that was emailed to that address, which is the same proof
+`POST /auth/email/verify` asks for. Sending a second verification mail to an
+address that just proved itself would be theatre.
+
+If the email already belongs to a user, answer **422 `VALIDATION_ERROR`** with the
+collision on the `email` field. The invitation stays open, and the existing user is
+never touched — the collision may be the invitee already having an account, which
+is a different problem from a bad token and must not be "resolved" by attaching
+that account to a new company.
+
+> This said **409** when it was first written, and the implementing agent pushed
+> back rather than complying. It was right: `ApiErrorCode::status()` maps each code
+> to exactly one status, no 409 code exists, and `abort(409)` would have rendered
+> `{code: "SERVER_ERROR"}`. Adding a code means the catalogue in `http-api-v1.md`
+> §2, both lang files and the SPA's message map — a contract change, not a local
+> choice. 422 with a field error keeps every property the 409 was there for: the
+> client can still tell it apart from the 404, and the reason reaches the user.
+> The same check must be **global**, not company-scoped: `users.email` is globally
+> unique, so a company-scoped check lets an invitation be created that can never be
+> accepted. Enumeration is prevented by the *message* — the in-company and
+> out-of-company collisions answer identically — not by narrowing the query.
+
+Audited as `team.invitation_accepted`.
+
 ## 4. Notifications
 
 ### `GET /api/v1/settings/notifications` -> `200`

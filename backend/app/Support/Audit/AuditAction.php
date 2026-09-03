@@ -38,6 +38,7 @@ enum AuditAction: string
     case TeamInvited = 'team.invited';
     case TeamRoleChanged = 'team.role_changed';
     case TeamMemberRemoved = 'team.member_removed';
+    case TeamInvitationAccepted = 'team.invitation_accepted';
 
     case ApiKeyCreated = 'api_key.created';
     case ApiKeyRevoked = 'api_key.revoked';

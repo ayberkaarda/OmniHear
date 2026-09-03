@@ -84,3 +84,34 @@ export interface VerifyEmailRequest {
   expires: number;
   signature: string;
 }
+
+/**
+ * `GET /api/v1/invitations/{token}` — everything a token-holder may learn
+ * about the tenant that invited them (`docs/contracts/settings-api.md` 3a).
+ *
+ * The company's *name* and nothing else: no id, no plan, no counts. An expired,
+ * already-accepted or unknown token answers 404 alike, so there is no state
+ * here for "expired" to be distinguished from "never existed".
+ */
+export interface PendingInvitation {
+  email: string;
+  company_name: string;
+  role: UserRole;
+  expires_at: string;
+}
+
+export interface InvitationResponse {
+  invitation: PendingInvitation;
+}
+
+/**
+ * `POST /api/v1/invitations/{token}/accept`.
+ *
+ * No `email`: the address is fixed by the invitation row. Sending one would be
+ * ignored, and offering the field would suggest it is not.
+ */
+export interface AcceptInvitationRequest {
+  name: string;
+  password: string;
+  password_confirmation: string;
+}

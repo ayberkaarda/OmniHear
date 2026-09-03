@@ -1,0 +1,90 @@
+<app-auth-layout [heading]="heading">
+  @switch (state()) {
+    @case ('loading') {
+      <p class="text-sm text-[var(--text-secondary)]" data-testid="invitation-loading" i18n="@@auth.invitation.loading">
+        Checking your invitation…
+      </p>
+    }
+    @case ('invalid') {
+      <div class="flex flex-col gap-4" role="status" data-testid="invitation-invalid">
+        <p
+          class="rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] p-4 text-sm text-[var(--sentiment-negative-text)]"
+          i18n="@@auth.invitation.invalid"
+        >
+          This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a
+          teammate to send you a new one.
+        </p>
+      </div>
+    }
+    @default {
+      @if (invitation(); as pending) {
+        <div class="flex flex-col gap-4">
+          <div
+            class="flex flex-col gap-1 rounded-md bg-[var(--bg-surface-sunken)] px-3 py-2 text-sm"
+            data-testid="invitation-summary"
+          >
+            <p class="text-[var(--text-primary)]">
+              <span i18n="@@auth.invitation.company">You have been invited to</span>
+              <span class="font-semibold">{{ pending.company_name }}</span>
+            </p>
+            <p class="text-[var(--text-secondary)]">
+              <span i18n="@@auth.invitation.as">Joining as</span>
+              <span class="font-semibold">{{ roleLabel(pending.role) }}</span>
+            </p>
+            <p class="text-[var(--text-secondary)]">{{ pending.email }}</p>
+          </div>
+
+          <p class="text-sm text-[var(--text-secondary)]" i18n="@@auth.invitation.lead">
+            Choose a password to finish setting up your account. Your email address is already confirmed.
+          </p>
+
+          <form [formGroup]="form" class="flex flex-col gap-4" novalidate (ngSubmit)="onSubmit()">
+            <app-input
+              formControlName="name"
+              type="text"
+              [label]="nameLabel"
+              [required]="true"
+              prefixIcon="user"
+              [error]="errorFor('name')"
+              (blurred)="onFieldBlur()"
+            />
+
+            <app-input
+              formControlName="password"
+              type="password"
+              [label]="passwordLabel"
+              [required]="true"
+              prefixIcon="lock"
+              [helper]="passwordHelper"
+              [error]="errorFor('password')"
+              (blurred)="onFieldBlur()"
+            />
+
+            <app-input
+              formControlName="password_confirmation"
+              type="password"
+              [label]="passwordConfirmationLabel"
+              [required]="true"
+              prefixIcon="lock"
+              [error]="errorFor('password_confirmation')"
+              (blurred)="onFieldBlur()"
+            />
+
+            <app-button type="submit" variant="primary" size="lg" [loading]="submitting()">
+              <span i18n="@@auth.invitation.submit">Accept and create my account</span>
+            </app-button>
+          </form>
+        </div>
+      }
+    }
+  }
+
+  <p authFooter>
+    <a
+      routerLink="/auth/login"
+      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      i18n="@@auth.invitation.backToLogin"
+      >Already have an account? Sign in</a
+    >
+  </p>
+</app-auth-layout>

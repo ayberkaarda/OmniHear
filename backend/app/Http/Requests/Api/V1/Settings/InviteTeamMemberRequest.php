@@ -41,14 +41,46 @@ class InviteTeamMemberRequest extends FormRequest
                 'string',
                 'email:rfc',
                 'max:255',
-                // Scoped to the company on purpose. A global uniqueness check
-                // would answer "this address is taken" for an account in
-                // another tenant, which is cross-tenant account enumeration
-                // through a validation message (invariant I1).
-                Rule::unique('users', 'email')
-                    ->where('company_id', $this->user()?->getAttribute('company_id')),
+                // Global, not scoped to the company — and that is a reversal of
+                // what this rule used to say.
+                //
+                // It was scoped so a validation message could not reveal that
+                // an address has an account in another tenant. But `users.email`
+                // carries a **global** UNIQUE index
+                // (0001_01_01_000000_create_users_table.php), so a scoped check
+                // happily issued an invitation that could never be accepted:
+                // the insert at accept time would hit the index. That left two
+                // outcomes, and both are worse than the leak this rule was
+                // avoiding — a 500 on the invitee's very first request, or the
+                // "obvious fix" of attaching the existing user to the inviting
+                // company, which is the definition of cross-tenant account
+                // takeover.
+                //
+                // The enumeration concern is answered by the message instead of
+                // by the scope: messages() below maps this failure to exactly
+                // the same sentence for an in-company collision and for a
+                // collision in a tenant the caller cannot see, so the two are
+                // indistinguishable from outside. It is the same sentence the
+                // accept endpoint returns, for the same reason.
+                Rule::unique('users', 'email'),
             ],
             'role' => ['required', 'string', Rule::in(User::ROLES)],
+        ];
+    }
+
+    /**
+     * One sentence for every uniqueness outcome.
+     *
+     * Laravel's default `unique` message ("The email has already been taken.")
+     * would already be identical in both cases; this states the requirement
+     * rather than relying on that, and says something the inviter can act on.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.unique' => (string) __('invitations.email_taken'),
         ];
     }
 

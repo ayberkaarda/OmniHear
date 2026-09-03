@@ -157,12 +157,32 @@ it('refuses inviting somebody who is already on the team', function () {
 });
 
 it('does not leak that an address exists in another tenant', function () {
-    [$companyA, $owner] = tenant(User::ROLE_OWNER);
+    // This test used to assert a 201, on the reasoning that refusing the
+    // address would confirm an account exists in a tenant the caller cannot
+    // see. The reasoning was right about the leak and wrong about the outcome:
+    // `users.email` carries a **global** UNIQUE index, so the invitation it
+    // issued could never be accepted — the insert at accept time hits the
+    // index. The endpoint was writing rows and mailing tokens that were
+    // guaranteed to fail, and the only ways to make them succeed are a 500 on
+    // the invitee's first request or moving an existing account into the
+    // inviting company, which is cross-tenant account takeover.
+    //
+    // So the refusal moved to where it belongs and the leak is closed by the
+    // *message* instead: an in-tenant collision and an out-of-tenant one are
+    // one indistinguishable 422. That is what this now asserts.
+    [$company, $owner] = tenant(User::ROLE_OWNER);
+    $insider = User::factory()->for($company)->create();
     $stranger = User::factory()->for(Company::factory()->create())->create();
 
-    actingAs($owner, 'sanctum')
+    $outside = actingAs($owner, 'sanctum')
         ->postJson('/api/v1/settings/team/invitations', ['email' => $stranger->email, 'role' => 'member'])
-        ->assertCreated();
+        ->assertStatus(422);
+
+    $inside = actingAs($owner, 'sanctum')
+        ->postJson('/api/v1/settings/team/invitations', ['email' => $insider->email, 'role' => 'member'])
+        ->assertStatus(422);
+
+    expect($outside->json())->toBe($inside->json());
 });
 
 it('keeps an invitation inside its own tenant', function () {

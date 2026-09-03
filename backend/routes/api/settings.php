@@ -45,7 +45,14 @@ Route::prefix('settings')->name('settings.')->group(function () {
     // Declared before the {user} routes: "invitations" is not numeric and the
     // parameter is constrained to digits, so the two cannot collide — the order
     // is belt and braces, not the mechanism.
-    Route::post('team/invitations', [TeamController::class, 'invite'])->name('team.invitations.store');
+    //
+    // The extra limiter is not decoration. This is the only authenticated
+    // endpoint that sends mail to an address nobody in the tenant controls, and
+    // `throttle:api` alone would let one admin mail 120 strangers a minute. The
+    // ceiling is per company and per day; see AppServiceProvider.
+    Route::post('team/invitations', [TeamController::class, 'invite'])
+        ->middleware('throttle:team-invitations')
+        ->name('team.invitations.store');
 
     Route::patch('team/{user}', [TeamController::class, 'update'])
         ->whereNumber('user')

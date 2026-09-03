@@ -218,6 +218,22 @@
                 ],
                 "type": "object"
             },
+            "PublicInvitationResource": {
+                "description": "Generated from App\\Http\\Resources\\Api\\V1\\PublicInvitationResource::toArray(). Field names are authoritative; member types are not expressed (see the class docblock on App\\Support\\OpenApi\\ResourceSchemas).",
+                "properties": {
+                    "company_name": {},
+                    "email": {},
+                    "expires_at": {},
+                    "role": {}
+                },
+                "required": [
+                    "email",
+                    "company_name",
+                    "role",
+                    "expires_at"
+                ],
+                "type": "object"
+            },
             "UserResource": {
                 "description": "Generated from App\\Http\\Resources\\Api\\V1\\UserResource::toArray(). Field names are authoritative; member types are not expressed (see the class docblock on App\\Support\\OpenApi\\ResourceSchemas).",
                 "properties": {
@@ -2419,6 +2435,16 @@
                         },
                         "description": "UNAUTHENTICATED"
                     },
+                    "402": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "QUOTA_EXCEEDED"
+                    },
                     "403": {
                         "content": {
                             "application/json": {
@@ -2467,6 +2493,163 @@
                 ],
                 "tags": [
                     "integrations"
+                ]
+            }
+        },
+        "/api/v1/invitations/{token}": {
+            "get": {
+                "operationId": "invitations_show",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "invitation": {
+                                            "$ref": "#/components/schemas/PublicInvitationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "invitation"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success."
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "tags": [
+                    "invitations"
+                ]
+            }
+        },
+        "/api/v1/invitations/{token}/accept": {
+            "post": {
+                "operationId": "invitations_accept",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "maxLength": 255,
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "description": "Must be repeated in a `<field>_confirmation` member. Subject to the application password policy (min 12, uncompromised in production).",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "password"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "description": "Validated by App\\Http\\Requests\\Api\\V1\\AcceptInvitationRequest.",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "company": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        },
+                                        "token": {},
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "token",
+                                        "user",
+                                        "company"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success."
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "VALIDATION_ERROR"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "tags": [
+                    "invitations"
                 ]
             }
         },

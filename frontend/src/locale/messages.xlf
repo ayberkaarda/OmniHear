@@ -2084,6 +2084,10 @@
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
         <note priority="1" from="description">Team role</note>
       </trans-unit>
       <trans-unit id="label.role.admin" datatype="html">
@@ -2091,6 +2095,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
           <context context-type="linenumber">201</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">133</context>
         </context-group>
         <note priority="1" from="description">Team role</note>
       </trans-unit>
@@ -2100,7 +2108,136 @@
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
         <note priority="1" from="description">Team role</note>
+      </trans-unit>
+      <trans-unit id="auth.invitation.loading" datatype="html">
+        <source> Checking your invitation… </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.invalid" datatype="html">
+        <source> This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a teammate to send you a new one. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">14,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.company" datatype="html">
+        <source>You have been invited to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.as" datatype="html">
+        <source>Joining as</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.lead" datatype="html">
+        <source> Choose a password to finish setting up your account. Your email address is already confirmed. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.submit" datatype="html">
+        <source>Accept and create my account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">74,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.backToLogin" datatype="html">
+        <source>Already have an account? Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">87,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.heading" datatype="html">
+        <source>Join your team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <note priority="1" from="description">Accept invitation heading</note>
+      </trans-unit>
+      <trans-unit id="auth.field.name" datatype="html">
+        <source>Your name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.field.password" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.field.passwordConfirmation" datatype="html">
+        <source>Repeat password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.register.passwordHelper" datatype="html">
+        <source>At least 12 characters.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <note priority="1" from="description">Field helper</note>
+      </trans-unit>
+      <trans-unit id="auth.invitation.success" datatype="html">
+        <source>Welcome aboard. Your account is ready.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <note priority="1" from="description">Invitation accepted toast</note>
       </trans-unit>
       <trans-unit id="auth.forgot.sent" datatype="html">
         <source> If that address belongs to an account, a reset link is on its way. The link is valid for a limited time. </source>
@@ -2203,18 +2340,6 @@
         </context-group>
         <note priority="1" from="description">Login page lead</note>
       </trans-unit>
-      <trans-unit id="auth.field.password" datatype="html">
-        <source>Password</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">32</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">45</context>
-        </context-group>
-        <note priority="1" from="description">Field label</note>
-      </trans-unit>
       <trans-unit id="auth.register.submit" datatype="html">
         <source>Create account</source>
         <context-group purpose="location">
@@ -2252,14 +2377,6 @@
         </context-group>
         <note priority="1" from="description">Register page lead</note>
       </trans-unit>
-      <trans-unit id="auth.field.name" datatype="html">
-        <source>Your name</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <note priority="1" from="description">Field label</note>
-      </trans-unit>
       <trans-unit id="auth.field.companyName" datatype="html">
         <source>Company name</source>
         <context-group purpose="location">
@@ -2267,30 +2384,6 @@
           <context context-type="linenumber">43</context>
         </context-group>
         <note priority="1" from="description">Field label</note>
-      </trans-unit>
-      <trans-unit id="auth.field.passwordConfirmation" datatype="html">
-        <source>Repeat password</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">46</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
-          <context context-type="linenumber">52</context>
-        </context-group>
-        <note priority="1" from="description">Field label</note>
-      </trans-unit>
-      <trans-unit id="auth.register.passwordHelper" datatype="html">
-        <source>At least 12 characters.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">47</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
-          <context context-type="linenumber">53</context>
-        </context-group>
-        <note priority="1" from="description">Field helper</note>
       </trans-unit>
       <trans-unit id="auth.register.emailHelper" datatype="html">
         <source>Use your work email address.</source>
