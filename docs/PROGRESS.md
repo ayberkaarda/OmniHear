@@ -20,7 +20,7 @@ commit messages; `git log` is the archive.
 | **W3-B** | F2.5 — `verified` enforced, device token revocation, erasure, audit writers, JSON logging, free-domain list | **green** — pest 694 passed, 2303 assertions, coverage 97.9% |
 | **W3-C** | cursor-model test hardening (test-only agent, no production code) | **green** — 39 passed, 81 assertions, no production defect found |
 | **W4** | frontend data layer ∥ D-06 fixture synthesis + F8 Zendesk | **green** — jest **193/193**, build:gate raw 332.22/347, transfer 93.53/105 · pest **813 passed, 3299 assertions**, coverage **98.1%** |
-| W5 | frontend data layer 2 (realtime, settings, billing flow, SubscriptionGuard) ∥ settings endpoints + in-app notifications + Laravel OpenAPI + demo seeder | planned |
+| **W5** | realtime, settings, billing flow, SubscriptionGuard ∥ settings endpoints, in-app notifications, Laravel OpenAPI, demo seeder | **green** — jest **284/284**, build:gate raw 335.75/347, transfer 94.09/105 · pest **969 passed, 4535 assertions**, coverage **98.9%** |
 | W6 | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, architecture diagram, docker build in CI | planned |
 | W7 | security review (OWASP), history rewrite, public flip | planned |
 
@@ -62,25 +62,27 @@ top-level directory — the one split that has held across four waves. Where two
 must share a directory, the seams document assigns files and the crossing points are
 events, so neither side references a class the other has not written yet.
 
+### Open after W5
+
+- **Invitations can be created but not accepted.** The row, the token and the expiry exist and
+  are audited; no endpoint consumes them, because the contract never defined one and §6
+  forbids inventing scope. The team feature is half-built until `POST /auth/invitations/accept`
+  and its notification are specified.
+- `EnforceQuota` (the `quota` alias) is still applied to **no route**. The 402 path is tested
+  and the paywall is wired end to end, but which write endpoint the quota actually guards is
+  an unmade decision.
+- `REVERB_APP_KEY` is `REPLACE_ME` in both env files, so realtime reports `disabled` and the
+  `private-company.{id}` subscription has never run against a real Reverb. W6's E2E covers it.
+
 ### Open after W4
 
-- **D-06's second half is still open.** The fixtures now hold no real person's data —
-  100 synthetic reviews, `reviewer-NNN`, `example.invalid` URIs, the app id replaced
-  everywhere including `page-empty-transient.json` — and a test enforces it. But
-  `24ac570` still carries the original capture, so **the history rewrite remains
-  required before the repository goes public**.
-- **Zendesk stores the requester's email** in `feedbacks.raw_payload` (`via.source.from.address`).
-  The ingestion PII mask only covers `body`. App Store has the same shape but only a
-  nickname; Zendesk is a real address. Spec §8 wants author PII maskable — F9's problem,
-  recorded here so it is not discovered later.
-- **`CONNECTABLE_PLATFORMS` in the frontend is a hand-copied mirror** of
-  `config/connectors.php`; nothing publishes the connectable platforms. The backend added
-  Zendesk while the frontend agent was working and it was caught by hand. W5 adds
-  `GET /api/v1/integrations/platforms` to the contract.
-- Zendesk's shape was synthesised from published documentation; **no part of it was
-  verified against a live account.** `contracts/fixtures/platforms/zendesk/README.md`
-  separates what the docs confirm from what was inferred — that table is the first place
-  to look when a real account exists.
+- **D-06's second half is still open.** The fixtures hold no real person's data any more
+  and a test enforces it, but `24ac570` still carries the original capture — the **history
+  rewrite remains required before the repository goes public**.
+- **Zendesk stores the requester's email** in `feedbacks.raw_payload`; the ingestion PII
+  mask only covers `body`. Spec §8 wants author PII maskable — F9's problem.
+- Zendesk's shape was synthesised from published documentation; **no part was verified
+  against a live account.** Its fixture README separates confirmed from inferred.
 
 ## Open decisions
 
