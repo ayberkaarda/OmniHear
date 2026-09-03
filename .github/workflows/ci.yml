@@ -221,6 +221,28 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
       - run: npx playwright install --with-deps chromium
+      # The three things a developer does once by hand and then never thinks
+      # about again — which is exactly why a clean checkout is the only place
+      # they surface.
+      #
+      # The stack bind-mounts ../backend, so vendor/ comes from the checkout and
+      # a fresh one has none: `artisan` died on a missing autoload.php in
+      # backend, horizon and reverb alike, and the stack never came up. APP_KEY
+      # ships empty in .env.example. The postgres volume is new on every runner,
+      # so there is no schema. None of this is visible locally, where all three
+      # have been true since F2 — measured 2026-09-03, first push after W7.
+      #
+      # `--no-deps` on the first two: composer and key:generate need no
+      # services, and starting postgres to run them would only slow the job. The
+      # migrate run deliberately drops it, so compose brings up its dependencies
+      # under their health conditions first.
+      - name: Prepare the backend (vendor, key, schema)
+        working-directory: .
+        run: |
+          C="docker compose -f infra/docker-compose.dev.yml"
+          $C run --rm --no-deps --build backend composer install --prefer-dist --no-progress
+          $C run --rm --no-deps backend php artisan key:generate --force
+          $C run --rm backend php artisan migrate --force
       - name: Start the stack
         working-directory: .
         run: |

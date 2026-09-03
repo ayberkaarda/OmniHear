@@ -64,19 +64,19 @@ events, so neither side references a class the other has not written yet.
 
 ### Still open
 
-- **Realtime has never run against a real Reverb.** `REVERB_APP_KEY` is `REPLACE_ME`
-  in both env files, so the client reports `disabled`. Three files away: compose env
-  for `reverb`/`backend`, the SPA's development environment, one E2E step. This is
-  the last item on the "done" line — a headline feature (spec §4 "Reaktif akış") that
-  has never been executed cannot be filed as a recorded limitation.
-- **Playwright was green for the implementing agent, not re-run by the main thread.**
-  It passed with the two new assertions — the browser reading `X-Quota-Remaining`
-  through CORS, and a guard that fails if any request leaves localhost — and emptying
-  `exposed_headers` was shown to turn it red. The re-run hit the 5-per-hour
-  registration limiter, which is the suite's own documented failure message.
-- **IBM Plex is self-hosted but unused.** `tailwind.config.js` never overrode
-  `fontFamily`, so the CDN request bought nothing. The faces cost no bytes until
-  something asks for them; either wire them into the theme or delete the six files.
+- **The E2E job has never completed in CI.** The first push after W7 died in
+  `Wait for the stack`: the compose stack bind-mounts `../backend`, so `vendor/` comes
+  from the checkout and nothing installed it — plus an empty `APP_KEY` and a fresh
+  postgres volume with no schema. All three are one-time local setup, which is why the
+  suite was green for the agent that wrote it. A `Prepare the backend` step now runs
+  `composer install`, `key:generate` and `migrate` before the stack starts; **unproven
+  until the next run is green.** The other six jobs passed (`docs/LESSONS.md`).
+- **Realtime delivery is asserted only by that E2E step** — the key and
+  `REVERB_HOST`/`REVERB_SCHEME` are wired, so it is proven when that job is, not before.
+- **`backend/config/horizon.php` was never published**, so Horizon watches `['default']`
+  only and `AnalyzeFeedbackJob`'s `analysis` queue is never drained. compose carries
+  `AI_ANALYSIS_QUEUE: default` as a stopgap, marked as one. The fix is a supervisor
+  watching both queues; until then the queue separation the backend designed is off.
 - **Tokens older than 90 days become invalid on deploy** — `expiration` counts from
   creation. Deliberate, but it is a release note.
 - **Zendesk's shape was never verified against a live account.** Its fixture README
