@@ -2,14 +2,17 @@ export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:8000/api',
   /**
-   * Matches `backend/.env.example`: `REVERB_HOST=localhost`, `REVERB_PORT=8080`.
-   * `key` is left empty on purpose — `REVERB_APP_KEY` is `REPLACE_ME` in the
-   * example env, and an invented value would make the client chase a socket
-   * that can never authorize it. Fill it in locally to exercise realtime; an
-   * empty key keeps the app on its documented non-realtime behaviour.
+   * Matches `infra/docker-compose.dev.yml`: `REVERB_HOST=localhost`,
+   * `REVERB_PORT=8080`. `REVERB_APP_KEY` is a public client identifier, not a
+   * secret, so it is safe to bake into this bundle — the compose `backend`,
+   * `horizon` and `reverb` services all default to this same value
+   * (`omnihear-dev-reverb-key`) when the environment variable is unset, which
+   * is how the dev stack runs realtime without any per-developer setup.
+   * `backend/.env.example` still ships `REPLACE_ME`, but the running
+   * containers no longer read that placeholder: see `docs/contracts/realtime.md`.
    */
   reverb: {
-    key: '',
+    key: 'omnihear-dev-reverb-key',
     host: 'localhost',
     port: 8080,
     scheme: 'http'

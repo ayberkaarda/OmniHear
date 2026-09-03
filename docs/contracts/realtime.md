@@ -4,7 +4,7 @@ Status: **binding for W5.** Written by the main thread before dispatch. The serv
 half already exists and is tested; this file records what it emits so the client
 does not have to guess, and states the one constraint that shapes the client design.
 
-Source of truth for behaviour: `omnihear-engineering-prompt (1).md` §2, §6.5, §6.6.
+Source of truth for behaviour: `docs/OMNIHEAR-SPEC.md` §2, §6.5, §6.6.
 
 ---
 
@@ -82,6 +82,14 @@ lazy chunk that now holds a real library is not unbudgeted.
   unreachable when the socket is down.
 - The `.env` values the SPA needs are `REVERB_APP_KEY`, host, port and scheme.
   `REVERB_APP_SECRET` is server-side only and must never reach the client bundle.
+- **Dev key:** `infra/docker-compose.dev.yml` sets `REVERB_APP_KEY` to
+  `omnihear-dev-reverb-key` (default, overridable via env var) on `backend`,
+  `horizon` and `reverb` alike, and `frontend/src/environments/environment.development.ts`
+  carries the same literal. `backend/.env.example` still shows `REPLACE_ME` —
+  that file is not what the running containers read once `--no-reload` is in
+  effect (`docs/LESSONS.md`, 2026-09-03). `REVERB_APP_SECRET` defaults to
+  `dev-only-not-a-real-reverb-secret` in the same compose file and is never
+  written to any frontend file.
 
 ## 5. What this does not cover
 
