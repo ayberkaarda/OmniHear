@@ -1,0 +1,14 @@
+{
+  "error": {
+    "code": 403,
+    "message": "The caller does not have permission to access this application.",
+    "status": "PERMISSION_DENIED",
+    "errors": [
+      {
+        "message": "The caller does not have permission to access this application.",
+        "domain": "global",
+        "reason": "forbidden"
+      }
+    ]
+  }
+}

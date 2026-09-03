@@ -1,0 +1,87 @@
+{
+  "reviews": [
+    {
+      "reviewId": "gp:FIXTURE-review-0001",
+      "authorName": "reviewer-01",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Son surumden sonra bildirimler cok daha hizli geliyor, tesekkurler.",
+            "lastModified": {
+              "seconds": "1788340500",
+              "nanos": 0
+            },
+            "starRating": 5,
+            "reviewerLanguage": "tr",
+            "device": "fixture_device_a",
+            "androidOsVersion": 34,
+            "appVersionCode": 412,
+            "appVersionName": "4.1.2",
+            "thumbsUpCount": 3,
+            "thumbsDownCount": 0,
+            "deviceMetadata": {
+              "productName": "Fixture Device A",
+              "manufacturer": "FixtureCo",
+              "screenWidthPx": 1080,
+              "screenHeightPx": 2400
+            }
+          }
+        }
+      ]
+    },
+    {
+      "reviewId": "gp:FIXTURE-review-0002",
+      "authorName": "reviewer-02",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Iade talebim icin destek.musteri@example.invalid adresine yazdim ama donus olmadi.",
+            "lastModified": {
+              "seconds": "1788288000",
+              "nanos": 0
+            },
+            "starRating": 2,
+            "reviewerLanguage": "tr",
+            "device": "fixture_device_b",
+            "androidOsVersion": 33,
+            "appVersionCode": 411,
+            "appVersionName": "4.1.1",
+            "thumbsUpCount": 0,
+            "thumbsDownCount": 1,
+            "deviceMetadata": {
+              "productName": "Fixture Device B",
+              "manufacturer": "FixtureCo",
+              "screenWidthPx": 720,
+              "screenHeightPx": 1600
+            }
+          }
+        }
+      ]
+    },
+    {
+      "reviewId": "gp:FIXTURE-review-0003",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Arayuz guzel ama uygulama arka planda pil tuketiyor.",
+            "lastModified": {
+              "seconds": "1788159900",
+              "nanos": 0
+            },
+            "starRating": 4,
+            "reviewerLanguage": "tr",
+            "device": "fixture_device_c",
+            "androidOsVersion": 31,
+            "appVersionCode": 410,
+            "appVersionName": "4.1.0",
+            "thumbsUpCount": 1,
+            "thumbsDownCount": 0
+          }
+        }
+      ]
+    }
+  ],
+  "tokenPagination": {
+    "nextPageToken": "gp-fixture-next-page-token-0001"
+  }
+}

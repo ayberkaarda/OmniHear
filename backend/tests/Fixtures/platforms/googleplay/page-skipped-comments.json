@@ -1,0 +1,65 @@
+{
+  "reviews": [
+    {
+      "reviewId": "gp:FIXTURE-review-0006",
+      "authorName": "reviewer-06",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Widget destegi geldigi icin tesekkurler.",
+            "lastModified": {
+              "seconds": "1787899500",
+              "nanos": 0
+            },
+            "starRating": 5,
+            "reviewerLanguage": "tr",
+            "device": "fixture_device_f",
+            "androidOsVersion": 34,
+            "appVersionCode": 412,
+            "appVersionName": "4.1.2",
+            "thumbsUpCount": 2,
+            "thumbsDownCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "reviewId": "gp:FIXTURE-review-0007",
+      "authorName": "reviewer-07",
+      "comments": [
+        {
+          "developerComment": {
+            "text": "DEVELOPER-ONLY-MUST-NOT-BE-INGESTED: surum 4.1.2 ile duzeltildi.",
+            "lastModified": {
+              "seconds": "1787840400",
+              "nanos": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "reviewId": "gp:FIXTURE-review-0008",
+      "authorName": "reviewer-08",
+      "comments": [
+        {
+          "userComment": {
+            "text": "",
+            "lastModified": {
+              "seconds": "1787840400",
+              "nanos": 0
+            },
+            "starRating": 4,
+            "reviewerLanguage": "tr",
+            "device": "fixture_device_g",
+            "androidOsVersion": 32,
+            "appVersionCode": 411,
+            "appVersionName": "4.1.1",
+            "thumbsUpCount": 0,
+            "thumbsDownCount": 0
+          }
+        }
+      ]
+    }
+  ]
+}

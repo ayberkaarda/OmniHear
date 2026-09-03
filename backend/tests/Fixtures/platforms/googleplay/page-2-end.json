@@ -1,0 +1,59 @@
+{
+  "reviews": [
+    {
+      "reviewId": "gp:FIXTURE-review-0004",
+      "authorName": "reviewer-04",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Giris ekraninda surekli hata aliyorum, kullanamiyorum.",
+            "lastModified": {
+              "seconds": "1788125400",
+              "nanos": 0
+            },
+            "starRating": 1,
+            "reviewerLanguage": "tr",
+            "device": "fixture_device_d",
+            "androidOsVersion": 30,
+            "appVersionCode": 409,
+            "appVersionName": "4.0.9",
+            "thumbsUpCount": 5,
+            "thumbsDownCount": 0
+          }
+        },
+        {
+          "developerComment": {
+            "text": "DEVELOPER-REPLY-MUST-NOT-BE-INGESTED: destek ekibimiz sizinle iletisime gececek.",
+            "lastModified": {
+              "seconds": "1788130000",
+              "nanos": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "reviewId": "gp:FIXTURE-review-0005",
+      "authorName": "reviewer-05",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Fena degil, senkronizasyon biraz yavas.",
+            "lastModified": {
+              "seconds": "1788001200",
+              "nanos": 0
+            },
+            "starRating": 3,
+            "reviewerLanguage": "en",
+            "device": "fixture_device_e",
+            "androidOsVersion": 34,
+            "appVersionCode": 412,
+            "appVersionName": "4.1.2",
+            "thumbsUpCount": 0,
+            "thumbsDownCount": 0
+          }
+        }
+      ]
+    }
+  ]
+}
