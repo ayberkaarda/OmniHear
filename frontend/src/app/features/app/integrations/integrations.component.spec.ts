@@ -6,6 +6,8 @@ import { provideRouter } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { makeIntegration, makeIntegrationPage } from '../../../core/integrations/integration.fixtures';
 import { IntegrationsStore } from '../../../core/integrations/integrations.store';
+import { PlatformsStore } from '../../../core/integrations/platforms.store';
+import { makePlatformList } from '../../../core/settings/settings.fixtures';
 import { IntegrationsComponent } from './integrations.component';
 
 const BASE = `${environment.apiBaseUrl}/v1/integrations`;
@@ -21,10 +23,17 @@ describe('IntegrationsComponent', () => {
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()]
     });
     TestBed.inject(IntegrationsStore).reset();
+    TestBed.inject(PlatformsStore).reset();
     http = TestBed.inject(HttpTestingController);
 
     fixture = TestBed.createComponent(IntegrationsComponent);
     element = fixture.nativeElement as HTMLElement;
+    fixture.detectChanges();
+
+    // The connector registry now drives the form, so every render of this
+    // screen reads it. Answering it here keeps each test about the thing it is
+    // testing rather than about the registry.
+    http.expectOne(`${BASE}/platforms`).flush(makePlatformList());
     fixture.detectChanges();
   });
 
@@ -177,6 +186,59 @@ describe('IntegrationsComponent', () => {
 
     expect(element.querySelector('div[role="alertdialog"]')).toBeNull();
     expect(element.querySelector('[data-testid="empty-state"]')).toBeTruthy();
+  });
+
+  /**
+   * The drift this endpoint exists to end. `CONNECTABLE_PLATFORMS` had to be
+   * edited by hand when the backend gained a connector, and was not — the
+   * mismatch reached a person rather than the build. Nothing in this spec file
+   * names Google Play, and the form offers it anyway, because the server said
+   * so.
+   */
+  it('offers a platform nobody added to the frontend', () => {
+    TestBed.inject(PlatformsStore).reset();
+    TestBed.inject(PlatformsStore).load();
+    http.expectOne(`${BASE}/platforms`).flush(
+      makePlatformList([
+        {
+          platform: 'googleplay',
+          requires_credentials: true,
+          settings: [{ key: 'package_name', required: true }],
+          credentials: [{ key: 'service_account_json', required: true }]
+        }
+      ])
+    );
+    settle(makeIntegrationPage([]));
+
+    buttonWith('Connect a channel').click();
+    fixture.detectChanges();
+
+    const options = Array.from(element.querySelectorAll('app-modal option')).map((o) => o.textContent?.trim());
+    expect(options).toEqual(['Google Play']);
+    // One setting and one credential, both from the registry.
+    expect(element.querySelectorAll('app-modal app-input')).toHaveLength(2);
+    expect(element.querySelectorAll('app-modal input[type="password"]')).toHaveLength(1);
+  });
+
+  it('offers nothing, and says why, when the registry cannot be read', () => {
+    TestBed.inject(PlatformsStore).reset();
+    TestBed.inject(PlatformsStore).load();
+    http
+      .expectOne(`${BASE}/platforms`)
+      .flush({ code: 'SERVER_ERROR', message: 'boom' }, { status: 500, statusText: 'Server Error' });
+    settle(makeIntegrationPage([]));
+
+    buttonWith('Connect a channel').click();
+    fixture.detectChanges();
+
+    expect(element.querySelector('[data-testid="platforms-unavailable"]')).toBeTruthy();
+    expect(element.querySelectorAll('app-modal option')).toHaveLength(0);
+
+    // And the save button cannot post a platform the server never offered.
+    const save = buttonWith('Save');
+    expect(save.disabled).toBe(true);
+    save.click();
+    http.expectNone((candidate) => candidate.method === 'POST');
   });
 
   it('renders the catalogue message when the list read fails', () => {

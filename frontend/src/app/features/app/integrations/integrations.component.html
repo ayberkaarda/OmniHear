@@ -101,12 +101,28 @@
 >
   <div modalBody class="flex flex-col gap-4">
     @if (dialog() === 'create') {
-      <app-select
-        [formControl]="platformControl"
-        [label]="platformFieldLabel"
-        [options]="platformOptions"
-        [error]="platformError()"
-      />
+      @if (platformsLoading()) {
+        <p class="text-sm text-[var(--text-muted)]" i18n="Connector registry is loading@@integrations.platforms.loading">
+          Loading the channels we can connect to…
+        </p>
+      } @else if (platformsUnavailable()) {
+        <p
+          class="rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-sm text-[var(--sentiment-negative-text)]"
+          role="alert"
+          data-testid="platforms-unavailable"
+          i18n="Connector registry could not be read@@integrations.platforms.unavailable"
+        >
+          We could not read the list of channels that can be connected, so there is nothing to offer here yet. Try again
+          in a moment.
+        </p>
+      } @else {
+        <app-select
+          [formControl]="platformControl"
+          [label]="platformFieldLabel"
+          [options]="platformOptions()"
+          [error]="platformError()"
+        />
+      }
     }
 
     <form [formGroup]="form()" class="flex flex-col gap-4" (submit)="$event.preventDefault()">
@@ -114,7 +130,7 @@
         <app-input
           [formControlName]="field.control"
           [label]="field.label"
-          [required]="true"
+          [required]="field.required"
           [error]="serverError(field)"
         />
       }
@@ -129,7 +145,7 @@
               [formControlName]="field.control"
               type="password"
               [label]="field.label"
-              [required]="dialog() === 'create'"
+              [required]="dialog() === 'create' && field.required"
               [error]="serverError(field)"
             />
           }
@@ -144,7 +160,12 @@
 
   <ng-container modalFooter>
     <app-button variant="ghost" (pressed)="closeDialog()">{{ cancelLabel }}</app-button>
-    <app-button [loading]="saving()" (pressed)="submit()">{{ saveLabel }}</app-button>
+    <app-button
+      [loading]="saving()"
+      [disabled]="dialog() === 'create' && platformsUnavailable()"
+      (pressed)="submit()"
+      >{{ saveLabel }}</app-button
+    >
   </ng-container>
 </app-modal>
 

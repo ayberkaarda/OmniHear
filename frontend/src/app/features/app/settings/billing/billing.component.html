@@ -1,8 +1,146 @@
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-6">
   <header class="flex flex-col gap-1">
     <h2 class="text-lg font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.settings.billing.title">Billing</h2>
-    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.settings.billing.subtitle">Your plan, your analysis allowance and your invoices.</p>
+    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.settings.billing.subtitle">
+      Your plan, how much of it you have used, and how to change it.
+    </p>
   </header>
 
-  <app-empty-state icon="tag" [heading]="emptyHeading" [description]="placeholderDescription" />
+  @if (outcome() === 'success') {
+    <p
+      class="rounded-lg border border-[var(--status-success)] px-4 py-3 text-sm text-[var(--status-success)]"
+      role="status"
+      data-testid="checkout-success"
+      i18n="Banner after returning from a completed checkout@@billing.return.success"
+    >
+      Your payment was submitted. The plan changes as soon as the provider confirms it — usually within a few seconds.
+      This page shows what your account is actually on, so refresh it if the plan below has not caught up yet.
+    </p>
+  } @else if (outcome() === 'cancel') {
+    <p
+      class="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm text-[var(--text-secondary)]"
+      role="status"
+      data-testid="checkout-cancel"
+      i18n="Banner after an abandoned checkout@@billing.return.cancel"
+    >
+      The checkout was cancelled and nothing was charged. Your plan is unchanged.
+    </p>
+  }
+
+  @if (errorMessage(); as message) {
+    <div
+      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      role="alert"
+      data-testid="billing-error"
+    >
+      <span class="flex-1">{{ message }}</span>
+      <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="flex flex-col gap-3" data-testid="billing-skeleton" aria-busy="true">
+      <span class="sr-only" i18n="Billing loading announcement@@billing.loading">Loading your plan…</span>
+      <span class="h-24 animate-pulse rounded-lg bg-[var(--bg-surface-sunken)]"></span>
+      <span class="h-24 animate-pulse rounded-lg bg-[var(--bg-surface-sunken)]"></span>
+    </div>
+  } @else {
+    <section class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@billing.currentPlan.heading">Current plan</h3>
+
+      <p class="flex flex-wrap items-baseline gap-2">
+        <span class="text-xl font-semibold text-[var(--text-primary)]" data-testid="billing-plan">{{ planLabel() }}</span>
+        @if (subscription(); as active) {
+          <span class="text-xs text-[var(--text-muted)]">{{ statusOf(active) }}</span>
+        }
+      </p>
+
+      @if (subscription(); as active) {
+        <dl class="flex flex-col gap-1 text-xs">
+          <div class="flex gap-2">
+            <dt class="text-[var(--text-muted)]" i18n="Subscription field@@billing.field.started">Current period from</dt>
+            <dd class="tabular-nums text-[var(--text-secondary)]">{{ startedOn() }}</dd>
+          </div>
+          <div class="flex gap-2">
+            <dt class="text-[var(--text-muted)]" i18n="Subscription field@@billing.field.renews">Renews on</dt>
+            <dd class="tabular-nums text-[var(--text-secondary)]">{{ renewsOn() }}</dd>
+          </div>
+          <div class="flex gap-2">
+            <dt class="text-[var(--text-muted)]" i18n="Subscription field@@billing.field.provider">Paid through</dt>
+            <dd class="text-[var(--text-secondary)]">{{ active.provider }}</dd>
+          </div>
+        </dl>
+      } @else {
+        <p class="text-sm text-[var(--text-secondary)]" i18n="Description of the free plan@@billing.freePlan.description">
+          You are on the free plan. Collection keeps running whatever happens; only the number of analyses is capped.
+        </p>
+      }
+    </section>
+
+    @if (quotaSummary(); as quota) {
+      <section class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+        <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@billing.usage.heading">
+          Analyses used this period
+        </h3>
+
+        <p class="flex flex-wrap items-baseline gap-2 text-sm">
+          <span class="text-xl font-semibold tabular-nums text-[var(--text-primary)]" data-testid="billing-quota-used">
+            {{ quota.used }}
+          </span>
+          <span class="text-[var(--text-muted)]" aria-hidden="true">/</span>
+          <span class="tabular-nums text-[var(--text-secondary)]">{{ quota.limit }}</span>
+          <span class="text-[var(--text-muted)]">({{ quota.percent }})</span>
+        </p>
+
+        <!-- Magnitude only, so it stays brand-coloured until the quota itself is at risk. -->
+        <span class="block h-2 w-full overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]">
+          <span
+            class="block h-full rounded-full"
+            [class]="quotaLevel() === 'ok' ? 'bg-[var(--brand)]' : 'bg-[var(--quota-exceeded-text)]'"
+            [style.width.%]="quota.width"
+          ></span>
+        </span>
+
+        <p class="text-xs text-[var(--text-muted)]">
+          <span i18n="Remaining analyses label@@billing.usage.remaining">Remaining</span>
+          <span class="tabular-nums">{{ quota.remaining }}</span>
+        </p>
+
+        @if (quotaLevel() === 'exceeded') {
+          <p
+            class="rounded-md bg-[var(--quota-exceeded-bg)] px-3 py-2 text-xs text-[var(--quota-exceeded-text)]"
+            role="status"
+            i18n="Note under an exhausted quota meter@@billing.usage.exceeded"
+          >
+            New comments are still being collected and are waiting in the queue. They are analysed automatically once the
+            plan is upgraded — nothing has been lost.
+          </p>
+        }
+      </section>
+    }
+
+    @if (!isPaid()) {
+      <section class="flex flex-col gap-3 rounded-lg border border-[var(--brand)] bg-[var(--bg-surface)] p-4">
+        <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@billing.upgrade.heading">Upgrade to Pro</h3>
+        <p class="text-sm text-[var(--text-secondary)]" i18n="@@billing.upgrade.description">
+          A larger analysis allowance, and every comment that piled up while the free allowance was full is analysed
+          automatically once the upgrade goes through.
+        </p>
+
+        @if (canCheckout()) {
+          <div class="flex flex-wrap gap-2" data-testid="billing-checkout">
+            <app-button [loading]="starting()" (pressed)="start('stripe')">{{ upgradeStripeLabel }}</app-button>
+            <app-button variant="secondary" [loading]="starting()" (pressed)="start('iyzico')">
+              {{ upgradeIyzicoLabel }}
+            </app-button>
+          </div>
+          <p class="text-xs text-[var(--text-muted)]" i18n="Note under the checkout buttons@@billing.upgrade.handoff">
+            You will be taken to the payment provider to finish, and brought back here afterwards.
+          </p>
+        } @else {
+          <p class="text-sm text-[var(--text-muted)]" data-testid="billing-owner-only">{{ ownerOnlyLabel }}</p>
+        }
+      </section>
+    }
+  }
 </section>

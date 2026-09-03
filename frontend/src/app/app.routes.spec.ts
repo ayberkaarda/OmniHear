@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Route, Routes } from '@angular/router';
+import { provideRouter, Route, Router, Routes } from '@angular/router';
 
 import { routes } from './app.routes';
 import { makeCompany, makeUser } from './core/auth/auth.fixtures';
@@ -53,6 +53,8 @@ describe('application route tree', () => {
 
     for (const expected of [
       '',
+      'billing/success',
+      'billing/cancel',
       'auth/login',
       'auth/register',
       'auth/forgot-password',
@@ -84,8 +86,19 @@ describe('application route tree', () => {
   });
 
   it('guards `/app` and keeps `/auth/verify-email` reachable while signed in', () => {
-    const appRoute = flat.find((entry) => entry.path === 'app')?.route;
-    expect(appRoute?.canActivate).toHaveLength(1);
+    const named = (route: Route | undefined): string[] =>
+      (route?.canActivate ?? []).map((guard) => (guard as { name: string }).name);
+
+    const appEntries = flat.filter((entry) => entry.path === 'app');
+    // The outer route carries `authGuard` and nothing heavier: everything it
+    // imports lands in the initial bundle.
+    expect(named(appEntries[0]?.route)).toEqual(['authGuard']);
+
+    // Spec section 4's `SubscriptionGuard` guards the same subtree from inside
+    // the lazily loaded config — `canActivate` runs after the config is
+    // loaded, so this protects the same URLs at the same moment while keeping
+    // `BillingStore` out of the initial chunk (measured: 6.05 kB).
+    expect(appEntries.some((entry) => named(entry.route).includes('subscriptionGuard'))).toBe(true);
 
     // A guest guard here would fight errorInterceptor's 403 EMAIL_NOT_VERIFIED
     // redirect and produce a loop.
@@ -118,6 +131,29 @@ describe('application route tree', () => {
   });
 
   /**
+   * The return leg of the checkout journey. `config/stripe.php` points the
+   * provider at `FRONTEND_URL/billing/{success,cancel}`; before these two
+   * routes existed the user paid and landed on the not-found screen.
+   */
+  it('brings the browser back from a provider into the billing screen', async () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()]
+    });
+    const router = TestBed.inject(Router);
+    TestBed.inject(AuthStore).setSession('1|abc', makeUser(), makeCompany());
+
+    // The redirect itself, resolved through the router rather than asserted on
+    // the config: `redirectTo` is a function here, and a function that never
+    // ran would be indistinguishable from a correct one.
+    await router.navigateByUrl('/billing/success');
+    expect(router.url).toBe('/app/settings/billing?checkout=success');
+
+    await router.navigateByUrl('/billing/cancel');
+    expect(router.url).toBe('/app/settings/billing?checkout=cancel');
+  });
+
+  /**
    * The four data screens no longer render a placeholder empty state, because
    * they are no longer placeholders: with `provideHttpClientTesting` their read
    * is in flight, so what they must render is a *loading* state. The assertion
@@ -128,7 +164,15 @@ describe('application route tree', () => {
     'app/overview': '[data-testid="kpi-skeleton"]',
     'app/inbox': '[data-testid="data-table-loading"]',
     'app/inbox/:id': '[data-testid="detail-skeleton"]',
-    'app/integrations': '[data-testid="integrations-skeleton"]'
+    'app/integrations': '[data-testid="integrations-skeleton"]',
+    // The five settings screens stopped being placeholders in this phase, so
+    // the honest answer for each of them changed from an empty state to a
+    // loading one — the same assertion, a different true answer.
+    'app/settings/profile': '[data-testid="profile-skeleton"]',
+    'app/settings/team': '[data-testid="team-skeleton"]',
+    'app/settings/billing': '[data-testid="billing-skeleton"]',
+    'app/settings/api-keys': '[data-testid="api-keys-skeleton"]',
+    'app/settings/notifications': '[data-testid="notifications-skeleton"]'
   };
 
   it('gives every `/app` screen a heading and an honest state for what it knows', async () => {

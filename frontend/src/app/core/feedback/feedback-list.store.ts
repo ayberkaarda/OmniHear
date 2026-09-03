@@ -3,7 +3,14 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { DEFAULT_PER_PAGE, EMPTY_META, PaginationMeta } from '../api/pagination';
 import { RequestState } from '../api/request-state';
 import { errorCodeOf } from '../errors/error-code';
-import { EMPTY_FILTERS, Feedback, FeedbackFilters, hasActiveFilter } from './feedback.models';
+import {
+  EMPTY_FILTERS,
+  Feedback,
+  FeedbackCategory,
+  FeedbackFilters,
+  hasActiveFilter,
+  SentimentLabel
+} from './feedback.models';
 import { FeedbackService } from './feedback.service';
 
 /**
@@ -98,6 +105,54 @@ export class FeedbackListStore {
         this.errorCodeSignal.set(errorCodeOf(error));
         this.stateSignal.set('error');
       }
+    });
+  }
+
+  /**
+   * Applies a `feedback.analyzed` broadcast to the row that is already on
+   * screen (`docs/contracts/realtime.md` section 4).
+   *
+   * Three deliberate choices:
+   *
+   * - **No re-fetch.** A row that is not on this page is left alone and no
+   *   request is made. A burst of analyses is the normal shape of a finished
+   *   sync run, and one read per event would be a request storm.
+   * - **The row stays where it is**, even when the active filter is
+   *   `analysis_status=pending_analysis` and the update no longer matches it.
+   *   Rearranging the list under a reader is worse than a row that is briefly
+   *   out of step with its filter; the next read settles it.
+   * - **Only the four broadcast fields are written.** `confidence`,
+   *   `keywords` and `analyzed_at` are not in the payload, so they stay empty
+   *   rather than being invented. The detail screen re-reads the full record.
+   */
+  applyAnalysis(event: {
+    readonly feedback_id: number;
+    readonly sentiment_label: SentimentLabel;
+    readonly sentiment_score: number;
+    readonly category: FeedbackCategory;
+    readonly model_version: string;
+  }): void {
+    this.itemsSignal.update((items) => {
+      const index = items.findIndex((item) => item.id === event.feedback_id);
+      if (index === -1) {
+        return items;
+      }
+
+      const next = [...items];
+      next[index] = {
+        ...items[index],
+        analysis_status: 'analyzed',
+        analysis: {
+          sentiment_score: event.sentiment_score,
+          sentiment_label: event.sentiment_label,
+          category: event.category,
+          confidence: null,
+          keywords: [],
+          model_version: event.model_version,
+          analyzed_at: null
+        }
+      };
+      return next;
     });
   }
 

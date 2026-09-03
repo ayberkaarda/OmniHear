@@ -16,16 +16,16 @@ export type Platform = (typeof PLATFORMS)[number];
 export const INTEGRATION_STATUSES = ['active', 'error', 'paused'] as const;
 export type IntegrationStatus = (typeof INTEGRATION_STATUSES)[number];
 
-/**
- * Platforms the API will actually accept on create.
+/*
+ * There is deliberately no `CONNECTABLE_PLATFORMS` constant here any more.
  *
- * `config/connectors.php` gates `POST /integrations` on having a connector
- * class, and the schema deliberately allows more platform values than the
- * factory does. No endpoint exposes that list, so it is mirrored here; a
- * platform without a connector would be refused with `422 VALIDATION_ERROR`,
- * which is a confusing way to learn it is not available yet.
+ * It used to mirror `config/connectors.php` by hand, and it drifted the first
+ * time the backend changed: Zendesk was added mid-wave and the mismatch was
+ * caught by a person rather than by the build. `GET /api/v1/integrations/platforms`
+ * now publishes what the connector registry actually holds, and `PlatformsStore`
+ * reads it — the same reason `REQUIRED_SETTINGS` and `REQUIRED_CREDENTIALS` are
+ * gone from this file too.
  */
-export const CONNECTABLE_PLATFORMS: readonly Platform[] = ['appstore', 'zendesk'];
 
 /** Non-secret connector configuration: app id, country, marketplace, ... */
 export type IntegrationSettings = Readonly<Record<string, string>>;
@@ -53,34 +53,3 @@ export interface IntegrationWriteBody {
   readonly credentials?: Record<string, string>;
   readonly status?: Exclude<IntegrationStatus, 'error'>;
 }
-
-/**
- * The settings each platform's connector requires, mirroring
- * `config/connectors.php` `required_settings`. Used to build the create form;
- * the server validates them again and remains the authority.
- */
-export const REQUIRED_SETTINGS: Readonly<Record<string, readonly string[]>> = {
-  appstore: ['app_id', 'country'],
-  zendesk: ['subdomain'],
-  googleplay: [],
-  trustpilot: [],
-  email: [],
-  social: [],
-  fixture: []
-};
-
-/**
- * The secrets each connector needs, mirroring `required_credentials` in the
- * same config. They are sent on create and on a deliberate rotation, and are
- * never read back — `Integration` has no field for them because the API has no
- * key for them (invariant I5).
- */
-export const REQUIRED_CREDENTIALS: Readonly<Record<string, readonly string[]>> = {
-  appstore: [],
-  zendesk: ['email', 'api_token'],
-  googleplay: [],
-  trustpilot: [],
-  email: [],
-  social: [],
-  fixture: []
-};

@@ -48,7 +48,10 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "pusher-js"
+            ]
           },
           "configurations": {
             "production": {
@@ -57,6 +60,11 @@
                   "type": "initial",
                   "maximumWarning": "327kb",
                   "maximumError": "347kb"
+                },
+                {
+                  "type": "anyScript",
+                  "maximumWarning": "205kb",
+                  "maximumError": "215kb"
                 },
                 {
                   "type": "anyComponentStyle",

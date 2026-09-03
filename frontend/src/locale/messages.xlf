@@ -126,7 +126,7 @@
         <source> Nothing is lost. Incoming feedback keeps arriving and waits in the queue; as soon as your plan is upgraded, the waiting items are analysed automatically. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
-          <context context-type="linenumber">20,25</context>
+          <context context-type="linenumber">23,28</context>
         </context-group>
         <note priority="1" from="description">Paywall reassurance</note>
       </trans-unit>
@@ -134,7 +134,7 @@
         <source>Not now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
-          <context context-type="linenumber">27,29</context>
+          <context context-type="linenumber">30,32</context>
         </context-group>
         <note priority="1" from="description">Paywall secondary action</note>
       </trans-unit>
@@ -142,17 +142,73 @@
         <source>Upgrade plan</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
-          <context context-type="linenumber">30,33</context>
+          <context context-type="linenumber">34,36</context>
         </context-group>
         <note priority="1" from="description">Paywall primary action</note>
+      </trans-unit>
+      <trans-unit id="paywall.viewPlan" datatype="html">
+        <source>See the plan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.html</context>
+          <context context-type="linenumber">36,41</context>
+        </context-group>
+        <note priority="1" from="description">Paywall primary action for a non-owner</note>
       </trans-unit>
       <trans-unit id="paywall.title" datatype="html">
         <source>Your analysis quota is full</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <note priority="1" from="description">Paywall modal title</note>
+      </trans-unit>
+      <trans-unit id="paywall.ownerOnly" datatype="html">
+        <source>Only the company owner can change the plan. Ask an owner to upgrade — the waiting comments are analysed as soon as they do.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/paywall/paywall-modal.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <note priority="1" from="description">Shown in the paywall to a non-owner</note>
+      </trans-unit>
+      <trans-unit id="realtime.quotaWarning" datatype="html">
+        <source>You have used 80% of your analysis quota. Upgrade before it runs out to keep new feedback being analysed.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/realtime/realtime.bridge.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <note priority="1" from="description">In-app 80% quota warning (spec 7.3)</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.saveFailed" datatype="html">
+        <source>That notification setting could not be saved. It has been put back the way it was.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/settings/notifications.store.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+        <note priority="1" from="description">Toast when a notification preference could not be saved</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.saved" datatype="html">
+        <source>Your profile has been saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/settings/profile.store.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <note priority="1" from="description">Toast after saving the profile</note>
+      </trans-unit>
+      <trans-unit id="settings.password.changed" datatype="html">
+        <source>Your password has been changed. Every other signed-in device has been signed out.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/settings/profile.store.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+        <note priority="1" from="description">Toast after changing the password</note>
+      </trans-unit>
+      <trans-unit id="settings.team.invited" datatype="html">
+        <source>Invitation sent. The member appears here once they accept it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/settings/team.store.ts</context>
+          <context context-type="linenumber">154</context>
+        </context-group>
+        <note priority="1" from="description">Toast after sending a team invitation</note>
       </trans-unit>
       <trans-unit id="toast.dismiss" datatype="html">
         <source>Dismiss notification</source>
@@ -224,7 +280,7 @@
         <source>Primary</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <note priority="1" from="description">Primary navigation landmark label</note>
       </trans-unit>
@@ -232,7 +288,7 @@
         <source>Sign out</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app-shell/app-shell.component.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <note priority="1" from="description">Sign out button label</note>
       </trans-unit>
@@ -435,11 +491,31 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/overview/overview.component.ts</context>
           <context context-type="linenumber">118</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">90</context>
         </context-group>
         <note priority="1" from="description">Retry a failed load</note>
       </trans-unit>
@@ -771,11 +847,27 @@
         </context-group>
         <note priority="1" from="description">Label above the last sync failure message</note>
       </trans-unit>
+      <trans-unit id="integrations.platforms.loading" datatype="html">
+        <source> Loading the channels we can connect to… </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.html</context>
+          <context context-type="linenumber">106,109</context>
+        </context-group>
+        <note priority="1" from="description">Connector registry is loading</note>
+      </trans-unit>
+      <trans-unit id="integrations.platforms.unavailable" datatype="html">
+        <source> We could not read the list of channels that can be connected, so there is nothing to offer here yet. Try again in a moment. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.html</context>
+          <context context-type="linenumber">115,120</context>
+        </context-group>
+        <note priority="1" from="description">Connector registry could not be read</note>
+      </trans-unit>
       <trans-unit id="integrations.delete.prompt" datatype="html">
         <source>Disconnect <x id="platform" equiv-text="name"/>? Its <x id="count" equiv-text="count"/> collected comments are removed with it, and this cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <note priority="1" from="description">Confirmation before deleting a connection</note>
       </trans-unit>
@@ -783,7 +875,7 @@
         <source>Connect a channel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <note priority="1" from="description">Open the connect-a-channel dialog</note>
       </trans-unit>
@@ -791,7 +883,7 @@
         <source>Connect a channel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <note priority="1" from="description">Connect dialog title</note>
       </trans-unit>
@@ -799,7 +891,7 @@
         <source>Edit connection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <note priority="1" from="description">Edit dialog title</note>
       </trans-unit>
@@ -807,7 +899,7 @@
         <source>Disconnect channel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">168</context>
         </context-group>
         <note priority="1" from="description">Delete dialog title</note>
       </trans-unit>
@@ -815,7 +907,7 @@
         <source>Platform</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <note priority="1" from="description">Platform picker label</note>
       </trans-unit>
@@ -823,7 +915,7 @@
         <source>Connection state</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <note priority="1" from="description">Connection status picker label</note>
       </trans-unit>
@@ -831,7 +923,7 @@
         <source>Active — sync on schedule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">156</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <note priority="1" from="description">Connection state option</note>
       </trans-unit>
@@ -839,7 +931,7 @@
         <source>Paused — do not sync</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <note priority="1" from="description">Connection state option</note>
       </trans-unit>
@@ -847,7 +939,7 @@
         <source>Leave blank to keep the stored credentials. Filling a field replaces it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">173</context>
         </context-group>
         <note priority="1" from="description">Hint above the credential inputs when editing</note>
       </trans-unit>
@@ -855,7 +947,7 @@
         <source>Credentials are stored encrypted and are never shown again, not even to you.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <note priority="1" from="description">Hint explaining credentials are never shown again</note>
       </trans-unit>
@@ -863,7 +955,7 @@
         <source>Save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">175</context>
         </context-group>
         <note priority="1" from="description">Save the connection dialog</note>
       </trans-unit>
@@ -871,7 +963,15 @@
         <source>Cancel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">176</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">89</context>
         </context-group>
         <note priority="1" from="description">Dismiss a dialog</note>
       </trans-unit>
@@ -879,7 +979,7 @@
         <source>Disconnect</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <note priority="1" from="description">Confirm disconnecting a channel</note>
       </trans-unit>
@@ -887,7 +987,7 @@
         <source>Sync now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <note priority="1" from="description">Trigger a sync run</note>
       </trans-unit>
@@ -895,7 +995,7 @@
         <source>Edit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">179</context>
         </context-group>
         <note priority="1" from="description">Edit a connection</note>
       </trans-unit>
@@ -903,7 +1003,7 @@
         <source>Disconnect</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">180</context>
         </context-group>
         <note priority="1" from="description">Remove a connection</note>
       </trans-unit>
@@ -911,7 +1011,7 @@
         <source>No channel is connected yet</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">182</context>
         </context-group>
         <note priority="1" from="description">Integrations empty state</note>
       </trans-unit>
@@ -919,7 +1019,7 @@
         <source>Connect App Store or Zendesk and OmniHear starts collecting comments on a schedule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <note priority="1" from="description">Integrations empty state</note>
       </trans-unit>
@@ -1130,50 +1230,239 @@
         <note priority="1" from="description">Toggle from the chart to a data table</note>
       </trans-unit>
       <trans-unit id="app.settings.apiKeys.title" datatype="html">
-        <source>API keys</source>
+        <source> API keys </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
-          <context context-type="linenumber">3,4</context>
+          <context context-type="linenumber">5,7</context>
         </context-group>
       </trans-unit>
       <trans-unit id="app.settings.apiKeys.subtitle" datatype="html">
-        <source>Tokens that let your own systems talk to OmniHear.</source>
+        <source> Keys for other systems, and the devices you are signed in on. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">8,11</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.listHeading" datatype="html">
+        <source> Keys for this company </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">29,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.loading" datatype="html">
+        <source>Loading API keys…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">34,35</context>
+        </context-group>
+        <note priority="1" from="description">API keys loading announcement</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.row.created" datatype="html">
+        <source>Created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">47,48</context>
+        </context-group>
+        <note priority="1" from="description">API key row detail</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.row.lastUsed" datatype="html">
+        <source>Last used</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">50,51</context>
+        </context-group>
+        <note priority="1" from="description">API key row detail</note>
+      </trans-unit>
+      <trans-unit id="settings.sessions.heading" datatype="html">
+        <source> Signed-in devices </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">72,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.sessions.description" datatype="html">
+        <source> These are browser sessions, not API keys. Signing one out ends that session only. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">75,78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.sessions.loading" datatype="html">
+        <source>Loading signed-in devices…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">81,83</context>
+        </context-group>
+        <note priority="1" from="description">Device sessions loading announcement</note>
+      </trans-unit>
+      <trans-unit id="settings.sessions.row.lastUsed" datatype="html">
+        <source>Last active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">92,93</context>
+        </context-group>
+        <note priority="1" from="description">Device session row detail</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.create.warning" datatype="html">
+        <source> The key itself is shown to you once, on the next screen. We keep only a fingerprint of it, so it cannot be shown again afterwards. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">125,131</context>
+        </context-group>
+        <note priority="1" from="description">Warning before an API key is created</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.reveal.warning" datatype="html">
+        <source> This is the only time this key is shown. Copy it somewhere safe before you close this dialog — once it is closed, nobody, including us, can read it again. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.html</context>
+          <context context-type="linenumber">154,159</context>
+        </context-group>
+        <note priority="1" from="description">The once-only warning above the revealed key</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.revoke.prompt" datatype="html">
+        <source>Revoke <x id="name" equiv-text="name"/>? Anything still using this key stops working immediately, and the key cannot be restored.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+        <note priority="1" from="description">Confirmation before revoking an API key</note>
+      </trans-unit>
+      <trans-unit id="settings.sessions.revoke.prompt" datatype="html">
+        <source>Sign <x id="name" equiv-text="name"/> out? If this is the device you are using now, you will be returned to the sign-in screen.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+        <note priority="1" from="description">Confirmation before revoking a device session</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.create" datatype="html">
+        <source>Create an API key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <note priority="1" from="description">Open the create-key dialog</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.create.title" datatype="html">
+        <source>Create an API key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <note priority="1" from="description">Create key dialog title</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.field.name" datatype="html">
+        <source>What is this key for?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+        <note priority="1" from="description">API key form field</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.field.nameHelper" datatype="html">
+        <source>A name only you see, so you can tell your keys apart later — &quot;billing export&quot;, &quot;staging&quot;.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <note priority="1" from="description">Helper under the API key name field</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.create.submit" datatype="html">
+        <source>Create key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+        <note priority="1" from="description">Create the API key</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.reveal.title" datatype="html">
+        <source>Copy your key now</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+        <note priority="1" from="description">Reveal dialog title</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.reveal.dismiss" datatype="html">
+        <source>I have copied it</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <note priority="1" from="description">Dismiss the reveal dialog</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.reveal.copy" datatype="html">
+        <source>Copy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <note priority="1" from="description">Copy the key to the clipboard</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.reveal.copied" datatype="html">
+        <source>Copied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <note priority="1" from="description">Confirmation that the key was copied</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.revoke.title" datatype="html">
+        <source>Revoke API key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <note priority="1" from="description">Revoke key dialog title</note>
+      </trans-unit>
+      <trans-unit id="settings.sessions.revoke.title" datatype="html">
+        <source>Sign this device out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <note priority="1" from="description">Revoke session dialog title</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.action.revoke" datatype="html">
+        <source>Revoke</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <note priority="1" from="description">Revoke an API key</note>
+      </trans-unit>
+      <trans-unit id="settings.sessions.action.revoke" datatype="html">
+        <source>Sign out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <note priority="1" from="description">Sign one device out</note>
       </trans-unit>
       <trans-unit id="app.settings.apiKeys.empty" datatype="html">
         <source>No API key has been created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <note priority="1" from="description">Empty state heading</note>
       </trans-unit>
-      <trans-unit id="app.placeholder.description" datatype="html">
-        <source>This screen is in place; it fills with real data once the matching API is connected.</source>
+      <trans-unit id="settings.apiKeys.empty.description" datatype="html">
+        <source>An API key lets a script or another system read this company&apos;s feedback without a browser session.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">107</context>
         </context-group>
+        <note priority="1" from="description">API keys empty state</note>
+      </trans-unit>
+      <trans-unit id="settings.apiKeys.neverUsed" datatype="html">
+        <source>Never used</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="sourcefile">src/app/features/app/settings/api-keys/api-keys.component.ts</context>
+          <context context-type="linenumber">108</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <note priority="1" from="description">Placeholder screen description</note>
+        <note priority="1" from="description">Shown instead of a last-used date</note>
       </trans-unit>
       <trans-unit id="app.settings.billing.title" datatype="html">
         <source>Billing</source>
@@ -1183,41 +1472,259 @@
         </context-group>
       </trans-unit>
       <trans-unit id="app.settings.billing.subtitle" datatype="html">
-        <source>Your plan, your analysis allowance and your invoices.</source>
+        <source> Your plan, how much of it you have used, and how to change it. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">5,9</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="app.settings.billing.empty" datatype="html">
-        <source>No billing history yet</source>
+      <trans-unit id="billing.return.success" datatype="html">
+        <source> Your payment was submitted. The plan changes as soon as the provider confirms it — usually within a few seconds. This page shows what your account is actually on, so refresh it if the plan below has not caught up yet. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">16,21</context>
+        </context-group>
+        <note priority="1" from="description">Banner after returning from a completed checkout</note>
+      </trans-unit>
+      <trans-unit id="billing.return.cancel" datatype="html">
+        <source> The checkout was cancelled and nothing was charged. Your plan is unchanged. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">26,32</context>
+        </context-group>
+        <note priority="1" from="description">Banner after an abandoned checkout</note>
+      </trans-unit>
+      <trans-unit id="billing.loading" datatype="html">
+        <source>Loading your plan…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">43,44</context>
+        </context-group>
+        <note priority="1" from="description">Billing loading announcement</note>
+      </trans-unit>
+      <trans-unit id="billing.currentPlan.heading" datatype="html">
+        <source>Current plan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="billing.field.started" datatype="html">
+        <source>Current period from</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">61,62</context>
+        </context-group>
+        <note priority="1" from="description">Subscription field</note>
+      </trans-unit>
+      <trans-unit id="billing.field.renews" datatype="html">
+        <source>Renews on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+        <note priority="1" from="description">Subscription field</note>
+      </trans-unit>
+      <trans-unit id="billing.field.provider" datatype="html">
+        <source>Paid through</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">69,70</context>
+        </context-group>
+        <note priority="1" from="description">Subscription field</note>
+      </trans-unit>
+      <trans-unit id="billing.freePlan.description" datatype="html">
+        <source> You are on the free plan. Collection keeps running whatever happens; only the number of analyses is capped. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">75,80</context>
+        </context-group>
+        <note priority="1" from="description">Description of the free plan</note>
+      </trans-unit>
+      <trans-unit id="billing.usage.heading" datatype="html">
+        <source> Analyses used this period </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">83,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="billing.usage.remaining" datatype="html">
+        <source>Remaining</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">105,106</context>
+        </context-group>
+        <note priority="1" from="description">Remaining analyses label</note>
+      </trans-unit>
+      <trans-unit id="billing.usage.exceeded" datatype="html">
+        <source> New comments are still being collected and are waiting in the queue. They are analysed automatically once the plan is upgraded — nothing has been lost. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">115,121</context>
+        </context-group>
+        <note priority="1" from="description">Note under an exhausted quota meter</note>
+      </trans-unit>
+      <trans-unit id="billing.upgrade.heading" datatype="html">
+        <source>Upgrade to Pro</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">124,125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="billing.upgrade.description" datatype="html">
+        <source> A larger analysis allowance, and every comment that piled up while the free allowance was full is analysed automatically once the upgrade goes through. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">126,130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="billing.upgrade.handoff" datatype="html">
+        <source> You will be taken to the payment provider to finish, and brought back here afterwards. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.html</context>
+          <context context-type="linenumber">138,141</context>
+        </context-group>
+        <note priority="1" from="description">Note under the checkout buttons</note>
+      </trans-unit>
+      <trans-unit id="billing.plan.pro" datatype="html">
+        <source>Pro</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">73</context>
         </context-group>
-        <note priority="1" from="description">Empty state heading</note>
+        <note priority="1" from="description">Plan name</note>
+      </trans-unit>
+      <trans-unit id="billing.plan.free" datatype="html">
+        <source>Free</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <note priority="1" from="description">Plan name</note>
+      </trans-unit>
+      <trans-unit id="billing.checkout.stripe" datatype="html">
+        <source>Pay with card (Stripe)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+        <note priority="1" from="description">Start checkout with Stripe</note>
+      </trans-unit>
+      <trans-unit id="billing.checkout.iyzico" datatype="html">
+        <source>Pay with iyzico</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+        <note priority="1" from="description">Start checkout with iyzico</note>
+      </trans-unit>
+      <trans-unit id="billing.ownerOnly" datatype="html">
+        <source>Only the company owner can change the plan. Ask an owner to upgrade.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/billing/billing.component.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+        <note priority="1" from="description">Why the upgrade buttons are absent</note>
       </trans-unit>
       <trans-unit id="app.settings.notifications.title" datatype="html">
-        <source>Notifications</source>
+        <source> Notifications </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
-          <context context-type="linenumber">3,4</context>
+          <context context-type="linenumber">7,9</context>
         </context-group>
       </trans-unit>
       <trans-unit id="app.settings.notifications.subtitle" datatype="html">
-        <source>Which events you want to hear about, and where.</source>
+        <source> Choose how we reach you, and read what we have sent. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">10,14</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="app.settings.notifications.empty" datatype="html">
-        <source>No notification rule yet</source>
+      <trans-unit id="settings.notifications.preferencesHeading" datatype="html">
+        <source> Delivery </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
+          <context context-type="linenumber">27,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.notifications.loading" datatype="html">
+        <source>Loading your notification settings…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
+          <context context-type="linenumber">33,35</context>
+        </context-group>
+        <note priority="1" from="description">Notification preferences loading announcement</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.inboxHeading" datatype="html">
+        <source> In-app messages </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.html</context>
+          <context context-type="linenumber">81,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.notifications.channel.mail" datatype="html">
+        <source>Email</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <note priority="1" from="description">Notification delivery channel</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.channel.database" datatype="html">
+        <source>In the app</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+        <note priority="1" from="description">Notification delivery channel</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.markRead" datatype="html">
+        <source>Mark as read</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <note priority="1" from="description">Mark a notification as read</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.read" datatype="html">
+        <source>Read</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <note priority="1" from="description">State of an already-read notification</note>
+      </trans-unit>
+      <trans-unit id="app.settings.notifications.empty" datatype="html">
+        <source>Nothing has been sent yet</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">67</context>
         </context-group>
         <note priority="1" from="description">Empty state heading</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.empty.description" datatype="html">
+        <source>Messages we send you in the app — the quota warning, for one — collect here.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <note priority="1" from="description">Notifications empty state</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.type.quotaWarning" datatype="html">
+        <source>Quota running out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <note priority="1" from="description">Notification type</note>
+      </trans-unit>
+      <trans-unit id="settings.notifications.type.quotaWarning.description" datatype="html">
+        <source>Sent once you have used 80% of the analyses in your plan, while there is still time to act.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/notifications/notifications.component.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+        <note priority="1" from="description">Notification type description</note>
       </trans-unit>
       <trans-unit id="app.settings.profile.title" datatype="html">
         <source>Profile</source>
@@ -1233,13 +1740,131 @@
           <context context-type="linenumber">4,7</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="app.settings.profile.empty" datatype="html">
-        <source>Nothing to edit here yet</source>
+      <trans-unit id="settings.profile.loading" datatype="html">
+        <source>Loading your profile…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">20,21</context>
+        </context-group>
+        <note priority="1" from="description">Profile loading announcement</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.detailsHeading" datatype="html">
+        <source> Account details </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">32,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.profile.verifiedOn" datatype="html">
+        <source>Address confirmed on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">55,56</context>
+        </context-group>
+        <note priority="1" from="description">Email verification state</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.notVerified" datatype="html">
+        <source> This address is not confirmed yet. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">60,64</context>
+        </context-group>
+        <note priority="1" from="description">Email verification state</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.reverify" datatype="html">
+        <source> Your email address has changed, so the account needs confirming again. We have sent a new confirmation email to the new address. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">71,77</context>
+        </context-group>
+        <note priority="1" from="description">Notice after the email address was changed</note>
+      </trans-unit>
+      <trans-unit id="settings.password.heading" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">86,89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.password.done" datatype="html">
+        <source> Your password has been changed and every other signed-in device has been signed out. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">123,128</context>
+        </context-group>
+        <note priority="1" from="description">Confirmation after the password was changed</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.field.name" datatype="html">
+        <source>Full name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">70</context>
         </context-group>
-        <note priority="1" from="description">Empty state heading</note>
+        <note priority="1" from="description">Profile form field</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.field.email" datatype="html">
+        <source>Email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+        <note priority="1" from="description">Profile form field</note>
+      </trans-unit>
+      <trans-unit id="settings.profile.field.emailHelper" datatype="html">
+        <source>Changing this address signs your account out of its confirmed state and sends a new confirmation email.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+        <note priority="1" from="description">Warning under the email field</note>
+      </trans-unit>
+      <trans-unit id="settings.password.field.current" datatype="html">
+        <source>Current password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <note priority="1" from="description">Password form field</note>
+      </trans-unit>
+      <trans-unit id="settings.password.field.new" datatype="html">
+        <source>New password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <note priority="1" from="description">Password form field</note>
+      </trans-unit>
+      <trans-unit id="settings.password.field.confirm" datatype="html">
+        <source>Repeat the new password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <note priority="1" from="description">Password form field</note>
+      </trans-unit>
+      <trans-unit id="settings.password.field.newHelper" datatype="html">
+        <source>At least 12 characters. Every other signed-in device is signed out when you change it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <note priority="1" from="description">Helper under the new password field</note>
+      </trans-unit>
+      <trans-unit id="settings.action.save" datatype="html">
+        <source>Save changes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+        <note priority="1" from="description">Save a settings form</note>
+      </trans-unit>
+      <trans-unit id="settings.password.submit" datatype="html">
+        <source>Change password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <note priority="1" from="description">Submit the password form</note>
       </trans-unit>
       <trans-unit id="app.settings.title" datatype="html">
         <source>Settings</source>
@@ -1295,23 +1920,187 @@
         <source>Team</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
-          <context context-type="linenumber">3,4</context>
+          <context context-type="linenumber">4,5</context>
         </context-group>
       </trans-unit>
       <trans-unit id="app.settings.team.subtitle" datatype="html">
-        <source>Invite colleagues and decide what each of them may do.</source>
+        <source> Who can sign in to this company, and what each of them may do. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">6,9</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="app.settings.team.empty" datatype="html">
-        <source>You are the only member so far</source>
+      <trans-unit id="settings.team.loading" datatype="html">
+        <source>Loading the team…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+        <note priority="1" from="description">Team loading announcement</note>
+      </trans-unit>
+      <trans-unit id="settings.team.tableCaption" datatype="html">
+        <source>Members of this company</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+        <note priority="1" from="description">Team table caption</note>
+      </trans-unit>
+      <trans-unit id="settings.team.column.member" datatype="html">
+        <source>Member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">37,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.team.column.role" datatype="html">
+        <source>Role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.team.column.joined" datatype="html">
+        <source>Joined</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">39,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.team.column.actions" datatype="html">
+        <source>Actions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">41,44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.team.invite.note" datatype="html">
+        <source> An invitation is an email with a signed link. No account exists until the person accepts it and sets a password. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.html</context>
+          <context context-type="linenumber">113,118</context>
+        </context-group>
+        <note priority="1" from="description">Explains what an invitation is</note>
+      </trans-unit>
+      <trans-unit id="settings.team.remove.prompt" datatype="html">
+        <source>Remove <x id="name" equiv-text="name"/> from the company? Their access ends immediately and every device they are signed in on is signed out.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">78</context>
         </context-group>
-        <note priority="1" from="description">Empty state heading</note>
+        <note priority="1" from="description">Confirmation before removing a team member</note>
+      </trans-unit>
+      <trans-unit id="settings.team.invite" datatype="html">
+        <source>Invite a member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+        <note priority="1" from="description">Open the invite dialog</note>
+      </trans-unit>
+      <trans-unit id="settings.team.invite.title" datatype="html">
+        <source>Invite a member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+        <note priority="1" from="description">Invite dialog title</note>
+      </trans-unit>
+      <trans-unit id="settings.team.invite.email" datatype="html">
+        <source>Email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+        <note priority="1" from="description">Invite form field</note>
+      </trans-unit>
+      <trans-unit id="settings.team.invite.role" datatype="html">
+        <source>Role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+        <note priority="1" from="description">Invite form field</note>
+      </trans-unit>
+      <trans-unit id="settings.team.invite.submit" datatype="html">
+        <source>Send invitation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+        <note priority="1" from="description">Send the invitation</note>
+      </trans-unit>
+      <trans-unit id="settings.team.remove.title" datatype="html">
+        <source>Remove member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+        <note priority="1" from="description">Remove member dialog title</note>
+      </trans-unit>
+      <trans-unit id="settings.team.remove.confirm" datatype="html">
+        <source>Remove</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <note priority="1" from="description">Confirm removing a member</note>
+      </trans-unit>
+      <trans-unit id="settings.team.action.remove" datatype="html">
+        <source>Remove</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+        <note priority="1" from="description">Remove a team member</note>
+      </trans-unit>
+      <trans-unit id="settings.team.roleFor" datatype="html">
+        <source>Role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <note priority="1" from="description">Row-level role picker label</note>
+      </trans-unit>
+      <trans-unit id="settings.team.lastOwner" datatype="html">
+        <source>A company must keep at least one owner.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <note priority="1" from="description">Why the owner row cannot be changed</note>
+      </trans-unit>
+      <trans-unit id="settings.team.selfRow" datatype="html">
+        <source>You cannot change your own role.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+        <note priority="1" from="description">Why your own row cannot be changed</note>
+      </trans-unit>
+      <trans-unit id="label.role.owner" datatype="html">
+        <source>Owner</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">199</context>
+        </context-group>
+        <note priority="1" from="description">Team role</note>
+      </trans-unit>
+      <trans-unit id="label.role.admin" datatype="html">
+        <source>Administrator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">201</context>
+        </context-group>
+        <note priority="1" from="description">Team role</note>
+      </trans-unit>
+      <trans-unit id="label.role.member" datatype="html">
+        <source>Member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+        <note priority="1" from="description">Team role</note>
       </trans-unit>
       <trans-unit id="auth.forgot.sent" datatype="html">
         <source> If that address belongs to an account, a reset link is on its way. The link is valid for a limited time. </source>

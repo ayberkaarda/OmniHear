@@ -71,6 +71,36 @@ describe('PaywallModalComponent', () => {
     expect(paywall.isOpen()).toBe(false);
   });
 
+  /**
+   * The other half of spec 7.5's loop: `/app/settings/billing` is where a
+   * provider is chosen and `POST /billing/checkout` is called. An admin cannot
+   * call it, so the wall tells them who can rather than sending them to a
+   * button they will find disabled.
+   */
+  it('tells a non-owner who can upgrade, and relabels the action', async () => {
+    TestBed.inject(AuthStore).setSession('1|abc', makeUser({ role: 'admin' }), makeCompany({ quota_limit: 200 }));
+    paywall.open();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('[data-testid="paywall-owner-only"]')?.textContent).toContain(
+      'Only the company owner'
+    );
+    expect(element.textContent).toContain('See the plan');
+    expect(element.textContent).not.toContain('Upgrade plan');
+  });
+
+  it('offers the owner the upgrade wording', async () => {
+    paywall.open();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('[data-testid="paywall-owner-only"]')).toBeNull();
+    expect(element.textContent).toContain('Upgrade plan');
+  });
+
   it('returns focus to the element that had it when the wall closes', async () => {
     const trigger = document.createElement('button');
     document.body.appendChild(trigger);

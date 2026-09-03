@@ -3,15 +3,9 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { Subscription } from 'rxjs';
 
 import { errorMessageForCode } from '../../../core/errors/error-messages';
-import {
-  CONNECTABLE_PLATFORMS,
-  Integration,
-  IntegrationWriteBody,
-  Platform,
-  REQUIRED_CREDENTIALS,
-  REQUIRED_SETTINGS
-} from '../../../core/integrations/integration.models';
+import { Integration, IntegrationWriteBody, Platform } from '../../../core/integrations/integration.models';
 import { IntegrationsStore } from '../../../core/integrations/integrations.store';
+import { PlatformsStore } from '../../../core/integrations/platforms.store';
 import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
@@ -30,6 +24,8 @@ export interface ConnectorField {
   /** The key the API expects inside `settings` / `credentials`. */
   readonly key: string;
   readonly label: string;
+  /** From the registry, not from a local table: the server decides what is mandatory. */
+  readonly required: boolean;
   readonly secret: boolean;
 }
 
@@ -44,10 +40,12 @@ type DialogMode = 'none' | 'create' | 'edit' | 'delete';
  * leaves the credential inputs blank and says so: submitting them empty keeps
  * what is stored, and filling them in rotates it.
  *
- * Which platforms can be connected, and what each one needs, mirrors
- * `config/connectors.php`. No endpoint publishes that list, so the mirror in
- * `integration.models.ts` is the frontend's copy of it — see the phase report's
- * open questions.
+ * **The form is server-driven.** Which platforms can be connected, and what
+ * each one needs, comes from `GET /api/v1/integrations/platforms` through
+ * `PlatformsStore`. It used to come from a hand-copied mirror of
+ * `config/connectors.php` in `integration.models.ts`, which drifted the first
+ * time the backend changed — the next drift would have reached a user as a
+ * `422` on a platform this form offered.
  */
 @Component({
   selector: 'app-integrations',
@@ -66,6 +64,7 @@ type DialogMode = 'none' | 'create' | 'edit' | 'delete';
 })
 export class IntegrationsComponent implements OnInit, OnDestroy {
   private readonly store = inject(IntegrationsStore);
+  private readonly platforms = inject(PlatformsStore);
   private readonly fb = inject(NonNullableFormBuilder);
 
   private readonly subscriptions = new Subscription();
@@ -78,7 +77,8 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
 
   protected readonly dialog = signal<DialogMode>('none');
   protected readonly selected = signal<Integration | null>(null);
-  protected readonly platform = signal<Platform>(CONNECTABLE_PLATFORMS[0]);
+  /** `null` until the platform list has arrived: there is nothing to guess at. */
+  protected readonly platform = signal<Platform | null>(null);
 
   /** Rebuilt whenever the platform changes: each connector asks for different fields. */
   protected readonly form = signal<FormGroup>(new FormGroup({}));
@@ -93,13 +93,26 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
     return code === null ? null : errorMessageForCode(code);
   });
 
-  protected readonly platformControl = this.fb.control<string>(CONNECTABLE_PLATFORMS[0]);
+  protected readonly platformControl = this.fb.control<string>('');
   protected readonly statusControl = this.fb.control<string>('active');
 
-  protected readonly platformOptions: SelectOption[] = CONNECTABLE_PLATFORMS.map((value) => ({
-    value,
-    label: platformLabel(value)
-  }));
+  /** Whatever the connector registry says it accepts, in the order the API sent it. */
+  protected readonly platformOptions = computed<SelectOption[]>(() =>
+    this.platforms.items().map((descriptor) => ({
+      value: descriptor.platform,
+      label: platformLabel(descriptor.platform)
+    }))
+  );
+
+  protected readonly platformsLoading = this.platforms.loading;
+
+  /**
+   * The create dialog has nothing to offer until the registry answers, and it
+   * says so rather than presenting an empty picker that would `422`.
+   */
+  protected readonly platformsUnavailable = computed(
+    () => !this.platforms.loading() && this.platforms.items().length === 0
+  );
 
   protected readonly statusOptions = computed<SelectOption[]>(() => [
     { value: 'active', label: this.statusActiveLabel },
@@ -107,19 +120,21 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
   ]);
 
   protected readonly settingFields = computed<readonly ConnectorField[]>(() =>
-    (REQUIRED_SETTINGS[this.platform()] ?? []).map((key) => ({
-      control: SETTING_PREFIX + key,
-      key,
-      label: settingLabel(key),
+    this.platforms.settingsFor(this.platform()).map((field) => ({
+      control: SETTING_PREFIX + field.key,
+      key: field.key,
+      label: settingLabel(field.key),
+      required: field.required,
       secret: false
     }))
   );
 
   protected readonly credentialFields = computed<readonly ConnectorField[]>(() =>
-    (REQUIRED_CREDENTIALS[this.platform()] ?? []).map((key) => ({
-      control: CREDENTIAL_PREFIX + key,
-      key,
-      label: credentialLabel(key),
+    this.platforms.credentialsFor(this.platform()).map((field) => ({
+      control: CREDENTIAL_PREFIX + field.key,
+      key: field.key,
+      label: credentialLabel(field.key),
+      required: field.required,
       secret: true
     }))
   );
@@ -171,11 +186,15 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
     this.rebuildForm();
     this.subscriptions.add(
       this.platformControl.valueChanges.subscribe((value) => {
-        this.platform.set(value as Platform);
+        this.platform.set(value === '' ? null : (value as Platform));
         this.rebuildForm();
       })
     );
     this.store.loadIfNeeded();
+    // The registry drives the form, so it is read on arrival rather than when
+    // the dialog opens: a spinner inside a modal the user just opened reads as
+    // a broken dialog.
+    this.platforms.loadIfNeeded();
   }
 
   ngOnDestroy(): void {
@@ -213,8 +232,9 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
   protected openCreate(): void {
     this.store.clearSaveErrors();
     this.selected.set(null);
-    this.platformControl.setValue(CONNECTABLE_PLATFORMS[0]);
-    this.platform.set(CONNECTABLE_PLATFORMS[0]);
+    const first = this.platforms.items()[0]?.platform ?? null;
+    this.platformControl.setValue(first ?? '', { emitEvent: false });
+    this.platform.set(first);
     this.statusControl.setValue('active');
     this.rebuildForm();
     this.dialog.set('create');
@@ -293,15 +313,22 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
   private rebuildForm(integration?: Integration): void {
     const controls: Record<string, FormControl<string>> = {};
 
-    for (const key of REQUIRED_SETTINGS[this.platform()] ?? []) {
-      controls[SETTING_PREFIX + key] = this.fb.control(String(integration?.settings[key] ?? ''), [Validators.required]);
+    for (const field of this.platforms.settingsFor(this.platform())) {
+      controls[SETTING_PREFIX + field.key] = this.fb.control(
+        String(integration?.settings[field.key] ?? ''),
+        field.required ? [Validators.required] : []
+      );
     }
 
-    for (const key of REQUIRED_CREDENTIALS[this.platform()] ?? []) {
-      // Required on create, optional on edit: an empty credential field on an
-      // existing connection means "keep what is stored", and there is no way to
-      // pre-fill it because the value is never sent to the browser.
-      controls[CREDENTIAL_PREFIX + key] = this.fb.control('', integration === undefined ? [Validators.required] : []);
+    for (const field of this.platforms.credentialsFor(this.platform())) {
+      // Required on create when the registry says so, always optional on edit:
+      // an empty credential field on an existing connection means "keep what is
+      // stored", and there is no way to pre-fill it because the value is never
+      // sent to the browser (invariant I5).
+      controls[CREDENTIAL_PREFIX + field.key] = this.fb.control(
+        '',
+        integration === undefined && field.required ? [Validators.required] : []
+      );
     }
 
     this.form.set(new FormGroup(controls));
@@ -330,6 +357,6 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
       return Object.keys(credentials).length > 0 ? { ...body, credentials } : body;
     }
 
-    return { platform: this.platform(), settings, credentials };
+    return { platform: this.platform() ?? undefined, settings, credentials };
   }
 }

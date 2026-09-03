@@ -23,7 +23,14 @@ export interface AiAnalysis {
   readonly sentiment_score: number;
   readonly sentiment_label: SentimentLabel;
   readonly category: FeedbackCategory;
-  readonly confidence: number;
+  /**
+   * `null` when the analysis arrived over the websocket rather than from the
+   * API: `feedback.analyzed` is deliberately an invalidation signal plus the
+   * four fields a row needs, not the whole record (`docs/contracts/realtime.md`
+   * section 2). A zero would render as "0% confident", which is a measurement
+   * nobody made.
+   */
+  readonly confidence: number | null;
   readonly keywords: readonly string[];
   readonly model_version: string;
   readonly analyzed_at: string | null;

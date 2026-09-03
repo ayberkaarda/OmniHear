@@ -35,7 +35,11 @@ const SRC_APP_DIR = join(ROOT, 'src/app');
 // identical in English and Turkish (brand names, acronyms, technical terms).
 // Keep this list explicit and small — anything else identical to its source
 // is treated as an untranslated copy.
-const IDENTICAL_ALLOWED = new Set(['OmniHear', 'API', 'URL', 'Zendesk', 'Trustpilot', 'ID']);
+// 'Pro' is the paid plan's name, the same class of token as the brand names
+// beside it: Turkish SaaS pricing keeps it verbatim, and translating it would
+// rename the product's plan rather than localize a sentence. 'Free' is not on
+// this list, because that one is an ordinary adjective and is translated.
+const IDENTICAL_ALLOWED = new Set(['OmniHear', 'API', 'URL', 'Zendesk', 'Trustpilot', 'ID', 'Pro']);
 
 let failed = false;
 const lines = [];

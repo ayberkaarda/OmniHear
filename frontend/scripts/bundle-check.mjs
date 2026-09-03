@@ -32,7 +32,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -154,6 +154,77 @@ if (transferKb > TRANSFER_MAX_KB) {
       `${(transferKb - TRANSFER_MAX_KB).toFixed(2)} kB.`,
   );
 }
+
+/*
+ * The realtime seam, checked rather than trusted.
+ *
+ * pusher-js and laravel-echo together are larger than the entire transfer
+ * headroom (docs/LESSONS.md), so docs/contracts/realtime.md requires them to
+ * load through a dynamic import() and never enter the initial bundle. The
+ * `initial` budget above cannot say *why* it grew, and 16.61 kB of transfer
+ * arriving in one commit would still leave room today — so the constraint is
+ * asserted directly: none of the files the CLI listed as initial may contain
+ * either library.
+ *
+ * Matching on file contents rather than on the CLI's chunk-name column is
+ * deliberate. A static import would not produce a chunk *named* "pusher" at
+ * all; it would fold the library into an existing initial chunk, and a
+ * name-based check would see nothing wrong. The fingerprint is present 83 times
+ * in the pusher chunk and 32 in the echo chunk, and zero times in every initial
+ * file of a correct build (measured).
+ */
+const REALTIME_FINGERPRINT = /pusher/i;
+
+const initialTable = output.slice(
+  output.indexOf('Initial chunk files'),
+  output.indexOf('Lazy chunk files') === -1 ? output.length : output.indexOf('Lazy chunk files'),
+);
+const initialJsFiles = [...initialTable.matchAll(/(\S+\.js)\s*\|/g)].map((match) => match[1]);
+
+if (initialJsFiles.length === 0) {
+  fail(
+    'Could not read the initial chunk file list from the build output. If the Angular CLI changed ' +
+      'its table format, fix this parser — do not delete the check.',
+  );
+}
+
+const browserDir = join(ROOT, 'dist', 'frontend', 'browser');
+const localeDirs = existsSync(browserDir)
+  ? readdirSync(browserDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => join(browserDir, entry.name))
+  : [];
+
+if (localeDirs.length === 0) {
+  fail(`No localized output directories under ${browserDir}. The build did not produce what this check reads.`);
+}
+
+const leaked = [];
+for (const localeDir of localeDirs) {
+  for (const file of initialJsFiles) {
+    const path = join(localeDir, file);
+    if (!existsSync(path)) {
+      continue;
+    }
+    if (REALTIME_FINGERPRINT.test(readFileSync(path, 'utf8'))) {
+      leaked.push(path.slice(ROOT.length + 1));
+    }
+  }
+}
+
+if (leaked.length > 0) {
+  fail(
+    'pusher-js / laravel-echo reached the INITIAL bundle: ' +
+      `${leaked.join(', ')}. Realtime must load through a dynamic import() from inside the ` +
+      'authenticated shell (docs/contracts/realtime.md section 3). CLAUDE.md Trap 2 class C: ' +
+      'the threshold does not move, the code does.',
+  );
+}
+
+console.log(
+  `[bundle-check] realtime is lazy — ${initialJsFiles.length} initial script file(s) checked ` +
+    `across ${localeDirs.length} locale(s), none carries pusher-js or laravel-echo.`,
+);
 
 console.log(
   `[bundle-check] PASS — raw ${(RAW_MAX_BYTES / KB - rawKb).toFixed(2)} kB and ` +

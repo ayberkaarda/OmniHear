@@ -23,8 +23,15 @@ export type QuotaLevel = 'ok' | 'warning' | 'exceeded';
 export class QuotaStore {
   private readonly auth = inject(AuthStore);
   private readonly headerRemaining = signal<number | null>(null);
+  /**
+   * Set only by the `quota.threshold-reached` broadcast, which carries the
+   * limit alongside the counter. It wins over the session's `quota_limit`
+   * because a plan upgrade raises the server-side limit while the `company`
+   * held in `AuthStore` is still the one `/auth/me` returned at sign-in.
+   */
+  private readonly eventLimit = signal<number | null>(null);
 
-  readonly limit = computed<number | null>(() => this.auth.company()?.quota_limit ?? null);
+  readonly limit = computed<number | null>(() => this.eventLimit() ?? this.auth.company()?.quota_limit ?? null);
 
   readonly remaining = computed<number | null>(() => this.headerRemaining() ?? this.auth.company()?.quota_remaining ?? null);
 
@@ -63,7 +70,14 @@ export class QuotaStore {
     this.headerRemaining.set(Math.max(0, remaining));
   }
 
+  /** `quota.threshold-reached` — `docs/contracts/realtime.md` section 2. */
+  setUsage(limit: number, remaining: number): void {
+    this.eventLimit.set(Math.max(0, limit));
+    this.headerRemaining.set(Math.max(0, remaining));
+  }
+
   reset(): void {
     this.headerRemaining.set(null);
+    this.eventLimit.set(null);
   }
 }

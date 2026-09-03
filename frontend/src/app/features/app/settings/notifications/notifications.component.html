@@ -1,8 +1,116 @@
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-6">
   <header class="flex flex-col gap-1">
-    <h2 class="text-lg font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.settings.notifications.title">Notifications</h2>
-    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.settings.notifications.subtitle">Which events you want to hear about, and where.</p>
+    <h2
+      class="text-lg font-semibold tracking-tight text-[var(--text-primary)]"
+      i18n="@@app.settings.notifications.title"
+    >
+      Notifications
+    </h2>
+    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.settings.notifications.subtitle">
+      Choose how we reach you, and read what we have sent.
+    </p>
   </header>
 
-  <app-empty-state icon="info" [heading]="emptyHeading" [description]="placeholderDescription" />
+  @if (errorMessage(); as message) {
+    <div
+      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      role="alert"
+      data-testid="notifications-error"
+    >
+      <span class="flex-1">{{ message }}</span>
+      <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
+    </div>
+  }
+
+  <section class="flex flex-col gap-3">
+    <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@settings.notifications.preferencesHeading">
+      Delivery
+    </h3>
+
+    @if (loading()) {
+      <div class="flex flex-col gap-2" data-testid="notifications-skeleton" aria-busy="true">
+        <span class="sr-only" i18n="Notification preferences loading announcement@@settings.notifications.loading"
+          >Loading your notification settings…</span
+        >
+        <span class="h-16 animate-pulse rounded-md bg-[var(--bg-surface-sunken)]"></span>
+      </div>
+    } @else {
+      <ul class="flex flex-col divide-y divide-[var(--border)] rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
+        @for (row of rows(); track row.type) {
+          <li class="flex flex-wrap items-start justify-between gap-4 px-4 py-3">
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm text-[var(--text-primary)]">{{ row.label }}</span>
+              @if (row.description) {
+                <span class="block text-xs text-[var(--text-muted)]">{{ row.description }}</span>
+              }
+            </span>
+
+            <span class="flex flex-wrap items-center gap-4">
+              <label class="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                <input
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-[var(--border-strong)] accent-[var(--brand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+                  [checked]="row.channels.mail"
+                  [disabled]="saving()"
+                  [attr.aria-label]="checkboxLabel(row, 'mail')"
+                  (change)="onToggle(row, 'mail', $event)"
+                />
+                <span>{{ mailLabel }}</span>
+              </label>
+
+              <label class="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                <input
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-[var(--border-strong)] accent-[var(--brand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+                  [checked]="row.channels.database"
+                  [disabled]="saving()"
+                  [attr.aria-label]="checkboxLabel(row, 'database')"
+                  (change)="onToggle(row, 'database', $event)"
+                />
+                <span>{{ databaseLabel }}</span>
+              </label>
+            </span>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="flex flex-col gap-3">
+    <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@settings.notifications.inboxHeading">
+      In-app messages
+    </h3>
+
+    @if (itemsLoading()) {
+      <div class="flex flex-col gap-2" data-testid="notification-list-skeleton" aria-busy="true">
+        <span class="h-14 animate-pulse rounded-md bg-[var(--bg-surface-sunken)]"></span>
+      </div>
+    } @else if (isEmpty()) {
+      <app-empty-state icon="mail" [heading]="emptyHeading" [description]="emptyDescription" />
+    } @else {
+      <ul class="flex flex-col divide-y divide-[var(--border)] rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
+        @for (item of items(); track item.id) {
+          <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm text-[var(--text-primary)]">{{ titleOf(item) }}</span>
+              <span class="block text-xs tabular-nums text-[var(--text-muted)]">{{ sentAt(item) }}</span>
+            </span>
+
+            @if (isUnread(item)) {
+              <app-button
+                variant="secondary"
+                size="sm"
+                [loading]="markingId() === item.id"
+                (pressed)="markRead(item)"
+              >
+                {{ markReadLabel }}
+              </app-button>
+            } @else {
+              <span class="text-xs text-[var(--text-muted)]">{{ readLabel }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
 </section>

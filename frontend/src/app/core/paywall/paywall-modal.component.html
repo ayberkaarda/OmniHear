@@ -16,6 +16,9 @@
         <span class="tabular-nums font-medium">{{ quotaLimit() }} / {{ quotaLimit() }}</span>
       </p>
     }
+    @if (!canUpgrade()) {
+      <p class="text-[var(--text-muted)]" data-testid="paywall-owner-only">{{ ownerOnly }}</p>
+    }
     <p i18n="Paywall reassurance@@paywall.pendingKept">
       Nothing is lost. Incoming feedback keeps arriving and waits in the queue; as soon as your plan is upgraded, the
       waiting items are analysed automatically.
@@ -27,7 +30,11 @@
       <span i18n="Paywall secondary action@@paywall.later">Not now</span>
     </app-button>
     <app-button variant="primary" (pressed)="onUpgrade()">
-      <span i18n="Paywall primary action@@paywall.upgrade">Upgrade plan</span>
+      @if (canUpgrade()) {
+        <span i18n="Paywall primary action@@paywall.upgrade">Upgrade plan</span>
+      } @else {
+        <span i18n="Paywall primary action for a non-owner@@paywall.viewPlan">See the plan</span>
+      }
     </app-button>
   </ng-container>
 </app-modal>

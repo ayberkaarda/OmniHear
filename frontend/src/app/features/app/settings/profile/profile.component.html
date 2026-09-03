@@ -1,8 +1,134 @@
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-6">
   <header class="flex flex-col gap-1">
     <h2 class="text-lg font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.settings.profile.title">Profile</h2>
     <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.settings.profile.subtitle">Your name, email address and password.</p>
   </header>
 
-  <app-empty-state icon="user" [heading]="emptyHeading" [description]="placeholderDescription" />
+  @if (errorMessage(); as message) {
+    <div
+      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      role="alert"
+      data-testid="profile-error"
+    >
+      <span class="flex-1">{{ message }}</span>
+      <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="flex flex-col gap-3" data-testid="profile-skeleton" aria-busy="true">
+      <span class="sr-only" i18n="Profile loading announcement@@settings.profile.loading">Loading your profile…</span>
+      <span class="h-9 animate-pulse rounded-md bg-[var(--bg-surface-sunken)]"></span>
+      <span class="h-9 animate-pulse rounded-md bg-[var(--bg-surface-sunken)]"></span>
+      <span class="h-9 w-32 animate-pulse rounded-md bg-[var(--bg-surface-sunken)]"></span>
+    </div>
+  } @else {
+    <form
+      [formGroup]="detailsForm"
+      class="flex max-w-lg flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4"
+      (submit)="$event.preventDefault(); submitDetails()"
+    >
+      <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@settings.profile.detailsHeading">
+        Account details
+      </h3>
+
+      <app-input
+        formControlName="name"
+        [label]="nameLabel"
+        [required]="true"
+        [error]="detailsError('name')"
+        (blurred)="onFieldBlur()"
+      />
+
+      <app-input
+        formControlName="email"
+        type="email"
+        [label]="emailLabel"
+        [required]="true"
+        [helper]="emailHelper"
+        [error]="detailsError('email')"
+        (blurred)="onFieldBlur()"
+      />
+
+      @if (isVerified()) {
+        <p class="text-xs text-[var(--text-muted)]">
+          <span i18n="Email verification state@@settings.profile.verifiedOn">Address confirmed on</span>
+          <span class="tabular-nums">{{ verifiedOn() }}</span>
+        </p>
+      } @else {
+        <p class="text-xs text-[var(--status-warning)]" i18n="Email verification state@@settings.profile.notVerified">
+          This address is not confirmed yet.
+        </p>
+      }
+
+      @if (emailVerificationRequired()) {
+        <p
+          class="rounded-md border border-[var(--category-complaint-border)] bg-[var(--category-complaint-bg)] px-3 py-2 text-sm text-[var(--category-complaint-text)]"
+          role="status"
+          data-testid="profile-reverify"
+          i18n="Notice after the email address was changed@@settings.profile.reverify"
+        >
+          Your email address has changed, so the account needs confirming again. We have sent a new confirmation email
+          to the new address.
+        </p>
+      }
+
+      <div>
+        <app-button type="submit" [loading]="savingProfile()" (pressed)="submitDetails()">{{ saveLabel }}</app-button>
+      </div>
+    </form>
+
+    <form
+      [formGroup]="passwordForm"
+      class="flex max-w-lg flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4"
+      (submit)="$event.preventDefault(); submitPassword()"
+    >
+      <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@settings.password.heading">Password</h3>
+
+      <app-input
+        formControlName="current_password"
+        type="password"
+        [label]="currentPasswordLabel"
+        [required]="true"
+        [error]="passwordError('current_password')"
+        (blurred)="onFieldBlur()"
+      />
+
+      <app-input
+        formControlName="password"
+        type="password"
+        [label]="newPasswordLabel"
+        [required]="true"
+        [helper]="passwordHelper"
+        [error]="passwordError('password')"
+        (blurred)="onFieldBlur()"
+      />
+
+      <app-input
+        formControlName="password_confirmation"
+        type="password"
+        [label]="confirmPasswordLabel"
+        [required]="true"
+        [error]="passwordError('password_confirmation')"
+        (blurred)="onFieldBlur()"
+      />
+
+      @if (passwordChanged()) {
+        <p
+          class="rounded-md border border-[var(--status-success)] px-3 py-2 text-sm text-[var(--status-success)]"
+          role="status"
+          data-testid="password-changed"
+          i18n="Confirmation after the password was changed@@settings.password.done"
+        >
+          Your password has been changed and every other signed-in device has been signed out.
+        </p>
+      }
+
+      <div>
+        <app-button type="submit" [loading]="savingPassword()" (pressed)="submitPassword()">
+          {{ changePasswordLabel }}
+        </app-button>
+      </div>
+    </form>
+  }
 </section>
