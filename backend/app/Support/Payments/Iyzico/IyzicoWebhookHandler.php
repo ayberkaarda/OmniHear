@@ -59,7 +59,7 @@ final class IyzicoWebhookHandler
             return WebhookStatus::IGNORED_UNKNOWN_PLAN;
         }
 
-        $this->activator->activate(
+        $subscription = $this->activator->activate(
             $companyId,
             IyzicoGateway::PROVIDER,
             $subscriptionId,
@@ -67,6 +67,13 @@ final class IyzicoWebhookHandler
             $this->timestamp($payload['startPeriod'] ?? $payload['iyziEventTime'] ?? null),
             $this->timestamp($payload['endPeriod'] ?? null),
         );
+
+        // null means the provider subscription id already belongs to another
+        // tenant. Decidable, so it answers 200 - a 500 would make the provider
+        // retry into the same collision, and iyzico gives up after three.
+        if ($subscription === null) {
+            return WebhookStatus::IGNORED_UNKNOWN_TENANT;
+        }
 
         return WebhookStatus::PROCESSED;
     }

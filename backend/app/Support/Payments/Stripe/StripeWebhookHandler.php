@@ -71,13 +71,20 @@ final class StripeWebhookHandler
             return WebhookStatus::IGNORED_MALFORMED;
         }
 
-        $this->activator->activate(
+        $subscription = $this->activator->activate(
             $companyId,
             StripeGateway::PROVIDER,
             $subscriptionId,
             (string) $plan,
             $this->timestamp($object['created'] ?? null),
         );
+
+        // null means the provider subscription id already belongs to another
+        // tenant. Decidable, so it answers 200 - a 500 would make the provider
+        // retry into the same collision, and iyzico gives up after three.
+        if ($subscription === null) {
+            return WebhookStatus::IGNORED_UNKNOWN_TENANT;
+        }
 
         return WebhookStatus::PROCESSED;
     }

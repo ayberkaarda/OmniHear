@@ -3,6 +3,7 @@
 namespace App\Support\Payments;
 
 use App\Events\SubscriptionActivated;
+use App\Models\Scopes\CompanyScope;
 use App\Models\Subscription;
 use App\Support\Tenancy\TenantContext;
 use DateTimeInterface;
@@ -36,6 +37,10 @@ final class SubscriptionActivator
      * a subscription we already know about updates the row rather than
      * duplicating it. Replay of the *same delivery* never gets this far —
      * WebhookPipeline stops it at the event id.
+     *
+     * Returns **null** when that id already belongs to a different company. The
+     * caller answers `ignored_unknown_tenant` and 200; see the guard below for
+     * why anything else is worse.
      */
     public function activate(
         int $companyId,
@@ -44,7 +49,11 @@ final class SubscriptionActivator
         string $plan,
         ?DateTimeInterface $periodStart = null,
         ?DateTimeInterface $periodEnd = null,
-    ): Subscription {
+    ): ?Subscription {
+        if ($this->claimedByAnotherCompany($companyId, $provider, $providerSubscriptionId)) {
+            return null;
+        }
+
         // Subscription carries CompanyScope, which throws when the context is
         // unset. A webhook has no authenticated user, so the tenant resolved
         // from the payload is established explicitly and restored afterwards.
@@ -73,5 +82,42 @@ final class SubscriptionActivator
 
             return $subscription;
         });
+    }
+
+    /**
+     * Is this provider subscription id already held by a different tenant?
+     *
+     * `subscriptions` is unique on `(provider, provider_subscription_id)` with
+     * no `company_id` in the key, while the `updateOrCreate` below runs inside
+     * `runFor($companyId)` and is therefore company-scoped. The two disagree
+     * exactly once: when the id exists under another company. The scoped lookup
+     * misses it, the insert hits the unique index, WebhookPipeline deletes the
+     * event row and rethrows, and the provider gets a 500.
+     *
+     * That 500 is the damage. Stripe would retry into the same wall; iyzico
+     * gives up after three attempts, so a *legitimate* activation arriving
+     * after a collision could be lost outright. A decidable outcome has to
+     * answer 2xx, which is the rule the rest of the webhook path already
+     * follows.
+     *
+     * A collision means the payload named a company that does not own the
+     * subscription - a spoofed or mis-keyed reference, not a state we should
+     * reconcile by moving somebody's paid plan between tenants. Refusing and
+     * saying so leaves the `webhook_events` row as the record that it happened.
+     *
+     * The read is unscoped on purpose: the whole question is about a row in
+     * *another* tenant, so a scoped query cannot ask it. Nothing from the row
+     * is returned or logged - only the boolean.
+     */
+    private function claimedByAnotherCompany(int $companyId, string $provider, string $providerSubscriptionId): bool
+    {
+        // tenant-scope: bypass-ok cross-tenant uniqueness check; only a boolean leaves this method
+        $owner = Subscription::query()
+            ->withoutGlobalScope(CompanyScope::class)
+            ->where('provider', $provider)
+            ->where('provider_subscription_id', $providerSubscriptionId)
+            ->value('company_id');
+
+        return $owner !== null && (int) $owner !== $companyId;
     }
 }
