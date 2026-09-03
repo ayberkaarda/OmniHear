@@ -1,0 +1,102 @@
+{
+  "reviews": [
+    {
+      "links": [
+        {
+          "href": "https://api.trustpilot.com/v1/reviews/60a1b2c3d4e5f60718293a04",
+          "method": "GET",
+          "rel": "self"
+        }
+      ],
+      "id": "60a1b2c3d4e5f60718293a04",
+      "stars": 1,
+      "title": null,
+      "text": "İade sürecinde iki hafta boyunca hiçbir dönüş alamadım, sonunda bankadan itiraz etmek zorunda kaldım.",
+      "language": "tr",
+      "location": null,
+      "createdAt": "2026-08-28T21:30:00Z",
+      "updatedAt": null,
+      "experiencedAt": "2026-08-20T00:00:00Z",
+      "referralEmail": null,
+      "referenceId": null,
+      "companyReply": null,
+      "isVerified": true,
+      "numberOfLikes": 7,
+      "status": "active",
+      "reportData": null,
+      "complianceLabels": [],
+      "countsTowardsTrustScore": true,
+      "countsTowardsLocationTrustScore": null,
+      "invitation": {
+        "businessUnitId": "5f3a1c9b2d4e6f8a0b1c2d3e"
+      },
+      "source": "Organic",
+      "consumer": {
+        "id": "70b2c3d4e5f60718293a0b04",
+        "displayName": "reviewer-04",
+        "displayLocation": "TR",
+        "numberOfReviews": 2,
+        "links": [
+          {
+            "href": "https://api.trustpilot.com/v1/consumers/70b2c3d4e5f60718293a0b04",
+            "method": "GET",
+            "rel": "self"
+          }
+        ]
+      },
+      "businessUnit": {
+        "id": "5f3a1c9b2d4e6f8a0b1c2d3e",
+        "identifyingName": "example.invalid",
+        "displayName": "Example Company"
+      }
+    },
+    {
+      "links": [
+        {
+          "href": "https://api.trustpilot.com/v1/reviews/60a1b2c3d4e5f60718293a05",
+          "method": "GET",
+          "rel": "self"
+        }
+      ],
+      "id": "60a1b2c3d4e5f60718293a05",
+      "stars": 3,
+      "title": "",
+      "text": null,
+      "language": "tr",
+      "location": null,
+      "createdAt": "2026-08-28T10:15:36Z",
+      "updatedAt": null,
+      "experiencedAt": "2026-08-27T00:00:00Z",
+      "referralEmail": null,
+      "referenceId": null,
+      "companyReply": null,
+      "isVerified": false,
+      "numberOfLikes": 0,
+      "status": "active",
+      "reportData": null,
+      "complianceLabels": [],
+      "countsTowardsTrustScore": true,
+      "countsTowardsLocationTrustScore": null,
+      "invitation": null,
+      "source": "Organic",
+      "consumer": {
+        "id": "70b2c3d4e5f60718293a0b05",
+        "displayName": "reviewer-05",
+        "displayLocation": "TR",
+        "numberOfReviews": 1,
+        "links": [
+          {
+            "href": "https://api.trustpilot.com/v1/consumers/70b2c3d4e5f60718293a0b05",
+            "method": "GET",
+            "rel": "self"
+          }
+        ]
+      },
+      "businessUnit": {
+        "id": "5f3a1c9b2d4e6f8a0b1c2d3e",
+        "identifyingName": "example.invalid",
+        "displayName": "Example Company"
+      }
+    }
+  ]
+}

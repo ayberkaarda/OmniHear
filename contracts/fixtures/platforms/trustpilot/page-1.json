@@ -1,0 +1,155 @@
+{
+  "reviews": [
+    {
+      "links": [
+        {
+          "href": "https://api.trustpilot.com/v1/reviews/60a1b2c3d4e5f60718293a01",
+          "method": "GET",
+          "rel": "self"
+        }
+      ],
+      "id": "60a1b2c3d4e5f60718293a01",
+      "stars": 5,
+      "title": "Kargo beklediğimden hızlı geldi",
+      "text": "Siparişi cuma akşamı verdim, pazartesi sabahı elimdeydi. Paketleme de özenliydi, hiçbir yeri ezilmemişti.",
+      "language": "tr",
+      "location": null,
+      "createdAt": "2026-08-30T09:12:44Z",
+      "updatedAt": "2026-08-31T07:02:10Z",
+      "experiencedAt": "2026-08-29T00:00:00Z",
+      "referralEmail": null,
+      "referenceId": null,
+      "companyReply": null,
+      "isVerified": true,
+      "numberOfLikes": 3,
+      "status": "active",
+      "reportData": null,
+      "complianceLabels": [],
+      "countsTowardsTrustScore": true,
+      "countsTowardsLocationTrustScore": null,
+      "invitation": {
+        "businessUnitId": "5f3a1c9b2d4e6f8a0b1c2d3e"
+      },
+      "source": "Organic",
+      "consumer": {
+        "id": "70b2c3d4e5f60718293a0b01",
+        "displayName": "reviewer-01",
+        "displayLocation": "TR",
+        "numberOfReviews": 4,
+        "links": [
+          {
+            "href": "https://api.trustpilot.com/v1/consumers/70b2c3d4e5f60718293a0b01",
+            "method": "GET",
+            "rel": "self"
+          }
+        ]
+      },
+      "businessUnit": {
+        "id": "5f3a1c9b2d4e6f8a0b1c2d3e",
+        "identifyingName": "example.invalid",
+        "displayName": "Example Company"
+      }
+    },
+    {
+      "links": [
+        {
+          "href": "https://api.trustpilot.com/v1/reviews/60a1b2c3d4e5f60718293a02",
+          "method": "GET",
+          "rel": "self"
+        }
+      ],
+      "id": "60a1b2c3d4e5f60718293a02",
+      "stars": 2,
+      "title": "Uygulama ödeme adımında donuyor",
+      "text": "Sepeti onayladıktan sonra ekran beyaz kalıyor ve baştan başlamak gerekiyor. Üç denemede ancak tamamlayabildim.",
+      "language": "tr",
+      "location": null,
+      "createdAt": "2026-08-29T18:41:03Z",
+      "updatedAt": null,
+      "experiencedAt": "2026-08-29T00:00:00Z",
+      "referralEmail": null,
+      "referenceId": null,
+      "companyReply": {
+        "text": "Geri bildiriminiz için teşekkür ederiz, ekibimiz konuyu inceliyor.",
+        "createdAt": "2026-08-30T06:20:00Z"
+      },
+      "isVerified": true,
+      "numberOfLikes": 0,
+      "status": "active",
+      "reportData": null,
+      "complianceLabels": [],
+      "countsTowardsTrustScore": true,
+      "countsTowardsLocationTrustScore": null,
+      "invitation": {
+        "businessUnitId": "5f3a1c9b2d4e6f8a0b1c2d3e"
+      },
+      "source": "Invitation",
+      "consumer": {
+        "id": "70b2c3d4e5f60718293a0b02",
+        "displayName": "reviewer-02",
+        "displayLocation": "TR",
+        "numberOfReviews": 1,
+        "links": [
+          {
+            "href": "https://api.trustpilot.com/v1/consumers/70b2c3d4e5f60718293a0b02",
+            "method": "GET",
+            "rel": "self"
+          }
+        ]
+      },
+      "businessUnit": {
+        "id": "5f3a1c9b2d4e6f8a0b1c2d3e",
+        "identifyingName": "example.invalid",
+        "displayName": "Example Company"
+      }
+    },
+    {
+      "links": [
+        {
+          "href": "https://api.trustpilot.com/v1/reviews/60a1b2c3d4e5f60718293a03",
+          "method": "GET",
+          "rel": "self"
+        }
+      ],
+      "id": "60a1b2c3d4e5f60718293a03",
+      "stars": 4,
+      "title": "Fiyat performans olarak iyi",
+      "text": "",
+      "language": "tr",
+      "location": null,
+      "createdAt": "2026-08-29T07:05:19Z",
+      "updatedAt": null,
+      "experiencedAt": "2026-08-28T00:00:00Z",
+      "referralEmail": null,
+      "referenceId": null,
+      "companyReply": null,
+      "isVerified": false,
+      "numberOfLikes": 1,
+      "status": "active",
+      "reportData": null,
+      "complianceLabels": [],
+      "countsTowardsTrustScore": true,
+      "countsTowardsLocationTrustScore": null,
+      "invitation": null,
+      "source": "Organic",
+      "consumer": {
+        "id": "70b2c3d4e5f60718293a0b03",
+        "displayName": "reviewer-03",
+        "displayLocation": "TR",
+        "numberOfReviews": 9,
+        "links": [
+          {
+            "href": "https://api.trustpilot.com/v1/consumers/70b2c3d4e5f60718293a0b03",
+            "method": "GET",
+            "rel": "self"
+          }
+        ]
+      },
+      "businessUnit": {
+        "id": "5f3a1c9b2d4e6f8a0b1c2d3e",
+        "identifyingName": "example.invalid",
+        "displayName": "Example Company"
+      }
+    }
+  ]
+}
