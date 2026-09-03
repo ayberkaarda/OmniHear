@@ -90,6 +90,24 @@ check('rekursif silme -> ask', 'guard-destructive-ops.mjs', cmd(`${RMRF} ./build
 check('korunan DB dusurme -> deny', 'guard-destructive-ops.mjs', cmd(`${DROPDB} ${DEVDB}`), 'deny')
 check('korunan DB truncate -> deny', 'guard-destructive-ops.mjs', cmd(`psql -d ${DEVDB} -c "${TRUNC} feedbacks"`), 'deny')
 check('joker DROP -> deny', 'guard-destructive-ops.mjs', cmd('psql -c "DROP DATABASE LIKE test_tmp_%"'), 'deny')
+// Bir baglanti bayraginin degeri hedef degildir. Bu yigin POSTGRES_USER olarak
+// `omnihear` kullaniyor, yani CLAUDE.md section 8'in temizlik adiminin tek
+// calisan bicimi budur; eskiden butun komut taranarak hard-deny veriliyordu ve
+// prosedur hicbir ajan tarafindan uygulanamiyordu.
+check('FP: -U bayragi hedef degil -> ask', 'guard-destructive-ops.mjs',
+  cmd(`${DROPDB} -U ${DEVDB} --if-exists test_tmp_w8gp`), 'ask')
+check('FP: uzun bayrak hedef degil -> ask', 'guard-destructive-ops.mjs',
+  cmd(`${DROPDB} --username=${DEVDB} --if-exists test_tmp_w8tp`), 'ask')
+// ...ve koruma gevsemedi: hedefin kendisi korunan bir DB ise hala deny.
+check('korunan DB, bayrakla birlikte -> deny', 'guard-destructive-ops.mjs',
+  cmd(`${DROPDB} -U postgres ${DEVDB}_test`), 'deny')
+check('korunan DB, --if-exists ile -> deny', 'guard-destructive-ops.mjs',
+  cmd(`${DROPDB} --if-exists ${DEVDB}`), 'deny')
+check('korunan DB, SQL formu -> deny', 'guard-destructive-ops.mjs',
+  cmd(`psql -c "DROP DATABASE IF EXISTS ${DEVDB}"`), 'deny')
+// Ayristirilamayan bir sekil fail-closed kalir: hedef okunamiyorsa butun komut taranir.
+check('ayristirilamayan drop -> deny', 'guard-destructive-ops.mjs',
+  cmd(`psql -c "DROP DATABASE" -d ${DEVDB}`), 'deny')
 check('FP: cache:clear -> pass', 'guard-destructive-ops.mjs', cmd('php artisan cache:clear'), 'pass')
 check('FP: compose down bayraksiz -> pass', 'guard-destructive-ops.mjs', cmd('docker compose down'), 'pass')
 check('FP: DELETE + WHERE -> pass', 'guard-destructive-ops.mjs', cmd('psql -c "DELETE FROM jobs WHERE id=1"'), 'pass')

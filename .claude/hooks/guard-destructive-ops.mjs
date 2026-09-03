@@ -14,6 +14,50 @@ const DROP_DATABASE_RE = /\bdrop\s+database\b/i;
 const DROPDB_RE = /(?:^|[\s/\\"'])dropdb\b/i;
 const TRUNCATE_RE = /\btruncate\b/i;
 
+/**
+ * `dropdb` flags that consume the following word.
+ *
+ * Without this list the protected-name check reads a connection flag's value as
+ * the drop target: on this stack `POSTGRES_USER` is `omnihear`, so the only
+ * working invocation is `dropdb -U omnihear --if-exists test_tmp_w8gp`, and
+ * scanning the whole command hard-denied it. That made CLAUDE.md section 8's
+ * own cleanup procedure impossible to carry out — measured 2026-09-03, after
+ * eleven `test_tmp_*` databases had accumulated on the dev server.
+ */
+const DROPDB_VALUE_FLAGS = /^(?:-h|-p|-U|-d|--host|--port|--username|--maintenance-db)$/i;
+
+/**
+ * The database names a drop command actually targets.
+ *
+ * Returns an empty array when nothing could be parsed, and every caller then
+ * falls back to scanning the whole command — fail closed, never open.
+ *
+ * @returns {string[]}
+ */
+function dropTargets(command) {
+  const targets = [];
+
+  const dropdb = /(?:^|[\s/\\"'(;&|])dropdb\b([^;&|)]*)/gi;
+  let m;
+  while ((m = dropdb.exec(command)) !== null) {
+    const args = (m[1] || '').trim().split(/\s+/).filter(Boolean);
+    for (let i = 0; i < args.length; i += 1) {
+      const arg = args[i];
+      if (arg.startsWith('-')) {
+        // `--host=x` carries its value inline and consumes nothing after it.
+        if (DROPDB_VALUE_FLAGS.test(arg)) i += 1;
+        continue;
+      }
+      targets.push(arg.replace(/^["'`]|["'`]$/g, ''));
+    }
+  }
+
+  const sql = /\bdrop\s+database\s+(?:if\s+exists\s+)?["'`]?([A-Za-z0-9_%*$-]+)/gi;
+  while ((m = sql.exec(command)) !== null) targets.push(m[1]);
+
+  return targets;
+}
+
 /** Hard-deny rules. Order matters: first match wins. */
 function hardDeny(command) {
   const wildcardDrop =
@@ -28,11 +72,17 @@ function hardDeny(command) {
   }
 
   if (!PROTECTED_DB_RE.test(command)) return null;
-  const name = (PROTECTED_DB_RE.exec(command) || [])[0];
 
   if (DROP_DATABASE_RE.test(command) || DROPDB_RE.test(command)) {
+    // Judge the parsed target, not the whole command line: a connection flag
+    // may legitimately name the protected role. When nothing parses, fall back
+    // to the whole command so an unrecognised shape is refused, not allowed.
+    const targets = dropTargets(command);
+    const scope = targets.length > 0 ? targets.join(' ') : command;
+    if (!PROTECTED_DB_RE.test(scope)) return null;
+
     return (
-      'Korunan veritabanı hedefleniyor: "' + name + '". ' +
+      'Korunan veritabanı hedefleniyor: "' + (PROTECTED_DB_RE.exec(scope) || [])[0] + '". ' +
       'omnihear (geliştirme) ve omnihear_test (test) veritabanlarının düşürülmesi bu kanaldan yasaktır. ' +
       'omnihear içinde integrations.credentials (şifreli JSONB) ve KVKK kapsamındaki feedbacks kayıtları bulunur; ' +
       'geri dönüşü yoktur. Kullanıcı bu işlemi ayrı ve açık bir talimatla kendisi yapmalıdır.'
@@ -40,7 +90,9 @@ function hardDeny(command) {
   }
   if (TRUNCATE_RE.test(command)) {
     return (
-      'Korunan veritabanı üzerinde TRUNCATE yakalandı: "' + name + '". ' +
+      'Korunan veritabanı üzerinde TRUNCATE yakalandı: "' +
+      (PROTECTED_DB_RE.exec(command) || [])[0] +
+      '". ' +
       'TRUNCATE geri alınamaz ve feedbacks (KVKK kapsamında PII) ile integrations tablolarını boşaltır. ' +
       'Geçici test verisi için test_tmp_<sonek> veritabanı kullan; ' +
       'korunan veritabanına dokunmak ayrı ve açık bir kullanıcı talimatı gerektirir.'
