@@ -2,10 +2,12 @@
 
 use App\Http\Middleware\CorrelationId;
 use App\Http\Middleware\EnforceQuota;
+use App\Http\Middleware\EnforceTokenAbility;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\QuotaRemainingHeader;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SetTenantContext;
+use App\Http\Middleware\ThrottleFailedAuthentication;
 use App\Support\Http\ApiErrorResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -37,7 +39,15 @@ return Application::configure(basePath: dirname(__DIR__))
     // and EmailVerificationEnforcementTest no longer exempts this uri.
     ->withBroadcasting(
         __DIR__.'/../routes/channels.php',
-        attributes: ['prefix' => 'api/v1', 'middleware' => ['api', 'auth:sanctum', 'verified']],
+        //
+        // EnforceTokenAbility is listed for the same reason `verified` is: this
+        // route builds its own middleware array and never sees the one
+        // routes/api.php shares, so without it an API key could subscribe to
+        // the tenant's private channel and stream every FeedbackAnalyzed and
+        // QuotaThresholdReached event — a capability no route in
+        // MACHINE_ROUTES grants. The route has no name, so the default-deny
+        // branch of that middleware is what refuses it.
+        attributes: ['prefix' => 'api/v1', 'middleware' => ['api', 'auth:sanctum', EnforceTokenAbility::class, 'verified']],
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Both are prepended, not appended. Laravel sorts route middleware by
@@ -48,6 +58,19 @@ return Application::configure(basePath: dirname(__DIR__))
         // correlation id is stamped on every response, errors included.
         $middleware->prependToGroup('api', SetLocale::class);
         $middleware->prependToGroup('api', CorrelationId::class);
+
+        // The only limiter an unauthenticated caller ever meets.
+        //
+        // `throttle:api` is listed inside the authenticated stack in
+        // routes/api.php and never runs for one: priority sorting puts
+        // Authenticate ahead of ThrottleRequests, so a missing or invalid
+        // bearer token answers 401 first and the limiter is unreachable. A
+        // second `throttle:` entry would be the same class and would sort the
+        // same way. Prepending a middleware that is *absent* from the priority
+        // list is the shape that actually runs first - the same reason
+        // CorrelationId is prepended rather than appended. See the class for
+        // why it counts failures rather than requests.
+        $middleware->prependToGroup('api', ThrottleFailedAuthentication::class);
 
         // SetTenantContext must run before SubstituteBindings. Route-model
         // binding queries the model, CompanyScope needs a tenant, and without

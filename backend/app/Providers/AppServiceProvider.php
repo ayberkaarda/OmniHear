@@ -58,7 +58,8 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * The four limiters of the HTTP contract, section 3.
+     * The four limiters of the HTTP contract, section 3, plus the outbound-mail
+     * ceiling on invitations.
      */
     private function configureRateLimiting(): void
     {
@@ -66,10 +67,34 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('auth-login', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
 
+        // Keyed by user, and only ever by user. The `?? $request->ip()` branch
+        // is UNREACHABLE and is kept only because removing it would leave a
+        // null dereference if the ordering below ever changed: `throttle:api`
+        // is declared inside the authenticated stack, and priority sorting
+        // puts Authenticate ahead of ThrottleRequests, so this closure is
+        // never evaluated for a request that has no user. It is not - and
+        // never was - the protection an anonymous caller meets; that is
+        // App\Http\Middleware\ThrottleFailedAuthentication, prepended to the
+        // `api` group in bootstrap/app.php.
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)
             ->by($request->user()?->getAuthIdentifier() ?? $request->ip()));
 
         RateLimiter::for('public', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
+
+        // Invitations send mail to an address the recipient never asked us to
+        // write to, which makes this the one authenticated endpoint that can be
+        // turned into a spam cannon. `throttle:api` alone allows 120 a minute
+        // from a single admin.
+        //
+        // Keyed by company, not by user: the abuse is a tenant mailing the
+        // world, and an owner who has run the ceiling down must not be able to
+        // reset it by inviting a colleague to do the next 50. A company that
+        // genuinely onboards more than 50 people in a day waits out the window
+        // — nothing is lost, and the refusal is the catalogued 429
+        // TOO_MANY_REQUESTS with a Retry-After header, not a new error code.
+        RateLimiter::for('team-invitations', fn (Request $request) => Limit::perDay(
+            (int) config('registration.invitations_per_day', 50),
+        )->by('company:'.($request->user()?->getAttribute('company_id') ?? $request->ip())));
     }
 
     /**

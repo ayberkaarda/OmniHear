@@ -15,6 +15,27 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Failed authentication ceiling
+    |--------------------------------------------------------------------------
+    |
+    | Not a framework key. App\Http\Middleware\ThrottleFailedAuthentication
+    | reads it: how many 401 answers one IP address may collect before every
+    | request from it is refused, and for how long. Only failures are counted,
+    | so authenticated traffic and successful public calls never spend the
+    | budget - see that class for why a plain per-IP request ceiling was the
+    | wrong instrument here.
+    |
+    | Set the maximum to 0 to disable the limiter entirely.
+    |
+    */
+
+    'failed_authentication' => [
+        'max_attempts' => (int) env('AUTH_FAILED_MAX_ATTEMPTS', 60),
+        'decay_minutes' => (int) env('AUTH_FAILED_DECAY_MINUTES', 1),
+    ],
+
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
