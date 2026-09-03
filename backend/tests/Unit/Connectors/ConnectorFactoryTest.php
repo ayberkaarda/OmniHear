@@ -59,9 +59,25 @@ it('builds the app store connector from its settings', function () {
 });
 
 it('refuses a platform that has no connector', function (string $platform) {
-    expect(factoryFailure(fn () => app(ConnectorFactory::class)->for(unsavedIntegration($platform))))
+    // Deliberately restricted to platforms with no config/connectors.php entry
+    // at all. googleplay and trustpilot used to be in this dataset, and both
+    // still made `for()` throw Misconfigured on an unsavedIntegration() with
+    // no settings — but for the wrong reason, once both got a config entry:
+    // the missing-required-setting branch, not the missing-connector branch.
+    // Both branches throw the exact same fixed Misconfigured sentence
+    // (invariant I5 — no per-cause message), so the exception alone cannot
+    // tell those two paths apart, and this test kept passing while asserting
+    // nothing about whether the platform was actually supported. Do not widen
+    // this dataset back to a real platform just because an empty
+    // unsavedIntegration() happens to fail for it too — check supports()
+    // first.
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->supports($platform))->toBeFalse()
+        ->and($factory->config($platform))->toBeNull()
+        ->and(factoryFailure(fn () => $factory->for(unsavedIntegration($platform))))
         ->toBe(ConnectorFailure::Misconfigured);
-})->with(['googleplay', 'trustpilot', 'email', 'social', 'not-a-platform']);
+})->with(['email', 'social', 'not-a-platform']);
 
 it('builds the zendesk connector from its settings and credentials', function () {
     $connector = app(ConnectorFactory::class)->for(unsavedIntegration(
@@ -118,7 +134,8 @@ it('refuses a fixture set name that could escape the fixture root', function (st
 })->with(['../appstore', '..', 'a/b', 'set with spaces', '.']);
 
 it('lists exactly the platforms that have a connector today', function () {
-    expect(app(ConnectorFactory::class)->platforms())->toBe(['fixture', 'appstore', 'zendesk']);
+    expect(app(ConnectorFactory::class)->platforms())
+        ->toBe(['fixture', 'appstore', 'zendesk', 'googleplay', 'trustpilot']);
 });
 
 it('answers whether a platform is supported', function () {
@@ -126,8 +143,10 @@ it('answers whether a platform is supported', function () {
 
     expect($factory->supports('appstore'))->toBeTrue()
         ->and($factory->supports('zendesk'))->toBeTrue()
-        ->and($factory->supports('googleplay'))->toBeFalse()
-        ->and($factory->config('googleplay'))->toBeNull();
+        ->and($factory->supports('googleplay'))->toBeTrue()
+        ->and($factory->config('googleplay'))->toBeArray()
+        ->and($factory->supports('trustpilot'))->toBeTrue()
+        ->and($factory->config('trustpilot'))->toBeArray();
 });
 
 it('reads the per-platform throttle and backoff out of config', function () {

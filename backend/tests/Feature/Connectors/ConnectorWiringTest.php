@@ -1,0 +1,337 @@
+<?php
+
+use App\Models\Integration;
+use App\Support\Connectors\ConnectorException;
+use App\Support\Connectors\ConnectorFactory;
+use App\Support\Connectors\ConnectorFailure;
+use App\Support\Connectors\GooglePlayConnector;
+use App\Support\Connectors\TrustpilotConnector;
+
+use function Pest\Laravel\actingAs;
+
+/*
+|--------------------------------------------------------------------------
+| ConnectorFactory / PlatformController wiring for googleplay + trustpilot
+|--------------------------------------------------------------------------
+|
+| GooglePlayConnector, GooglePlayAccessToken and TrustpilotConnector already
+| have their own green unit and ingestion tests on another track. Nothing
+| here re-tests their sync logic. This file is about the two new `match` arms
+| in ConnectorFactory, the two new config/connectors.php entries, and the
+| package_name / business_unit_id format rules in
+| IntegrationSettingFormats — the wiring that turns those classes into
+| something a tenant can actually create through the API. A wrong
+| constructor-argument name in the factory's match arm is exactly the risk
+| this file exists to catch, which is why the positive-path test below
+| asserts the concrete connector class rather than just "did not throw".
+|
+*/
+
+/**
+ * An unsaved integration, for exercising ConnectorFactory without a database
+ * round trip. Named distinctly from tests/Unit/Connectors/ConnectorFactoryTest.php's
+ * own `unsavedIntegration()` helper — both files are pulled into the same Pest
+ * run, and top-level function names collide globally in PHP.
+ */
+function wiringIntegration(string $platform, array $settings = [], array $credentials = []): Integration
+{
+    $integration = new Integration;
+    $integration->forceFill([
+        'platform' => $platform,
+        'settings' => $settings,
+        'credentials' => $credentials,
+    ]);
+
+    return $integration;
+}
+
+function wiringFactoryFailure(callable $call): ?ConnectorFailure
+{
+    try {
+        $call();
+    } catch (ConnectorException $e) {
+        return $e->failure();
+    }
+
+    return null;
+}
+
+/*
+|--------------------------------------------------------------------------
+| 1. ConnectorFactory::for() resolves the right concrete class
+|--------------------------------------------------------------------------
+*/
+
+it('builds a GooglePlayConnector for a fully-populated googleplay integration', function () {
+    $connector = app(ConnectorFactory::class)->for(wiringIntegration(
+        'googleplay',
+        ['package_name' => 'com.acme.app'],
+        ['client_email' => 'sa@acme.iam.gserviceaccount.com', 'private_key' => 'test-fixture-key-material'],
+    ));
+
+    expect($connector)->toBeInstanceOf(GooglePlayConnector::class)
+        ->and($connector->limits()->maxPagesPerRun)->toBe(10)
+        ->and($connector->limits()->maxConsecutiveEmptyPages)->toBe(3);
+});
+
+it('builds a TrustpilotConnector for a fully-populated trustpilot integration', function () {
+    $connector = app(ConnectorFactory::class)->for(wiringIntegration(
+        'trustpilot',
+        ['business_unit_id' => 'abcdef0123456789abcdef01'],
+        ['api_key' => 'test-fixture-trustpilot-key'],
+    ));
+
+    expect($connector)->toBeInstanceOf(TrustpilotConnector::class)
+        ->and($connector->limits()->maxPagesPerRun)->toBe(20)
+        ->and($connector->limits()->maxConsecutiveEmptyPages)->toBe(3);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 2. Every required setting / credential, omitted one at a time
+|--------------------------------------------------------------------------
+|
+| Driven from config('connectors.platforms.<p>') rather than a hard-coded key
+| list, so a key added to either platform's config later is covered here
+| automatically without anyone remembering to update this file.
+|
+*/
+
+it('refuses a googleplay or trustpilot integration missing any required setting', function () {
+    $factory = app(ConnectorFactory::class);
+
+    foreach (['googleplay', 'trustpilot'] as $platform) {
+        $config = $factory->config($platform);
+        expect($config)->not->toBeNull();
+
+        $settings = array_fill_keys($config['required_settings'] ?? [], 'placeholder-value');
+        $credentials = array_fill_keys($config['required_credentials'] ?? [], 'placeholder-value');
+
+        // Sanity check the fixture below is not vacuous: today's config always
+        // has at least one required setting for these two platforms.
+        expect($settings)->not->toBe([]);
+
+        foreach (array_keys($settings) as $missing) {
+            $partialSettings = $settings;
+            unset($partialSettings[$missing]);
+
+            $failure = wiringFactoryFailure(
+                fn () => $factory->for(wiringIntegration($platform, $partialSettings, $credentials)),
+            );
+
+            expect($failure)->toBe(
+                ConnectorFailure::Misconfigured,
+                "platform={$platform} missing setting={$missing} should be Misconfigured",
+            );
+        }
+    }
+});
+
+it('refuses a googleplay or trustpilot integration missing any required credential', function () {
+    $factory = app(ConnectorFactory::class);
+
+    foreach (['googleplay', 'trustpilot'] as $platform) {
+        $config = $factory->config($platform);
+        expect($config)->not->toBeNull();
+
+        $settings = array_fill_keys($config['required_settings'] ?? [], 'placeholder-value');
+        $credentials = array_fill_keys($config['required_credentials'] ?? [], 'placeholder-value');
+
+        // Sanity check the fixture below is not vacuous: both platforms need
+        // credentials today, which is the whole point of this test existing.
+        expect($credentials)->not->toBe([]);
+
+        foreach (array_keys($credentials) as $missing) {
+            $partialCredentials = $credentials;
+            unset($partialCredentials[$missing]);
+
+            $failure = wiringFactoryFailure(
+                fn () => $factory->for(wiringIntegration($platform, $settings, $partialCredentials)),
+            );
+
+            expect($failure)->toBe(
+                ConnectorFailure::Misconfigured,
+                "platform={$platform} missing credential={$missing} should be Misconfigured",
+            );
+        }
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
+| 3. supports() / platforms()
+|--------------------------------------------------------------------------
+*/
+
+it('recognises googleplay and trustpilot as supported platforms', function () {
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->supports('googleplay'))->toBeTrue()
+        ->and($factory->supports('trustpilot'))->toBeTrue()
+        ->and($factory->platforms())->toContain('googleplay')
+        ->and($factory->platforms())->toContain('trustpilot');
+});
+
+/*
+|--------------------------------------------------------------------------
+| 4. GET /api/v1/integrations/platforms
+|--------------------------------------------------------------------------
+*/
+
+it('publishes googleplay and trustpilot with their settings, credentials and format rules', function () {
+    [, $user] = tenant();
+
+    $response = actingAs($user, 'sanctum')->getJson('/api/v1/integrations/platforms')->assertOk();
+    $data = collect($response->json('data'))->keyBy('platform');
+
+    expect($data->keys()->all())->toContain('googleplay', 'trustpilot');
+
+    $googleplay = $data['googleplay'];
+    expect($googleplay['requires_credentials'])->toBeTrue()
+        ->and(collect($googleplay['settings'])->pluck('key')->all())->toBe(['package_name'])
+        ->and(collect($googleplay['settings'])->firstWhere('key', 'package_name')['format'])->toBe('android_package')
+        ->and(collect($googleplay['credentials'])->pluck('key')->all())->toBe(['client_email', 'private_key']);
+
+    $trustpilot = $data['trustpilot'];
+    expect($trustpilot['requires_credentials'])->toBeTrue()
+        ->and(collect($trustpilot['settings'])->pluck('key')->all())->toBe(['business_unit_id'])
+        ->and(collect($trustpilot['settings'])->firstWhere('key', 'business_unit_id')['format'])->toBe('hex24')
+        ->and(collect($trustpilot['credentials'])->pluck('key')->all())->toBe(['api_key']);
+});
+
+it('never lets a stored googleplay or trustpilot credential value reach the platforms catalogue', function () {
+    // Invariant I5. The endpoint is config-driven and never touches an
+    // Integration row, so this is also a regression guard: if a future change
+    // ever made it read actual integration credentials, this is the test that
+    // would catch it, because there is a real secret in the database to leak.
+    [$company, $user] = tenant();
+
+    Integration::factory()->for($company)->create([
+        'platform' => 'googleplay',
+        'settings' => ['package_name' => 'com.acme.app'],
+        'credentials' => [
+            'client_email' => 'sa@acme.iam.gserviceaccount.com',
+            'private_key' => 'test-fixture-supersecretgoogleplaymaterial-not-a-real-key',
+        ],
+    ]);
+
+    Integration::factory()->for($company)->create([
+        'platform' => 'trustpilot',
+        'settings' => ['business_unit_id' => 'abcdef0123456789abcdef01'],
+        'credentials' => ['api_key' => 'tp-super-secret-api-key-value'],
+    ]);
+
+    $response = actingAs($user, 'sanctum')->getJson('/api/v1/integrations/platforms')->assertOk();
+
+    expect($response->getContent())
+        ->not->toContain('supersecretgoogleplaymaterial')
+        ->and($response->getContent())->not->toContain('sa@acme.iam.gserviceaccount.com')
+        ->and($response->getContent())->not->toContain('tp-super-secret-api-key-value');
+
+    foreach ($response->json('data.*.credentials') as $credentials) {
+        foreach ($credentials as $credential) {
+            expect(array_keys($credential))->toBe(['key', 'required']);
+        }
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
+| 5. POST /api/v1/integrations — package_name / business_unit_id validation
+|--------------------------------------------------------------------------
+|
+| The point of IntegrationSettingFormats existing at all: turning a sync-time
+| Misconfigured failure, discovered hours later by the scheduler, into an
+| immediate 422 the user can act on at create time.
+|
+*/
+
+it('validates googleplay package_name and trustpilot business_unit_id at create time', function (array $payload, ?string $invalidField) {
+    [, $user] = tenant();
+
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', $payload);
+
+    if ($invalidField === null) {
+        $response->assertCreated()
+            ->assertJsonPath('integration.platform', $payload['platform']);
+
+        return;
+    }
+
+    $response->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonValidationErrors($invalidField);
+})->with([
+    'googleplay package_name with a path separator' => [[
+        'platform' => 'googleplay',
+        'settings' => ['package_name' => 'com/acme'],
+        'credentials' => ['client_email' => 'sa@acme.iam.gserviceaccount.com', 'private_key' => 'key-material'],
+    ], 'settings.package_name'],
+    'googleplay package_name with no dot segment' => [[
+        'platform' => 'googleplay',
+        'settings' => ['package_name' => 'acme'],
+        'credentials' => ['client_email' => 'sa@acme.iam.gserviceaccount.com', 'private_key' => 'key-material'],
+    ], 'settings.package_name'],
+    'googleplay package_name attempting path traversal' => [[
+        'platform' => 'googleplay',
+        'settings' => ['package_name' => '../etc'],
+        'credentials' => ['client_email' => 'sa@acme.iam.gserviceaccount.com', 'private_key' => 'key-material'],
+    ], 'settings.package_name'],
+    'googleplay well-formed package_name succeeds' => [[
+        'platform' => 'googleplay',
+        'settings' => ['package_name' => 'com.acme.app'],
+        'credentials' => ['client_email' => 'sa@acme.iam.gserviceaccount.com', 'private_key' => 'key-material'],
+    ], null],
+    'trustpilot business_unit_id too short' => [[
+        'platform' => 'trustpilot',
+        'settings' => ['business_unit_id' => 'abc123'],
+        'credentials' => ['api_key' => 'tp-key'],
+    ], 'settings.business_unit_id'],
+    'trustpilot business_unit_id not hexadecimal' => [[
+        'platform' => 'trustpilot',
+        'settings' => ['business_unit_id' => 'zzzzzzzzzzzzzzzzzzzzzzzz'],
+        'credentials' => ['api_key' => 'tp-key'],
+    ], 'settings.business_unit_id'],
+    'trustpilot well-formed business_unit_id succeeds' => [[
+        'platform' => 'trustpilot',
+        'settings' => ['business_unit_id' => 'abcdef0123456789abcdef01'],
+        'credentials' => ['api_key' => 'tp-key'],
+    ], null],
+]);
+
+it('rejects a googleplay or trustpilot create with no credentials at all', function (array $payload, string $field) {
+    // Both platforms are credentialed, same as zendesk in
+    // tests/Feature/Ingestion/IntegrationCrudTest.php — accepting a create
+    // without them would produce an integration the scheduler can only fail
+    // on, hours later, instead of a 422 the user can act on now.
+    [, $user] = tenant();
+
+    $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', $payload)
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonValidationErrors($field);
+})->with([
+    'googleplay without credentials' => [[
+        'platform' => 'googleplay',
+        'settings' => ['package_name' => 'com.acme.app'],
+    ], 'credentials'],
+    'trustpilot without credentials' => [[
+        'platform' => 'trustpilot',
+        'settings' => ['business_unit_id' => 'abcdef0123456789abcdef01'],
+    ], 'credentials'],
+]);
+
+/*
+|--------------------------------------------------------------------------
+| 6. rate_limit() / retryAfter()
+|--------------------------------------------------------------------------
+*/
+
+it('reads the configured throttle and backoff for googleplay and trustpilot', function () {
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->rateLimit('googleplay'))->toBe(['max_attempts' => 20, 'decay_seconds' => 60])
+        ->and($factory->retryAfter('googleplay'))->toBe(60)
+        ->and($factory->rateLimit('trustpilot'))->toBe(['max_attempts' => 30, 'decay_seconds' => 60])
+        ->and($factory->retryAfter('trustpilot'))->toBe(60);
+});

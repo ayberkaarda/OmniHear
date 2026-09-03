@@ -2,6 +2,8 @@
 
 use App\Support\Connectors\AppStoreConnector;
 use App\Support\Connectors\FixtureConnector;
+use App\Support\Connectors\GooglePlayConnector;
+use App\Support\Connectors\TrustpilotConnector;
 use App\Support\Connectors\ZendeskConnector;
 
 return [
@@ -133,6 +135,59 @@ return [
             // Zendesk refuses a start_time too close to now, so the first
             // request is held this far behind the clock.
             'start_time_lag_seconds' => (int) env('ZENDESK_START_TIME_LAG', 300),
+        ],
+
+        'googleplay' => [
+            'connector' => GooglePlayConnector::class,
+            'base_url' => env('GOOGLEPLAY_BASE_URL', 'https://androidpublisher.googleapis.com'),
+            // Where the service-account JWT is exchanged for an access token.
+            // Its own key rather than a constant, because it is a different
+            // host from the API and both are overridden together in tests.
+            'token_url' => env('GOOGLEPLAY_TOKEN_URL', 'https://oauth2.googleapis.com/token'),
+            'required_settings' => ['package_name'],
+            'optional_settings' => [],
+            // A service account, not an API token — the first credential in
+            // this file that is an asymmetric private key. GooglePlayAccessToken
+            // signs with it and nothing else ever touches it (invariant I5).
+            'required_credentials' => ['client_email', 'private_key'],
+            // `reviews.list` only answers for roughly the last seven days, so a
+            // run is bounded by the platform rather than by this number; it is
+            // a runaway-loop ceiling. At 100 per page it still covers 1000
+            // reviews in one pass, which is far past a week for any app this
+            // product is aimed at.
+            'max_pages_per_run' => 10,
+            'max_consecutive_empty_pages' => 3,
+            // An app with nothing in the window answers `{}` every single run.
+            // That is a healthy integration, not a fault, which is why the
+            // connector reads an absent `reviews` key as an empty page.
+            'max_results' => (int) env('GOOGLEPLAY_MAX_RESULTS', 100),
+            'timeout' => (int) env('GOOGLEPLAY_TIMEOUT', 30),
+            // Google publishes a per-project quota rather than a per-endpoint
+            // one; this is a deliberately conservative share of it.
+            'rate_limit' => ['max_attempts' => 20, 'decay_seconds' => 60],
+            'retry_after' => 60,
+        ],
+
+        'trustpilot' => [
+            'connector' => TrustpilotConnector::class,
+            'base_url' => env('TRUSTPILOT_BASE_URL', 'https://api.trustpilot.com'),
+            // Whitelisted in the connector's constructor (24 hex characters),
+            // not here: it is substituted into the URL path, and the factory
+            // does not duplicate a rule the connector already refuses on.
+            'required_settings' => ['business_unit_id'],
+            'optional_settings' => [],
+            // Travels in the `apikey` header and never in the query string.
+            'required_credentials' => ['api_key'],
+            // Page-based and newest-first, with no depth cap of its own, so
+            // this is a runaway-loop ceiling like Zendesk's. 20 x 100 covers
+            // 2000 reviews in one run and a run cut short resumes from the
+            // stored watermark.
+            'max_pages_per_run' => 20,
+            'max_consecutive_empty_pages' => 3,
+            'per_page' => (int) env('TRUSTPILOT_PER_PAGE', 100),
+            'timeout' => (int) env('TRUSTPILOT_TIMEOUT', 30),
+            'rate_limit' => ['max_attempts' => 30, 'decay_seconds' => 60],
+            'retry_after' => 60,
         ],
 
     ],

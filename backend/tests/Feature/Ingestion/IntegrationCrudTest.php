@@ -165,7 +165,16 @@ it('rejects a create it cannot connect', function (array $payload, string $field
 })->with([
     'no platform' => [[], 'platform'],
     'unknown platform' => [['platform' => 'myspace'], 'platform'],
-    'platform with no connector yet' => [['platform' => 'googleplay'], 'platform'],
+    // email: docs/contracts/backend-core.md section 1 lists it in the platform
+    // enum, but config/connectors.php has no entry for it, so
+    // Rule::in($connectors->platforms()) refuses it at the same layer
+    // 'unknown platform' does above. googleplay used to be this example; it
+    // gained a config entry and a required setting, so the same payload now
+    // fails on settings.package_name instead of platform — a different
+    // validation layer, which stopped proving anything about the platform
+    // whitelist this case names. Check config('connectors.platforms') before
+    // reusing 'email' or 'social' here.
+    'platform with no connector yet' => [['platform' => 'email'], 'platform'],
     // Zendesk is the first platform that needs credentials. Accepting a create
     // without them would produce an integration the scheduler can only fail on,
     // hours later, instead of a 422 the user can act on now.

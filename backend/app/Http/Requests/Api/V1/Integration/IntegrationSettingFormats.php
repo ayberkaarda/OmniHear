@@ -32,6 +32,8 @@ final class IntegrationSettingFormats
     {
         return match ($key) {
             'subdomain' => 'hostname',
+            'package_name' => 'android_package',
+            'business_unit_id' => 'hex24',
             default => null,
         };
     }
@@ -46,6 +48,16 @@ final class IntegrationSettingFormats
             // or a dot would send every authenticated request, Authorization
             // header included, somewhere else entirely. DNS label rules.
             'subdomain' => ['max:63', 'regex:/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/'],
+            // Substituted into the Google Play API path. Java package syntax,
+            // which excludes `/` and `.` sequences that could climb out of the
+            // applications/{package}/reviews segment. Mirrors
+            // GooglePlayConnector::PACKAGE_NAME_PATTERN; both layers stay,
+            // because a row that reached the database another way still has to
+            // be refused at sync time.
+            'package_name' => ['max:255', 'regex:/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$/'],
+            // Substituted into the Trustpilot API path. Mirrors
+            // TrustpilotConnector::BUSINESS_UNIT_ID.
+            'business_unit_id' => ['regex:/^[a-f0-9]{24}$/i'],
             default => [],
         };
     }

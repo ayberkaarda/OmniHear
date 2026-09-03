@@ -67,6 +67,34 @@ class ConnectorFactory
                 initialLookbackDays: (int) ($config['initial_lookback_days'] ?? 30),
                 startTimeLagSeconds: (int) ($config['start_time_lag_seconds'] ?? 300),
             ),
+            GooglePlayConnector::class => new GooglePlayConnector(
+                packageName: (string) $settings['package_name'],
+                // The private key never reaches the connector: it is held by
+                // the token minter, which hands out bearer tokens and nothing
+                // else. Constructed here rather than resolved from the
+                // container because it is per-integration state, and the
+                // integration id is what keeps one tenant's cached access token
+                // out of another tenant's requests.
+                token: new GooglePlayAccessToken(
+                    clientEmail: (string) $credentials['client_email'],
+                    privateKey: (string) $credentials['private_key'],
+                    integrationId: (int) $integration->getKey(),
+                    tokenUrl: (string) ($config['token_url'] ?? 'https://oauth2.googleapis.com/token'),
+                    timeout: (int) ($config['timeout'] ?? 30),
+                ),
+                baseUrl: (string) ($config['base_url'] ?? 'https://androidpublisher.googleapis.com'),
+                limits: $limits,
+                timeout: (int) ($config['timeout'] ?? 30),
+                maxResults: (int) ($config['max_results'] ?? 100),
+            ),
+            TrustpilotConnector::class => new TrustpilotConnector(
+                businessUnitId: (string) $settings['business_unit_id'],
+                apiKey: (string) $credentials['api_key'],
+                baseUrl: (string) ($config['base_url'] ?? 'https://api.trustpilot.com'),
+                limits: $limits,
+                timeout: (int) ($config['timeout'] ?? 30),
+                perPage: (int) ($config['per_page'] ?? 100),
+            ),
             AppStoreConnector::class => new AppStoreConnector(
                 appId: (string) $settings['app_id'],
                 country: (string) $settings['country'],

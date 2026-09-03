@@ -1800,7 +1800,9 @@
                                         "enum": [
                                             "fixture",
                                             "appstore",
-                                            "zendesk"
+                                            "zendesk",
+                                            "googleplay",
+                                            "trustpilot"
                                         ],
                                         "type": "string"
                                     },
