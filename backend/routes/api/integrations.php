@@ -36,6 +36,19 @@ Route::apiResource('integrations', IntegrationController::class)
     ->names('integrations')
     ->whereNumber('integration');
 
+// The one endpoint in the whole authenticated surface that carries `quota`
+// (spec 7.4). It is the only user-triggered route that spends analysis quota:
+// FetchFeedbackJob::dispatch appears here and nowhere else, store() starts no
+// initial sync, and there is no re-analyse endpoint. Everything else stays
+// open on purpose — an exhausted tenant still has to reach the inbox, the KPIs
+// and the billing page, because that is where the paywall is rendered, and
+// gating the group would hide the wall behind the wall.
+//
+// This does not weaken spec 7.4's `pending_analysis` accumulation: the
+// five-minute scheduler dispatches FetchFeedbackJob without consulting the
+// quota and AnalyzeFeedbackJob parks the work, so the backlog still builds.
+// The 402 only closes the "give me more work I cannot pay for" button.
 Route::post('integrations/{integration}/sync', [IntegrationController::class, 'sync'])
+    ->middleware('quota')
     ->whereNumber('integration')
     ->name('integrations.sync');

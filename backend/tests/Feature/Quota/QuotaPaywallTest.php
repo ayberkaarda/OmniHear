@@ -3,10 +3,18 @@
 use App\Http\Middleware\EnforceQuota;
 use App\Http\Middleware\SetTenantContext;
 use App\Jobs\AnalyzeFeedbackJob;
+use App\Jobs\FetchFeedbackJob;
 use App\Models\Feedback;
+use App\Models\Integration;
+use App\Support\Connectors\IntegrationSyncLock;
 use App\Support\Quota\QuotaCounter;
 use App\Support\Tenancy\TenantContext;
+use Illuminate\Console\Scheduling\Event as ScheduledEvent;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
+use Tests\Feature\Payments\PaymentTestKit;
 use Tests\Support\AiServiceFake;
 
 /**
@@ -173,4 +181,123 @@ it('is registered under the quota middleware alias', function () {
     expect(app('router')->getMiddleware())
         ->toHaveKey('quota')
         ->and(app('router')->getMiddleware()['quota'])->toBe(EnforceQuota::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| The gated route — the real one, not the probe
+|--------------------------------------------------------------------------
+|
+| Everything above proves the middleware's behaviour. These prove it is
+| actually reachable: before POST /integrations/{id}/sync carried the alias, no
+| request the product can make could produce a 402 at all, and the SPA's
+| QUOTA_EXCEEDED branch was unreachable code.
+|
+*/
+
+it('answers 402 on the sync trigger once the quota is exhausted', function () {
+    Queue::fake();
+    [$company, $user] = tenant();
+    $company->forceFill(['quota_limit' => 5, 'analyzed_feedback_count' => 5])->save();
+    $integration = Integration::factory()->for($company)->create();
+
+    $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations/'.$integration->id.'/sync')
+        ->assertStatus(402)
+        ->assertExactJson([
+            'code' => 'QUOTA_EXCEEDED',
+            'message' => 'Your analysis quota is exhausted. Upgrade your plan to continue.',
+        ])
+        ->assertHeader('X-Quota-Remaining', '0');
+
+    // The refusal is a refusal: no work was queued and the sync lock was not
+    // taken, so the button works again the moment the plan is upgraded.
+    Queue::assertNothingPushed();
+    expect(app(IntegrationSyncLock::class)->isHeld((int) $integration->id))->toBeFalse();
+});
+
+it('queues the sync while a single unit of quota remains', function () {
+    Queue::fake();
+    [$company, $user] = tenant();
+    $company->forceFill(['quota_limit' => 5, 'analyzed_feedback_count' => 4])->save();
+    $integration = Integration::factory()->for($company)->create();
+
+    $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations/'.$integration->id.'/sync')
+        ->assertStatus(202)
+        ->assertHeader('X-Quota-Remaining', '1');
+
+    Queue::assertPushed(FetchFeedbackJob::class, 1);
+});
+
+it('leaves every other tenant endpoint open while the quota is exhausted', function () {
+    Http::fake([
+        PaymentTestKit::STRIPE_API_BASE.'/*' => Http::response(
+            PaymentTestKit::fixture('stripe', 'checkout-session-created-response'),
+        ),
+    ]);
+    PaymentTestKit::configure();
+
+    [$company, $user] = tenant();
+    $company->forceFill(['quota_limit' => 1, 'analyzed_feedback_count' => 1])->save();
+    Feedback::factory()->for($company)->create();
+
+    // The paywall is rendered over these screens and bought on that one. A
+    // group-wide gate would put the wall behind the wall.
+    $this->actingAs($user, 'sanctum')->getJson('/api/v1/feedbacks')->assertOk();
+    $this->actingAs($user, 'sanctum')->getJson('/api/v1/overview/kpis')->assertOk();
+    $this->actingAs($user, 'sanctum')->getJson('/api/v1/billing/subscription')->assertOk();
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/billing/checkout', ['provider' => 'stripe', 'plan' => 'pro'])
+        ->assertOk();
+
+    // Connecting a channel spends nothing: store() starts no initial sync, so
+    // an exhausted tenant may still finish setting the product up.
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/integrations', ['platform' => 'appstore', 'settings' => ['app_id' => '123', 'country' => 'tr']])
+        ->assertStatus(201);
+});
+
+it('carries the quota alias on the sync trigger and on no other route', function () {
+    $gated = collect(app('router')->getRoutes())
+        // `_probe/consume` is this file's own beforeEach route and exists only
+        // inside the test run; the assertion is about the application.
+        ->reject(fn (RoutingRoute $route): bool => str_starts_with($route->uri(), 'api/v1/_probe/'))
+        ->filter(fn (RoutingRoute $route): bool => collect($route->gatherMiddleware())->contains('quota'))
+        ->map(fn (RoutingRoute $route): string => $route->methods()[0].' '.$route->uri())
+        ->values()
+        ->all();
+
+    // Named exhaustively rather than counted: a future route that quietly
+    // opted in would otherwise pass as "still one of them".
+    expect($gated)->toBe(['POST api/v1/integrations/{integration}/sync']);
+});
+
+it('keeps the scheduled sweep ingesting while the quota is exhausted', function () {
+    // Spec 7.4: the 402 closes the manual trigger only. The five-minute sweep
+    // never consults the quota, so the backlog the post-upgrade re-queue needs
+    // still builds — see "accumulates the backlog in pending_analysis" above
+    // for the analyzer half.
+    [$company] = tenant();
+    $company->forceFill(['quota_limit' => 1, 'analyzed_feedback_count' => 1])->save();
+    Integration::factory()->for($company)->create([
+        'platform' => 'fixture',
+        'settings' => ['fixture_set' => 'default'],
+        'status' => 'active',
+    ]);
+
+    // The registered event itself, not a copy of its body: a test that
+    // reimplemented the sweep would keep passing after the real one broke.
+    $sweep = collect(app(Schedule::class)->events())
+        ->firstWhere(fn (ScheduledEvent $event): bool => $event->description === 'ingestion:fetch-feedback');
+
+    expect($sweep)->not->toBeNull();
+
+    // QUEUE_CONNECTION is sync under phpunit.xml, so the dispatched
+    // FetchFeedbackJob runs inline and this is the real ingestion path.
+    $sweep->run(app());
+
+    $pending = asTenant($company, fn () => Feedback::query()
+        ->where('analysis_status', Feedback::STATUS_PENDING)
+        ->count());
+
+    expect($pending)->toBeGreaterThan(0);
 });
