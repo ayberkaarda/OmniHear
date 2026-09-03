@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
+use App\Http\Middleware\EnforceTokenAbility;
 use App\Http\Middleware\QuotaRemainingHeader;
 use App\Http\Middleware\SetTenantContext;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,10 @@ Route::get('/health', function () {
 $authenticated = [
     'auth:sanctum',
     'throttle:api',
+    // Default deny for API keys. Every authenticated route is session-only
+    // unless EnforceTokenAbility::MACHINE_ROUTES names it, so a route added
+    // later is closed to machine credentials until somebody decides otherwise.
+    EnforceTokenAbility::class,
     SetTenantContext::class,
     QuotaRemainingHeader::class,
 ];

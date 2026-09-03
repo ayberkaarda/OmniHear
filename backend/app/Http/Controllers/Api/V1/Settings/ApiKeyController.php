@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
 use App\Support\Auth\TokenAbility;
+use App\Support\Auth\TokenLifetime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -72,6 +73,7 @@ class ApiKeyController extends Controller
         $token = $request->user()->createToken(
             (string) $request->string('name'),
             TokenAbility::api(),
+            TokenLifetime::apiKey(),
         );
 
         $this->audit->record(

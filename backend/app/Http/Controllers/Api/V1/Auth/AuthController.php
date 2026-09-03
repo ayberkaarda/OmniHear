@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
 use App\Support\Auth\TokenAbility;
+use App\Support\Auth\TokenLifetime;
 use App\Support\DisposableEmailDomains;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -85,7 +86,7 @@ class AuthController extends Controller
             // is the same kind of row in the same table, and the two screens
             // that list them must not be able to revoke each other's
             // credentials (docs/contracts/settings-api.md section 3).
-            'token' => $created['user']->createToken('web', TokenAbility::session())->plainTextToken,
+            'token' => $created['user']->createToken('web', TokenAbility::session(), TokenLifetime::session())->plainTextToken,
             'user' => new UserResource($created['user']),
             'company' => new CompanyResource($created['company']),
         ], Response::HTTP_CREATED);
@@ -130,7 +131,7 @@ class AuthController extends Controller
         return response()->json([
             // See register() above: sessions carry the `session` ability so
             // /auth/tokens and /settings/api-keys stay disjoint.
-            'token' => $user->createToken($request->deviceName(), TokenAbility::session())->plainTextToken,
+            'token' => $user->createToken($request->deviceName(), TokenAbility::session(), TokenLifetime::session())->plainTextToken,
             'user' => new UserResource($user),
             'company' => new CompanyResource($user->company),
         ]);
