@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-03 · Current: **W7 complete; every gate green** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-03 · Current: **W8 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -23,6 +23,7 @@ commit messages; `git log` is the archive.
 | **W5** | realtime, settings, billing flow, SubscriptionGuard ∥ settings endpoints, in-app notifications, Laravel OpenAPI, demo seeder | **green** — jest **284/284**, build:gate raw 335.75/347, transfer 94.09/105 · pest **969 passed, 4535 assertions**, coverage **98.9%** |
 | **W6** | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, ARCHITECTURE, ADR-0009/0010, ai-service JSON log | **green** — E2E 46.5 s, DB shows 3 analyzed / 2 pending_analysis · pytest 274 |
 | **W7** | history rewrite (done) · quota gate + invitations · security review + its seven findings + KVKK PII + self-hosted fonts | **green** — pest **1046 passed, 4870 assertions**, coverage **98.9%** · pytest **282** · jest **290** · build:gate raw 337.88/347, transfer 94.46/105 |
+| **W8** | Google Play ∥ Trustpilot connectors (spec §2: 2 of 6 channels → 4), factory/config wiring, `dropdb` guard false positive | **green** — pest **1259 passed, 5524 assertions**, coverage **98.8%**, 349.5 s · guards **122** · unchanged: pytest 282, jest 290, build:gate raw 337.93/347, transfer 94.46/105 |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -64,26 +65,25 @@ events, so neither side references a class the other has not written yet.
 
 ### Still open
 
-- **The E2E job has never completed in CI.** The first push after W7 died in
-  `Wait for the stack`: the compose stack bind-mounts `../backend`, so `vendor/` comes
-  from the checkout and nothing installed it — plus an empty `APP_KEY` and a fresh
-  postgres volume with no schema. All three are one-time local setup, which is why the
-  suite was green for the agent that wrote it. A `Prepare the backend` step now runs
-  `composer install`, `key:generate` and `migrate` before the stack starts; **unproven
-  until the next run is green.** The other six jobs passed (`docs/LESSONS.md`).
-- **Realtime delivery is asserted only by that E2E step** — the key and
-  `REVERB_HOST`/`REVERB_SCHEME` are wired, so it is proven when that job is, not before.
 - **`backend/config/horizon.php` was never published**, so Horizon watches `['default']`
   only and `AnalyzeFeedbackJob`'s `analysis` queue is never drained. compose carries
   `AI_ANALYSIS_QUEUE: default` as a stopgap, marked as one. The fix is a supervisor
   watching both queues; until then the queue separation the backend designed is off.
-- **Tokens older than 90 days become invalid on deploy** — `expiration` counts from
-  creation. Deliberate, but it is a release note.
-- **Zendesk's shape was never verified against a live account.** Its fixture README
-  separates what the documentation confirms from what was inferred.
+- **Three of the four connectors have never touched a live account.** Zendesk, Google
+  Play and Trustpilot are synthesised from published documentation, each with a fixture
+  README separating documented from inferred; App Store is the only one recorded from a
+  real response. Largest gap between "the tests pass" and "it works".
+- **Tokens older than 90 days become invalid on deploy** — `expiration` counts from creation. Deliberate; a release note.
 - `infra/docker-compose.dev.yml` keeps `${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}`
-  on purpose: removing it breaks `docker compose up` for a fresh clone, and the value
-  names itself. The *application* no longer has a default — that was the finding.
+  on purpose: removing it breaks a fresh clone's `docker compose up`, and the value names
+  itself. The *application* no longer has a default — that was the finding.
+
+### Closed by CI run `33792058154` (2026-09-03)
+
+First green run including E2E. The journey — register, verify through a real mailbox,
+connect a channel, sync, inbox, paywall — passed in **10.6 s** on a clean checkout
+against all three services, retiring two entries: the suite had only ever been green on
+the machine that wrote it, and realtime delivery had only ever been asserted.
 
 ## Open decisions
 

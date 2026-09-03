@@ -252,13 +252,42 @@ Do not change these signatures. If one is wrong, say so before writing code.
 
 ### Error mapping
 
+> **Corrected 2026-09-03, mid-wave.** The first version of this table named
+> three `ConnectorFailure` cases that do not exist — `AuthFailed`,
+> `TemporarilyUnavailable`, `UnexpectedResponse`. The enum has exactly six:
+> `Unreachable`, `InvalidCredentials`, `RateLimited`, `DepthLimitExceeded`,
+> `MalformedResponse`, `Misconfigured`. Both tracks caught it and neither
+> invented a case; the table below is the real vocabulary.
+
 | HTTP | `ConnectorFailure` |
 |---|---|
-| 401, 403 | `AuthFailed` |
+| 401, 403 | `InvalidCredentials` |
 | 404 | `Misconfigured` (unknown package, or the account cannot see it) |
 | 429 | `RateLimited` |
-| 5xx, connection error, timeout | `TemporarilyUnavailable` |
-| unparseable body, missing `reviews` key | `UnexpectedResponse` |
+| **400** | `Misconfigured` — **decided mid-wave**, see below |
+| 5xx, connection error, timeout | `Unreachable` |
+| unparseable body, `reviews` present but not a list | `MalformedResponse` |
+
+**400 is terminal, not transient.** `ConnectorFailure::isTransient()` is true only
+for `Unreachable` and `RateLimited`, and `FetchFeedbackJob` retries on that — so
+mapping 400 to `Unreachable` spends five identical attempts before the user sees
+anything, and blames the platform for a problem that is in the integration
+settings. A 400 on a request carrying no page token means the request shape or the
+package name is not acceptable, and that repeats identically however often it is
+retried.
+
+A 400 on a request that *did* carry a page token is a different thing and is
+retried once without it: a run cut short by the runner's page cap leaves a token
+in the cursor, and a token that has gone stale between runs would otherwise wedge
+the integration permanently. That recovery was not anticipated by this contract
+and is the connector's own.
+
+**An absent `reviews` key is an empty page, not a malformed response** — also
+decided mid-wave. The protobuf-to-JSON mapping omits empty repeated fields, so an
+application with nothing in the seven-day window answers `{}`, and refusing that
+would report a healthy integration as permanently broken. `{}` and `[]` are
+indistinguishable once decoded, so the pair is accepted together and a *non-empty*
+top-level list is what gets refused as "not an envelope".
 
 Match `ZendeskConnector`'s existing mapping where the two overlap; read it first
 rather than inventing a second vocabulary.
@@ -340,8 +369,10 @@ public function __construct(
 
 ### Error mapping
 
-Same table as Track A, with 401/403 → `AuthFailed` covering both a bad key and a
-business unit the key cannot read.
+Same table as Track A — 401/403 → `InvalidCredentials` covers both a bad key and a
+business unit the key cannot read; 404 → `Misconfigured`; 429 → `RateLimited`;
+everything else → `Unreachable`. Trustpilot has no equivalent of Google Play's
+stale-token case, so it has no 400 arm.
 
 ---
 
@@ -363,7 +394,16 @@ output in the report (§2 — a claim without output is not a claim):
       an empty page · a malformed body · each error status in the table.
 - [ ] A feedback-ingestion test that runs `IngestionRunner` against the fixtures
       through `Http::fake()` and asserts rows land with the right
-      `company_id`, `external_id`, `published_at` and `rating`.
+      `company_id`, `external_id` and `published_at`. **Not `rating`** — corrected
+      mid-wave: `feedbacks` has no such column, so `ConnectorItem::$rating` only
+      reaches the database inside `raw_payload`. Assert the mapping directly in
+      the unit test and through `raw_payload` at the database layer.
+
+> **`Http::fake()` merges stub callbacks; it does not replace them.** A second
+> `Http::fake(closure)` in a test that already installed one leaves the first in
+> charge, so the later phase of a two-phase test never runs while the test stays
+> green. It cost both tracks a debugging pass. Use one closure driven by a
+> mutable script and assert the request count.
 - [ ] An I2 test: the same page ingested twice produces no second row.
 - [ ] An I5 test: force a failure and assert `integrations.sync_error` contains
       no substring of any credential.

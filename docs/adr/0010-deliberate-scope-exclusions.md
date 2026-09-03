@@ -61,6 +61,15 @@ as Sentry — logging is built, metrics-export infrastructure is a separate
 undertaken not yet scheduled.
 
 ### Google Play, Trustpilot, email, and social connectors
+
+> **Amended 2026-09-03 (W8).** Google Play and Trustpilot were built and are no
+> longer exclusions; the entry below is left standing as the record of why they
+> were absent, and applies now to **email and social only**. Both new connectors
+> carry the same caveat Zendesk does — synthesised from published documentation,
+> never run against a live account — and each ships a provenance README beside
+> its fixtures separating what is documented from what is inferred. The scope
+> decision that ranked them first is recorded in `docs/contracts/w8-connectors.md`.
+
 Spec §2 names six channels. `backend/app/Support/Connectors/` contains
 `AppStoreConnector`, `ZendeskConnector`, and `FixtureConnector` (the test-only
 connector documented in `docs/contracts/backend-core.md` §1 as never
