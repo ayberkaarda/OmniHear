@@ -6,6 +6,7 @@ use App\Support\Connectors\ConnectorException;
 use App\Support\Connectors\ConnectorFactory;
 use App\Support\Connectors\ConnectorFailure;
 use App\Support\Connectors\FixtureConnector;
+use App\Support\Connectors\MastodonConnector;
 use App\Support\Connectors\ZendeskConnector;
 use Tests\TestCase;
 
@@ -60,15 +61,19 @@ it('builds the app store connector from its settings', function () {
 
 it('refuses a platform that has no connector', function (string $platform) {
     // Deliberately restricted to platforms with no config/connectors.php entry
-    // at all. googleplay, trustpilot and email used to be in this dataset, and
-    // all three still made `for()` throw Misconfigured on an
+    // at all. googleplay, trustpilot, email and social used to be in this
+    // dataset, and all four still made `for()` throw Misconfigured on an
     // unsavedIntegration() with no settings — but for the wrong reason, once
     // each got a config entry: the missing-required-setting/credential branch,
     // not the missing-connector branch. Both branches throw the exact same
     // fixed Misconfigured sentence (invariant I5 — no per-cause message), so
     // the exception alone cannot tell those two paths apart, and this test kept
     // passing while asserting nothing about whether the platform was actually
-    // supported. Do not widen this dataset back to a real platform just
+    // supported. social was wired in W12, the sixth and last channel of spec
+    // §2 — every platform in Integration::PLATFORMS now has a connector, so
+    // 'not-a-platform' (a string that names no real platform at all, not even
+    // an unwired one) is what is left to exercise the missing-connector
+    // branch honestly. Do not widen this dataset back to a real platform just
     // because an empty unsavedIntegration() happens to fail for it too — check
     // supports() first.
     $factory = app(ConnectorFactory::class);
@@ -77,7 +82,7 @@ it('refuses a platform that has no connector', function (string $platform) {
         ->and($factory->config($platform))->toBeNull()
         ->and(factoryFailure(fn () => $factory->for(unsavedIntegration($platform))))
         ->toBe(ConnectorFailure::Misconfigured);
-})->with(['social', 'not-a-platform']);
+})->with(['not-a-platform']);
 
 it('builds the zendesk connector from its settings and credentials', function () {
     $connector = app(ConnectorFactory::class)->for(unsavedIntegration(
@@ -133,9 +138,19 @@ it('refuses a fixture set name that could escape the fixture root', function (st
     )))->toBe(ConnectorFailure::Misconfigured);
 })->with(['../appstore', '..', 'a/b', 'set with spaces', '.']);
 
+it('builds the mastodon connector from its settings, needing no credential', function () {
+    $connector = app(ConnectorFactory::class)->for(unsavedIntegration(
+        'social',
+        ['instance_url' => 'https://mastodon.example.invalid', 'hashtag' => 'omnihear'],
+    ));
+
+    expect($connector)->toBeInstanceOf(MastodonConnector::class)
+        ->and($connector->limits()->maxPagesPerRun)->toBe(20);
+});
+
 it('lists exactly the platforms that have a connector today', function () {
     expect(app(ConnectorFactory::class)->platforms())
-        ->toBe(['fixture', 'appstore', 'zendesk', 'googleplay', 'trustpilot', 'email']);
+        ->toBe(['fixture', 'appstore', 'zendesk', 'googleplay', 'trustpilot', 'email', 'social']);
 });
 
 it('answers whether a platform is supported', function () {
@@ -148,7 +163,9 @@ it('answers whether a platform is supported', function () {
         ->and($factory->supports('trustpilot'))->toBeTrue()
         ->and($factory->config('trustpilot'))->toBeArray()
         ->and($factory->supports('email'))->toBeTrue()
-        ->and($factory->config('email'))->toBeArray();
+        ->and($factory->config('email'))->toBeArray()
+        ->and($factory->supports('social'))->toBeTrue()
+        ->and($factory->config('social'))->toBeArray();
 });
 
 it('reads the per-platform throttle and backoff out of config', function () {

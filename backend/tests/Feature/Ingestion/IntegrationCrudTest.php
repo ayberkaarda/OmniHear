@@ -165,16 +165,19 @@ it('rejects a create it cannot connect', function (array $payload, string $field
 })->with([
     'no platform' => [[], 'platform'],
     'unknown platform' => [['platform' => 'myspace'], 'platform'],
-    // social: docs/contracts/backend-core.md section 1 lists it in the platform
-    // enum, but config/connectors.php has no entry for it, so
-    // Rule::in($connectors->platforms()) refuses it at the same layer
-    // 'unknown platform' does above. googleplay and email used to be this
-    // example; both gained a config entry (email's is credential-only, so it
-    // fails on credentials rather than settings.package_name, but it stopped
-    // being connectorless either way), which stopped proving anything about
-    // the platform whitelist this case names. Check
-    // config('connectors.platforms') before reusing 'email' or 'social' here.
-    'platform with no connector yet' => [['platform' => 'social'], 'platform'],
+    // not-a-platform: social was the last remaining example of "in the
+    // documented platform enum but with no config/connectors.php entry", and
+    // it was wired in W12, the sixth and last channel of spec §2. Every value
+    // in Integration::PLATFORMS now has a connector, so no such example is
+    // left. 'not-a-platform' names no real platform at all — the same
+    // sentinel tests/Unit/Connectors/ConnectorFactoryTest.php uses — and it
+    // hits the identical Rule::in($connectors->platforms()) branch
+    // 'unknown platform' above does; both rows are kept, because each
+    // documents a distinct scenario (a platform someone might plausibly type
+    // vs. one that was never real) even though they now share a code path.
+    // Check config('connectors.platforms') before reusing a real platform
+    // name here again.
+    'platform with no connector yet' => [['platform' => 'not-a-platform'], 'platform'],
     // Zendesk is the first platform that needs credentials. Accepting a create
     // without them would produce an integration the scheduler can only fail on,
     // hours later, instead of a 422 the user can act on now.

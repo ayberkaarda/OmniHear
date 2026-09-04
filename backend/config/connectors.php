@@ -4,6 +4,7 @@ use App\Support\Connectors\AppStoreConnector;
 use App\Support\Connectors\EmailConnector;
 use App\Support\Connectors\FixtureConnector;
 use App\Support\Connectors\GooglePlayConnector;
+use App\Support\Connectors\MastodonConnector;
 use App\Support\Connectors\TrustpilotConnector;
 use App\Support\Connectors\ZendeskConnector;
 
@@ -225,6 +226,38 @@ return [
             // reason: without it a mailbox holding years of mail spends years
             // of analysis quota on its first sync.
             'initial_lookback_days' => (int) env('EMAIL_INITIAL_LOOKBACK_DAYS', 30),
+        ],
+
+        'social' => [
+            'connector' => MastodonConnector::class,
+            // The sixth and last channel of spec §2, and the second connector
+            // with no credential at all — App Store is the first. instance_url
+            // and hashtag are both settings because both are pasted by the
+            // user and neither is a secret (docs/contracts/w12-social-connector.md).
+            'required_settings' => ['instance_url', 'hashtag'],
+            'optional_settings' => [],
+            // No `required_credentials` key at all, the same absence as
+            // appstore above: ConnectorFactory and PlatformController both
+            // already read a missing key as "none required"
+            // (`$config['required_credentials'] ?? []`), so an empty array
+            // here would say nothing an absent key doesn't already say.
+            // The timeline has no depth cap of its own — it ends when a page
+            // comes back shorter than `limit`
+            // (docs/contracts/w12-social-connector.md's short-page rule) — so
+            // this is a runaway-loop ceiling like Zendesk's and Trustpilot's,
+            // not a platform limit.
+            'max_pages_per_run' => 20,
+            'max_consecutive_empty_pages' => 3,
+            // Documented ceiling for a Mastodon timeline's `limit` query
+            // parameter; MastodonConnector clamps to it itself, so this is
+            // only the requested page size, not a second cap.
+            'limit' => (int) env('SOCIAL_LIMIT', 40),
+            'timeout' => (int) env('SOCIAL_TIMEOUT', 30),
+            // Deliberately well under the documented 300 requests per 5
+            // minutes (60/min) — the connector track's measured
+            // recommendation in docs/contracts/w12-social-connector.md.
+            'rate_limit' => ['max_attempts' => 20, 'decay_seconds' => 60],
+            'retry_after' => 60,
         ],
 
     ],

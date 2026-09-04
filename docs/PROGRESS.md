@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-04 · Current: **W11 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-04 · Current: **W11 green (CI `33903711379`); W12 in flight — the sixth channel** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -26,7 +26,8 @@ commit messages; `git log` is the archive.
 | **W8** | Google Play ∥ Trustpilot connectors (spec §2: 2 of 6 channels → 4), factory/config wiring, `dropdb` guard false positive | **green** — pest **1259 passed, 5524 assertions**, coverage **98.8%**, 349.5 s · guards **122** · unchanged: pytest 282, jest 290, build:gate raw 337.93/347, transfer 94.46/105 |
 | **W9** | CI download retry+resume ∥ Horizon queue coverage ∥ reprocess command + Redis KPI cache (invalidated on upgrade and channel deletion too); plus a W8 unordered-`pluck` flake the gate caught | **green** — CI `33861764527`, seven jobs, E2E 11.3 s · pest **1297 passed, 5658 assertions**, coverage **98.9%**, 367.2 s · guards **122** · pytest **295** (was 282), no skips · jest **290** · build:gate raw 337.93/347, transfer 94.46/105 · Horizon measured live: `analysis` queue 5 → 0 |
 | **W10** | TOTP 2FA — the API had published `two_factor_enabled` since F2 with no code path able to write it ∥ frontend enrolment and challenge ∥ `actions/*` majors + `waits` on the analysis queue | **green** — CI `33873188756`, seven jobs, E2E 56.4 s with the 2FA leg (was 11.3 s) · pest **1404 passed, 6075 assertions**, coverage **98.9%** · guards **122** · jest **323/56** (was 290/55) · i18n **478/478** · build:gate raw 339.66/347, transfer 94.89/105 · pytest 295 unchanged · OpenAPI `--check` matches |
-| **W11** | email connector over JMAP (spec §2: 4 of 6 channels → **5**) ∥ the 2FA replay mark moves from cache to a `users` column, making the check atomic | **local green, E2E awaiting CI** — pest **1512 passed, 6419 assertions**, coverage **98.9%** · guards **122** · i18n **480/480** · build:gate raw 339.66/347, transfer 94.88/105 (unmoved) · the replay race test fails 5-of-5 against read-then-write and passes 1-of-5 with the conditional `UPDATE` |
+| **W11** | email connector over JMAP (spec §2: 4 of 6 channels → **5**) ∥ the 2FA replay mark moves from cache to a `users` column, making the check atomic | **green** — CI `33903711379`, seven jobs, E2E 58.3 s, image cache hit for the second run running · pest **1512 passed, 6419 assertions** (identical on a clean checkout), coverage **98.9%** · guards **122** · i18n **480/480** · build:gate raw 339.66/347, transfer 94.88/105 (unmoved) · the replay race test fails 5-of-5 against read-then-write and passes 1-of-5 with the conditional `UPDATE` |
+| **W12** | social connector over the Mastodon hashtag timeline — **6 of 6 channels**, spec §2 complete ∥ MIT licence, the public-facing docs brought to the truth, and the fixture-provenance promise finally tested for Zendesk and Google Play | **local green, E2E awaiting CI** — pest **1648 passed, 7009 assertions**, coverage **98.9%** · guards **122** · jest **323/56** · i18n **482/482** · build:gate raw 339.66/347, transfer 94.90/105 (unmoved) · **recorded live** from `mastodon.social`, no account: the second channel after App Store to meet a real server |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -36,11 +37,11 @@ leaves a diagnosable tree.
 
 ## Now
 
-**Latest gate** is the W9 row below, re-run by the main thread and then confirmed
-by CI `33861764527` — seven jobs green, backend 1297 passed on a clean checkout
-(identical to local), ai-service 295 with no skips, and the E2E journey in 11.3 s.
-`npx playwright test` was the one line that could not run locally: port 4200 was
-held by an unrelated project's dev server on this machine. CI settled it.
+**Latest gate** is the W11 row above, re-run by the main thread and confirmed by
+CI `33903711379` — seven jobs green, backend **1512 passed** on a clean checkout,
+identical to local, and the E2E journey in 58.3 s. `npx playwright test` is the
+one line that cannot run on this machine: port 4200 is held by an unrelated
+project. CI is the authority on it, every time.
 
 **A green CI run is not automatically evidence.** The first one reported *534 warnings,
 69 passed* for the backend and *11 skipped* for the AI service and went green anyway.
@@ -58,19 +59,12 @@ events, so neither side references a class the other has not written yet.
 
 ### Still open
 
-- **Three of the four connectors have never touched a live account.** Zendesk, Google
-  Play and Trustpilot are synthesised from published documentation, each with a fixture
+- **Four of the five channels have never touched a live account.** Zendesk, Google Play,
+  Trustpilot and email are synthesised from published documentation, each with a fixture
   README separating documented from inferred; App Store is the only one recorded from a
-  real response. Largest gap between "the tests pass" and "it works".
-- **Closed by `33873188756`:** the E2E image cache took its hit path for the first time
-  (`Cache restored from key: ai-service-image-d74170e9…`, `Loaded image:
-  omnihear-ai-service:latest`), and the `actions/*` major upgrades ran with no Node 20
-  deprecation annotation. Both were only ever provable in CI.
-- **2FA replay protection is cache-backed, not atomic.** The high-water mark and the
-  per-token attempt counter share one cache, so losing it resets both; and the check is
-  read-then-write, so two requests carrying the same code both pass. A
-  `users.two_factor_last_used_step` column with a conditional `UPDATE` closes both.
-  Details and the measured exposure: `docs/contracts/w10-two-factor.md`.
+  real response. Still the largest gap between "the tests pass" and "it works" — though
+  email's README names, in priority order, what a live recording would settle, and the
+  social channel needs no account at all, so W12 can narrow this twice over.
 - **Tokens older than 90 days become invalid on deploy** — `expiration` counts from creation. Deliberate; a release note.
 - `infra/docker-compose.dev.yml` keeps `${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}`
   on purpose: removing it breaks a fresh clone's `docker compose up`, and the value names
@@ -88,11 +82,11 @@ the machine that wrote it, and realtime delivery had only ever been asserted.
 | id | question | default | decide by |
 |---|---|---|---|
 | D-01 | `.claude/` + `CLAUDE.md` public in repo? | **decided: keep.** Narrow reading of the no-attribution rule, confirmed by behaviour: the note was written 01:56:27 and `14a51d8` at 01:58:14 deliberately kept them tracked | closed |
-| D-05 | Repo visibility | **decided 2026-09-02: stays private; goes public when the project is finished.** Actions billing was unblocked separately, so CI now runs on the private repo | closed |
+| D-05 | Repo visibility | **superseded by fact, 2026-09-04.** The row said "stays private until finished" and `docs/LESSONS.md` said Actions minutes were billed because of it. Neither is true: `gh repo view` reports `visibility: PUBLIC`, `isPrivate: false`, since `createdAt 2026-09-03T08:52:06Z`. The W7 rewrite re-created the repository and the new one was public from its first commit — which is also why Actions has been free since W8. Everything that was being held for "before the flip" has been published all along | closed |
 | D-07 | Angular initial-bundle budget | **decided: two thresholds re-derived from the measured floor (ADR-0007).** raw 320kb in `angular.json`, brotli transfer 100 kB in `scripts/bundle-check.mjs`; Trap 2 rewritten with a ratchet | closed |
 | D-08 | **Angular 18 is out of support** (angular.dev: v2-v19 no longer supported). Upgrade is required regardless of the budget | target v22 (Active); also turns `provideExperimentalZonelessChangeDetection` into the stable `provideZonelessChangeDetection` and closes that deviation. Own phase, own gate, after wave 2 | schedule after wave 2 |
 | D-09 | Is spec §11 (staging deploy, prod promotion) and are K8s manifests in scope? | **decided 2026-09-03: no — portfolio project, never deployed.** Out of scope, not deferred; ADR-0010 amended, spec erratum E-7. Leaves the completion denominator and gives D-05 a reachable threshold | closed |
-| D-06 | Real App Store review text is already in history (`24ac570`). Rewriting the fixtures does not remove it; going public later publishes the history | rewrite fixtures now, history rewrite before the flip (cheapest today at 4 commits) | before going public |
+| D-06 | Real App Store review text was in history (`24ac570`) | **done and verified 2026-09-04.** The rewrite landed: `24ac570`, `24e38a2` and `e122c06` are unreachable from every ref and absent from `origin`; they survive only as dangling local objects awaiting `gc`, which are never pushed. First reachable fixture commit `7d0e927` carries `reviewer-NNN` / `example.invalid` only, and a `git log -S` sweep for key material finds nothing but hook regexes | closed |
 
 ## Known deviations from spec
 

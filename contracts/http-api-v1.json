@@ -2274,7 +2274,8 @@
                                             "zendesk",
                                             "googleplay",
                                             "trustpilot",
-                                            "email"
+                                            "email",
+                                            "social"
                                         ],
                                         "type": "string"
                                     },

@@ -3513,12 +3513,12 @@
           <context context-type="linenumber">209,212</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.integration.social" datatype="html">
-        <source>Social media mentions</source>
-        <target>Sosyal medya bahsedişleri</target>
+      <trans-unit id="landing.integration.socialHashtags" datatype="html">
+        <source>Social media hashtags</source>
+        <target>Sosyal medya hashtag'leri</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">215,218</context>
+          <context context-type="linenumber">214,217</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.title" datatype="html">
@@ -4015,6 +4015,24 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
           <context context-type="linenumber">90</context>
+        </context-group>
+        <note priority="1" from="description">Connector setting field label</note>
+      </trans-unit>
+      <trans-unit id="label.setting.instanceUrl" datatype="html">
+        <source>Instance URL</source>
+        <target>Sunucu URL'si</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <note priority="1" from="description">Connector setting field label</note>
+      </trans-unit>
+      <trans-unit id="label.setting.hashtag" datatype="html">
+        <source>Hashtag</source>
+        <target>Etiket</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <note priority="1" from="description">Connector setting field label</note>
       </trans-unit>

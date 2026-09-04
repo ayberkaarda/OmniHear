@@ -1,10 +1,12 @@
 # OmniHear
 
-A B2B SaaS platform that collects customer feedback from multiple channels (App
-Store, Zendesk today; the full spec list and what's not built yet is in
-`docs/adr/0010-deliberate-scope-exclusions.md`), runs it through an AI pipeline
-for sentiment and category classification, and gives companies a real-time
-inbox with quota-gated analysis and a paywall.
+A B2B SaaS platform that collects customer feedback from all six channels spec
+§2 names — App Store, Google Play, Zendesk, Trustpilot, email (JMAP), and
+social (Mastodon hashtag timelines) — runs it through an AI pipeline for
+sentiment and category classification, and gives companies a real-time inbox
+with quota-gated analysis and a paywall. Everything else deliberately left out
+of this phase (TOTP 2FA, IP/device risk scoring, Sentry/Prometheus, and more)
+is tracked in `docs/adr/0010-deliberate-scope-exclusions.md`.
 
 ## Architecture, in one paragraph
 

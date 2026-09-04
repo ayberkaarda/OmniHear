@@ -30,7 +30,7 @@ sequenceDiagram
     autonumber
     participant Sched as Laravel Scheduler
     participant Fetch as FetchFeedbackJob
-    participant Conn as PlatformConnector<br/>(AppStore / Zendesk / Fixture)
+    participant Conn as PlatformConnector<br/>(AppStore / GooglePlay / Zendesk / Trustpilot / Email / Social)
     participant DB as PostgreSQL<br/>(feedbacks)
     participant Analyze as AnalyzeFeedbackJob
     participant Quota as QuotaCounter<br/>(atomic)
@@ -150,9 +150,10 @@ initial-bundle budget leaves (ADR-0007, ADR-0008).
 
 ## 7. What is deliberately not in this diagram
 
-TOTP 2FA, IP/device risk scoring, Sentry/Prometheus, most non-fixture connectors,
-`/analyze/batch` usage from the backend, a `model_version` reprocess command,
-staging/production deploy, K8s manifests, and a Redis KPI cache are spec items not
-built. Each is recorded with its reason in
+TOTP 2FA, IP/device risk scoring, Sentry/Prometheus, `/analyze/batch` usage
+from the backend, a `model_version` reprocess command, staging/production
+deploy, K8s manifests, and a Redis KPI cache are spec items not built. All six
+spec §2 channels now have a connector — that gap is closed. Each remaining
+exclusion is recorded with its reason in
 `docs/adr/0010-deliberate-scope-exclusions.md` rather than drawn here as if it
 existed.

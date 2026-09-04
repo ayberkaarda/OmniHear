@@ -37,6 +37,8 @@ final class IntegrationSettingFormats
             'package_name' => 'android_package',
             'business_unit_id' => 'hex24',
             'session_url' => 'https_url',
+            'instance_url' => 'https_url',
+            'hashtag' => 'hashtag',
             default => null,
         };
     }
@@ -74,6 +76,19 @@ final class IntegrationSettingFormats
             // connector's own trim() check would only catch it once the
             // scheduler runs.
             'mailbox' => ['regex:/\S/'],
+            // The instance URL is substituted into every request this
+            // connector makes, so the same reasoning as `session_url` applies
+            // verbatim: a non-https value would otherwise be accepted here
+            // and only fail once MastodonConnector::isHttpsUrl() runs, hours
+            // later. Same rule, reused rather than duplicated.
+            'instance_url' => ['max:2048', 'url', 'regex:/^https:\/\//i'],
+            // Substituted into the Mastodon timeline URL path, so it is
+            // whitelisted rather than escaped — the same discipline as
+            // Trustpilot's business_unit_id and Google Play's package_name.
+            // Mirrors MastodonConnector::HASHTAG; both layers stay, because a
+            // row that reached the database another way still has to be
+            // refused at sync time.
+            'hashtag' => ['max:100', 'regex:/^[\p{L}\p{N}_]{1,100}$/u'],
             default => [],
         };
     }

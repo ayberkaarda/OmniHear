@@ -70,20 +70,22 @@ it('leaves paused and failing integrations alone', function () {
 it('skips a platform that has no connector yet', function () {
     Queue::fake();
 
-    // social, not googleplay or email: both gained a connector when their
-    // respective waves wired them into config/connectors.php, so the same
-    // integration row would now match the scheduler's
-    // whereIn(array_keys(config('connectors.platforms'))) filter and this test
-    // would fail for real, not silently — but a platform that stops meaning
-    // "unimplemented" the moment someone lands it is still the wrong example
-    // to keep. social is the one platform docs/contracts/backend-core.md
-    // section 1 lists that still has no connector; assert that here rather
-    // than assume it, so this goes red with a clear reason instead of silently
-    // passing for the wrong one if social is ever wired.
-    expect(config('connectors.platforms.social'))->toBeNull();
+    // not-a-platform, not social: social gained a connector in W12, the sixth
+    // and last channel of spec §2 — every platform docs/contracts/backend-core.md
+    // section 1 lists (Integration::PLATFORMS) now has a connector, so there
+    // is no longer any documented-but-unwired platform left to name here. The
+    // scheduler behaviour this test protects — skipping an integration row
+    // whose platform has no entry in config('connectors.platforms') — is
+    // still real, so the case moves to a value that names no real platform at
+    // all rather than an unwired one, matching
+    // tests/Unit/Connectors/ConnectorFactoryTest.php's own 'not-a-platform'.
+    // Assert the absence rather than assume it, so this goes red with a clear
+    // reason instead of silently passing for the wrong platform if
+    // 'not-a-platform' is ever accidentally wired.
+    expect(config('connectors.platforms.not-a-platform'))->toBeNull();
 
     $company = Company::factory()->create();
-    Integration::factory()->for($company)->create(['platform' => 'social']);
+    Integration::factory()->for($company)->create(['platform' => 'not-a-platform']);
 
     runIngestionSweep();
 

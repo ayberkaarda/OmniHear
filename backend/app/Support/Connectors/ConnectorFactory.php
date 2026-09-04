@@ -105,6 +105,13 @@ class ConnectorFactory
                 maxBodyBytes: (int) ($config['max_body_bytes'] ?? 20000),
                 initialLookbackDays: (int) ($config['initial_lookback_days'] ?? 30),
             ),
+            MastodonConnector::class => new MastodonConnector(
+                instanceUrl: (string) $settings['instance_url'],
+                hashtag: (string) $settings['hashtag'],
+                limits: $limits,
+                timeout: (int) ($config['timeout'] ?? 30),
+                limit: (int) ($config['limit'] ?? 40),
+            ),
             AppStoreConnector::class => new AppStoreConnector(
                 appId: (string) $settings['app_id'],
                 country: (string) $settings['country'],

@@ -88,6 +88,10 @@ export function settingLabel(key: string): string {
       return $localize`:Connector setting field label@@label.setting.country:Country code`;
     case 'subdomain':
       return $localize`:Connector setting field label@@label.setting.subdomain:Subdomain`;
+    case 'instance_url':
+      return $localize`:Connector setting field label@@label.setting.instanceUrl:Instance URL`;
+    case 'hashtag':
+      return $localize`:Connector setting field label@@label.setting.hashtag:Hashtag`;
     default:
       return key;
   }

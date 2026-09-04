@@ -487,3 +487,61 @@ it('exposes the configured ceilings', function () {
     expect($limits->maxPagesPerRun)->toBe(20)
         ->and($limits->maxConsecutiveEmptyPages)->toBe(3);
 });
+
+/*
+|--------------------------------------------------------------------------
+| The fixtures themselves — decision D-06
+|--------------------------------------------------------------------------
+|
+| contracts/fixtures/platforms/zendesk/README.md promises no real customer, no
+| real agent and no real credential is in these files. This asserts the promise
+| rather than restating it, so a future edit — or a re-derivation against a live
+| account — cannot quietly bring one in.
+|
+*/
+
+it('holds no real requester identity on any recorded ticket', function (string $file) {
+    foreach (zendeskTickets($file) as $ticket) {
+        $from = $ticket['via']['source']['from'] ?? null;
+
+        if ($from === null) {
+            continue;
+        }
+
+        expect($from['name'])->toMatch('/^requester-\d+$/')
+            // The requester's address is derived from their name, not a free
+            // value, so the two cannot drift apart.
+            ->and($from['address'])->toBe($from['name'].'@example.invalid');
+    }
+})->with(['page-1.json', 'page-2-end.json']);
+
+it('keeps every recorded address and host inside the synthetic account', function (string $file) {
+    $raw = PlatformFixture::raw('zendesk', $file);
+
+    preg_match_all('/[\w.+-]+@[\w.-]+/', $raw, $addresses);
+
+    // Either a requester on the reserved-and-unresolvable .invalid TLD (RFC
+    // 2606), or the fixture account's own support inbox on the one subdomain
+    // these tests are configured against — never anything else. Filtered down
+    // to what fails, rather than asserted per element in a foreach, so a page
+    // with zero addresses (the error bodies) still exercises the assertion
+    // instead of silently skipping it.
+    $unexpectedAddresses = array_values(array_filter(
+        $addresses[0],
+        static fn (string $address): bool => $address !== 'support@'.ZENDESK_SUBDOMAIN.'.zendesk.com'
+            && ! str_ends_with($address, '@example.invalid'),
+    ));
+
+    preg_match_all('#https?://([^/"]+)#', $raw, $hosts);
+
+    $unexpectedHosts = array_values(array_unique(array_filter(
+        $hosts[1],
+        static fn (string $host): bool => $host !== ZENDESK_SUBDOMAIN.'.zendesk.com',
+    )));
+
+    expect($unexpectedAddresses)->toBe([])
+        ->and($unexpectedHosts)->toBe([]);
+})->with([
+    'page-1.json', 'page-2-end.json', 'page-empty-continues.json', 'page-caught-up.json',
+    'error-unauthorized.json', 'error-forbidden.json', 'error-rate-limited.json', 'error-invalid-start-time.json',
+]);

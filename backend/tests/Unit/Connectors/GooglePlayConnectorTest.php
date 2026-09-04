@@ -1024,3 +1024,51 @@ it('never puts credential material into a token exchange failure', function () {
             ->and($rendered)->not->toContain(gpKeys()['private']);
     }
 });
+
+/*
+|--------------------------------------------------------------------------
+| The fixtures themselves — decision D-06
+|--------------------------------------------------------------------------
+|
+| contracts/fixtures/platforms/googleplay/README.md promises no real reviewer,
+| no real review, no real package name and no real credential is in these
+| files. This asserts the promise rather than restating it, so a future edit —
+| or a re-derivation against a live account — cannot quietly bring one in.
+|
+*/
+
+it('holds no real reviewer identity on any recorded review', function (string $file) {
+    foreach (gpReviews($file) as $review) {
+        expect($review['reviewId'])->toMatch('/^gp:FIXTURE-review-\d{4}$/');
+
+        // authorName is documented as absent for an anonymous review, so its
+        // presence is optional — but never anything other than the synthetic
+        // form when it is there.
+        if (array_key_exists('authorName', $review)) {
+            expect($review['authorName'])->toMatch('/^reviewer-\d{2}$/');
+        }
+    }
+})->with(['page-1.json', 'page-2-end.json', 'page-skipped-comments.json']);
+
+it('keeps every recorded address and host on the reserved example space', function (string $file) {
+    $raw = gpRaw($file);
+
+    preg_match_all('/[\w.+-]+@[\w.-]+/', $raw, $addresses);
+
+    foreach ($addresses[0] as $address) {
+        // RFC 2606 reserves .invalid, so it can never resolve to a real inbox.
+        expect($address)->toEndWith('@example.invalid');
+    }
+
+    preg_match_all('#https?://([^/"]+)#', $raw, $hosts);
+
+    // Neither the review payloads nor the token exchange fixtures carry a URL:
+    // source_url is built by the connector from the package name, not read off
+    // the fixture. A host showing up here at all would be new surface this
+    // test has not been told to trust yet.
+    expect($hosts[1])->toBeEmpty();
+})->with([
+    'page-1.json', 'page-2-end.json', 'page-skipped-comments.json', 'page-empty-continues.json',
+    'page-empty-window.json', 'token-response.json', 'error-unauthorized.json', 'error-forbidden.json',
+    'error-not-found.json', 'error-rate-limited.json', 'error-invalid-page-token.json', 'error-invalid-grant.json',
+]);

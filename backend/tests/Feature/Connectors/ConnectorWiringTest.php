@@ -6,6 +6,7 @@ use App\Support\Connectors\ConnectorFactory;
 use App\Support\Connectors\ConnectorFailure;
 use App\Support\Connectors\EmailConnector;
 use App\Support\Connectors\GooglePlayConnector;
+use App\Support\Connectors\MastodonConnector;
 use App\Support\Connectors\TrustpilotConnector;
 
 use function Pest\Laravel\actingAs;
@@ -13,15 +14,17 @@ use function Pest\Laravel\actingAs;
 /*
 |--------------------------------------------------------------------------
 | ConnectorFactory / PlatformController wiring for googleplay + trustpilot
-| + email
+| + email + social
 |--------------------------------------------------------------------------
 |
-| GooglePlayConnector, GooglePlayAccessToken, TrustpilotConnector and
-| EmailConnector already have their own green unit and ingestion tests on
-| another track (email's: tests/Unit/Connectors/EmailConnectorTest.php,
-| tests/Feature/Ingestion/EmailIngestionTest.php). Nothing here re-tests their
-| sync logic. This file is about the `match` arms in ConnectorFactory, the
-| config/connectors.php entries, and the format rules in
+| GooglePlayConnector, GooglePlayAccessToken, TrustpilotConnector,
+| EmailConnector and MastodonConnector already have their own green unit and
+| ingestion tests on another track (email's:
+| tests/Unit/Connectors/EmailConnectorTest.php,
+| tests/Feature/Ingestion/EmailIngestionTest.php; social's:
+| tests/Unit/Connectors/MastodonConnectorTest.php). Nothing here re-tests
+| their sync logic. This file is about the `match` arms in ConnectorFactory,
+| the config/connectors.php entries, and the format rules in
 | IntegrationSettingFormats — the wiring that turns those classes into
 | something a tenant can actually create through the API. A wrong
 | constructor-argument name in the factory's match arm is exactly the risk
@@ -528,4 +531,141 @@ it('reads the configured throttle and backoff for email', function () {
 
     expect($factory->rateLimit('email'))->toBe(['max_attempts' => 30, 'decay_seconds' => 60])
         ->and($factory->retryAfter('email'))->toBe(60);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 9. social — the second no-credential platform, two settings
+|--------------------------------------------------------------------------
+|
+| social differs from every credentialed platform above in the direction
+| appstore already established: no `required_credentials` key at all.
+| instance_url and hashtag are both settings, not credentials — neither is a
+| secret (docs/contracts/w12-social-connector.md) — so the test shapes below
+| mirror sections 1/2/4/5/6, and there is no credential-leak or
+| missing-credential test here because there is no credential to leak or
+| omit.
+|
+*/
+
+it('builds a MastodonConnector for a fully-populated social integration', function () {
+    $connector = app(ConnectorFactory::class)->for(wiringIntegration(
+        'social',
+        ['instance_url' => 'https://mastodon.example.invalid', 'hashtag' => 'omnihear'],
+    ));
+
+    expect($connector)->toBeInstanceOf(MastodonConnector::class)
+        ->and($connector->limits()->maxPagesPerRun)->toBe(20)
+        ->and($connector->limits()->maxConsecutiveEmptyPages)->toBe(3);
+});
+
+it('refuses a social integration missing any required setting', function () {
+    $factory = app(ConnectorFactory::class);
+    $config = $factory->config('social');
+    expect($config)->not->toBeNull();
+
+    $settings = [
+        'instance_url' => 'https://mastodon.example.invalid',
+        'hashtag' => 'omnihear',
+    ];
+
+    // Sanity check the fixture below is not vacuous: today's config always
+    // requires both keys.
+    expect(array_keys($settings))->toBe($config['required_settings'] ?? []);
+
+    foreach (array_keys($settings) as $missing) {
+        $partialSettings = $settings;
+        unset($partialSettings[$missing]);
+
+        $failure = wiringFactoryFailure(
+            fn () => $factory->for(wiringIntegration('social', $partialSettings)),
+        );
+
+        expect($failure)->toBe(
+            ConnectorFailure::Misconfigured,
+            "social missing setting={$missing} should be Misconfigured",
+        );
+    }
+});
+
+it('recognises social as a supported platform requiring no credentials', function () {
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->supports('social'))->toBeTrue()
+        ->and($factory->platforms())->toContain('social')
+        ->and($factory->config('social')['required_credentials'] ?? [])->toBe([]);
+});
+
+it('publishes social with its settings, no credentials, and its format rules', function () {
+    [, $user] = tenant();
+
+    $response = actingAs($user, 'sanctum')->getJson('/api/v1/integrations/platforms')->assertOk();
+    $data = collect($response->json('data'))->keyBy('platform');
+
+    expect($data->keys()->all())->toContain('social');
+
+    $social = $data['social'];
+    expect($social['requires_credentials'])->toBeFalse()
+        ->and($social['credentials'])->toBe([])
+        ->and(collect($social['settings'])->pluck('key')->all())->toBe(['instance_url', 'hashtag'])
+        ->and(collect($social['settings'])->firstWhere('key', 'instance_url')['format'])->toBe('https_url')
+        ->and(collect($social['settings'])->firstWhere('key', 'hashtag')['format'])->toBe('hashtag');
+});
+
+it('validates social instance_url and hashtag at create time', function (array $payload, ?string $invalidField) {
+    [, $user] = tenant();
+
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', $payload);
+
+    if ($invalidField === null) {
+        $response->assertCreated()
+            ->assertJsonPath('integration.platform', $payload['platform']);
+
+        return;
+    }
+
+    $response->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonValidationErrors($invalidField);
+})->with([
+    'social instance_url without https' => [[
+        'platform' => 'social',
+        'settings' => ['instance_url' => 'http://mastodon.example.invalid', 'hashtag' => 'omnihear'],
+    ], 'settings.instance_url'],
+    'social instance_url that is not a url at all' => [[
+        'platform' => 'social',
+        'settings' => ['instance_url' => 'not-a-url', 'hashtag' => 'omnihear'],
+    ], 'settings.instance_url'],
+    'social hashtag with a path separator' => [[
+        'platform' => 'social',
+        'settings' => ['instance_url' => 'https://mastodon.example.invalid', 'hashtag' => 'a/b'],
+    ], 'settings.hashtag'],
+    'social hashtag with a leading hash character' => [[
+        'platform' => 'social',
+        'settings' => ['instance_url' => 'https://mastodon.example.invalid', 'hashtag' => '#omnihear'],
+    ], 'settings.hashtag'],
+    'social well-formed settings succeed' => [[
+        'platform' => 'social',
+        'settings' => ['instance_url' => 'https://mastodon.example.invalid', 'hashtag' => 'omnihear'],
+    ], null],
+]);
+
+it('rejects a social create with no settings at all', function () {
+    // Same reasoning as every credentialed platform above, applied to
+    // settings instead: accepting a create without instance_url/hashtag
+    // would produce an integration the scheduler can only fail on, hours
+    // later, instead of a 422 the user can act on now.
+    [, $user] = tenant();
+
+    $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', ['platform' => 'social'])
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonValidationErrors('settings');
+});
+
+it('reads the configured throttle and backoff for social', function () {
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->rateLimit('social'))->toBe(['max_attempts' => 20, 'decay_seconds' => 60])
+        ->and($factory->retryAfter('social'))->toBe(60);
 });
