@@ -31,6 +31,14 @@ export class InputComponent implements ControlValueAccessor {
   readonly disabled = input(false);
   /** Not part of the mandated API — added so the field can back email/password/etc. inputs. Defaults to 'text'. */
   readonly type = input<InputType>('text');
+  /**
+   * Browser autofill hint. Added for the two-factor code field, where
+   * `one-time-code` is what lets a phone offer the code from the SMS/keychain
+   * instead of making the user copy it by hand.
+   */
+  readonly autocomplete = input<string | undefined>(undefined);
+  /** On-screen keyboard hint — `numeric` for the six-digit code field. */
+  readonly inputMode = input<string | undefined>(undefined);
 
   readonly blurred = output<void>();
 

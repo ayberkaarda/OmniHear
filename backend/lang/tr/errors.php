@@ -31,4 +31,9 @@ return [
     'INVALID_WEBHOOK_SIGNATURE' => 'Webhook imzası doğrulanamadı.',
     'PAYMENT_PROVIDER_ERROR' => 'Ödeme sağlayıcısı hata döndürdü. Herhangi bir tahsilat yapılmadı.',
 
+    // W10 — two-factor authentication.
+    'TWO_FACTOR_CODE_INVALID' => 'Bu kod geçerli değil. Doğrulama uygulamanızı kontrol edip tekrar deneyin.',
+    'TWO_FACTOR_ALREADY_ENABLED' => 'Bu hesapta iki adımlı doğrulama zaten etkin.',
+    'TWO_FACTOR_NOT_ENABLED' => 'Bu hesapta iki adımlı doğrulama etkin değil.',
+
 ];

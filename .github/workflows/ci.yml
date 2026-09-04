@@ -17,8 +17,8 @@ jobs:
     name: Guard hooks self-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version-file: '.nvmrc' }
       - run: node .claude/hooks/__selftest.mjs
 
@@ -46,7 +46,7 @@ jobs:
     defaults:
       run: { working-directory: backend }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
@@ -75,7 +75,7 @@ jobs:
       # HMAC over the raw bytes, the correlation id, the response shape — not
       # model quality, which the ai_service job covers with the real ONNX weights.
       # Fetching 171 MB of weights again here would buy nothing and cost minutes.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.12' }
       - name: Start the analyzer
         working-directory: ai-service
@@ -109,8 +109,8 @@ jobs:
     defaults:
       run: { working-directory: ai-service }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with: { python-version: '3.12' }
       - run: pip install -e ".[onnx,dev]"
       # Weights are a build artifact (ADR-0004), fetched here and SHA-256 pinned by
@@ -118,7 +118,7 @@ jobs:
       # silently — the sentiment engine the product actually ships would have no
       # coverage on the only machine that checks a clean tree.
       - name: Cache sentiment weights
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ai-service/models
           key: sentiment-onnx-${{ hashFiles('ai-service/scripts/fetch_sentiment_model.py') }}
@@ -141,8 +141,8 @@ jobs:
     defaults:
       run: { working-directory: frontend }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version-file: '.nvmrc', cache: npm, cache-dependency-path: frontend/package-lock.json }
       - run: npm ci
       # A dependency whose requirement the installed tree does not satisfy.
@@ -177,7 +177,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: guards
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # compose declares `env_file: ../backend/.env`, which is gitignored, so on a
       # clean checkout `config` fails with "env file not found" — as this job did
       # the first time it ever ran. Creating it from the example is not a
@@ -202,11 +202,11 @@ jobs:
     defaults:
       run: { working-directory: frontend }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Seed backend/.env
         working-directory: .
         run: cp backend/.env.example backend/.env
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: { node-version-file: '.nvmrc', cache: npm, cache-dependency-path: frontend/package-lock.json }
       - run: npm ci
       # Keyed on the resolved Playwright version, not a hand-written string: a
@@ -216,7 +216,7 @@ jobs:
         id: pw
         run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
@@ -248,7 +248,7 @@ jobs:
       # must not bust the cache.
       - name: Cache ai-service image
         id: ai-service-image-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /tmp/ai-service-image.tar
           key: ai-service-image-${{ hashFiles('infra/docker/ai-service.Dockerfile', 'ai-service/pyproject.toml', 'ai-service/app/**', 'ai-service/scripts/fetch_sentiment_model.py') }}
@@ -312,7 +312,7 @@ jobs:
         if: failure()
         working-directory: .
         run: docker compose -f infra/docker-compose.dev.yml logs --tail=200
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -330,10 +330,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: guards
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
       - name: Backend image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: backend
           file: infra/docker/backend.Dockerfile
@@ -343,7 +343,7 @@ jobs:
       # Builds the ONNX weights in, so this is also the only place that proves the
       # fetch script and its SHA-256 pins still resolve.
       - name: AI service image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ai-service
           file: infra/docker/ai-service.Dockerfile

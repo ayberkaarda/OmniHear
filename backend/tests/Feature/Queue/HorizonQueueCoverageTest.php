@@ -67,6 +67,20 @@ it("matches APP_ENV=local under Horizon's own Str::is() rule, the way infra/dock
     expect($matched)->not->toBeNull();
 });
 
+it('fires LongWaitDetected on the analysis queue, not only default', function () {
+    // W9 fixed Horizon to actually drain omnihear_database_queues:analysis
+    // (config/horizon.php 'defaults', config('ai.queue')). That fix is
+    // worthless as an early-warning system if starvation of that same queue
+    // never raises LongWaitDetected — 'waits' only ever covered 'redis:default'
+    // until now, which is precisely why the W9 starvation went unalarmed.
+    $waits = config('horizon.waits');
+    $analysisQueue = config('ai.queue');
+
+    expect($analysisQueue)->toBeString()->not->toBeEmpty();
+    expect($waits)->toHaveKey('redis:default');
+    expect($waits)->toHaveKey('redis:'.$analysisQueue);
+});
+
 it('never leaves a declared environment with zero live supervisors', function () {
     // The exact failure mode this file exists to close: ProvisioningPlan::deploy()
     // finds no matching environment (or a matching one with maxProcesses <= 0)

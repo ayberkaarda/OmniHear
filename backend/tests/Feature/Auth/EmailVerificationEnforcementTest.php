@@ -104,6 +104,15 @@ it('applies verified to every authenticated api route except the session surface
         'api/v1/auth/tokens',
         'api/v1/auth/tokens/{token}',
         'api/v1/account',
+        // Two-factor enrolment and teardown (W10). Same argument as the two
+        // above: adding or removing a second factor is account security, and
+        // gating it on a mailbox gets the dependency backwards — the user who
+        // most needs to turn 2FA on is the one who thinks their password is
+        // already out, and the one who most needs to turn it off has lost the
+        // authenticator. Neither should have to reach an inbox first.
+        'api/v1/auth/two-factor',
+        'api/v1/auth/two-factor/confirm',
+        'api/v1/auth/two-factor/recovery-codes',
     ];
 
     $unguarded = collect(Route::getRoutes()->getRoutes())

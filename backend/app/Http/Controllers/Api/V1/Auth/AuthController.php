@@ -14,6 +14,7 @@ use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
 use App\Support\Auth\TokenAbility;
 use App\Support\Auth\TokenLifetime;
+use App\Support\Auth\TwoFactorChallenge;
 use App\Support\DisposableEmailDomains;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +26,10 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly TwoFactorChallenge $challenges,
+    ) {}
 
     /**
      * POST /api/v1/auth/register
@@ -122,6 +126,27 @@ class AuthController extends Controller
             $this->audit->record(AuditAction::LoginFailed, actor: $user);
 
             throw ApiException::invalidCredentials();
+        }
+
+        // First factor satisfied, second still owed
+        // (docs/contracts/w10-two-factor.md).
+        //
+        // 200, not 401. The SPA's error interceptor maps 401 to UNAUTHENTICATED
+        // and tears the session down, so answering 401 here would log the user
+        // out of the very flow they are entering. Nothing has failed: the
+        // password was right, and what comes back is a credential for the next
+        // step rather than a session.
+        //
+        // No LoginSucceeded row yet, and last_login_ip is not moved. Neither is
+        // true until the second factor is proven; writing them here would put
+        // "logged in" in the audit trail for an attacker who had the password
+        // and stopped at the code prompt - which is precisely the event the
+        // trail needs to keep distinct.
+        if ($user->twoFactorEnabled()) {
+            return response()->json([
+                'two_factor_required' => true,
+                'challenge_token' => $this->challenges->issue($user),
+            ]);
         }
 
         $user->forceFill(['last_login_ip' => $request->ip()])->save();

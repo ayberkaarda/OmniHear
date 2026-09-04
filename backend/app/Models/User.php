@@ -47,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
         'two_factor_secret',
+        'two_factor_recovery_codes',
         'last_login_ip',
     ];
 
@@ -59,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_secret' => 'encrypted',
+            'two_factor_confirmed_at' => 'datetime',
+            // Encrypted *and* hashed: see App\Support\Auth\RecoveryCodes.
+            // The array cast is what makes the column a JSON list of hashes
+            // rather than a string the callers have to encode by hand.
+            'two_factor_recovery_codes' => 'encrypted:array',
         ];
     }
 
@@ -95,8 +101,28 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->getAttribute('company_id') === $companyId;
     }
 
+    /**
+     * Enabled means *confirmed*, never merely started.
+     *
+     * `filled($this->two_factor_secret)` is the tempting one-liner and it is
+     * wrong: a secret exists from the moment enrolment begins, so a user who
+     * opened the settings page and closed the tab would be met by a code prompt
+     * on their next login, for an authenticator entry they never scanned. There
+     * is no way out of that state without support. The server has to have seen
+     * a code the user could only have produced from the secret before the
+     * second factor becomes a condition of entry — and that is exactly what
+     * `two_factor_confirmed_at` records (docs/contracts/w10-two-factor.md).
+     */
     public function twoFactorEnabled(): bool
     {
-        return filled($this->two_factor_secret);
+        return $this->two_factor_confirmed_at !== null;
+    }
+
+    /**
+     * A secret has been generated but no code has been proven against it yet.
+     */
+    public function twoFactorPending(): bool
+    {
+        return filled($this->two_factor_secret) && $this->two_factor_confirmed_at === null;
     }
 }

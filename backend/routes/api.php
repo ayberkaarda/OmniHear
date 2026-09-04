@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
+use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use App\Http\Controllers\Api\V1\InvitationController;
 use App\Http\Middleware\EnforceTokenAbility;
 use App\Http\Middleware\QuotaRemainingHeader;
@@ -55,6 +56,26 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authenticated) {
         // Named because the verification signature is generated against it.
         Route::post('email/verify', [EmailVerificationController::class, 'verify'])
             ->name('email.verify');
+
+        // The second step of a login (docs/contracts/w10-two-factor.md).
+        //
+        // Public on purpose, and it is the only route in the application that
+        // authenticates a bearer token without `auth:sanctum`. The caller holds
+        // a challenge token, which carries `TokenAbility::CHALLENGE` and
+        // nothing else, and EnforceTokenAbility refuses that ability on every
+        // route behind the guard - so putting this one behind the guard too
+        // would make the flow unreachable by construction. The controller
+        // resolves the token itself and repeats the two checks Sanctum's guard
+        // would have made.
+        //
+        // `throttle:public` (30/min/IP) is inherited from the group and bounds
+        // how fast anyone can knock. It is not what bounds guessing against a
+        // *single* account: that is the per-token attempt counter in
+        // App\Support\Auth\TwoFactorChallenge, because an attacker holding
+        // the password can spread six-digit guesses across as many addresses as
+        // they like without ever meeting an IP limiter.
+        Route::post('two-factor/challenge', [TwoFactorController::class, 'challenge'])
+            ->name('two-factor.challenge');
     });
 
     // Accepting a team invitation (docs/contracts/settings-api.md section 3a).
@@ -114,6 +135,29 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authenticated) {
             Route::delete('tokens/{token}', [TokenController::class, 'destroy'])
                 ->whereNumber('token')
                 ->name('tokens.destroy');
+
+            // Two-factor enrolment and teardown (docs/contracts/w10-two-factor.md).
+            //
+            // Here rather than behind `verified`, for the same reason
+            // /auth/tokens and DELETE /account are here: this is account
+            // security lifecycle, and making it wait on a mailbox gets the
+            // dependency backwards. A user who suspects their password is out
+            // must be able to add a second factor now, and one who has lost the
+            // authenticator must be able to remove it now - neither should
+            // hinge on an inbox they may not currently control. The challenge
+            // route above is public in any case, so a confirmed user can always
+            // finish a login regardless of verification state.
+            Route::post('two-factor', [TwoFactorController::class, 'store'])
+                ->name('two-factor.store');
+
+            Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])
+                ->name('two-factor.confirm');
+
+            Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'recoveryCodes'])
+                ->name('two-factor.recovery-codes');
+
+            Route::delete('two-factor', [TwoFactorController::class, 'destroy'])
+                ->name('two-factor.destroy');
         });
 
         // Right to erasure. No id in the path on purpose — the company is read

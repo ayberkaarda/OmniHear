@@ -35,6 +35,20 @@ final class TokenAbility
     public const API = 'api';
 
     /**
+     * A password was correct and a second factor is still owed
+     * (docs/contracts/w10-two-factor.md).
+     *
+     * It is matched literally, exactly like `api` and for a sharper version of
+     * the same reason. Classifying it by elimination — "not a session" — would
+     * read `['*']` as a challenge token and lock every legacy session out of
+     * the whole API; classifying a session as "not a challenge" would read
+     * `['*']` as a *session* and hand a half-authenticated caller the full
+     * surface. Only a positive match on the literal ability says the thing that
+     * is actually true about the row.
+     */
+    public const CHALLENGE = 'two-factor-challenge';
+
+    /**
      * @return list<string>
      */
     public static function session(): array
@@ -50,15 +64,36 @@ final class TokenAbility
         return [self::API];
     }
 
+    /**
+     * @return list<string>
+     */
+    public static function challenge(): array
+    {
+        return [self::CHALLENGE];
+    }
+
     public static function isApiKey(PersonalAccessToken $token): bool
+    {
+        return self::carries($token, self::API);
+    }
+
+    public static function isChallenge(PersonalAccessToken $token): bool
+    {
+        return self::carries($token, self::CHALLENGE);
+    }
+
+    /**
+     * Everything that is neither of the two literals, wildcards included.
+     */
+    public static function isSession(PersonalAccessToken $token): bool
+    {
+        return ! self::isApiKey($token) && ! self::isChallenge($token);
+    }
+
+    private static function carries(PersonalAccessToken $token, string $ability): bool
     {
         $abilities = $token->abilities;
 
-        return is_array($abilities) && in_array(self::API, $abilities, true);
-    }
-
-    public static function isSession(PersonalAccessToken $token): bool
-    {
-        return ! self::isApiKey($token);
+        return is_array($abilities) && in_array($ability, $abilities, true);
     }
 }

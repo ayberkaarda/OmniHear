@@ -41,3 +41,35 @@ export function serverFieldError(fieldErrors: FieldErrors | null, field: string)
   const messages = fieldErrors?.[field];
   return messages !== undefined && messages.length > 0 ? messages[0] : undefined;
 }
+
+/* ----------------------------------------------------- two-factor (W10) --- */
+
+/** Six digits — RFC 6238's default, and what every authenticator app shows. */
+export const TOTP_CODE_PATTERN = /^[0-9]{6}$/;
+
+/** `xxxx-xxxx`, the shape the API hands out at enrolment. */
+export const RECOVERY_CODE_PATTERN = /^[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}$/;
+
+/**
+ * Client-side text for a two-factor field.
+ *
+ * Separate from `controlErrorMessage` because a mistyped code is the one
+ * validation failure a user is most likely to hit while locked out, and
+ * "Check this field." — what a bare `pattern` error would produce there — says
+ * nothing about what is wrong. Shared by the login step and the settings
+ * section so both name the same rule the same way.
+ */
+export function twoFactorControlMessage(
+  control: AbstractControl | null | undefined,
+  kind: 'code' | 'recovery_code'
+): string | undefined {
+  if (control === null || control === undefined || !control.touched || control.valid) {
+    return undefined;
+  }
+  if (control.hasError('required')) {
+    return $localize`:Form validation message@@form.error.required:This field is required.`;
+  }
+  return kind === 'code'
+    ? $localize`:Two-factor validation message@@auth.twoFactor.error.codeFormat:Enter the six digits shown in your authenticator app.`
+    : $localize`:Two-factor validation message@@auth.twoFactor.error.recoveryFormat:A recovery code looks like xxxx-xxxx.`;
+}

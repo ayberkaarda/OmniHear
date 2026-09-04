@@ -2,6 +2,33 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" target-language="tr" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="settings.twoFactor.enabledToast" datatype="html">
+        <source>Two-step verification is on. Save your recovery codes now — they are shown once.</source>
+        <target>İki adımlı doğrulama açık. Kurtarma kodlarınızı şimdi kaydedin — yalnızca bir kez gösterilirler.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/auth/two-factor.store.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+        <note priority="1" from="description">Toast after two-factor was switched on</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disabledToast" datatype="html">
+        <source>Two-step verification is off. Your account is now protected by its password alone.</source>
+        <target>İki adımlı doğrulama kapatıldı. Hesabınızı artık yalnızca parolası koruyor.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/auth/two-factor.store.ts</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+        <note priority="1" from="description">Toast after two-factor was switched off</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regeneratedToast" datatype="html">
+        <source>New recovery codes are ready. The old ones no longer work.</source>
+        <target>Yeni kurtarma kodları hazır. Eskiler artık çalışmıyor.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/auth/two-factor.store.ts</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+        <note priority="1" from="description">Toast after recovery codes were replaced</note>
+      </trans-unit>
       <trans-unit id="error.validationError" datatype="html">
         <source>Some of the details you entered are not valid. Please review the form and try again.</source>
         <target>Girdiğiniz bilgilerin bir kısmı geçerli değil. Lütfen formu gözden geçirip yeniden deneyin.</target>
@@ -83,12 +110,39 @@
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
+      <trans-unit id="error.twoFactorCodeInvalid" datatype="html">
+        <source>That code was not accepted. Check your authenticator app and try the current code.</source>
+        <target>Bu kod kabul edilmedi. Doğrulayıcı uygulamanızı kontrol edip güncel kodu deneyin.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.twoFactorAlreadyEnabled" datatype="html">
+        <source>Two-step verification is already switched on for this account.</source>
+        <target>Bu hesapta iki adımlı doğrulama zaten açık.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.twoFactorNotEnabled" datatype="html">
+        <source>Two-step verification is not switched on for this account, or its setup was never finished. Reload the page to see where things stand.</source>
+        <target>Bu hesapta iki adımlı doğrulama açık değil ya da kurulumu hiç tamamlanmamış. Güncel durumu görmek için sayfayı yenileyin.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
       <trans-unit id="error.serverError" datatype="html">
         <source>Something went wrong on our side. Please try again shortly.</source>
         <target>Bizim tarafımızda bir sorun oluştu. Lütfen kısa süre sonra tekrar deneyin.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
@@ -97,7 +151,7 @@
         <target>OmniHear'a ulaşamadık. Bağlantınızı kontrol edip tekrar deneyin.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">44</context>
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
@@ -106,7 +160,7 @@
         <target>Bir sorun oluştu. Lütfen tekrar deneyin.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
@@ -572,7 +626,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
@@ -2016,12 +2070,164 @@
         </context-group>
         <note priority="1" from="description">Confirmation after the password was changed</note>
       </trans-unit>
+      <trans-unit id="settings.twoFactor.heading" datatype="html">
+        <source> Two-step verification </source>
+        <target>İki adımlı doğrulama</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">139,141</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.intro" datatype="html">
+        <source> An authenticator app on your phone produces a six-digit code that changes every 30 seconds. With this on, signing in asks for that code after your password, so a stolen password is not enough on its own. </source>
+        <target>Telefonunuzdaki doğrulayıcı uygulama, her 30 saniyede bir değişen altı haneli bir kod üretir. Bu açıkken giriş, parolanızdan sonra bu kodu da ister; böylece çalınan bir parola tek başına yetmez.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">142,146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.newCodesHeading" datatype="html">
+        <source> Your new recovery codes </source>
+        <target>Yeni kurtarma kodlarınız</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">154,156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.codesHeading" datatype="html">
+        <source> Save your recovery codes </source>
+        <target>Kurtarma kodlarınızı kaydedin</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">158,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.codesHelp" datatype="html">
+        <source> Each code signs you in once if you lose your phone. This is the only time they are shown — store them somewhere safe before you close this. </source>
+        <target>Telefonunuzu kaybederseniz her kod sizi bir kez içeri alır. Yalnızca bu bir kez gösterilirler — kapatmadan önce güvenli bir yere kaydedin.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">162,165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.codesSaved" datatype="html">
+        <source>I have saved these codes</source>
+        <target>Bu kodları kaydettim</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">172,174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.on" datatype="html">
+        <source> Two-step verification is on for this account. </source>
+        <target>Bu hesapta iki adımlı doğrulama açık.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">180,183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regenerateHeading" datatype="html">
+        <source> Replace your recovery codes </source>
+        <target>Kurtarma kodlarınızı yenileyin</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">190,192</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regenerateHelp" datatype="html">
+        <source> Issues a fresh set of eight and makes the old ones stop working. Confirm with a current code. </source>
+        <target>Sekiz kodluk yeni bir set üretir ve eskilerini geçersiz kılar. Güncel bir kodla onaylayın.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">193,196</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regenerateSubmit" datatype="html">
+        <source>Generate new codes</source>
+        <target>Yeni kod üret</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">208,210</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disableHeading" datatype="html">
+        <source> Turn two-step verification off </source>
+        <target>İki adımlı doğrulamayı kapat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">220,222</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disableHelp" datatype="html">
+        <source> Both your password and a current code are needed, because removing a second factor is exactly what someone using your open session would try first. </source>
+        <target>Hem parolanız hem de güncel bir kod gerekir; çünkü açık oturumunuzu ele geçiren birinin ilk deneyeceği şey ikinci adımı kaldırmaktır.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">223,227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disableSubmit" datatype="html">
+        <source>Turn it off</source>
+        <target>Kapat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">249,251</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.scanInstruction" datatype="html">
+        <source> Scan this with your authenticator app, then type the code it shows to finish. </source>
+        <target>Bunu doğrulayıcı uygulamanızla tarayın, ardından gösterdiği kodu yazarak bitirin.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">256,260</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.secretLabel" datatype="html">
+        <source>Cannot scan? Enter this key by hand:</source>
+        <target>Tarayamıyor musunuz? Bu anahtarı elle girin:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">269,270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.confirmSubmit" datatype="html">
+        <source>Confirm and switch on</source>
+        <target>Doğrula ve aç</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">294,296</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.cancel" datatype="html">
+        <source>Cancel</source>
+        <target>Vazgeç</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">297,299</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.off" datatype="html">
+        <source> Two-step verification is off. Your password is the only thing protecting this account. </source>
+        <target>İki adımlı doğrulama kapalı. Bu hesabı koruyan tek şey parolanız.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">304,307</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.enable" datatype="html">
+        <source>Set up two-step verification</source>
+        <target>İki adımlı doğrulamayı kur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">308,310</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="settings.profile.field.name" datatype="html">
         <source>Full name</source>
         <target>Ad soyad</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <note priority="1" from="description">Profile form field</note>
       </trans-unit>
@@ -2030,7 +2236,7 @@
         <target>E-posta adresi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">112</context>
         </context-group>
         <note priority="1" from="description">Profile form field</note>
       </trans-unit>
@@ -2039,7 +2245,7 @@
         <target>Bu adresi değiştirmek hesabınızı doğrulanmış durumundan çıkarır ve yeni bir doğrulama e-postası gönderir.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <note priority="1" from="description">Warning under the email field</note>
       </trans-unit>
@@ -2048,7 +2254,7 @@
         <target>Mevcut parola</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">114</context>
         </context-group>
         <note priority="1" from="description">Password form field</note>
       </trans-unit>
@@ -2057,7 +2263,7 @@
         <target>Yeni parola</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">115</context>
         </context-group>
         <note priority="1" from="description">Password form field</note>
       </trans-unit>
@@ -2066,7 +2272,7 @@
         <target>Yeni parolayı yeniden yazın</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <note priority="1" from="description">Password form field</note>
       </trans-unit>
@@ -2075,7 +2281,7 @@
         <target>En az 12 karakter. Parolayı değiştirdiğinizde oturum açık olan diğer tüm cihazların oturumu kapatılır.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <note priority="1" from="description">Helper under the new password field</note>
       </trans-unit>
@@ -2084,7 +2290,7 @@
         <target>Değişiklikleri kaydet</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <note priority="1" from="description">Save a settings form</note>
       </trans-unit>
@@ -2093,9 +2299,40 @@
         <target>Parolayı değiştir</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">119</context>
         </context-group>
         <note priority="1" from="description">Submit the password form</note>
+      </trans-unit>
+      <trans-unit id="auth.field.twoFactorCode" datatype="html">
+        <source>Six-digit code</source>
+        <target>Altı haneli kod</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.confirmHelper" datatype="html">
+        <source>Type the code your authenticator app is showing right now.</source>
+        <target>Doğrulayıcı uygulamanızın şu anda gösterdiği kodu yazın.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <note priority="1" from="description">Helper under the enrolment code field</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.qrAlt" datatype="html">
+        <source>QR code that sets up this account in an authenticator app</source>
+        <target>Bu hesabı bir doğrulayıcı uygulamada kuran QR kodu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for the enrolment QR code</note>
       </trans-unit>
       <trans-unit id="app.settings.title" datatype="html">
         <source>Settings</source>
@@ -2344,6 +2581,10 @@
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
         <note priority="1" from="description">Team role</note>
       </trans-unit>
       <trans-unit id="label.role.admin" datatype="html">
@@ -2352,6 +2593,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
           <context context-type="linenumber">201</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">133</context>
         </context-group>
         <note priority="1" from="description">Team role</note>
       </trans-unit>
@@ -2362,7 +2607,149 @@
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
         <note priority="1" from="description">Team role</note>
+      </trans-unit>
+      <trans-unit id="auth.invitation.loading" datatype="html">
+        <source> Checking your invitation… </source>
+        <target> Davetiniz kontrol ediliyor… </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.invalid" datatype="html">
+        <source> This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a teammate to send you a new one. </source>
+        <target> Bu davet bağlantısı artık kullanılamıyor. Davetlerin süresi dolar ve her biri yalnızca bir kez kabul edilebilir. Ekip arkadaşınızdan size yeni bir davet göndermesini isteyin. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">14,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.company" datatype="html">
+        <source>You have been invited to</source>
+        <target>Şu ekibe davet edildiniz:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.as" datatype="html">
+        <source>Joining as</source>
+        <target>Katılım rolünüz:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.lead" datatype="html">
+        <source> Choose a password to finish setting up your account. Your email address is already confirmed. </source>
+        <target> Hesabınızı tamamlamak için bir parola belirleyin. E-posta adresiniz zaten doğrulandı. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.submit" datatype="html">
+        <source>Accept and create my account</source>
+        <target>Kabul et ve hesabımı oluştur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">74,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.backToLogin" datatype="html">
+        <source>Already have an account? Sign in</source>
+        <target>Zaten hesabınız var mı? Giriş yapın</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
+          <context context-type="linenumber">87,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.invitation.heading" datatype="html">
+        <source>Join your team</source>
+        <target>Ekibinize katılın</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <note priority="1" from="description">Accept invitation heading</note>
+      </trans-unit>
+      <trans-unit id="auth.field.name" datatype="html">
+        <source>Your name</source>
+        <target>Adınız</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.field.password" datatype="html">
+        <source>Password</source>
+        <target>Parola</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.field.passwordConfirmation" datatype="html">
+        <source>Repeat password</source>
+        <target>Parolayı tekrar girin</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.register.passwordHelper" datatype="html">
+        <source>At least 12 characters.</source>
+        <target>En az 12 karakter.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <note priority="1" from="description">Field helper</note>
+      </trans-unit>
+      <trans-unit id="auth.invitation.success" datatype="html">
+        <source>Welcome aboard. Your account is ready.</source>
+        <target>Aramıza hoş geldiniz. Hesabınız hazır.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <note priority="1" from="description">Invitation accepted toast</note>
       </trans-unit>
       <trans-unit id="auth.forgot.sent" datatype="html">
         <source> If that address belongs to an account, a reset link is on its way. The link is valid for a limited time. </source>
@@ -2415,7 +2802,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
@@ -2427,12 +2814,21 @@
         </context-group>
         <note priority="1" from="description">Field label</note>
       </trans-unit>
+      <trans-unit id="auth.twoFactor.expired" datatype="html">
+        <source> That confirmation step has expired. Sign in again to get a new code prompt. </source>
+        <target>Bu doğrulama adımının süresi doldu. Yeni bir kod istemi için tekrar giriş yapın.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+        <note priority="1" from="description">Notice when the two-factor challenge could not be completed</note>
+      </trans-unit>
       <trans-unit id="auth.login.forgotLink" datatype="html">
         <source>Forgot your password?</source>
         <target>Parolanızı mı unuttunuz?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">28,32</context>
+          <context context-type="linenumber">40,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.submit" datatype="html">
@@ -2440,7 +2836,39 @@
         <target>Giriş yap</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">33,35</context>
+          <context context-type="linenumber">45,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.submit" datatype="html">
+        <source>Confirm and sign in</source>
+        <target>Doğrula ve giriş yap</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">82,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.useApp" datatype="html">
+        <source> Use my authenticator app instead </source>
+        <target>Bunun yerine doğrulayıcı uygulamamı kullan</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">94,96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.useRecovery" datatype="html">
+        <source> I cannot use my authenticator app </source>
+        <target>Doğrulayıcı uygulamamı kullanamıyorum</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">104,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.back" datatype="html">
+        <source> Back to sign in </source>
+        <target>Girişe dön</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">115,117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.noAccount" datatype="html">
@@ -2448,7 +2876,7 @@
         <target>Henüz hesabınız yok mu?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">38,40</context>
+          <context context-type="linenumber">123,125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.registerLink" datatype="html">
@@ -2456,7 +2884,7 @@
         <target>Hesap oluşturun</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">43,47</context>
+          <context context-type="linenumber">128,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.heading" datatype="html">
@@ -2464,7 +2892,7 @@
         <target>OmniHear'a giriş yapın</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <note priority="1" from="description">Login page heading</note>
       </trans-unit>
@@ -2473,22 +2901,63 @@
         <target>Kayıt olurken kullandığınız e-posta adresini girin.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <note priority="1" from="description">Login page lead</note>
       </trans-unit>
-      <trans-unit id="auth.field.password" datatype="html">
-        <source>Password</source>
-        <target>Parola</target>
+      <trans-unit id="auth.twoFactor.heading" datatype="html">
+        <source>Confirm it is you</source>
+        <target>Sizin olduğunuzu doğrulayın</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">89</context>
         </context-group>
+        <note priority="1" from="description">Two-factor step heading</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.lead" datatype="html">
+        <source>Your password was accepted. Enter the six-digit code from your authenticator app to finish signing in.</source>
+        <target>Parolanız kabul edildi. Girişi tamamlamak için doğrulayıcı uygulamanızdaki altı haneli kodu girin.</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor step lead</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.recoveryLead" datatype="html">
+        <source>Enter one of the recovery codes you saved when you switched on two-step verification. Each code works once.</source>
+        <target>İki adımlı doğrulamayı açarken kaydettiğiniz kurtarma kodlarından birini girin. Her kod yalnızca bir kez çalışır.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor recovery step lead</note>
+      </trans-unit>
+      <trans-unit id="auth.field.recoveryCode" datatype="html">
+        <source>Recovery code</source>
+        <target>Kurtarma kodu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.codeHelper" datatype="html">
+        <source>The code changes every 30 seconds.</source>
+        <target>Kod her 30 saniyede bir değişir.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <note priority="1" from="description">Helper under the two-factor code field</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.error.rejected" datatype="html">
+        <source>That code was not accepted. Try the current code, or use a recovery code.</source>
+        <target>Bu kod kabul edilmedi. Güncel kodu deneyin ya da bir kurtarma kodu kullanın.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">252</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor rejection message</note>
       </trans-unit>
       <trans-unit id="auth.register.submit" datatype="html">
         <source>Create account</source>
@@ -2532,15 +3001,6 @@
         </context-group>
         <note priority="1" from="description">Register page lead</note>
       </trans-unit>
-      <trans-unit id="auth.field.name" datatype="html">
-        <source>Your name</source>
-        <target>Adınız</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <note priority="1" from="description">Field label</note>
-      </trans-unit>
       <trans-unit id="auth.field.companyName" datatype="html">
         <source>Company name</source>
         <target>Şirket adı</target>
@@ -2549,32 +3009,6 @@
           <context context-type="linenumber">43</context>
         </context-group>
         <note priority="1" from="description">Field label</note>
-      </trans-unit>
-      <trans-unit id="auth.field.passwordConfirmation" datatype="html">
-        <source>Repeat password</source>
-        <target>Parolayı tekrar girin</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">46</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
-          <context context-type="linenumber">52</context>
-        </context-group>
-        <note priority="1" from="description">Field label</note>
-      </trans-unit>
-      <trans-unit id="auth.register.passwordHelper" datatype="html">
-        <source>At least 12 characters.</source>
-        <target>En az 12 karakter.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
-          <context context-type="linenumber">47</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/reset-password/reset-password.component.ts</context>
-          <context context-type="linenumber">53</context>
-        </context-group>
-        <note priority="1" from="description">Field helper</note>
       </trans-unit>
       <trans-unit id="auth.register.emailHelper" datatype="html">
         <source>Use your work email address.</source>
@@ -2652,6 +3086,10 @@
           <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
         <note priority="1" from="description">Form validation message</note>
       </trans-unit>
       <trans-unit id="form.error.email" datatype="html">
@@ -2689,6 +3127,24 @@
           <context context-type="linenumber">30</context>
         </context-group>
         <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.error.codeFormat" datatype="html">
+        <source>Enter the six digits shown in your authenticator app.</source>
+        <target>Doğrulayıcı uygulamanızda görünen altı haneyi girin.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor validation message</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.error.recoveryFormat" datatype="html">
+        <source>A recovery code looks like xxxx-xxxx.</source>
+        <target>Kurtarma kodu xxxx-xxxx biçimindedir.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor validation message</note>
       </trans-unit>
       <trans-unit id="auth.verify.pending" datatype="html">
         <source> Checking your confirmation link… </source>
@@ -3786,80 +4242,6 @@
           <context context-type="linenumber">28</context>
         </context-group>
         <note priority="1" from="description">Modal close button label</note>
-      </trans-unit>
-      <trans-unit id="auth.invitation.loading" datatype="html">
-        <source> Checking your invitation… </source>
-        <target> Davetiniz kontrol ediliyor… </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">5,8</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.invalid" datatype="html">
-        <source> This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a teammate to send you a new one. </source>
-        <target> Bu davet bağlantısı artık kullanılamıyor. Davetlerin süresi dolar ve her biri yalnızca bir kez kabul edilebilir. Ekip arkadaşınızdan size yeni bir davet göndermesini isteyin. </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">14,17</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.company" datatype="html">
-        <source>You have been invited to</source>
-        <target>Şu ekibe davet edildiniz:</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">27,28</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.as" datatype="html">
-        <source>Joining as</source>
-        <target>Katılım rolünüz:</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">31,32</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.lead" datatype="html">
-        <source> Choose a password to finish setting up your account. Your email address is already confirmed. </source>
-        <target> Hesabınızı tamamlamak için bir parola belirleyin. E-posta adresiniz zaten doğrulandı. </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">38,41</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.submit" datatype="html">
-        <source>Accept and create my account</source>
-        <target>Kabul et ve hesabımı oluştur</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">74,76</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.backToLogin" datatype="html">
-        <source>Already have an account? Sign in</source>
-        <target>Zaten hesabınız var mı? Giriş yapın</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.html</context>
-          <context context-type="linenumber">87,91</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="auth.invitation.heading" datatype="html">
-        <source>Join your team</source>
-        <target>Ekibinize katılın</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
-          <context context-type="linenumber">58</context>
-        </context-group>
-        <note priority="1" from="description">Accept invitation heading</note>
-      </trans-unit>
-      <trans-unit id="auth.invitation.success" datatype="html">
-        <source>Welcome aboard. Your account is ready.</source>
-        <target>Aramıza hoş geldiniz. Hesabınız hazır.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/auth/accept-invitation/accept-invitation.component.ts</context>
-          <context context-type="linenumber">100</context>
-        </context-group>
-        <note priority="1" from="description">Invitation accepted toast</note>
       </trans-unit>
     </body>
   </file>

@@ -173,14 +173,30 @@ it('exposes the role helpers on the user model', function () {
         ->and($member->hasRole(User::ROLE_OWNER, User::ROLE_MEMBER))->toBeTrue();
 });
 
-it('reports two factor as disabled until a secret is stored', function () {
+it('reports two factor as disabled until the enrolment is confirmed', function () {
     [$company, $user] = tenant();
 
-    expect($user->twoFactorEnabled())->toBeFalse();
+    expect($user->twoFactorEnabled())->toBeFalse()
+        ->and($user->twoFactorPending())->toBeFalse();
 
+    // A secret alone means enrolment *started*. If "enabled" flipped here, a
+    // user who generated a secret and closed the tab would be met by a code
+    // prompt for an authenticator entry they never scanned - locked out of
+    // their own account by an enrolment they never finished
+    // (docs/contracts/w10-two-factor.md).
     $user->forceFill(['two_factor_secret' => 'ABC123'])->save();
 
-    expect(User::query()->findOrFail($user->id)->twoFactorEnabled())->toBeTrue();
+    $started = User::query()->findOrFail($user->id);
+
+    expect($started->twoFactorEnabled())->toBeFalse()
+        ->and($started->twoFactorPending())->toBeTrue();
+
+    $user->forceFill(['two_factor_confirmed_at' => now()])->save();
+
+    $confirmed = User::query()->findOrFail($user->id);
+
+    expect($confirmed->twoFactorEnabled())->toBeTrue()
+        ->and($confirmed->twoFactorPending())->toBeFalse();
 });
 
 it('encrypts the two factor secret at rest', function () {

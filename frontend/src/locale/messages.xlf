@@ -2,6 +2,30 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="settings.twoFactor.enabledToast" datatype="html">
+        <source>Two-step verification is on. Save your recovery codes now — they are shown once.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/auth/two-factor.store.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+        <note priority="1" from="description">Toast after two-factor was switched on</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disabledToast" datatype="html">
+        <source>Two-step verification is off. Your account is now protected by its password alone.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/auth/two-factor.store.ts</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+        <note priority="1" from="description">Toast after two-factor was switched off</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regeneratedToast" datatype="html">
+        <source>New recovery codes are ready. The old ones no longer work.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/auth/two-factor.store.ts</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+        <note priority="1" from="description">Toast after recovery codes were replaced</note>
+      </trans-unit>
       <trans-unit id="error.validationError" datatype="html">
         <source>Some of the details you entered are not valid. Please review the form and try again.</source>
         <context-group purpose="location">
@@ -74,11 +98,35 @@
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
+      <trans-unit id="error.twoFactorCodeInvalid" datatype="html">
+        <source>That code was not accepted. Check your authenticator app and try the current code.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.twoFactorAlreadyEnabled" datatype="html">
+        <source>Two-step verification is already switched on for this account.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
+      <trans-unit id="error.twoFactorNotEnabled" datatype="html">
+        <source>Two-step verification is not switched on for this account, or its setup was never finished. Reload the page to see where things stand.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <note priority="1" from="description">API error message</note>
+      </trans-unit>
       <trans-unit id="error.serverError" datatype="html">
         <source>Something went wrong on our side. Please try again shortly.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
@@ -86,7 +134,7 @@
         <source>We could not reach OmniHear. Check your connection and try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">44</context>
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
@@ -94,7 +142,7 @@
         <source>Something went wrong. Please try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/errors/error-messages.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <note priority="1" from="description">API error message</note>
       </trans-unit>
@@ -511,7 +559,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/team/team.component.ts</context>
@@ -1794,11 +1842,144 @@
         </context-group>
         <note priority="1" from="description">Confirmation after the password was changed</note>
       </trans-unit>
+      <trans-unit id="settings.twoFactor.heading" datatype="html">
+        <source> Two-step verification </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">139,141</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.intro" datatype="html">
+        <source> An authenticator app on your phone produces a six-digit code that changes every 30 seconds. With this on, signing in asks for that code after your password, so a stolen password is not enough on its own. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">142,146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.newCodesHeading" datatype="html">
+        <source> Your new recovery codes </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">154,156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.codesHeading" datatype="html">
+        <source> Save your recovery codes </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">158,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.codesHelp" datatype="html">
+        <source> Each code signs you in once if you lose your phone. This is the only time they are shown — store them somewhere safe before you close this. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">162,165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.codesSaved" datatype="html">
+        <source>I have saved these codes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">172,174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.on" datatype="html">
+        <source> Two-step verification is on for this account. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">180,183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regenerateHeading" datatype="html">
+        <source> Replace your recovery codes </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">190,192</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regenerateHelp" datatype="html">
+        <source> Issues a fresh set of eight and makes the old ones stop working. Confirm with a current code. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">193,196</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.regenerateSubmit" datatype="html">
+        <source>Generate new codes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">208,210</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disableHeading" datatype="html">
+        <source> Turn two-step verification off </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">220,222</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disableHelp" datatype="html">
+        <source> Both your password and a current code are needed, because removing a second factor is exactly what someone using your open session would try first. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">223,227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.disableSubmit" datatype="html">
+        <source>Turn it off</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">249,251</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.scanInstruction" datatype="html">
+        <source> Scan this with your authenticator app, then type the code it shows to finish. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">256,260</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.secretLabel" datatype="html">
+        <source>Cannot scan? Enter this key by hand:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">269,270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.confirmSubmit" datatype="html">
+        <source>Confirm and switch on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">294,296</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.cancel" datatype="html">
+        <source>Cancel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">297,299</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.off" datatype="html">
+        <source> Two-step verification is off. Your password is the only thing protecting this account. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">304,307</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.enable" datatype="html">
+        <source>Set up two-step verification</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.html</context>
+          <context context-type="linenumber">308,310</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="settings.profile.field.name" datatype="html">
         <source>Full name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <note priority="1" from="description">Profile form field</note>
       </trans-unit>
@@ -1806,7 +1987,7 @@
         <source>Email address</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">112</context>
         </context-group>
         <note priority="1" from="description">Profile form field</note>
       </trans-unit>
@@ -1814,7 +1995,7 @@
         <source>Changing this address signs your account out of its confirmed state and sends a new confirmation email.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <note priority="1" from="description">Warning under the email field</note>
       </trans-unit>
@@ -1822,7 +2003,7 @@
         <source>Current password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">114</context>
         </context-group>
         <note priority="1" from="description">Password form field</note>
       </trans-unit>
@@ -1830,7 +2011,7 @@
         <source>New password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">115</context>
         </context-group>
         <note priority="1" from="description">Password form field</note>
       </trans-unit>
@@ -1838,7 +2019,7 @@
         <source>Repeat the new password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <note priority="1" from="description">Password form field</note>
       </trans-unit>
@@ -1846,7 +2027,7 @@
         <source>At least 12 characters. Every other signed-in device is signed out when you change it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <note priority="1" from="description">Helper under the new password field</note>
       </trans-unit>
@@ -1854,7 +2035,7 @@
         <source>Save changes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <note priority="1" from="description">Save a settings form</note>
       </trans-unit>
@@ -1862,9 +2043,37 @@
         <source>Change password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">119</context>
         </context-group>
         <note priority="1" from="description">Submit the password form</note>
+      </trans-unit>
+      <trans-unit id="auth.field.twoFactorCode" datatype="html">
+        <source>Six-digit code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.confirmHelper" datatype="html">
+        <source>Type the code your authenticator app is showing right now.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <note priority="1" from="description">Helper under the enrolment code field</note>
+      </trans-unit>
+      <trans-unit id="settings.twoFactor.qrAlt" datatype="html">
+        <source>QR code that sets up this account in an authenticator app</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/settings/profile/profile.component.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+        <note priority="1" from="description">Alt text for the enrolment QR code</note>
       </trans-unit>
       <trans-unit id="app.settings.title" datatype="html">
         <source>Settings</source>
@@ -2191,7 +2400,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">104</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
@@ -2284,7 +2493,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/register/register.component.ts</context>
@@ -2296,39 +2505,75 @@
         </context-group>
         <note priority="1" from="description">Field label</note>
       </trans-unit>
+      <trans-unit id="auth.twoFactor.expired" datatype="html">
+        <source> That confirmation step has expired. Sign in again to get a new code prompt. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+        <note priority="1" from="description">Notice when the two-factor challenge could not be completed</note>
+      </trans-unit>
       <trans-unit id="auth.login.forgotLink" datatype="html">
         <source>Forgot your password?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">28,32</context>
+          <context context-type="linenumber">40,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.submit" datatype="html">
         <source>Sign in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">33,35</context>
+          <context context-type="linenumber">45,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.submit" datatype="html">
+        <source>Confirm and sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">82,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.useApp" datatype="html">
+        <source> Use my authenticator app instead </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">94,96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.useRecovery" datatype="html">
+        <source> I cannot use my authenticator app </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">104,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.back" datatype="html">
+        <source> Back to sign in </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
+          <context context-type="linenumber">115,117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.noAccount" datatype="html">
         <source>Do not have an account yet?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">38,40</context>
+          <context context-type="linenumber">123,125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.registerLink" datatype="html">
         <source>Create one</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.html</context>
-          <context context-type="linenumber">43,47</context>
+          <context context-type="linenumber">128,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="auth.login.heading" datatype="html">
         <source>Sign in to OmniHear</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <note priority="1" from="description">Login page heading</note>
       </trans-unit>
@@ -2336,9 +2581,57 @@
         <source>Use the email address you registered with.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <note priority="1" from="description">Login page lead</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.heading" datatype="html">
+        <source>Confirm it is you</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor step heading</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.lead" datatype="html">
+        <source>Your password was accepted. Enter the six-digit code from your authenticator app to finish signing in.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor step lead</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.recoveryLead" datatype="html">
+        <source>Enter one of the recovery codes you saved when you switched on two-step verification. Each code works once.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor recovery step lead</note>
+      </trans-unit>
+      <trans-unit id="auth.field.recoveryCode" datatype="html">
+        <source>Recovery code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+        <note priority="1" from="description">Field label</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.codeHelper" datatype="html">
+        <source>The code changes every 30 seconds.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <note priority="1" from="description">Helper under the two-factor code field</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.error.rejected" datatype="html">
+        <source>That code was not accepted. Try the current code, or use a recovery code.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/login/login.component.ts</context>
+          <context context-type="linenumber">252</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor rejection message</note>
       </trans-unit>
       <trans-unit id="auth.register.submit" datatype="html">
         <source>Create account</source>
@@ -2452,6 +2745,10 @@
           <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
         <note priority="1" from="description">Form validation message</note>
       </trans-unit>
       <trans-unit id="form.error.email" datatype="html">
@@ -2485,6 +2782,22 @@
           <context context-type="linenumber">30</context>
         </context-group>
         <note priority="1" from="description">Form validation message</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.error.codeFormat" datatype="html">
+        <source>Enter the six digits shown in your authenticator app.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor validation message</note>
+      </trans-unit>
+      <trans-unit id="auth.twoFactor.error.recoveryFormat" datatype="html">
+        <source>A recovery code looks like xxxx-xxxx.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/form-errors.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <note priority="1" from="description">Two-factor validation message</note>
       </trans-unit>
       <trans-unit id="auth.verify.pending" datatype="html">
         <source> Checking your confirmation link… </source>

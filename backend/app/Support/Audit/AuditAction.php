@@ -45,4 +45,15 @@ enum AuditAction: string
 
     case NotificationPreferencesUpdated = 'settings.notification_preferences_updated';
     case NotificationRead = 'notification.read';
+
+    // W10 — two-factor authentication (docs/contracts/w10-two-factor.md).
+    //
+    // The failed challenge is the one that earns its place: a burst of them on
+    // one account is a password already in someone else's hands, which is the
+    // single most useful thing this table can tell a reviewer. Metadata carries
+    // no secret and no submitted code — the row says that a challenge failed,
+    // never what was tried (invariant I5).
+    case TwoFactorEnabled = 'auth.two_factor_enabled';
+    case TwoFactorDisabled = 'auth.two_factor_disabled';
+    case TwoFactorChallengeFailed = 'auth.two_factor_challenge_failed';
 }

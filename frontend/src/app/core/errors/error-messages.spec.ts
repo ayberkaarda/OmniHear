@@ -5,7 +5,7 @@ describe('errorMessageForCode', () => {
   it('has a distinct message for every code in the contract catalogue', () => {
     const messages = API_ERROR_CODES.map((code) => errorMessageForCode(code));
 
-    expect(messages).toHaveLength(10);
+    expect(messages).toHaveLength(13);
     expect(new Set(messages).size).toBe(messages.length);
     for (const message of messages) {
       expect(message.length).toBeGreaterThan(0);

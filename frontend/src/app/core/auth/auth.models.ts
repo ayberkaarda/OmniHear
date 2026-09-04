@@ -115,3 +115,59 @@ export interface AcceptInvitationRequest {
   password: string;
   password_confirmation: string;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Two-factor authentication — `docs/contracts/w10-two-factor.md`             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * `POST /auth/login` when the password was right and a second factor is owed.
+ *
+ * **200, not 401.** This is a successful first factor, not a failure: the error
+ * interceptor maps 401 to `UNAUTHENTICATED` and tears the session down, so a
+ * 401 here would sign the user out of the flow they are entering.
+ */
+export interface TwoFactorChallengeResponse {
+  two_factor_required: true;
+  challenge_token: string;
+}
+
+/** What `POST /auth/login` may now answer — one of two success shapes. */
+export type LoginResponse = AuthSessionResponse | TwoFactorChallengeResponse;
+
+/**
+ * Discriminates the two 200s. Tests the literal flag rather than the absence of
+ * `token`: a body that carried neither would otherwise be read as a session.
+ */
+export function isTwoFactorChallenge(response: LoginResponse): response is TwoFactorChallengeResponse {
+  return (response as TwoFactorChallengeResponse).two_factor_required === true;
+}
+
+/**
+ * `POST /auth/two-factor/challenge` — exactly one of the two fields, never both.
+ * The union is what stops a caller from sending an empty object or a pair.
+ */
+export type TwoFactorChallengeRequest = { code: string } | { recovery_code: string };
+
+/** `POST /auth/two-factor` (201). The secret is served here and nowhere else. */
+export interface TwoFactorEnrolmentResponse {
+  secret: string;
+  otpauth_url: string;
+  /** `data:image/svg+xml;base64,…` — rendered server-side, straight into `<img src>`. */
+  qr_svg_data_uri: string;
+}
+
+/** `POST /auth/two-factor/confirm` and `POST /auth/two-factor/recovery-codes`. */
+export interface RecoveryCodesResponse {
+  recovery_codes: string[];
+}
+
+export interface TwoFactorCodeRequest {
+  code: string;
+}
+
+/** `DELETE /auth/two-factor` — both factors re-proved before one is removed. */
+export interface TwoFactorDisableRequest {
+  password: string;
+  code: string;
+}

@@ -20,6 +20,8 @@
       [value]="value() ?? ''"
       [disabled]="isDisabled"
       [required]="required()"
+      [attr.autocomplete]="autocomplete() ?? null"
+      [attr.inputmode]="inputMode() ?? null"
       [attr.aria-invalid]="error() ? 'true' : null"
       [attr.aria-describedby]="describedBy()"
       (input)="onInput($event)"

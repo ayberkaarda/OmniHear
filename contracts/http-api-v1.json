@@ -81,7 +81,10 @@
                             "SYNC_IN_PROGRESS",
                             "AI_SERVICE_UNAVAILABLE",
                             "INVALID_WEBHOOK_SIGNATURE",
-                            "PAYMENT_PROVIDER_ERROR"
+                            "PAYMENT_PROVIDER_ERROR",
+                            "TWO_FACTOR_CODE_INVALID",
+                            "TWO_FACTOR_ALREADY_ENABLED",
+                            "TWO_FACTOR_NOT_ENABLED"
                         ],
                         "type": "string"
                     },
@@ -1199,6 +1202,474 @@
                             }
                         },
                         "description": "NOT_FOUND"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/api/v1/auth/two-factor": {
+            "delete": {
+                "operationId": "auth_two_factor_destroy",
+                "responses": {
+                    "204": {
+                        "description": "No content."
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "UNAUTHENTICATED"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "FORBIDDEN"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "NOT_FOUND"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "VALIDATION_ERROR"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ]
+            },
+            "post": {
+                "operationId": "auth_two_factor_store",
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "otpauth_url": {},
+                                        "qr_svg_data_uri": {},
+                                        "secret": {}
+                                    },
+                                    "required": [
+                                        "secret",
+                                        "otpauth_url",
+                                        "qr_svg_data_uri"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success."
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "UNAUTHENTICATED"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "FORBIDDEN"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "NOT_FOUND"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/api/v1/auth/two-factor/challenge": {
+            "post": {
+                "operationId": "auth_two_factor_challenge",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "pattern": "^[0-9]{6}$",
+                                        "type": "string"
+                                    },
+                                    "recovery_code": {
+                                        "maxLength": 64,
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "description": "Validated by App\\Http\\Requests\\Api\\V1\\Auth\\TwoFactorChallengeRequest.",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "company": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        },
+                                        "token": {},
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "token",
+                                        "user",
+                                        "company"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success."
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "VALIDATION_ERROR"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/api/v1/auth/two-factor/confirm": {
+            "post": {
+                "operationId": "auth_two_factor_confirm",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "pattern": "^[0-9]{6}$",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "code"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "description": "Validated by App\\Http\\Requests\\Api\\V1\\Auth\\ConfirmTwoFactorRequest.",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "recovery_codes": {}
+                                    },
+                                    "required": [
+                                        "recovery_codes"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success."
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "UNAUTHENTICATED"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "FORBIDDEN"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "NOT_FOUND"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "VALIDATION_ERROR"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "TOO_MANY_REQUESTS"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "SERVER_ERROR"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/api/v1/auth/two-factor/recovery-codes": {
+            "post": {
+                "operationId": "auth_two_factor_recovery_codes",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "pattern": "^[0-9]{6}$",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "code"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "description": "Validated by App\\Http\\Requests\\Api\\V1\\Auth\\ConfirmTwoFactorRequest.",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "recovery_codes": {}
+                                    },
+                                    "required": [
+                                        "recovery_codes"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success."
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "UNAUTHENTICATED"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "FORBIDDEN"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "NOT_FOUND"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "VALIDATION_ERROR"
                     },
                     "429": {
                         "content": {

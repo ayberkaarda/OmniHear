@@ -130,5 +130,185 @@
         </app-button>
       </div>
     </form>
+
+    <section
+      class="flex max-w-lg flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4"
+      data-testid="two-factor-section"
+    >
+      <h3 class="text-sm font-semibold text-[var(--text-primary)]" i18n="@@settings.twoFactor.heading">
+        Two-step verification
+      </h3>
+      <p class="text-xs text-[var(--text-muted)]" i18n="@@settings.twoFactor.intro">
+        An authenticator app on your phone produces a six-digit code that changes every 30 seconds. With this on,
+        signing in asks for that code after your password, so a stolen password is not enough on its own.
+      </p>
+
+      @if (recoveryCodes(); as codes) {
+        <div
+          class="flex flex-col gap-2 rounded-md border border-[var(--status-warning)] px-3 py-3"
+          role="status"
+          data-testid="recovery-codes"
+        >
+          @if (recoveryOrigin() === 'regeneration') {
+            <p class="text-sm font-medium text-[var(--text-primary)]" i18n="@@settings.twoFactor.newCodesHeading">
+              Your new recovery codes
+            </p>
+          } @else {
+            <p class="text-sm font-medium text-[var(--text-primary)]" i18n="@@settings.twoFactor.codesHeading">
+              Save your recovery codes
+            </p>
+          }
+          <p class="text-xs text-[var(--text-secondary)]" i18n="@@settings.twoFactor.codesHelp">
+            Each code signs you in once if you lose your phone. This is the only time they are shown — store them
+            somewhere safe before you close this.
+          </p>
+          <ul class="grid grid-cols-2 gap-1 font-mono text-sm tabular-nums text-[var(--text-primary)]">
+            @for (code of codes; track code) {
+              <li>{{ code }}</li>
+            }
+          </ul>
+          <div>
+            <app-button variant="secondary" size="sm" (pressed)="dismissRecoveryCodes()">
+              <span i18n="@@settings.twoFactor.codesSaved">I have saved these codes</span>
+            </app-button>
+          </div>
+        </div>
+      }
+
+      @if (twoFactorEnabled()) {
+        <p class="text-sm text-[var(--status-success)]" data-testid="two-factor-on" i18n="@@settings.twoFactor.on">
+          Two-step verification is on for this account.
+        </p>
+
+        <form
+          [formGroup]="regenerateForm"
+          class="flex flex-col gap-3 border-t border-[var(--border)] pt-4"
+          data-testid="two-factor-regenerate-form"
+          (submit)="$event.preventDefault(); submitRegenerate()"
+        >
+          <h4 class="text-sm font-medium text-[var(--text-primary)]" i18n="@@settings.twoFactor.regenerateHeading">
+            Replace your recovery codes
+          </h4>
+          <p class="text-xs text-[var(--text-muted)]" i18n="@@settings.twoFactor.regenerateHelp">
+            Issues a fresh set of eight and makes the old ones stop working. Confirm with a current code.
+          </p>
+
+          <app-input
+            formControlName="code"
+            [label]="codeLabel"
+            [required]="true"
+            autocomplete="one-time-code"
+            inputMode="numeric"
+            [error]="regenerateError('code')"
+            (blurred)="onFieldBlur()"
+          />
+
+          <div>
+            <app-button type="submit" variant="secondary" [loading]="regeneratingCodes()" (pressed)="submitRegenerate()">
+              <span i18n="@@settings.twoFactor.regenerateSubmit">Generate new codes</span>
+            </app-button>
+          </div>
+        </form>
+
+        <form
+          [formGroup]="disableForm"
+          class="flex flex-col gap-3 border-t border-[var(--border)] pt-4"
+          data-testid="two-factor-disable-form"
+          (submit)="$event.preventDefault(); submitDisable()"
+        >
+          <h4 class="text-sm font-medium text-[var(--text-primary)]" i18n="@@settings.twoFactor.disableHeading">
+            Turn two-step verification off
+          </h4>
+          <p class="text-xs text-[var(--text-muted)]" i18n="@@settings.twoFactor.disableHelp">
+            Both your password and a current code are needed, because removing a second factor is exactly what someone
+            using your open session would try first.
+          </p>
+
+          <app-input
+            formControlName="password"
+            type="password"
+            [label]="currentPasswordLabel"
+            [required]="true"
+            autocomplete="current-password"
+            [error]="disableError('password')"
+            (blurred)="onFieldBlur()"
+          />
+
+          <app-input
+            formControlName="code"
+            [label]="codeLabel"
+            [required]="true"
+            autocomplete="one-time-code"
+            inputMode="numeric"
+            [error]="disableError('code')"
+            (blurred)="onFieldBlur()"
+          />
+
+          <div>
+            <app-button type="submit" variant="destructive" [loading]="disablingTwoFactor()" (pressed)="submitDisable()">
+              <span i18n="@@settings.twoFactor.disableSubmit">Turn it off</span>
+            </app-button>
+          </div>
+        </form>
+      } @else if (enrolment(); as setup) {
+        <div class="flex flex-col gap-3" data-testid="two-factor-enrolment">
+          <p class="text-sm text-[var(--text-secondary)]" i18n="@@settings.twoFactor.scanInstruction">
+            Scan this with your authenticator app, then type the code it shows to finish.
+          </p>
+
+          <img
+            [src]="setup.qr_svg_data_uri"
+            [alt]="qrAltText"
+            width="176"
+            height="176"
+            class="h-44 w-44 rounded-md border border-[var(--border)] bg-white p-2"
+            data-testid="two-factor-qr"
+          />
+
+          <p class="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
+            <span i18n="@@settings.twoFactor.secretLabel">Cannot scan? Enter this key by hand:</span>
+            <code class="font-mono text-sm tracking-wider text-[var(--text-primary)]" data-testid="two-factor-secret">{{
+              setup.secret
+            }}</code>
+          </p>
+
+          <form
+            [formGroup]="confirmForm"
+            class="flex flex-col gap-3"
+            data-testid="two-factor-confirm-form"
+            (submit)="$event.preventDefault(); submitConfirm()"
+          >
+            <app-input
+              formControlName="code"
+              [label]="codeLabel"
+              [required]="true"
+              autocomplete="one-time-code"
+              inputMode="numeric"
+              [helper]="confirmCodeHelper"
+              [error]="confirmError('code')"
+              (blurred)="onFieldBlur()"
+            />
+
+            <div class="flex flex-wrap gap-2">
+              <app-button type="submit" [loading]="confirmingEnrolment()" (pressed)="submitConfirm()">
+                <span i18n="@@settings.twoFactor.confirmSubmit">Confirm and switch on</span>
+              </app-button>
+              <app-button variant="ghost" (pressed)="cancelEnrolment()">
+                <span i18n="@@settings.twoFactor.cancel">Cancel</span>
+              </app-button>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <p class="text-sm text-[var(--text-secondary)]" data-testid="two-factor-off" i18n="@@settings.twoFactor.off">
+          Two-step verification is off. Your password is the only thing protecting this account.
+        </p>
+        <div>
+          <app-button [loading]="startingEnrolment()" (pressed)="startEnrolment()">
+            <span i18n="@@settings.twoFactor.enable">Set up two-step verification</span>
+          </app-button>
+        </div>
+      }
+    </section>
   }
 </section>

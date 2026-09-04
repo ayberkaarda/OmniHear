@@ -5,6 +5,7 @@ import { expect, Page, test } from '@playwright/test';
 import { API_URL, COMPOSE_FILE, FIXTURE_COMMENTS, PASSWORD, QUOTA_LIMIT, uniqueEmail } from './support/env';
 import { waitForVerificationLink } from './support/mailpit';
 import { setQuotaLimit } from './support/stack';
+import { freshTotpCode } from './support/totp';
 
 /**
  * Spec section 9's end-to-end journey: register -> integration -> paywall.
@@ -214,6 +215,108 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
 
     await expect(page).toHaveURL(/\/app\/overview$/);
     await expect(page.getByText(companyName)).toBeVisible();
+  });
+
+  await test.step('switch on two-step verification and sign in through it', async () => {
+    // Everything below runs against the real endpoints of
+    // `docs/contracts/w10-two-factor.md`. Jest proves the component reacts to
+    // each response shape; only this proves the secret the server generated and
+    // the code this file computes are the same secret and the same algorithm.
+    await page.goto('/app/settings/profile');
+    await expect(page.getByTestId('two-factor-off')).toBeVisible();
+
+    const enrolled = page.waitForResponse(
+      (response) =>
+        /\/api\/v1\/auth\/two-factor$/.test(new URL(response.url()).pathname) &&
+        response.request().method() === 'POST'
+    );
+    await page.getByRole('button', { name: 'Set up two-step verification' }).click();
+    expect((await enrolled).status()).toBe(201);
+
+    // The QR is server-rendered SVG delivered as a data URI, which is what keeps
+    // a QR library out of the browser bundle entirely (Trap 2).
+    const qr = page.getByTestId('two-factor-qr');
+    await expect(qr).toBeVisible();
+    expect(await qr.getAttribute('src')).toMatch(/^data:image\/svg\+xml;base64,/);
+    // A sanitizer that rejected the URI would leave this prefix behind.
+    expect(await qr.getAttribute('src')).not.toContain('unsafe:');
+
+    const secret = (await page.getByTestId('two-factor-secret').innerText()).trim();
+    expect(secret.length).toBeGreaterThan(0);
+
+    const enrolmentCode = await freshTotpCode(secret);
+    await page
+      .getByTestId('two-factor-confirm-form')
+      .getByLabel('Six-digit code')
+      .fill(enrolmentCode.code);
+    await page.getByRole('button', { name: 'Confirm and switch on' }).click();
+
+    // Shown exactly once, and this is that once.
+    const codes = page.getByTestId('recovery-codes');
+    await expect(codes).toBeVisible();
+    const recoveryCodes = (await codes.locator('li').allTextContents()).map((code) => code.trim());
+    expect(recoveryCodes).toHaveLength(8);
+    await expect(page.getByTestId('two-factor-on')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Sign out' }).click();
+    await expect(page).toHaveURL(/\/$/);
+
+    // ---- the password alone is no longer enough --------------------------
+    await page.goto('/auth/login');
+    await page.getByLabel('Email address').fill(email);
+    await page.getByLabel('Password').fill(PASSWORD);
+
+    const challenged = page.waitForResponse(
+      (response) => response.url().includes('/api/v1/auth/login') && response.request().method() === 'POST'
+    );
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    // 200, not 401: a correct password with a second factor still owed is a
+    // success. A 401 here would be mapped to UNAUTHENTICATED and would tear
+    // down the very flow the user is entering.
+    expect((await challenged).status()).toBe(200);
+
+    // Same route, second step — spec section 4's page tree has no /auth/two-factor.
+    await expect(page).toHaveURL(/\/auth\/login$/);
+    await expect(page.getByTestId('two-factor-form')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirm it is you' })).toBeVisible();
+
+    // A different timestep from the one enrolment consumed: an accepted code is
+    // single-use, so reusing it here would be refused as a replay.
+    const signInCode = await freshTotpCode(secret, enrolmentCode.timeStep);
+    await page.getByLabel('Six-digit code').fill(signInCode.code);
+    await page.getByRole('button', { name: 'Confirm and sign in' }).click();
+
+    await expect(page).toHaveURL(/\/app\/overview$/);
+    await expect(page.getByText(companyName)).toBeVisible();
+
+    // ---- a recovery code is the way back in without the phone ------------
+    await page.getByRole('button', { name: 'Sign out' }).click();
+    await expect(page).toHaveURL(/\/$/);
+
+    await page.goto('/auth/login');
+    await page.getByLabel('Email address').fill(email);
+    await page.getByLabel('Password').fill(PASSWORD);
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByTestId('two-factor-form')).toBeVisible();
+
+    await page.getByTestId('two-factor-use-recovery').click();
+    await page.getByLabel('Recovery code').fill(recoveryCodes[0]);
+    await page.getByRole('button', { name: 'Confirm and sign in' }).click();
+    await expect(page).toHaveURL(/\/app\/overview$/);
+
+    // ---- and both factors are needed to give one of them up ---------------
+    await page.goto('/app/settings/profile');
+    const disableForm = page.getByTestId('two-factor-disable-form');
+    await expect(disableForm).toBeVisible();
+
+    const disableCode = await freshTotpCode(secret, signInCode.timeStep);
+    await disableForm.getByLabel('Current password').fill(PASSWORD);
+    await disableForm.getByLabel('Six-digit code').fill(disableCode.code);
+    await page.getByRole('button', { name: 'Turn it off' }).click();
+
+    // Back to a password-only account, which is the state the rest of this
+    // journey was written against.
+    await expect(page.getByTestId('two-factor-off')).toBeVisible();
   });
 
   await test.step('the browser is allowed to read X-Quota-Remaining across the origin boundary', async () => {

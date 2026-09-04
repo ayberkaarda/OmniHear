@@ -94,10 +94,19 @@ return [
     | will be fired. Every connection / queue combination may have its
     | own, unique threshold (in seconds) before this event is fired.
     |
+    | The 'defaults' block below (config('ai.queue')) explains why this file
+    | can resolve config('ai.queue') at all — config/ai.php sorts before
+    | config/horizon.php in Laravel's config loader, so it is already loaded.
+    | Same reasoning applies here: the analysis queue is the one W9 fixed
+    | Horizon to actually drain, so it needs its own wait threshold, not just
+    | 'default'. 'analysis' is never written here as a literal for the same
+    | drift-safety reason as the supervisor's queue list below.
+    |
     */
 
     'waits' => [
         'redis:default' => 60,
+        'redis:'.config('ai.queue') => 60,
     ],
 
     /*

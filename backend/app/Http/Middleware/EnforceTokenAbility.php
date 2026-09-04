@@ -43,6 +43,23 @@ use Symfony\Component\HttpFoundation\Response;
  * as a session. The question asked here is `TokenAbility::isApiKey()`, matched
  * on the literal `api` ability, and never `can()`.
  *
+ * # The challenge token
+ *
+ * W10 adds a third kind of row to the same table: the credential a correct
+ * password buys while a second factor is still owed
+ * (docs/contracts/w10-two-factor.md). It reaches exactly one endpoint, and that
+ * endpoint is public — `POST /api/v1/auth/two-factor/challenge` resolves the
+ * token itself rather than going through `auth:sanctum`, so this middleware is
+ * not on it. Which means the rule here is unconditional: a challenge token is
+ * refused on every route this middleware guards, without an allow list, because
+ * there is nothing on the authenticated surface it is entitled to.
+ *
+ * The check is `TokenAbility::isChallenge()`, a positive match on the literal
+ * ability, and it is asked *before* the API-key question. Inferring it from the
+ * absence of `session` would classify every legacy `['*']` row as a challenge
+ * token and lock the whole existing user base out of the API — the same
+ * wildcard trap described below, with the failure mode inverted.
+ *
  * # What counts as "not an API key"
  *
  * Only a persisted `PersonalAccessToken` carrying the literal `api` ability is
@@ -96,7 +113,19 @@ class EnforceTokenAbility
     {
         $token = $request->user()?->currentAccessToken();
 
-        if (! $token instanceof PersonalAccessToken || ! TokenAbility::isApiKey($token)) {
+        if (! $token instanceof PersonalAccessToken) {
+            return $next($request);
+        }
+
+        // A half-authenticated credential on a fully authenticated route.
+        // FORBIDDEN for the same reason as below: the caller is authenticated
+        // and the route exists; what is missing is the second factor, and the
+        // way to get it is the challenge endpoint, not this one.
+        if (TokenAbility::isChallenge($token)) {
+            throw new ApiException(ApiErrorCode::Forbidden);
+        }
+
+        if (! TokenAbility::isApiKey($token)) {
             return $next($request);
         }
 

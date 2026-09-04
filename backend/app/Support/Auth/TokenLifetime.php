@@ -24,6 +24,25 @@ use Illuminate\Support\Carbon;
  */
 final class TokenLifetime
 {
+    /**
+     * Minutes a two-factor challenge token lives
+     * (docs/contracts/w10-two-factor.md).
+     *
+     * A constant rather than a config entry, and deliberately not an escape
+     * hatch: unlike the two above it, this number is not a deployment policy
+     * about how long a credential may sit in a keychain. It is the width of a
+     * half-authenticated state — the password has been accepted and the second
+     * factor has not — and a deployment that sets it to zero would turn that
+     * state permanent, which is the one value the `> 0` branch below reads as
+     * "never expires".
+     */
+    public const CHALLENGE_MINUTES = 5;
+
+    public static function twoFactorChallenge(): CarbonInterface
+    {
+        return Carbon::now()->addMinutes(self::CHALLENGE_MINUTES);
+    }
+
     public static function session(): ?CarbonInterface
     {
         return self::after((int) config('sanctum.session_expiration'));

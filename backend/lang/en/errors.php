@@ -32,4 +32,9 @@ return [
     'INVALID_WEBHOOK_SIGNATURE' => 'The webhook signature could not be verified.',
     'PAYMENT_PROVIDER_ERROR' => 'The payment provider returned an error. No charge was made.',
 
+    // W10 — two-factor authentication.
+    'TWO_FACTOR_CODE_INVALID' => 'That code is not valid. Check your authenticator app and try again.',
+    'TWO_FACTOR_ALREADY_ENABLED' => 'Two-factor authentication is already enabled on this account.',
+    'TWO_FACTOR_NOT_ENABLED' => 'Two-factor authentication is not enabled on this account.',
+
 ];

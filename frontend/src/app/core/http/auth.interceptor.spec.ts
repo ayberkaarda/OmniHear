@@ -55,4 +55,29 @@ describe('authInterceptor', () => {
     expect(request.request.headers.has('Accept-Language')).toBe(false);
     request.flush({});
   });
+  /**
+   * The two-factor challenge carries a five-minute challenge token that is
+   * deliberately never stored (`docs/contracts/w10-two-factor.md`). If the
+   * interceptor overwrote it with a leftover session token, the one endpoint
+   * that only accepts a challenge token would receive the wrong credential —
+   * and the failure would look like a wrong TOTP code.
+   */
+  it('does not overwrite an Authorization header the caller set itself', () => {
+    store.setSession('1|session', makeUser(), makeCompany());
+
+    http
+      .post(
+        `${environment.apiBaseUrl}/v1/auth/two-factor/challenge`,
+        { code: '123456' },
+        { headers: { Authorization: 'Bearer 9|challenge' } }
+      )
+      .subscribe();
+
+    const request = controller.expectOne(`${environment.apiBaseUrl}/v1/auth/two-factor/challenge`);
+    expect(request.request.headers.get('Authorization')).toBe('Bearer 9|challenge');
+    // The rest of the contract's headers are still added.
+    expect(request.request.headers.get('Accept')).toBe('application/json');
+    expect(request.request.headers.get('Accept-Language')).toBeTruthy();
+    request.flush({});
+  });
 });

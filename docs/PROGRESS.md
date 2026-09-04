@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-04 · Current: **W9 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-04 · Current: **W10 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -24,7 +24,8 @@ commit messages; `git log` is the archive.
 | **W6** | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, ARCHITECTURE, ADR-0009/0010, ai-service JSON log | **green** — E2E 46.5 s, DB shows 3 analyzed / 2 pending_analysis · pytest 274 |
 | **W7** | history rewrite (done) · quota gate + invitations · security review + its seven findings + KVKK PII + self-hosted fonts | **green** — pest **1046 passed, 4870 assertions**, coverage **98.9%** · pytest **282** · jest **290** · build:gate raw 337.88/347, transfer 94.46/105 |
 | **W8** | Google Play ∥ Trustpilot connectors (spec §2: 2 of 6 channels → 4), factory/config wiring, `dropdb` guard false positive | **green** — pest **1259 passed, 5524 assertions**, coverage **98.8%**, 349.5 s · guards **122** · unchanged: pytest 282, jest 290, build:gate raw 337.93/347, transfer 94.46/105 |
-| **W9** | CI download retry+resume ∥ Horizon queue coverage ∥ reprocess command + Redis KPI cache (invalidated on upgrade and channel deletion too); plus a W8 unordered-`pluck` flake the gate caught | **local green, E2E awaiting CI** — pest **1297 passed, 5658 assertions**, coverage **98.9%**, 367.2 s · guards **122** · pytest **295** (was 282) · jest **290** · build:gate raw 337.93/347, transfer 94.46/105 · Horizon measured live: `analysis` queue 5 → 0 |
+| **W9** | CI download retry+resume ∥ Horizon queue coverage ∥ reprocess command + Redis KPI cache (invalidated on upgrade and channel deletion too); plus a W8 unordered-`pluck` flake the gate caught | **green** — CI `33861764527`, seven jobs, E2E 11.3 s · pest **1297 passed, 5658 assertions**, coverage **98.9%**, 367.2 s · guards **122** · pytest **295** (was 282), no skips · jest **290** · build:gate raw 337.93/347, transfer 94.46/105 · Horizon measured live: `analysis` queue 5 → 0 |
+| **W10** | TOTP 2FA — the API had published `two_factor_enabled` since F2 with no code path able to write it ∥ frontend enrolment and challenge ∥ `actions/*` majors + `waits` on the analysis queue | **local green, E2E awaiting CI** — pest **1398 passed, 6046 assertions**, coverage **98.9%**, 387.8 s · guards **122** · jest **323/56** (was 290/55) · i18n **478/478** · build:gate raw 339.66/347, transfer 94.89/105 · pytest 295 unchanged · OpenAPI `--check` matches |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -34,10 +35,11 @@ leaves a diagnosable tree.
 
 ## Now
 
-**Latest gate** is the W9 row below, re-run by the main thread. One line did not
-run: `npx playwright test`, because port 4200 was held by an unrelated project's
-dev server on this machine. CI is the authority on that line and its run id
-turns the row green.
+**Latest gate** is the W9 row below, re-run by the main thread and then confirmed
+by CI `33861764527` — seven jobs green, backend 1297 passed on a clean checkout
+(identical to local), ai-service 295 with no skips, and the E2E journey in 11.3 s.
+`npx playwright test` was the one line that could not run locally: port 4200 was
+held by an unrelated project's dev server on this machine. CI settled it.
 
 **A green CI run is not automatically evidence.** The first one reported *534 warnings,
 69 passed* for the backend and *11 skipped* for the AI service and went green anyway.
@@ -59,6 +61,14 @@ events, so neither side references a class the other has not written yet.
   Play and Trustpilot are synthesised from published documentation, each with a fixture
   README separating documented from inferred; App Store is the only one recorded from a
   real response. Largest gap between "the tests pass" and "it works".
+- **Every `actions/*` step is on a deprecated runtime.** `33861764527` annotates
+  `checkout@v4`, `setup-node@v4` and `setup-python@v5` as targeting Node 20 and being
+  forced onto Node 24. Green today because GitHub still forces; it breaks the day it stops.
+- **The E2E image cache has only ever taken its miss path.** `33861764527` was the first
+  run with the key, so it built and saved; the hit that makes the step worth having is
+  unproven until the next push that does not touch `ai-service/`.
+- **`horizon.php`'s `waits` covers `redis:default` only**, so `LongWaitDetected` never
+  fires for the `analysis` queue — the one whose starvation W9 just fixed. One line, undecided.
 - **Tokens older than 90 days become invalid on deploy** — `expiration` counts from creation. Deliberate; a release note.
 - `infra/docker-compose.dev.yml` keeps `${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}`
   on purpose: removing it breaks a fresh clone's `docker compose up`, and the value names

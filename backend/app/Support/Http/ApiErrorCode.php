@@ -32,18 +32,41 @@ enum ApiErrorCode: string
     case InvalidWebhookSignature = 'INVALID_WEBHOOK_SIGNATURE';
     case PaymentProviderError = 'PAYMENT_PROVIDER_ERROR';
 
+    // W10 — two-factor authentication (docs/contracts/w10-two-factor.md).
+    //
+    // TWO_FACTOR_CODE_INVALID covers a wrong TOTP code, a code replayed inside
+    // its own window, and a recovery code that is unknown or already spent. One
+    // code for all four on purpose: telling the caller *which* of them happened
+    // tells an attacker whether the digits were right, whether the recovery
+    // code existed, and how close the clock is — none of which the legitimate
+    // user needs, because the remedy is the same in every case.
+    case TwoFactorCodeInvalid = 'TWO_FACTOR_CODE_INVALID';
+
+    // Enrolment refused because there is already a confirmed factor. The
+    // contract names this one.
+    case TwoFactorAlreadyEnabled = 'TWO_FACTOR_ALREADY_ENABLED';
+
+    // The mirror image, which the contract does not name but which three of its
+    // five endpoints need a shape for: confirming with no enrolment started,
+    // regenerating recovery codes with nothing to regenerate, disabling what is
+    // not enabled. Folding it into VALIDATION_ERROR would blame a field, and
+    // into NOT_FOUND would say the endpoint does not exist; it is a conflict
+    // with the account's current state, which is what 409 means.
+    case TwoFactorNotEnabled = 'TWO_FACTOR_NOT_ENABLED';
+
     public function status(): int
     {
         return match ($this) {
             self::ValidationError, self::DisposableEmail,
-            self::IntegrationInvalidCredentials => 422,
+            self::IntegrationInvalidCredentials, self::TwoFactorCodeInvalid => 422,
             self::InvalidCredentials, self::Unauthenticated => 401,
             self::EmailNotVerified, self::Forbidden => 403,
             self::NotFound => 404,
             self::QuotaExceeded => 402,
             self::TooManyRequests => 429,
             self::InvalidWebhookSignature => 400,
-            self::SyncInProgress => 409,
+            self::SyncInProgress, self::TwoFactorAlreadyEnabled,
+            self::TwoFactorNotEnabled => 409,
             self::PaymentProviderError => 502,
             self::IntegrationUnavailable, self::AiServiceUnavailable => 503,
             self::ServerError => 500,

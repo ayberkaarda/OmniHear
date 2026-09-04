@@ -1,46 +1,132 @@
-<app-auth-layout [heading]="heading" [lead]="lead">
-  <form [formGroup]="form" class="flex flex-col gap-4" novalidate (ngSubmit)="onSubmit()">
-    <app-input
-      formControlName="email"
-      type="email"
-      [label]="emailLabel"
-      [required]="true"
-      prefixIcon="mail"
-      [error]="errorFor('email')"
-      (blurred)="onFieldBlur()"
-    />
-
-    <app-input
-      formControlName="password"
-      type="password"
-      [label]="passwordLabel"
-      [required]="true"
-      prefixIcon="lock"
-      [error]="errorFor('password')"
-      (blurred)="onFieldBlur()"
-    />
-
-    <div class="flex justify-end">
-      <a
-        routerLink="/auth/forgot-password"
-        class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-        i18n="@@auth.login.forgotLink"
-        >Forgot your password?</a
+<app-auth-layout [heading]="heading()" [lead]="lead()">
+  @if (step() === 'credentials') {
+    @if (challengeExpired()) {
+      <p
+        class="mb-4 rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-sm text-[var(--sentiment-negative-text)]"
+        role="alert"
+        data-testid="two-factor-expired"
+        i18n="Notice when the two-factor challenge could not be completed@@auth.twoFactor.expired"
       >
-    </div>
+        That confirmation step has expired. Sign in again to get a new code prompt.
+      </p>
+    }
 
-    <app-button type="submit" variant="primary" size="lg" [loading]="submitting()">
-      <span i18n="@@auth.login.submit">Sign in</span>
-    </app-button>
-  </form>
+    <form [formGroup]="form" class="flex flex-col gap-4" novalidate (ngSubmit)="onSubmit()">
+      <app-input
+        formControlName="email"
+        type="email"
+        [label]="emailLabel"
+        [required]="true"
+        prefixIcon="mail"
+        [error]="errorFor('email')"
+        (blurred)="onFieldBlur()"
+      />
 
-  <p authFooter>
-    <span i18n="@@auth.login.noAccount">Do not have an account yet?</span>
-    <a
-      routerLink="/auth/register"
-      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-      i18n="@@auth.login.registerLink"
-      >Create one</a
+      <app-input
+        formControlName="password"
+        type="password"
+        [label]="passwordLabel"
+        [required]="true"
+        prefixIcon="lock"
+        [error]="errorFor('password')"
+        (blurred)="onFieldBlur()"
+      />
+
+      <div class="flex justify-end">
+        <a
+          routerLink="/auth/forgot-password"
+          class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          i18n="@@auth.login.forgotLink"
+          >Forgot your password?</a
+        >
+      </div>
+
+      <app-button type="submit" variant="primary" size="lg" [loading]="submitting()">
+        <span i18n="@@auth.login.submit">Sign in</span>
+      </app-button>
+    </form>
+  } @else {
+    <form
+      [formGroup]="challengeForm"
+      class="flex flex-col gap-4"
+      novalidate
+      data-testid="two-factor-form"
+      (ngSubmit)="onChallengeSubmit()"
     >
-  </p>
+      @if (usingRecoveryCode()) {
+        <app-input
+          formControlName="recovery_code"
+          [label]="recoveryCodeLabel"
+          [required]="true"
+          prefixIcon="lock"
+          autocomplete="one-time-code"
+          [error]="challengeErrorFor('recovery_code')"
+          (blurred)="onFieldBlur()"
+        />
+      } @else {
+        <app-input
+          formControlName="code"
+          type="text"
+          [label]="codeLabel"
+          [required]="true"
+          prefixIcon="lock"
+          autocomplete="one-time-code"
+          inputMode="numeric"
+          [helper]="codeHelper"
+          [error]="challengeErrorFor('code')"
+          (blurred)="onFieldBlur()"
+        />
+      }
+
+      <app-button type="submit" variant="primary" size="lg" [loading]="submitting()">
+        <span i18n="@@auth.twoFactor.submit">Confirm and sign in</span>
+      </app-button>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+        @if (usingRecoveryCode()) {
+          <button
+            type="button"
+            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            data-testid="two-factor-use-app"
+            i18n="@@auth.twoFactor.useApp"
+            (click)="useRecoveryCode(false)"
+          >
+            Use my authenticator app instead
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            data-testid="two-factor-use-recovery"
+            i18n="@@auth.twoFactor.useRecovery"
+            (click)="useRecoveryCode(true)"
+          >
+            I cannot use my authenticator app
+          </button>
+        }
+
+        <button
+          type="button"
+          class="rounded-sm text-[var(--text-secondary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          data-testid="two-factor-cancel"
+          i18n="@@auth.twoFactor.back"
+          (click)="cancelChallenge()"
+        >
+          Back to sign in
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (step() === 'credentials') {
+    <p authFooter>
+      <span i18n="@@auth.login.noAccount">Do not have an account yet?</span>
+      <a
+        routerLink="/auth/register"
+        class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        i18n="@@auth.login.registerLink"
+        >Create one</a
+      >
+    </p>
+  }
 </app-auth-layout>

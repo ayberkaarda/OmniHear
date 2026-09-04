@@ -29,6 +29,15 @@ export function errorMessageForCode(code: string): string {
       return $localize`:API error message@@error.tooManyRequests:Too many attempts. Please wait a moment and try again.`;
     case 'DISPOSABLE_EMAIL':
       return $localize`:API error message@@error.disposableEmail:Please sign up with your work email address.`;
+    case 'TWO_FACTOR_CODE_INVALID':
+      return $localize`:API error message@@error.twoFactorCodeInvalid:That code was not accepted. Check your authenticator app and try the current code.`;
+    case 'TWO_FACTOR_ALREADY_ENABLED':
+      return $localize`:API error message@@error.twoFactorAlreadyEnabled:Two-step verification is already switched on for this account.`;
+    case 'TWO_FACTOR_NOT_ENABLED':
+      // A 409, and almost always a second tab or a screen left open: the
+      // account moved out of the state the request assumed. Nothing the user
+      // typed was wrong, so the message says what is true rather than blaming.
+      return $localize`:API error message@@error.twoFactorNotEnabled:Two-step verification is not switched on for this account, or its setup was never finished. Reload the page to see where things stand.`;
     case 'SERVER_ERROR':
       return $localize`:API error message@@error.serverError:Something went wrong on our side. Please try again shortly.`;
     case NETWORK_ERROR_CODE:

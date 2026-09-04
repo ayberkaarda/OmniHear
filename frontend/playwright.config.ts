@@ -50,7 +50,15 @@ export default defineConfig({
   // One journey covers register -> verify -> sign in -> integrate -> sync ->
   // inbox -> paywall, and the analyzer loads its ONNX weights on the first
   // request of the stack's life. The budget is for that first run.
-  timeout: 180_000,
+  //
+  // The two-factor leg added roughly a minute to it. An accepted TOTP code is
+  // single-use (`docs/contracts/w10-two-factor.md` — the last accepted timestep
+  // is stored and anything at or below it is refused), so that leg has to cross
+  // a 30-second timestep boundary twice. That is a wall-clock wait the
+  // algorithm imposes, not a slow machine: `freshTotpCode` waits on the
+  // boundary and returns the instant it passes, which is why this is still not
+  // a `waitForTimeout`.
+  timeout: 240_000,
   expect: { timeout: 15_000 },
 
   reporter: process.env['CI'] ? [['list'], ['html', { open: 'never' }]] : [['list']],

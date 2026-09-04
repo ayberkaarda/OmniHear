@@ -21,6 +21,9 @@ it('maps every catalogue code to the documented status', function (string $code,
     ['AI_SERVICE_UNAVAILABLE', 503],
     ['INVALID_WEBHOOK_SIGNATURE', 400],
     ['PAYMENT_PROVIDER_ERROR', 502],
+    ['TWO_FACTOR_CODE_INVALID', 422],
+    ['TWO_FACTOR_ALREADY_ENABLED', 409],
+    ['TWO_FACTOR_NOT_ENABLED', 409],
 ]);
 
 it('maps an http status back onto a catalogue code', function (int $status, string $code) {
@@ -42,5 +45,5 @@ it('maps an http status back onto a catalogue code', function (int $status, stri
 // locales, so that is what this asserts. The count stays as a reminder that
 // adding a case is a contract change (docs/contracts/http-api-v1.md section 2).
 it('covers exactly the codes in the contract', function () {
-    expect(ApiErrorCode::cases())->toHaveCount(16);
+    expect(ApiErrorCode::cases())->toHaveCount(19);
 });
