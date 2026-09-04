@@ -1,0 +1,19 @@
+{
+  "methodResponses": [
+    [
+      "error",
+      {
+        "type": "accountNotFound"
+      },
+      "q0"
+    ],
+    [
+      "error",
+      {
+        "type": "invalidResultReference"
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

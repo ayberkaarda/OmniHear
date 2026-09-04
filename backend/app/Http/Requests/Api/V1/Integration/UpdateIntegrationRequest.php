@@ -56,7 +56,10 @@ class UpdateIntegrationRequest extends FormRequest
         // all replaces the stored object, so every key the connector needs has
         // to be present in the new one.
         foreach ($config['required_credentials'] ?? [] as $key) {
-            $rules['credentials.'.$key] = ['required_with:credentials', 'string', 'max:255'];
+            $rules['credentials.'.$key] = array_merge(
+                ['required_with:credentials', 'string', 'max:255'],
+                IntegrationSettingFormats::for($key),
+            );
         }
 
         return $rules;

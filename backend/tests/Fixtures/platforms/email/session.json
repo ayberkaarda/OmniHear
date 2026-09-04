@@ -1,0 +1,53 @@
+{
+  "capabilities": {
+    "urn:ietf:params:jmap:core": {
+      "maxSizeUpload": 50000000,
+      "maxConcurrentUpload": 4,
+      "maxSizeRequest": 10000000,
+      "maxConcurrentRequests": 4,
+      "maxCallsInRequest": 16,
+      "maxObjectsInGet": 500,
+      "maxObjectsInSet": 500,
+      "collationAlgorithms": [
+        "i;ascii-numeric",
+        "i;ascii-casemap",
+        "i;unicode-casemap"
+      ]
+    },
+    "urn:ietf:params:jmap:mail": {}
+  },
+  "accounts": {
+    "acct-01": {
+      "name": "destek@example.invalid",
+      "isPersonal": true,
+      "isReadOnly": false,
+      "accountCapabilities": {
+        "urn:ietf:params:jmap:core": {},
+        "urn:ietf:params:jmap:mail": {
+          "maxMailboxesPerEmail": 10,
+          "maxMailboxDepth": null,
+          "maxSizeMailboxName": 490,
+          "maxSizeAttachmentsPerEmail": 50000000,
+          "emailQuerySortOptions": [
+            "receivedAt",
+            "from",
+            "to",
+            "subject",
+            "size"
+          ],
+          "mayCreateTopLevelMailbox": true
+        }
+      }
+    }
+  },
+  "primaryAccounts": {
+    "urn:ietf:params:jmap:core": "acct-01",
+    "urn:ietf:params:jmap:mail": "acct-01"
+  },
+  "username": "destek@example.invalid",
+  "apiUrl": "https://jmap.example.invalid/jmap/api/",
+  "downloadUrl": "https://jmap.example.invalid/jmap/download/{accountId}/{blobId}/{name}?accept={type}",
+  "uploadUrl": "https://jmap.example.invalid/jmap/upload/{accountId}/",
+  "eventSourceUrl": "https://jmap.example.invalid/jmap/eventsource/?types={types}&closeafter={closeafter}&ping={ping}",
+  "state": "sess-0001"
+}

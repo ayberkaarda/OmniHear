@@ -60,24 +60,24 @@ it('builds the app store connector from its settings', function () {
 
 it('refuses a platform that has no connector', function (string $platform) {
     // Deliberately restricted to platforms with no config/connectors.php entry
-    // at all. googleplay and trustpilot used to be in this dataset, and both
-    // still made `for()` throw Misconfigured on an unsavedIntegration() with
-    // no settings — but for the wrong reason, once both got a config entry:
-    // the missing-required-setting branch, not the missing-connector branch.
-    // Both branches throw the exact same fixed Misconfigured sentence
-    // (invariant I5 — no per-cause message), so the exception alone cannot
-    // tell those two paths apart, and this test kept passing while asserting
-    // nothing about whether the platform was actually supported. Do not widen
-    // this dataset back to a real platform just because an empty
-    // unsavedIntegration() happens to fail for it too — check supports()
-    // first.
+    // at all. googleplay, trustpilot and email used to be in this dataset, and
+    // all three still made `for()` throw Misconfigured on an
+    // unsavedIntegration() with no settings — but for the wrong reason, once
+    // each got a config entry: the missing-required-setting/credential branch,
+    // not the missing-connector branch. Both branches throw the exact same
+    // fixed Misconfigured sentence (invariant I5 — no per-cause message), so
+    // the exception alone cannot tell those two paths apart, and this test kept
+    // passing while asserting nothing about whether the platform was actually
+    // supported. Do not widen this dataset back to a real platform just
+    // because an empty unsavedIntegration() happens to fail for it too — check
+    // supports() first.
     $factory = app(ConnectorFactory::class);
 
     expect($factory->supports($platform))->toBeFalse()
         ->and($factory->config($platform))->toBeNull()
         ->and(factoryFailure(fn () => $factory->for(unsavedIntegration($platform))))
         ->toBe(ConnectorFailure::Misconfigured);
-})->with(['email', 'social', 'not-a-platform']);
+})->with(['social', 'not-a-platform']);
 
 it('builds the zendesk connector from its settings and credentials', function () {
     $connector = app(ConnectorFactory::class)->for(unsavedIntegration(
@@ -135,7 +135,7 @@ it('refuses a fixture set name that could escape the fixture root', function (st
 
 it('lists exactly the platforms that have a connector today', function () {
     expect(app(ConnectorFactory::class)->platforms())
-        ->toBe(['fixture', 'appstore', 'zendesk', 'googleplay', 'trustpilot']);
+        ->toBe(['fixture', 'appstore', 'zendesk', 'googleplay', 'trustpilot', 'email']);
 });
 
 it('answers whether a platform is supported', function () {
@@ -146,7 +146,9 @@ it('answers whether a platform is supported', function () {
         ->and($factory->supports('googleplay'))->toBeTrue()
         ->and($factory->config('googleplay'))->toBeArray()
         ->and($factory->supports('trustpilot'))->toBeTrue()
-        ->and($factory->config('trustpilot'))->toBeArray();
+        ->and($factory->config('trustpilot'))->toBeArray()
+        ->and($factory->supports('email'))->toBeTrue()
+        ->and($factory->config('email'))->toBeArray();
 });
 
 it('reads the per-platform throttle and backoff out of config', function () {

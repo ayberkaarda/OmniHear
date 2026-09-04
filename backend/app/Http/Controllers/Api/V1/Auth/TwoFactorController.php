@@ -89,6 +89,11 @@ class TwoFactorController extends Controller
             'two_factor_recovery_codes' => null,
         ])->save();
 
+        // The spent-step mark belongs to the secret that was just replaced.
+        // Carrying it over would reject the new secret's first code as a replay
+        // of a code from a secret the user no longer has.
+        $this->replay->clear($user);
+
         $uri = Totp::provisioningUri($secret, $user->email, (string) config('app.name'));
 
         return response()->json([
@@ -150,6 +155,12 @@ class TwoFactorController extends Controller
             'two_factor_confirmed_at' => null,
             'two_factor_recovery_codes' => null,
         ])->save();
+
+        // After the verification above, not before it: the code presented here
+        // must still be spent, so it cannot be replayed against the seconds
+        // between this request and the next enrolment. Once the secret is gone
+        // the mark has nothing left to describe.
+        $this->replay->clear($user);
 
         $this->audit->record(AuditAction::TwoFactorDisabled, actor: $user);
 
@@ -286,15 +297,19 @@ class TwoFactorController extends Controller
             return false;
         }
 
-        $step = Totp::verify($secret, $code, $this->replay->lastAcceptedStep($user));
+        $step = Totp::verify($secret, $code);
 
         if ($step === null) {
             return false;
         }
 
-        $this->replay->markAccepted($user, $step);
-
-        return true;
+        // The guard, not this method, decides whether the step was still
+        // available: reading the mark here and comparing it would reopen the
+        // read-then-write window that two simultaneous requests carrying the
+        // same code walk straight through. `Totp::verify` establishes only
+        // which step the digits belong to; `spend()` is the authority on
+        // whether that step was already used.
+        return $this->replay->spend($user, $step);
     }
 
     private function user(Request $request): User

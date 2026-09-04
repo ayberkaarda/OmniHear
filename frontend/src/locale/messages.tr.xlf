@@ -4036,6 +4036,24 @@
         </context-group>
         <note priority="1" from="description">Connector credential field label</note>
       </trans-unit>
+      <trans-unit id="label.credential.sessionUrl" datatype="html">
+        <source>Session URL</source>
+        <target>Oturum URL'si</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+        <note priority="1" from="description">Connector credential field label</note>
+      </trans-unit>
+      <trans-unit id="label.credential.mailbox" datatype="html">
+        <source>Mailbox</source>
+        <target>Posta kutusu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+        <note priority="1" from="description">Connector credential field label</note>
+      </trans-unit>
       <trans-unit id="badge.sentiment.positive" datatype="html">
         <source>Positive</source>
         <target>Pozitif</target>

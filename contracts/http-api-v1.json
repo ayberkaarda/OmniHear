@@ -2273,7 +2273,8 @@
                                             "appstore",
                                             "zendesk",
                                             "googleplay",
-                                            "trustpilot"
+                                            "trustpilot",
+                                            "email"
                                         ],
                                         "type": "string"
                                     },

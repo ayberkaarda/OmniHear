@@ -1,6 +1,7 @@
 <?php
 
 use App\Support\Connectors\AppStoreConnector;
+use App\Support\Connectors\EmailConnector;
 use App\Support\Connectors\FixtureConnector;
 use App\Support\Connectors\GooglePlayConnector;
 use App\Support\Connectors\TrustpilotConnector;
@@ -188,6 +189,42 @@ return [
             'timeout' => (int) env('TRUSTPILOT_TIMEOUT', 30),
             'rate_limit' => ['max_attempts' => 30, 'decay_seconds' => 60],
             'retry_after' => 60,
+        ],
+
+        'email' => [
+            'connector' => EmailConnector::class,
+            // A shared mailbox over JMAP (RFC 8620/8621), not a vendor API — the
+            // session URL, bearer token and the mailbox name to read all come
+            // from the user, so all three are credentials rather than settings
+            // (docs/contracts/w11-email-connector.md).
+            'required_settings' => [],
+            'optional_settings' => [],
+            'required_credentials' => ['session_url', 'api_token', 'mailbox'],
+            // Email/changes has no depth cap of its own — it ends when
+            // hasMoreChanges says so — so this is a runaway-loop ceiling like
+            // Zendesk's and Trustpilot's, not a platform limit.
+            'max_pages_per_run' => 20,
+            'max_consecutive_empty_pages' => 3,
+            // One page is one Email/query or Email/changes chained into one
+            // Email/get via a result reference (RFC 8620 section 3.7), capped
+            // again inside the connector by the session's own maxObjectsInGet.
+            'page_size' => (int) env('EMAIL_PAGE_SIZE', 50),
+            // Bounds Email/get's maxBodyValueBytes. Left unbounded, a single
+            // message's quoted thread history could put megabytes into
+            // raw_payload; this is generous for a feedback email while keeping
+            // that column sane.
+            'max_body_bytes' => (int) env('EMAIL_MAX_BODY_BYTES', 20000),
+            'timeout' => (int) env('EMAIL_TIMEOUT', 30),
+            // No public JMAP rate limit to read off a spec — this is a
+            // conservative default in the same range as the other credentialed
+            // connectors above.
+            'rate_limit' => ['max_attempts' => 30, 'decay_seconds' => 60],
+            'retry_after' => 60,
+            // How far back the very first run reaches when there is no stored
+            // token yet. Mirrors Zendesk's initial_lookback_days for the same
+            // reason: without it a mailbox holding years of mail spends years
+            // of analysis quota on its first sync.
+            'initial_lookback_days' => (int) env('EMAIL_INITIAL_LOOKBACK_DAYS', 30),
         ],
 
     ],

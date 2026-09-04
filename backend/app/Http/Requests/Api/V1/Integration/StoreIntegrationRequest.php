@@ -65,7 +65,10 @@ class StoreIntegrationRequest extends FormRequest
         }
 
         foreach ($requiredCredentials as $key) {
-            $rules['credentials.'.$key] = ['required', 'string', 'max:255'];
+            $rules['credentials.'.$key] = array_merge(
+                ['required', 'string', 'max:255'],
+                IntegrationSettingFormats::for($key),
+            );
         }
 
         return $rules;

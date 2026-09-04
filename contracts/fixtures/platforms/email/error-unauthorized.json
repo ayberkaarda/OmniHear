@@ -1,0 +1,6 @@
+{
+  "type": "about:blank",
+  "status": 401,
+  "title": "Unauthorized",
+  "detail": "The bearer token was not accepted."
+}

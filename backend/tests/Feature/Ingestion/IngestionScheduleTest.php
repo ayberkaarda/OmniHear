@@ -70,20 +70,20 @@ it('leaves paused and failing integrations alone', function () {
 it('skips a platform that has no connector yet', function () {
     Queue::fake();
 
-    // email, not googleplay: googleplay gained a connector when this wave
-    // wired it into config/connectors.php, so the same integration row now
-    // matches the scheduler's whereIn(array_keys(config('connectors.platforms')))
-    // filter and this test would fail for real, not silently — but a
-    // platform that stops meaning "unimplemented" the moment someone lands it
-    // is still the wrong example to keep. email is one of the two platforms
-    // docs/contracts/backend-core.md section 1 lists that have no connector
-    // today (the other is social); assert that here rather than assume it,
-    // so this goes red with a clear reason instead of silently passing for
-    // the wrong one if email is ever wired.
-    expect(config('connectors.platforms.email'))->toBeNull();
+    // social, not googleplay or email: both gained a connector when their
+    // respective waves wired them into config/connectors.php, so the same
+    // integration row would now match the scheduler's
+    // whereIn(array_keys(config('connectors.platforms'))) filter and this test
+    // would fail for real, not silently — but a platform that stops meaning
+    // "unimplemented" the moment someone lands it is still the wrong example
+    // to keep. social is the one platform docs/contracts/backend-core.md
+    // section 1 lists that still has no connector; assert that here rather
+    // than assume it, so this goes red with a clear reason instead of silently
+    // passing for the wrong one if social is ever wired.
+    expect(config('connectors.platforms.social'))->toBeNull();
 
     $company = Company::factory()->create();
-    Integration::factory()->for($company)->create(['platform' => 'email']);
+    Integration::factory()->for($company)->create(['platform' => 'social']);
 
     runIngestionSweep();
 

@@ -1,0 +1,110 @@
+{
+  "methodResponses": [
+    [
+      "Email/changes",
+      {
+        "accountId": "acct-01",
+        "oldState": "emstate-0002",
+        "newState": "emstate-0003",
+        "hasMoreChanges": false,
+        "created": [
+          "em-0006",
+          "em-0007"
+        ],
+        "updated": [],
+        "destroyed": []
+      },
+      "c0"
+    ],
+    [
+      "Email/get",
+      {
+        "accountId": "acct-01",
+        "state": "emstate-0003",
+        "notFound": [],
+        "list": [
+          {
+            "id": "em-0006",
+            "blobId": "blob-0006",
+            "threadId": "th-0006",
+            "mailboxIds": {
+              "mbx-support": true
+            },
+            "size": 812,
+            "receivedAt": "2026-09-02T14:45:00Z",
+            "sentAt": "2026-09-02T14:44:03Z",
+            "messageId": [
+              "0006.1756824243@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-06",
+                "email": "sender-06@example.invalid"
+              }
+            ],
+            "subject": "(konu yok)",
+            "hasAttachment": true,
+            "preview": "",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0006-1",
+                "size": 4,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "   \n ",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          },
+          {
+            "id": "em-0007",
+            "blobId": "blob-0007",
+            "threadId": "th-0007",
+            "mailboxIds": {
+              "mbx-support": true
+            },
+            "size": 2260,
+            "receivedAt": "2026-09-02T16:10:00Z",
+            "sentAt": "2026-09-02T16:09:18Z",
+            "messageId": [
+              "0007.1756829358@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-07",
+                "email": "sender-07@example.invalid"
+              }
+            ],
+            "subject": "Mobil uygulamada bildirimler gelmiyor",
+            "hasAttachment": false,
+            "preview": "Bildirim ayarları açık olmasına rağmen hiçbir bildirim ulaşmıyor.",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0007-1",
+                "size": 205,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "Bildirim ayarları açık olmasına rağmen mobil uygulamada hiçbir bildirim ulaşmıyor. Web tarafında sorun yok.",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          }
+        ]
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

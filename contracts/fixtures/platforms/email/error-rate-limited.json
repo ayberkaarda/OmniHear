@@ -1,0 +1,6 @@
+{
+  "type": "about:blank",
+  "status": 429,
+  "title": "Too Many Requests",
+  "detail": "The account request budget was exceeded."
+}

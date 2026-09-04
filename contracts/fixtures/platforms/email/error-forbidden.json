@@ -1,0 +1,6 @@
+{
+  "type": "about:blank",
+  "status": 403,
+  "title": "Forbidden",
+  "detail": "The token is not permitted to read this account."
+}

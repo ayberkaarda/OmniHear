@@ -1,0 +1,149 @@
+{
+  "methodResponses": [
+    [
+      "Email/query",
+      {
+        "accountId": "acct-01",
+        "queryState": "eq-0001",
+        "canCalculateChanges": true,
+        "position": 0,
+        "ids": [
+          "em-0001",
+          "em-0002",
+          "em-0003"
+        ]
+      },
+      "q0"
+    ],
+    [
+      "Email/get",
+      {
+        "accountId": "acct-01",
+        "state": "emstate-0001",
+        "notFound": [],
+        "list": [
+          {
+            "id": "em-0001",
+            "blobId": "blob-0001",
+            "threadId": "th-0001",
+            "mailboxIds": {
+              "mbx-support": true
+            },
+            "size": 2841,
+            "receivedAt": "2026-09-01T09:15:00Z",
+            "sentAt": "2026-09-01T09:14:41Z",
+            "messageId": [
+              "0001.1756716881@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-01",
+                "email": "sender-01@example.invalid"
+              }
+            ],
+            "subject": "Kargo gecikmesi hakkında",
+            "hasAttachment": false,
+            "preview": "Siparişim üç gün geç geldi ve kimse bilgi vermedi.",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0001-1",
+                "size": 231,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "Siparişim üç gün geç geldi ve kimse bilgi vermedi. Destek hattını iki kez aradım, her seferinde farklı bir teslim tarihi söylendi.",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          },
+          {
+            "id": "em-0002",
+            "blobId": "blob-0002",
+            "threadId": "th-0002",
+            "mailboxIds": {
+              "mbx-support": true
+            },
+            "size": 5120,
+            "receivedAt": "2026-09-01T08:40:00Z",
+            "sentAt": "2026-09-01T08:39:52Z",
+            "messageId": [
+              "0002.1756714792@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-02",
+                "email": "sender-02@example.invalid"
+              }
+            ],
+            "subject": "Yeni arayüz çok daha hızlı",
+            "hasAttachment": false,
+            "preview": "Yeni panel gerçekten hızlı açılıyor, raporları indirmek de kolaylaştı.",
+            "textBody": [
+              {
+                "partId": "2",
+                "blobId": "blob-0002-2",
+                "size": 1402,
+                "type": "text/html",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "2": {
+                "value": "<html><body><p>Yeni panel gerçekten <b>hızlı</b> açılıyor, raporları indirmek de kolaylaştı.</p></body></html>",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          },
+          {
+            "id": "em-0003",
+            "blobId": "blob-0003",
+            "threadId": "th-0003",
+            "mailboxIds": {
+              "mbx-support": true,
+              "mbx-archive": true
+            },
+            "size": 1904,
+            "receivedAt": "2026-09-01T07:05:00Z",
+            "sentAt": "2026-09-01T07:04:12Z",
+            "messageId": [
+              "0003.1756709052@example.invalid"
+            ],
+            "from": [
+              {
+                "name": null,
+                "email": "sender-03@example.invalid"
+              }
+            ],
+            "subject": "Fatura adresimi değiştiremiyorum",
+            "hasAttachment": true,
+            "preview": "Hesap ayarlarından fatura adresini kaydettiğimde eski adres geri geliyor.",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0003-1",
+                "size": 174,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "Hesap ayarlarından fatura adresini kaydettiğimde eski adres geri geliyor. Ekran görüntüsünü ekte gönderiyorum.",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          }
+        ]
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

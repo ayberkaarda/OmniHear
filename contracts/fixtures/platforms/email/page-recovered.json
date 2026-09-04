@@ -1,0 +1,68 @@
+{
+  "methodResponses": [
+    [
+      "Email/query",
+      {
+        "accountId": "acct-01",
+        "queryState": "eq-0009",
+        "canCalculateChanges": true,
+        "position": 0,
+        "ids": [
+          "em-0008"
+        ]
+      },
+      "q0"
+    ],
+    [
+      "Email/get",
+      {
+        "accountId": "acct-01",
+        "state": "emstate-0009",
+        "notFound": [],
+        "list": [
+          {
+            "id": "em-0008",
+            "blobId": "blob-0008",
+            "threadId": "th-0008",
+            "mailboxIds": {
+              "mbx-support": true
+            },
+            "size": 1740,
+            "receivedAt": "2026-09-03T08:30:00Z",
+            "sentAt": "2026-09-03T08:29:37Z",
+            "messageId": [
+              "0008.1756888177@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-08",
+                "email": "sender-08@example.invalid"
+              }
+            ],
+            "subject": "Şifre sıfırlama bağlantısı gelmiyor",
+            "hasAttachment": false,
+            "preview": "Şifre sıfırlama bağlantısı hiç ulaşmadı, spam klasörüne de baktım.",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0008-1",
+                "size": 160,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "Şifre sıfırlama bağlantısı hiç ulaşmadı, spam klasörüne de baktım. Üç kez denedim, aynı sonuç.",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          }
+        ]
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

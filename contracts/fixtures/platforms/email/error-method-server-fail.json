@@ -1,0 +1,20 @@
+{
+  "methodResponses": [
+    [
+      "error",
+      {
+        "type": "serverFail",
+        "description": "An unexpected internal error occurred."
+      },
+      "c0"
+    ],
+    [
+      "error",
+      {
+        "type": "invalidResultReference"
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

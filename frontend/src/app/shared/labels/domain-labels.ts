@@ -106,6 +106,10 @@ export function credentialLabel(key: string): string {
       return $localize`:Connector credential field label@@label.credential.email:Account email`;
     case 'api_token':
       return $localize`:Connector credential field label@@label.credential.apiToken:API token`;
+    case 'session_url':
+      return $localize`:Connector credential field label@@label.credential.sessionUrl:Session URL`;
+    case 'mailbox':
+      return $localize`:Connector credential field label@@label.credential.mailbox:Mailbox`;
     default:
       return key;
   }

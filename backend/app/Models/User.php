@@ -48,6 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'two_factor_secret',
         'two_factor_recovery_codes',
+        'two_factor_last_used_step',
         'last_login_ip',
     ];
 
@@ -65,6 +66,12 @@ class User extends Authenticatable implements MustVerifyEmail
             // The array cast is what makes the column a JSON list of hashes
             // rather than a string the callers have to encode by hand.
             'two_factor_recovery_codes' => 'encrypted:array',
+            // The replay high-water mark: the last TOTP timestep this user
+            // spent. Hidden as well as cast, because it is a precise statement
+            // about when the account last authenticated and about the shape of
+            // its second factor, and no client has a use for it.
+            // See App\Support\Auth\TwoFactorReplayGuard.
+            'two_factor_last_used_step' => 'integer',
         ];
     }
 

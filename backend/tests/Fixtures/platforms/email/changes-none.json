@@ -1,0 +1,28 @@
+{
+  "methodResponses": [
+    [
+      "Email/changes",
+      {
+        "accountId": "acct-01",
+        "oldState": "emstate-0003",
+        "newState": "emstate-0003",
+        "hasMoreChanges": false,
+        "created": [],
+        "updated": [],
+        "destroyed": []
+      },
+      "c0"
+    ],
+    [
+      "Email/get",
+      {
+        "accountId": "acct-01",
+        "state": "emstate-0003",
+        "notFound": [],
+        "list": []
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

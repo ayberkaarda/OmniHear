@@ -4,6 +4,7 @@ use App\Models\Integration;
 use App\Support\Connectors\ConnectorException;
 use App\Support\Connectors\ConnectorFactory;
 use App\Support\Connectors\ConnectorFailure;
+use App\Support\Connectors\EmailConnector;
 use App\Support\Connectors\GooglePlayConnector;
 use App\Support\Connectors\TrustpilotConnector;
 
@@ -12,13 +13,15 @@ use function Pest\Laravel\actingAs;
 /*
 |--------------------------------------------------------------------------
 | ConnectorFactory / PlatformController wiring for googleplay + trustpilot
+| + email
 |--------------------------------------------------------------------------
 |
-| GooglePlayConnector, GooglePlayAccessToken and TrustpilotConnector already
-| have their own green unit and ingestion tests on another track. Nothing
-| here re-tests their sync logic. This file is about the two new `match` arms
-| in ConnectorFactory, the two new config/connectors.php entries, and the
-| package_name / business_unit_id format rules in
+| GooglePlayConnector, GooglePlayAccessToken, TrustpilotConnector and
+| EmailConnector already have their own green unit and ingestion tests on
+| another track (email's: tests/Unit/Connectors/EmailConnectorTest.php,
+| tests/Feature/Ingestion/EmailIngestionTest.php). Nothing here re-tests their
+| sync logic. This file is about the `match` arms in ConnectorFactory, the
+| config/connectors.php entries, and the format rules in
 | IntegrationSettingFormats — the wiring that turns those classes into
 | something a tenant can actually create through the API. A wrong
 | constructor-argument name in the factory's match arm is exactly the risk
@@ -334,4 +337,195 @@ it('reads the configured throttle and backoff for googleplay and trustpilot', fu
         ->and($factory->retryAfter('googleplay'))->toBe(60)
         ->and($factory->rateLimit('trustpilot'))->toBe(['max_attempts' => 30, 'decay_seconds' => 60])
         ->and($factory->retryAfter('trustpilot'))->toBe(60);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 7. email — same wiring, credential-only shape
+|--------------------------------------------------------------------------
+|
+| email differs from googleplay/trustpilot in one structural way worth
+| calling out: all three of its keys (session_url, api_token, mailbox) are
+| credentials, not settings (docs/contracts/w11-email-connector.md), so there
+| is no settings.* entry to validate and required_settings is empty. The test
+| shapes below are the credential equivalents of sections 2 and 5 above.
+|
+*/
+
+it('builds an EmailConnector for a fully-populated email integration', function () {
+    $connector = app(ConnectorFactory::class)->for(wiringIntegration(
+        'email',
+        [],
+        [
+            'session_url' => 'https://jmap.example.invalid/.well-known/jmap',
+            'api_token' => 'jmap-LIVE-abcdefghijklmnopqrstuvwxyz-0123456789',
+            'mailbox' => 'Support',
+        ],
+    ));
+
+    expect($connector)->toBeInstanceOf(EmailConnector::class)
+        ->and($connector->limits()->maxPagesPerRun)->toBe(20)
+        ->and($connector->limits()->maxConsecutiveEmptyPages)->toBe(3);
+});
+
+it('refuses an email integration missing any required credential', function () {
+    $factory = app(ConnectorFactory::class);
+    $config = $factory->config('email');
+    expect($config)->not->toBeNull();
+
+    $credentials = [
+        'session_url' => 'https://jmap.example.invalid/.well-known/jmap',
+        'api_token' => 'placeholder-token',
+        'mailbox' => 'Support',
+    ];
+
+    // Sanity check the fixture below is not vacuous: today's config always
+    // requires all three keys.
+    expect(array_keys($credentials))->toBe($config['required_credentials'] ?? []);
+
+    foreach (array_keys($credentials) as $missing) {
+        $partialCredentials = $credentials;
+        unset($partialCredentials[$missing]);
+
+        $failure = wiringFactoryFailure(
+            fn () => $factory->for(wiringIntegration('email', [], $partialCredentials)),
+        );
+
+        expect($failure)->toBe(
+            ConnectorFailure::Misconfigured,
+            "email missing credential={$missing} should be Misconfigured",
+        );
+    }
+});
+
+it('recognises email as a supported platform', function () {
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->supports('email'))->toBeTrue()
+        ->and($factory->platforms())->toContain('email');
+});
+
+it('publishes email with its credentials, no settings, and its format rule', function () {
+    [, $user] = tenant();
+
+    $response = actingAs($user, 'sanctum')->getJson('/api/v1/integrations/platforms')->assertOk();
+    $data = collect($response->json('data'))->keyBy('platform');
+
+    expect($data->keys()->all())->toContain('email');
+
+    $email = $data['email'];
+    expect($email['requires_credentials'])->toBeTrue()
+        ->and($email['settings'])->toBe([])
+        ->and(collect($email['credentials'])->pluck('key')->all())->toBe(['session_url', 'api_token', 'mailbox']);
+
+    // The catalogue never carries a `format` for a credential — invariant I5
+    // reasoning applies here too: PlatformController's credential map is
+    // {key, required} only, same as googleplay/trustpilot above, so a format
+    // rule enforced server-side is not also advertised as a value-shaped hint
+    // about a field the response never echoes back.
+    foreach ($email['credentials'] as $credential) {
+        expect(array_keys($credential))->toBe(['key', 'required']);
+    }
+});
+
+it('never lets a stored email credential value reach the platforms catalogue', function () {
+    [$company, $user] = tenant();
+
+    Integration::factory()->for($company)->create([
+        'platform' => 'email',
+        'settings' => [],
+        'credentials' => [
+            'session_url' => 'https://jmap.example.invalid/.well-known/jmap',
+            'api_token' => 'test-fixture-supersecretjmaptoken-not-real',
+            'mailbox' => 'Support',
+        ],
+    ]);
+
+    $response = actingAs($user, 'sanctum')->getJson('/api/v1/integrations/platforms')->assertOk();
+
+    expect($response->getContent())
+        ->not->toContain('supersecretjmaptoken')
+        ->and($response->getContent())->not->toContain('jmap.example.invalid');
+});
+
+/*
+|--------------------------------------------------------------------------
+| 8. POST /api/v1/integrations — email credential validation
+|--------------------------------------------------------------------------
+|
+| session_url is the one email key with a structural risk: it is used to
+| build every later JMAP request, so a non-https value would otherwise be
+| accepted here and only fail once EmailConnector's own scheme check runs
+| during a sync, hours later. mailbox's only structural risk is
+| whitespace-only, which `required` alone does not catch.
+|
+*/
+
+it('validates email session_url and mailbox at create time', function (array $payload, ?string $invalidField) {
+    [, $user] = tenant();
+
+    $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', $payload);
+
+    if ($invalidField === null) {
+        $response->assertCreated()
+            ->assertJsonPath('integration.platform', $payload['platform']);
+
+        return;
+    }
+
+    $response->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonValidationErrors($invalidField);
+})->with([
+    'email session_url without https' => [[
+        'platform' => 'email',
+        'credentials' => [
+            'session_url' => 'http://jmap.example.invalid/.well-known/jmap',
+            'api_token' => 'jmap-token',
+            'mailbox' => 'Support',
+        ],
+    ], 'credentials.session_url'],
+    'email session_url that is not a url at all' => [[
+        'platform' => 'email',
+        'credentials' => [
+            'session_url' => 'not-a-url',
+            'api_token' => 'jmap-token',
+            'mailbox' => 'Support',
+        ],
+    ], 'credentials.session_url'],
+    'email mailbox that is only whitespace' => [[
+        'platform' => 'email',
+        'credentials' => [
+            'session_url' => 'https://jmap.example.invalid/.well-known/jmap',
+            'api_token' => 'jmap-token',
+            'mailbox' => '   ',
+        ],
+    ], 'credentials.mailbox'],
+    'email well-formed credentials succeed' => [[
+        'platform' => 'email',
+        'credentials' => [
+            'session_url' => 'https://jmap.example.invalid/.well-known/jmap',
+            'api_token' => 'jmap-token',
+            'mailbox' => 'Support',
+        ],
+    ], null],
+]);
+
+it('rejects an email create with no credentials at all', function () {
+    // Same reasoning as zendesk/googleplay/trustpilot: accepting a create
+    // without them would produce an integration the scheduler can only fail
+    // on, hours later, instead of a 422 the user can act on now.
+    [, $user] = tenant();
+
+    $this->actingAs($user, 'sanctum')->postJson('/api/v1/integrations', ['platform' => 'email'])
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonValidationErrors('credentials');
+});
+
+it('reads the configured throttle and backoff for email', function () {
+    $factory = app(ConnectorFactory::class);
+
+    expect($factory->rateLimit('email'))->toBe(['max_attempts' => 30, 'decay_seconds' => 60])
+        ->and($factory->retryAfter('email'))->toBe(60);
 });

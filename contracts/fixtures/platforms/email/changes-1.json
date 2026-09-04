@@ -1,0 +1,110 @@
+{
+  "methodResponses": [
+    [
+      "Email/changes",
+      {
+        "accountId": "acct-01",
+        "oldState": "emstate-0001",
+        "newState": "emstate-0002",
+        "hasMoreChanges": true,
+        "created": [
+          "em-0004",
+          "em-0005"
+        ],
+        "updated": [],
+        "destroyed": []
+      },
+      "c0"
+    ],
+    [
+      "Email/get",
+      {
+        "accountId": "acct-01",
+        "state": "emstate-0002",
+        "notFound": [],
+        "list": [
+          {
+            "id": "em-0004",
+            "blobId": "blob-0004",
+            "threadId": "th-0004",
+            "mailboxIds": {
+              "mbx-support": true
+            },
+            "size": 3312,
+            "receivedAt": "2026-09-02T11:20:00Z",
+            "sentAt": "2026-09-02T11:19:31Z",
+            "messageId": [
+              "0004.1756812571@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-04",
+                "email": "sender-04@example.invalid"
+              }
+            ],
+            "subject": "İade sürecinde dönüş alamadım",
+            "hasAttachment": false,
+            "preview": "İki hafta boyunca hiçbir dönüş alamadım.",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0004-1",
+                "size": 198,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "İade sürecinde iki hafta boyunca hiçbir dönüş alamadım, sonunda bankadan itiraz etmek zorunda kaldım.",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          },
+          {
+            "id": "em-0005",
+            "blobId": "blob-0005",
+            "threadId": "th-0005",
+            "mailboxIds": {
+              "mbx-archive": true
+            },
+            "size": 1180,
+            "receivedAt": "2026-09-02T10:02:00Z",
+            "sentAt": "2026-09-02T10:01:44Z",
+            "messageId": [
+              "0005.1756807304@example.invalid"
+            ],
+            "from": [
+              {
+                "name": "sender-05",
+                "email": "sender-05@example.invalid"
+              }
+            ],
+            "subject": "Bülten aboneliği",
+            "hasAttachment": false,
+            "preview": "Bu ileti arşiv klasöründe, izlenen klasörde değil.",
+            "textBody": [
+              {
+                "partId": "1",
+                "blobId": "blob-0005-1",
+                "size": 96,
+                "type": "text/plain",
+                "charset": "utf-8"
+              }
+            ],
+            "bodyValues": {
+              "1": {
+                "value": "Bu ileti arşiv klasöründe duruyor, izlenen klasörde değil, bu yüzden alınmaması gerekiyor.",
+                "isEncodingProblem": false,
+                "isTruncated": false
+              }
+            }
+          }
+        ]
+      },
+      "g0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

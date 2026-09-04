@@ -3,13 +3,15 @@
 namespace App\Http\Requests\Api\V1\Integration;
 
 /**
- * Extra shape rules for individual connector settings.
+ * Extra shape rules for individual connector settings and credentials.
  *
- * `required_settings` in config/connectors.php only says a key must be present.
- * Some of those keys end up in a URL, and for those "a non-empty string under
- * 255 characters" is not enough: the connector would accept the value, build a
- * request around it and only then discover the problem — at sync time, hours
- * after the create that caused it.
+ * `required_settings` and `required_credentials` in config/connectors.php only
+ * say a key must be present. Some of those keys end up in a URL, and for those
+ * "a non-empty string under 255 characters" is not enough: the connector would
+ * accept the value, build a request around it and only then discover the
+ * problem — at sync time, hours after the create that caused it. `email`'s
+ * `session_url` is the first credential in this position; the earlier entries
+ * here are all settings.
  *
  * This is the create/update mirror of the whitelists the connectors enforce for
  * themselves. Both layers stay: this one gives the user a 422 they can act on,
@@ -34,6 +36,7 @@ final class IntegrationSettingFormats
             'subdomain' => 'hostname',
             'package_name' => 'android_package',
             'business_unit_id' => 'hex24',
+            'session_url' => 'https_url',
             default => null,
         };
     }
@@ -58,6 +61,19 @@ final class IntegrationSettingFormats
             // Substituted into the Trustpilot API path. Mirrors
             // TrustpilotConnector::BUSINESS_UNIT_ID.
             'business_unit_id' => ['regex:/^[a-f0-9]{24}$/i'],
+            // A credential rather than a setting — the shape rule applies here
+            // for the same reason: every later JMAP request, bearer token
+            // included, goes wherever this URL points. Mirrors
+            // EmailConnector::isHttpsUrl(); a non-https value would otherwise be
+            // accepted here and only fail once the connector runs, hours later.
+            'session_url' => ['max:2048', 'url', 'regex:/^https:\/\//i'],
+            // The mailbox is matched by name against the fetched list
+            // (EmailConnector::mailboxId()), not substituted into a request, so
+            // it needs no URL/path whitelist. The one gap worth closing here is
+            // whitespace-only: `required` accepts a string of blanks, and the
+            // connector's own trim() check would only catch it once the
+            // scheduler runs.
+            'mailbox' => ['regex:/\S/'],
             default => [],
         };
     }

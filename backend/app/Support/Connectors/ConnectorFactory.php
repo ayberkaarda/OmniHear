@@ -95,6 +95,16 @@ class ConnectorFactory
                 timeout: (int) ($config['timeout'] ?? 30),
                 perPage: (int) ($config['per_page'] ?? 100),
             ),
+            EmailConnector::class => new EmailConnector(
+                sessionUrl: (string) $credentials['session_url'],
+                apiToken: (string) $credentials['api_token'],
+                mailbox: (string) $credentials['mailbox'],
+                limits: $limits,
+                timeout: (int) ($config['timeout'] ?? 30),
+                pageSize: (int) ($config['page_size'] ?? 50),
+                maxBodyBytes: (int) ($config['max_body_bytes'] ?? 20000),
+                initialLookbackDays: (int) ($config['initial_lookback_days'] ?? 30),
+            ),
             AppStoreConnector::class => new AppStoreConnector(
                 appId: (string) $settings['app_id'],
                 country: (string) $settings['country'],

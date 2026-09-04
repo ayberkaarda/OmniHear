@@ -11,6 +11,7 @@ use App\Support\Auth\Totp;
 use App\Support\Auth\TwoFactorChallenge;
 use App\Support\Auth\TwoFactorReplayGuard;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -680,6 +681,67 @@ it('refuses to disable what is not enabled', function () {
         ->assertJsonPath('code', 'TWO_FACTOR_NOT_ENABLED');
 });
 
+it('lets a user re-enrol in the same timestep it disabled in', function () {
+    // Everything below happens inside one 30-second step, which is exactly the
+    // situation the mark used to break: a user turns the factor off, decides
+    // they wanted a different authenticator app, and turns it straight back on.
+    Carbon::setTestNow(Carbon::createFromTimestampUTC(1700000000));
+
+    [$company, $user, $secret] = twoFactorUser();
+    $guard = app(TwoFactorReplayGuard::class);
+
+    $this->actingAs($user, 'sanctum')
+        ->deleteJson('/api/v1/auth/two-factor', [
+            'password' => TWO_FACTOR_PASSWORD,
+            'code' => codeNow($secret),
+        ])
+        ->assertNoContent();
+
+    // The step that code belonged to is spent while the factor exists, and the
+    // mark goes with the secret it described.
+    expect($guard->lastAcceptedStep($user))->toBeNull();
+
+    $fresh = $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/auth/two-factor')
+        ->assertCreated()
+        ->json('secret');
+
+    expect($fresh)->not->toBe($secret);
+
+    // The new secret's first code lands in the very step the old secret's last
+    // code was spent in. Without the clearing above this is a 422 and a dead
+    // zone of up to 90 seconds that the user cannot interpret: the app says the
+    // code is wrong, and the authenticator is showing the right one.
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/auth/two-factor/confirm', ['code' => codeNow($fresh)])
+        ->assertOk();
+
+    expect($user->refresh()->twoFactorEnabled())->toBeTrue()
+        ->and($guard->lastAcceptedStep($user))->toBe(Totp::timestep(1700000000));
+});
+
+it('forgets the spent-step mark when a new enrolment replaces the secret', function () {
+    Carbon::setTestNow(Carbon::createFromTimestampUTC(1700000000));
+
+    [$company, $user, $secret] = pendingTwoFactorUser();
+    $guard = app(TwoFactorReplayGuard::class);
+
+    $guard->spend($user, Totp::timestep(1700000000));
+
+    $fresh = $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/auth/two-factor')
+        ->assertCreated()
+        ->json('secret');
+
+    // A mark left over from a secret that no longer exists is not evidence
+    // about the secret that just replaced it.
+    expect($guard->lastAcceptedStep($user))->toBeNull();
+
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/auth/two-factor/confirm', ['code' => codeNow($fresh)])
+        ->assertOk();
+});
+
 /*
 |--------------------------------------------------------------------------
 | POST /auth/two-factor/recovery-codes
@@ -742,16 +804,56 @@ it('never moves the spent-step mark backwards', function () {
 
     expect($guard->lastAcceptedStep($user))->toBeNull();
 
-    $guard->markAccepted($user, 100);
+    expect($guard->spend($user, 100))->toBeTrue();
+
     // An older code arriving late must not un-spend a newer one, or a replay
-    // becomes possible by first replaying something even older.
-    $guard->markAccepted($user, 99);
+    // becomes possible by first replaying something even older. The conditional
+    // UPDATE simply matches no row, so the answer is "already used".
+    expect($guard->spend($user, 99))->toBeFalse()
+        ->and($guard->lastAcceptedStep($user))->toBe(100);
 
-    expect($guard->lastAcceptedStep($user))->toBe(100);
+    // The same step twice is the replay itself.
+    expect($guard->spend($user, 100))->toBeFalse()
+        ->and($guard->lastAcceptedStep($user))->toBe(100);
 
-    $guard->markAccepted($user, 101);
+    expect($guard->spend($user, 101))->toBeTrue()
+        ->and($guard->lastAcceptedStep($user))->toBe(101);
+});
 
-    expect($guard->lastAcceptedStep($user))->toBe(101);
+it('keeps the spent-step mark on the user row, not in the cache', function () {
+    [$company, $user] = twoFactorUser();
+    $guard = app(TwoFactorReplayGuard::class);
+
+    expect($user->refresh()->two_factor_last_used_step)->toBeNull();
+
+    $guard->spend($user, 4242);
+
+    // The column is the storage, so losing the cache no longer forgets which
+    // codes have been spent — the reason the mark left the cache was atomicity,
+    // but this is the part a reader can see.
+    Cache::flush();
+
+    expect($guard->lastAcceptedStep($user))->toBe(4242)
+        ->and($user->refresh()->two_factor_last_used_step)->toBe(4242);
+
+    $guard->clear($user);
+
+    expect($guard->lastAcceptedStep($user))->toBeNull()
+        ->and($user->refresh()->two_factor_last_used_step)->toBeNull();
+});
+
+it('never publishes the spent-step mark', function () {
+    [$company, $user] = twoFactorUser();
+    app(TwoFactorReplayGuard::class)->spend($user, 4242);
+
+    // It says when the account last authenticated and nothing a client needs,
+    // so it belongs with the secret and the recovery codes in $hidden.
+    expect(array_key_exists('two_factor_last_used_step', $user->refresh()->toArray()))->toBeFalse();
+
+    $this->actingAs($user, 'sanctum')
+        ->getJson('/api/v1/auth/me')
+        ->assertOk()
+        ->assertJsonMissingPath('user.two_factor_last_used_step');
 });
 
 it('treats an empty or unrecoverable recovery code as no code at all', function () {

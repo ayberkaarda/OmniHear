@@ -1,0 +1,40 @@
+{
+  "methodResponses": [
+    [
+      "Mailbox/get",
+      {
+        "accountId": "acct-01",
+        "state": "mbox-0001",
+        "notFound": [],
+        "list": [
+          {
+            "id": "mbx-inbox",
+            "name": "Inbox",
+            "parentId": null,
+            "role": "inbox"
+          },
+          {
+            "id": "mbx-support",
+            "name": "Support",
+            "parentId": null,
+            "role": null
+          },
+          {
+            "id": "mbx-archive",
+            "name": "Archive",
+            "parentId": null,
+            "role": "archive"
+          },
+          {
+            "id": "mbx-sent",
+            "name": "Sent",
+            "parentId": null,
+            "role": "sent"
+          }
+        ]
+      },
+      "m0"
+    ]
+  ],
+  "sessionState": "sess-0001"
+}

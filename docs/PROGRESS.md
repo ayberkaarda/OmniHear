@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-04 · Current: **W10 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-04 · Current: **W11 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -25,7 +25,8 @@ commit messages; `git log` is the archive.
 | **W7** | history rewrite (done) · quota gate + invitations · security review + its seven findings + KVKK PII + self-hosted fonts | **green** — pest **1046 passed, 4870 assertions**, coverage **98.9%** · pytest **282** · jest **290** · build:gate raw 337.88/347, transfer 94.46/105 |
 | **W8** | Google Play ∥ Trustpilot connectors (spec §2: 2 of 6 channels → 4), factory/config wiring, `dropdb` guard false positive | **green** — pest **1259 passed, 5524 assertions**, coverage **98.8%**, 349.5 s · guards **122** · unchanged: pytest 282, jest 290, build:gate raw 337.93/347, transfer 94.46/105 |
 | **W9** | CI download retry+resume ∥ Horizon queue coverage ∥ reprocess command + Redis KPI cache (invalidated on upgrade and channel deletion too); plus a W8 unordered-`pluck` flake the gate caught | **green** — CI `33861764527`, seven jobs, E2E 11.3 s · pest **1297 passed, 5658 assertions**, coverage **98.9%**, 367.2 s · guards **122** · pytest **295** (was 282), no skips · jest **290** · build:gate raw 337.93/347, transfer 94.46/105 · Horizon measured live: `analysis` queue 5 → 0 |
-| **W10** | TOTP 2FA — the API had published `two_factor_enabled` since F2 with no code path able to write it ∥ frontend enrolment and challenge ∥ `actions/*` majors + `waits` on the analysis queue | **local green, E2E awaiting CI** — pest **1404 passed, 6075 assertions**, coverage **98.9%** · guards **122** · jest **323/56** (was 290/55) · i18n **478/478** · build:gate raw 339.66/347, transfer 94.89/105 · pytest 295 unchanged · OpenAPI `--check` matches |
+| **W10** | TOTP 2FA — the API had published `two_factor_enabled` since F2 with no code path able to write it ∥ frontend enrolment and challenge ∥ `actions/*` majors + `waits` on the analysis queue | **green** — CI `33873188756`, seven jobs, E2E 56.4 s with the 2FA leg (was 11.3 s) · pest **1404 passed, 6075 assertions**, coverage **98.9%** · guards **122** · jest **323/56** (was 290/55) · i18n **478/478** · build:gate raw 339.66/347, transfer 94.89/105 · pytest 295 unchanged · OpenAPI `--check` matches |
+| **W11** | email connector over JMAP (spec §2: 4 of 6 channels → **5**) ∥ the 2FA replay mark moves from cache to a `users` column, making the check atomic | **local green, E2E awaiting CI** — pest **1512 passed, 6419 assertions**, coverage **98.9%** · guards **122** · i18n **480/480** · build:gate raw 339.66/347, transfer 94.88/105 (unmoved) · the replay race test fails 5-of-5 against read-then-write and passes 1-of-5 with the conditional `UPDATE` |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -61,10 +62,10 @@ events, so neither side references a class the other has not written yet.
   Play and Trustpilot are synthesised from published documentation, each with a fixture
   README separating documented from inferred; App Store is the only one recorded from a
   real response. Largest gap between "the tests pass" and "it works".
-- **The E2E image cache has only ever taken its miss path.** `33861764527` was the first
-  run with the key, so it built and saved. W10 deliberately did not touch `ai-service/`,
-  so its own CI run is the free proof — the `Load cached ai-service image` step either
-  runs or it does not.
+- **Closed by `33873188756`:** the E2E image cache took its hit path for the first time
+  (`Cache restored from key: ai-service-image-d74170e9…`, `Loaded image:
+  omnihear-ai-service:latest`), and the `actions/*` major upgrades ran with no Node 20
+  deprecation annotation. Both were only ever provable in CI.
 - **2FA replay protection is cache-backed, not atomic.** The high-water mark and the
   per-token attempt counter share one cache, so losing it resets both; and the check is
   read-then-write, so two requests carrying the same code both pass. A
