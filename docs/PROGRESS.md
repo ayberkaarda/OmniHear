@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-04 · Current: **W11 green (CI `33903711379`); W12 in flight — the sixth channel** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-05 · Current: **W13 green (CI `33920031959`); spec complete at 6/6 channels** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -27,7 +27,8 @@ commit messages; `git log` is the archive.
 | **W9** | CI download retry+resume ∥ Horizon queue coverage ∥ reprocess command + Redis KPI cache (invalidated on upgrade and channel deletion too); plus a W8 unordered-`pluck` flake the gate caught | **green** — CI `33861764527`, seven jobs, E2E 11.3 s · pest **1297 passed, 5658 assertions**, coverage **98.9%**, 367.2 s · guards **122** · pytest **295** (was 282), no skips · jest **290** · build:gate raw 337.93/347, transfer 94.46/105 · Horizon measured live: `analysis` queue 5 → 0 |
 | **W10** | TOTP 2FA — the API had published `two_factor_enabled` since F2 with no code path able to write it ∥ frontend enrolment and challenge ∥ `actions/*` majors + `waits` on the analysis queue | **green** — CI `33873188756`, seven jobs, E2E 56.4 s with the 2FA leg (was 11.3 s) · pest **1404 passed, 6075 assertions**, coverage **98.9%** · guards **122** · jest **323/56** (was 290/55) · i18n **478/478** · build:gate raw 339.66/347, transfer 94.89/105 · pytest 295 unchanged · OpenAPI `--check` matches |
 | **W11** | email connector over JMAP (spec §2: 4 of 6 channels → **5**) ∥ the 2FA replay mark moves from cache to a `users` column, making the check atomic | **green** — CI `33903711379`, seven jobs, E2E 58.3 s, image cache hit for the second run running · pest **1512 passed, 6419 assertions** (identical on a clean checkout), coverage **98.9%** · guards **122** · i18n **480/480** · build:gate raw 339.66/347, transfer 94.88/105 (unmoved) · the replay race test fails 5-of-5 against read-then-write and passes 1-of-5 with the conditional `UPDATE` |
-| **W12** | social connector over the Mastodon hashtag timeline — **6 of 6 channels**, spec §2 complete ∥ MIT licence, the public-facing docs brought to the truth, and the fixture-provenance promise finally tested for Zendesk and Google Play | **local green, E2E awaiting CI** — pest **1648 passed, 7009 assertions**, coverage **98.9%** · guards **122** · jest **323/56** · i18n **482/482** · build:gate raw 339.66/347, transfer 94.90/105 (unmoved) · **recorded live** from `mastodon.social`, no account: the second channel after App Store to meet a real server |
+| **W12** | social connector over the Mastodon hashtag timeline — **6 of 6 channels**, spec §2 complete ∥ MIT licence, the public-facing docs brought to the truth, and the fixture-provenance promise finally tested for Zendesk and Google Play | **green** — CI `33913560354` · pest **1648 passed, 7009 assertions**, coverage **98.9%** · guards **122** · jest **323/56** · i18n **482/482** · build:gate raw 339.66/347, transfer 94.90/105 (unmoved) · **recorded live** from `mastodon.social`, no account: the second channel after App Store to meet a real server |
+| **W13** | closure round: the theme-switch contrast flash found by *looking* at the product, 403 → `Misconfigured`, six raw-key labels, bilingual README with screenshots, D-13 recorded | **green** — CI `33920031959` · pest **1649 passed, 7017 assertions**, coverage **98.9%** · guards **122** · jest **325/56** · i18n **488/488** · pytest 295 · tokens 63/2/0 · build:gate raw 340.70/347, transfer 95.03/105 (unmoved) · **E2E ran locally for the first time**, and found the dev database two migrations behind |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -37,11 +38,13 @@ leaves a diagnosable tree.
 
 ## Now
 
-**Latest gate** is the W11 row above, re-run by the main thread and confirmed by
-CI `33903711379` — seven jobs green, backend **1512 passed** on a clean checkout,
-identical to local, and the E2E journey in 58.3 s. `npx playwright test` is the
-one line that cannot run on this machine: port 4200 is held by an unrelated
-project. CI is the authority on it, every time.
+**Latest gate** is the W13 row above, confirmed by CI `33920031959`. `npx
+playwright test` **can** now run on this machine, which had been assumed
+impossible: port 4200 is held by the compose `frontend` service serving this
+very app, so with `CI` unset Playwright reuses it instead of starting a second
+server. The first local run failed and was right to — see the dev-database
+drift in `docs/LESSONS.md`. CI remains the authority, but a two-minute local
+run now catches what used to cost a push.
 
 **A green CI run is not automatically evidence.** The first one reported *534 warnings,
 69 passed* for the backend and *11 skipped* for the AI service and went green anyway.
@@ -59,12 +62,14 @@ events, so neither side references a class the other has not written yet.
 
 ### Still open
 
-- **Four of the five channels have never touched a live account.** Zendesk, Google Play,
+- **Four of the six channels have never touched a live account.** Zendesk, Google Play,
   Trustpilot and email are synthesised from published documentation, each with a fixture
-  README separating documented from inferred; App Store is the only one recorded from a
-  real response. Still the largest gap between "the tests pass" and "it works" — though
-  email's README names, in priority order, what a live recording would settle, and the
-  social channel needs no account at all, so W12 can narrow this twice over.
+  README separating documented from inferred. **Two are recorded from real responses**:
+  App Store since F4, and social since W12 — `mastodon.social` needs no account, so that
+  one was free. Still the largest gap between "the tests pass" and "it works". Email is
+  the only one that can close cheaply: its README lists, in priority order, exactly what
+  a Fastmail-trial recording would settle, error status codes first. The other three
+  each want a paid or approved account, and each already declares itself synthetic.
 - **Tokens older than 90 days become invalid on deploy** — `expiration` counts from creation. Deliberate; a release note.
 - `infra/docker-compose.dev.yml` keeps `${AI_SERVICE_HMAC_SECRET:-dev-only-not-a-real-secret}`
   on purpose: removing it breaks a fresh clone's `docker compose up`, and the value names
