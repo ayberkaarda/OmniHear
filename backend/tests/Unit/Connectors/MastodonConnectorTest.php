@@ -623,6 +623,12 @@ it('maps the recorded error bodies onto connector failures', function (string $f
     'not a mastodon endpoint' => ['error-not-found.html', 404, ConnectorFailure::Misconfigured],
     'request refused' => ['error-unprocessable.json', 422, ConnectorFailure::Misconfigured],
     'throttled' => ['error-rate-limited.json', 429, ConnectorFailure::RateLimited],
+    // Not recorded live — no suspended or defederated instance was found to
+    // capture — but 403 is a standing decision by the server, not a blip.
+    // Unreachable is retryable by design and would burn five attempts on a
+    // refusal that reads identically on the sixth, so this is Misconfigured
+    // rather than falling into the default arm.
+    'suspended or defederated instance' => ['error-forbidden.json', 403, ConnectorFailure::Misconfigured],
 ]);
 
 it('maps the remaining status codes onto connector failures', function (int $status, ConnectorFailure $expected) {
@@ -631,7 +637,6 @@ it('maps the remaining status codes onto connector failures', function (int $sta
     expect(mastodonFailure(fn () => mastodonConnector()->fetchPage(null)))->toBe($expected);
 })->with([
     [400, ConnectorFailure::Unreachable],
-    [403, ConnectorFailure::Unreachable],
     [500, ConnectorFailure::Unreachable],
     [502, ConnectorFailure::Unreachable],
     [503, ConnectorFailure::Unreachable],
@@ -699,7 +704,7 @@ it('never builds a failure, its message or its trace from the response body', fu
             ->and($e->getTraceAsString())->not->toContain('super-secret-value')
             ->and($e->getSafeMessage())->toBe($e->failure()->safeMessage());
     }
-})->with([401, 404, 422, 429, 500]);
+})->with([401, 403, 404, 422, 429, 500]);
 
 /*
 |--------------------------------------------------------------------------

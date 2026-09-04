@@ -138,8 +138,14 @@
 
   @if (kpis()) {
     <p class="text-xs text-[var(--text-muted)]" data-testid="overview-quota">
-      <span i18n="Overview quota line@@overview.quota.label">Analysis quota used:</span>
-      <span class="tabular-nums">{{ quotaUsedLabel() }}</span>
+      <!-- &ngsp; survives Angular's default whitespace collapsing, which would
+           otherwise join these two spans into "used:60". A CSS gap would need
+           the paragraph to become a flex container; this is one inline text
+           line, so the space belongs in the text. -->
+      <span i18n="Overview quota line@@overview.quota.label">Analysis quota used:</span>&ngsp;<span
+        class="tabular-nums"
+        >{{ quotaUsedLabel() }}</span
+      >
     </p>
   }
 

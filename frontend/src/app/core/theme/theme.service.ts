@@ -6,6 +6,20 @@ export type ResolvedTheme = 'light' | 'dark';
 const STORAGE_KEY = 'omnihear.theme';
 const DARK_CLASS = 'dark';
 const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+/**
+ * Applied to `documentElement` for the instant the `.dark` class is toggled.
+ * `styles.scss` gives it a blanket `transition: none !important`, so every
+ * element re-paints in its new palette immediately instead of animating
+ * `background-color`/`color` independently. Without this, elements whose
+ * colour-affecting properties transition at different rates (or not at all)
+ * can render an unreadable combination for the duration of the transition —
+ * e.g. a card background still mid-fade from light to dark under text that
+ * already snapped to its dark-mode colour. Removed two animation frames
+ * later, once the new palette has already painted, so removing it does not
+ * itself trigger a visible transition. Safe under `prefers-reduced-motion`:
+ * it only ever suppresses a transition, never re-enables one.
+ */
+const SUPPRESS_TRANSITIONS_CLASS = 'theme-changing';
 
 function isThemePreference(value: unknown): value is ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system';
@@ -65,7 +79,7 @@ export class ThemeService {
     effect(() => {
       const resolved = this.resolved();
       if (typeof document !== 'undefined') {
-        document.documentElement.classList.toggle(DARK_CLASS, resolved === 'dark');
+        this.applyResolvedTheme(resolved === 'dark');
       }
       writeStoredPreference(this.preference());
     });
@@ -73,6 +87,38 @@ export class ThemeService {
 
   setPreference(preference: ThemePreference): void {
     this.preference.set(preference);
+  }
+
+  /**
+   * Toggles `.dark` on `documentElement`, suppressing colour transitions for
+   * the moment the class actually changes (see `SUPPRESS_TRANSITIONS_CLASS`).
+   * A no-op toggle (resolved theme already matches — e.g. the FOUC-guard
+   * inline script in index.html already applied the right class before this
+   * service ran) never adds the suppression class, since nothing is about to
+   * transition.
+   */
+  private applyResolvedTheme(isDark: boolean): void {
+    const root = document.documentElement;
+    const alreadyApplied = root.classList.contains(DARK_CLASS) === isDark;
+    if (alreadyApplied) {
+      return;
+    }
+
+    root.classList.add(SUPPRESS_TRANSITIONS_CLASS);
+    root.classList.toggle(DARK_CLASS, isDark);
+
+    const removeSuppression = (): void => root.classList.remove(SUPPRESS_TRANSITIONS_CLASS);
+
+    if (typeof requestAnimationFrame === 'function') {
+      // Two frames, not one: the first is where the browser recalculates
+      // style and paints with transitions suppressed. Only after that paint
+      // has actually happened is it safe to remove the suppression class —
+      // removing it a frame too early can race the paint on slower devices.
+      requestAnimationFrame(() => requestAnimationFrame(removeSuppression));
+    } else {
+      // SSR/test environments without rAF.
+      setTimeout(removeSuppression, 0);
+    }
   }
 
   private watchSystemPreference(): void {

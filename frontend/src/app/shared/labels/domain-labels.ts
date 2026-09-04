@@ -92,6 +92,12 @@ export function settingLabel(key: string): string {
       return $localize`:Connector setting field label@@label.setting.instanceUrl:Instance URL`;
     case 'hashtag':
       return $localize`:Connector setting field label@@label.setting.hashtag:Hashtag`;
+    case 'package_name':
+      return $localize`:Connector setting field label@@label.setting.packageName:Package name`;
+    case 'business_unit_id':
+      return $localize`:Connector setting field label@@label.setting.businessUnitId:Business Unit ID`;
+    case 'fixture_set':
+      return $localize`:Connector setting field label@@label.setting.fixtureSet:Fixture set`;
     default:
       return key;
   }
@@ -114,6 +120,12 @@ export function credentialLabel(key: string): string {
       return $localize`:Connector credential field label@@label.credential.sessionUrl:Session URL`;
     case 'mailbox':
       return $localize`:Connector credential field label@@label.credential.mailbox:Mailbox`;
+    case 'client_email':
+      return $localize`:Connector credential field label@@label.credential.clientEmail:Service account email`;
+    case 'private_key':
+      return $localize`:Connector credential field label@@label.credential.privateKey:Service account private key`;
+    case 'api_key':
+      return $localize`:Connector credential field label@@label.credential.apiKey:API key`;
     default:
       return key;
   }

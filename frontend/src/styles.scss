@@ -5,3 +5,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * ThemeService (src/app/core/theme/theme.service.ts) adds `.theme-changing`
+ * to <html> for the instant it toggles `.dark`, so every element's palette
+ * swaps in one frame instead of each animating its own colour-affecting
+ * properties (background, border, text) at its own pace/duration. Without
+ * this, elements only some of which carry `transition-colors` render an
+ * unreadable mismatch — e.g. a card background still fading from light to
+ * dark under text that already snapped to its dark-mode colour — for the
+ * length of the transition.
+ *
+ * Always safe under `prefers-reduced-motion: reduce`: this only ever turns a
+ * transition off for one frame, never on, so it cannot fight a
+ * reduced-motion rule declared elsewhere.
+ */
+.theme-changing,
+.theme-changing * {
+  transition: none !important;
+}

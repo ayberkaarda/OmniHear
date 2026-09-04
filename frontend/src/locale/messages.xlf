@@ -1113,7 +1113,7 @@
         <source>Analysis quota used:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/overview/overview.component.html</context>
-          <context context-type="linenumber">141,142</context>
+          <context context-type="linenumber">145,147</context>
         </context-group>
         <note priority="1" from="description">Overview quota line</note>
       </trans-unit>
@@ -1121,7 +1121,7 @@
         <source> No comments have been collected yet. Connect a channel on the Integrations screen to start. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/overview/overview.component.html</context>
-          <context context-type="linenumber">148,152</context>
+          <context context-type="linenumber">154,158</context>
         </context-group>
         <note priority="1" from="description">Overview empty state</note>
       </trans-unit>
@@ -3125,7 +3125,7 @@
         <source>Social media hashtags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">214,217</context>
+          <context context-type="linenumber">215,219</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.title" datatype="html">
@@ -3581,11 +3581,35 @@
         </context-group>
         <note priority="1" from="description">Connector setting field label</note>
       </trans-unit>
+      <trans-unit id="label.setting.packageName" datatype="html">
+        <source>Package name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+        <note priority="1" from="description">Connector setting field label</note>
+      </trans-unit>
+      <trans-unit id="label.setting.businessUnitId" datatype="html">
+        <source>Business Unit ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <note priority="1" from="description">Connector setting field label</note>
+      </trans-unit>
+      <trans-unit id="label.setting.fixtureSet" datatype="html">
+        <source>Fixture set</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <note priority="1" from="description">Connector setting field label</note>
+      </trans-unit>
       <trans-unit id="label.credential.email" datatype="html">
         <source>Account email</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <note priority="1" from="description">Connector credential field label</note>
       </trans-unit>
@@ -3593,7 +3617,7 @@
         <source>API token</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <note priority="1" from="description">Connector credential field label</note>
       </trans-unit>
@@ -3601,7 +3625,7 @@
         <source>Session URL</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <note priority="1" from="description">Connector credential field label</note>
       </trans-unit>
@@ -3609,7 +3633,31 @@
         <source>Mailbox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <note priority="1" from="description">Connector credential field label</note>
+      </trans-unit>
+      <trans-unit id="label.credential.clientEmail" datatype="html">
+        <source>Service account email</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+        <note priority="1" from="description">Connector credential field label</note>
+      </trans-unit>
+      <trans-unit id="label.credential.privateKey" datatype="html">
+        <source>Service account private key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+        <note priority="1" from="description">Connector credential field label</note>
+      </trans-unit>
+      <trans-unit id="label.credential.apiKey" datatype="html">
+        <source>API key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/labels/domain-labels.ts</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <note priority="1" from="description">Connector credential field label</note>
       </trans-unit>

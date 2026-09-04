@@ -35,7 +35,7 @@ function installFakeMatchMedia(initialMatches: boolean): FakeMediaQueryList {
 describe('ThemeService', () => {
   beforeEach(() => {
     localStorage.clear();
-    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.remove('dark', 'theme-changing');
   });
 
   it('defaults to "system" preference when nothing is stored', () => {
@@ -118,6 +118,46 @@ describe('ThemeService', () => {
     TestBed.flushEffects();
 
     expect(localStorage.getItem('omnihear.theme')).toBe('dark');
+  });
+
+  it('suppresses transitions for the moment the .dark class actually toggles, then removes the marker', async () => {
+    installFakeMatchMedia(false);
+    TestBed.configureTestingModule({});
+    const service = TestBed.inject(ThemeService);
+
+    service.setPreference('dark');
+    TestBed.flushEffects();
+
+    // Synchronously, right after the toggle: class flipped, transitions
+    // suppressed. This is the window that used to render a light-background
+    // KPI card under already-dark text.
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.classList.contains('theme-changing')).toBe(true);
+
+    // Two animation frames later, the marker is gone and .dark is untouched.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.classList.contains('theme-changing')).toBe(false);
+  });
+
+  it('does not mark a no-op preference change (already-resolved theme) as transitioning', () => {
+    installFakeMatchMedia(false);
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('omnihear.theme', 'dark');
+    TestBed.configureTestingModule({});
+    const service = TestBed.inject(ThemeService);
+    TestBed.flushEffects();
+
+    // Constructor ran with the resolved theme already matching the class the
+    // FOUC-guard script would have applied — nothing should be suppressed.
+    expect(document.documentElement.classList.contains('theme-changing')).toBe(false);
+
+    // Re-selecting the same preference the service already resolved to is
+    // also a no-op: no class flip, so nothing to suppress.
+    service.setPreference('dark');
+    TestBed.flushEffects();
+    expect(document.documentElement.classList.contains('theme-changing')).toBe(false);
   });
 
   it('does not throw when localStorage access throws (private-mode fallback)', () => {

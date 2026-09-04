@@ -94,6 +94,7 @@ The second one is the one that survives into CI.
 |---|---|
 | `error-rate-limited.json` (`429`) | the 300-per-5-minutes quota was not deliberately exhausted. The **body** is a guess; the status code and the headers above are recorded |
 | `error-unprocessable.json` (`422`) | no request shape was found that this endpoint answers with 422. Mastodon accepted every malformed `min_id` and every unknown tag with `200 []`. Kept in the error table because the contract lists it, and because other Mastodon-compatible servers may be stricter |
+| `error-forbidden.json` (`403`) | no suspended or defederated instance was found to record. The **body** is a guess written to match the scenario (an instance-level refusal); the mapping itself — 403 → Misconfigured, not the default Unreachable arm — is the fix this fixture exists to prove |
 | the `401` **scenario** | the body is a real capture, but from `GET /api/v1/timelines/home` on the same instance — an endpoint that requires a token. No instance with public preview switched off was found to record the tag-timeline case, so the mapping "401 → the instance disabled public preview" is an inference over a recorded body |
 | the boost in `page-2-last.json` | Mastodon's hashtag timeline **excludes boosts**: `reblog` was `null` on all 40 recorded statuses. The wrapper is a real status with a nested status assembled into `reblog`, and its own `content` is the empty string a reblog wrapper really carries. The skip rule is defensive, for servers that do not filter them |
 | `<p></p>` as the empty body in `page-2-last.json` | the capture contained no status whose content stripped to nothing. Mastodon serialises a media-only post with an empty `content`; `<p></p>` was chosen instead so the fixture exercises the **stripping** path rather than an empty-string short circuit |
@@ -118,6 +119,7 @@ API returns it.
 | `error-not-found.html` | `404`, the head of the real HTML page |
 | `error-rate-limited.json` | `429`, inferred |
 | `error-unprocessable.json` | `422`, inferred |
+| `error-forbidden.json` | `403`, inferred |
 
 ## Two copies
 

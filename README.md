@@ -1,5 +1,7 @@
 # OmniHear
 
+**English** · [Türkçe](README.tr.md)
+
 A B2B SaaS platform that collects customer feedback from all six channels spec
 §2 names — App Store, Google Play, Zendesk, Trustpilot, email (JMAP), and
 social (Mastodon hashtag timelines) — runs it through an AI pipeline for
@@ -19,6 +21,40 @@ an HMAC-signed internal call and returns sentiment + category, keeping
 nothing. `frontend/` (Angular 22, standalone + Signals, zoneless) is the SPA —
 inbox, KPI overview, integrations, billing, all lazy-loaded behind a ~335 kB
 initial bundle budget. Full diagram and data flow: **`docs/ARCHITECTURE.md`**.
+
+## Screens
+
+All captured from the running application against the demo seed described
+below — not mockups.
+
+**Overview** — KPI cards, the 30-day sentiment trend, and the sentiment and
+category breakdowns. The quota panel in the sidebar is at 60/75, which is why
+the paywall is one sync away.
+
+![Overview](docs/screenshots/overview.png)
+
+**Inbox** — every collected comment with its AI label, source, sentiment score
+and analysis status, behind sentiment/category/source/date filters.
+
+![Inbox](docs/screenshots/inbox.png)
+
+**Comment detail** — the analysis and its reasoning: score, category,
+confidence, extracted keywords, and the `model_version` that produced them, so
+an old analysis can be told apart from a current one.
+
+![Comment detail](docs/screenshots/inbox-detail.png)
+
+**Dark theme** — the same overview. The sentiment palette separates
+positive/neutral/negative by **lightness as well as hue**, so the chart stays
+readable in both themes and for red-green colour blindness (ADR-0006).
+
+![Overview in dark theme](docs/screenshots/overview-dark.png)
+
+**Integrations and landing** — the connection cards with per-channel health,
+and the public page.
+
+![Integrations](docs/screenshots/integrations.png)
+![Landing](docs/screenshots/landing.png)
 
 ## Setup
 
@@ -43,6 +79,13 @@ docker compose -f infra/docker-compose.dev.yml exec backend php artisan db:seed 
 (realtime), and `frontend`. The frontend service installs its dependencies
 inside the container rather than borrowing the host's `node_modules`, so the
 first start is slower than the rest.
+
+**Do not skip `migrate`, even on a long-lived checkout.** This project measured
+that one: the development database fell two phases behind the code, because
+migrations had only ever been run against throwaway test databases. CI cannot
+see that class of drift — its schema is built from scratch on every run — and it
+surfaced only when the end-to-end suite was finally run against the long-lived
+local stack.
 
 **What was actually executed and verified this session**, on a checkout whose
 `backend/.env` a prior phase had already populated (so `cp` and

@@ -234,6 +234,11 @@ final readonly class MastodonConnector implements PlatformConnector
             // settings, not the platform, and it repeats identically however
             // often it is retried.
             $response->status() === 422 => ConnectorFailure::Misconfigured,
+            // A suspended or defederated instance answers 403. That is a
+            // standing decision by the server, not a blip — Unreachable is
+            // retryable by design and would burn five attempts on a refusal
+            // that will read identically on the sixth.
+            $response->status() === 403 => ConnectorFailure::Misconfigured,
             $response->status() === 429 => ConnectorFailure::RateLimited,
             default => ConnectorFailure::Unreachable,
         });
