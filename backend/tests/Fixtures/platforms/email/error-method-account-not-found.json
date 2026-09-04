@@ -3,7 +3,8 @@
     [
       "error",
       {
-        "type": "accountNotFound"
+        "type": "accountNotFound",
+        "description": "Not a valid accountId"
       },
       "q0"
     ],
@@ -15,5 +16,5 @@
       "g0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

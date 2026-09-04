@@ -3,13 +3,13 @@
     [
       "Email/changes",
       {
-        "accountId": "acct-01",
-        "oldState": "emstate-0002",
-        "newState": "emstate-0003",
+        "accountId": "u7c1e05b3",
+        "oldState": "J462",
+        "newState": "J488",
         "hasMoreChanges": false,
         "created": [
-          "em-0006",
-          "em-0007"
+          "Emsg00000006",
+          "Emsg00000007"
         ],
         "updated": [],
         "destroyed": []
@@ -19,22 +19,22 @@
     [
       "Email/get",
       {
-        "accountId": "acct-01",
-        "state": "emstate-0003",
+        "accountId": "u7c1e05b3",
+        "state": "J503",
         "notFound": [],
         "list": [
           {
-            "id": "em-0006",
-            "blobId": "blob-0006",
-            "threadId": "th-0006",
+            "id": "Emsg00000006",
+            "blobId": "G6d360123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000006",
             "mailboxIds": {
-              "mbx-support": true
+              "Mb6": true
             },
-            "size": 812,
+            "size": 1059,
             "receivedAt": "2026-09-02T14:45:00Z",
-            "sentAt": "2026-09-02T14:44:03Z",
+            "sentAt": "2026-09-02T17:44:03+03:00",
             "messageId": [
-              "0006.1756824243@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d9116eb65fc@example.invalid"
             ],
             "from": [
               {
@@ -48,10 +48,15 @@
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0006-1",
-                "size": 4,
+                "blobId": "G70360123456789abcdef0123456789abcdef0123",
+                "size": 5,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -63,17 +68,17 @@
             }
           },
           {
-            "id": "em-0007",
-            "blobId": "blob-0007",
-            "threadId": "th-0007",
+            "id": "Emsg00000007",
+            "blobId": "G6d370123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000007",
             "mailboxIds": {
-              "mbx-support": true
+              "Mb6": true
             },
-            "size": 2260,
+            "size": 1836,
             "receivedAt": "2026-09-02T16:10:00Z",
-            "sentAt": "2026-09-02T16:09:18Z",
+            "sentAt": "2026-09-02T19:09:18+03:00",
             "messageId": [
-              "0007.1756829358@example.invalid"
+              "20260902164401.a7f3c10e.4180226@example.invalid"
             ],
             "from": [
               {
@@ -83,14 +88,19 @@
             ],
             "subject": "Mobil uygulamada bildirimler gelmiyor",
             "hasAttachment": false,
-            "preview": "Bildirim ayarları açık olmasına rağmen hiçbir bildirim ulaşmıyor.",
+            "preview": "Bildirim ayarları açık olmasına rağmen mobil uygulamada hiçbir bildirim ulaşmıyor. Web tarafında sorun yok.",
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0007-1",
-                "size": 205,
+                "blobId": "G70370123456789abcdef0123456789abcdef0123",
+                "size": 116,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -106,5 +116,5 @@
       "g0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

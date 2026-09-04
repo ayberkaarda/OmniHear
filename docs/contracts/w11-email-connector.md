@@ -128,3 +128,39 @@ an empty text body, and a message whose `from` has no display name.
   `pluck()` with no `orderBy` compared by `toBe()` passed alone and failed in the
   suite as recently as W9.
 - Test database `test_tmp_w11em`, dropped by explicit name.
+
+---
+
+## Errata — the live recording, 2026-09-05
+
+Two claims above were written on the assumption that this channel would never
+touch a live account. It has: the fixtures were re-recorded against a Fastmail
+account, envelope-real and content-synthetic, and
+`contracts/fixtures/platforms/email/README.md` carries the full settled /
+falsified / still-inferred split.
+
+- "**Fixtures derived from an RFC also keep the provenance README's 'inferred'
+  column nearly empty — the honest advantage for a channel that will never touch
+  a live account.**" — **withdrawn.** The inferred column was neither empty nor
+  right. Every core-capability number in `session.json` was wrong (`maxObjectsInGet`
+  is 4096, not 500; `maxCallsInRequest` 50, not 16), the 401 body is `text/plain`
+  and not an RFC 7807 document, request-level errors are not RFC 7807 documents
+  at all, and the measured server has **no 404** for a wrong session URL — it
+  answers a redirect, so the connector's `404 → Misconfigured` branch is dead
+  code there.
+- "**Fixtures**: … a README separating what is **documented** … from what is
+  **inferred**" — the README now separates *recorded*, *falsified* and *still
+  inferred*, and the RFC table stayed where it was.
+
+What the recording confirmed, and what this contract was right about: the
+`Email/query` → `Email/get` result reference really does answer one page in one
+HTTP request; `Email/changes` really is account-wide, returning created ids from
+three folders at once; and `cannotCalculateChanges` pairs with
+`invalidResultReference` on the chained call exactly as predicted.
+
+One thing this contract did not anticipate: **`Email/changes`'s `newState` is
+not the state its chained `Email/get` reports.** A window capped by `maxChanges`
+answers a `newState` part-way through the change log while the `Email/get` in the
+same response answers the account's current state. The connector already took the
+token from `newState`, so no code changed — but a reader who assumed the two
+agree would have introduced a silent gap.

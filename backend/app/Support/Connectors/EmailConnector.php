@@ -38,13 +38,20 @@ use Illuminate\Support\Facades\Http;
  *
  * ## Where the shape came from
  *
- * There is no live JMAP account behind this project. Every request shape,
- * response envelope and field name is taken from RFC 8620 and RFC 8621, and the
- * fixtures under tests/Fixtures/platforms/email/ are synthesised from them —
- * the same position ZendeskConnector, GooglePlayConnector and
- * TrustpilotConnector are in. contracts/fixtures/platforms/email/README.md
- * separates, with section numbers, what the RFCs document from what is
- * inferred. Read it before trusting a detail here against a real server.
+ * Every request shape, response envelope and field name is taken from RFC 8620
+ * and RFC 8621. The fixtures under tests/Fixtures/platforms/email/ were then
+ * **recorded against a live JMAP account on 2026-09-05** — envelopes real,
+ * messages written for this repository, the way the App Store fixtures were
+ * rebuilt. contracts/fixtures/platforms/email/README.md separates what the
+ * RFCs document, what that recording measured, what it **falsified**, and what
+ * is still inferred. Read it before trusting a detail here against a server
+ * that is not the one that was measured.
+ *
+ * Three results of that recording are load bearing in the code below and are
+ * marked where they apply: the result reference really does answer one page in
+ * one request; `Email/changes`'s `newState` is **not** the state its chained
+ * `Email/get` reports; and the 404 branch in `request()` never fires on the
+ * server that was measured, which answers a redirect for an unknown path.
  *
  * ## Invariant I5 — the API token
  *
@@ -143,9 +150,11 @@ final class EmailConnector implements PlatformConnector
      * `integrations.sync_cursor` is varchar(255) and the encoded SyncCursor has
      * to fit inside it. This connector's cursor is `{"page":1,"token":"…"}`,
      * twenty-one characters of envelope, so 200 leaves the column comfortable.
-     * Real states are short — Cyrus answers strings in the tens of characters —
-     * and one longer than this means the response is not what this connector
-     * thinks it is.
+     *
+     * The live recording settled how much headroom that is: the measured server
+     * answers `J` followed by decimal digits — **four characters** at the widest
+     * observation. This ceiling is fifty times the real thing, and a state
+     * longer than it means the response is not what this connector thinks it is.
      */
     private const MAX_TOKEN_LENGTH = 200;
 
@@ -349,6 +358,12 @@ final class EmailConnector implements PlatformConnector
             throw ConnectorException::of(ConnectorFailure::MalformedResponse);
         }
 
+        // `newState` and nothing else. The chained Email/get reports the
+        // account's CURRENT state, which on a window capped by maxChanges runs
+        // ahead of where this page actually reached — measured during the live
+        // recording, where a capped window answered a newState thirty change
+        // numbers behind its own Email/get. Reading the token off Email/get
+        // would silently skip every change between the two.
         $newState = $this->token($changes['newState'] ?? null);
 
         // A server that reports more changes while handing back the state we
@@ -378,6 +393,9 @@ final class EmailConnector implements PlatformConnector
      *
      * This is the result reference of RFC 8620 section 3.7 and it is the whole
      * reason this connector is one request per page instead of one per message.
+     * The live recording confirmed a real server evaluates it: both method
+     * responses came back in a single HTTP response with the ids resolved, on
+     * the Email/query path and on the Email/changes path alike.
      *
      * @return array{0: string, 1: array<string, mixed>, 2: string}
      */
@@ -416,8 +434,29 @@ final class EmailConnector implements PlatformConnector
 
         $decoded = $this->request('GET', $this->sessionUrl)->json();
 
-        if (! is_array($decoded)) {
-            throw ConnectorException::of(ConnectorFailure::MalformedResponse);
+        // Is this a JMAP Session resource at all?
+        //
+        // A mis-pasted session URL is the most likely configuration error on
+        // this channel, and the live recording (2026-09-05) showed the branch
+        // that was meant to catch it — 404 — never fires: the measured server
+        // answers an unknown path with a 302 to a documentation page, which the
+        // client follows, so what arrives is 200 and a page of HTML. That used
+        // to surface as MalformedResponse, telling the user their mail provider
+        // had returned something unparseable when in fact they had typed the
+        // URL wrong.
+        //
+        // The status code cannot be the discriminator, because the same
+        // recording showed <session-url>/<stray suffix> answering 200 with a
+        // complete and perfectly usable session document. The shape can: RFC
+        // 8620 section 2 requires these members, so a body without them is not
+        // a session resource, whatever answered it.
+        $isSessionResource = is_array($decoded)
+            && array_key_exists('capabilities', $decoded)
+            && array_key_exists('accounts', $decoded)
+            && array_key_exists('apiUrl', $decoded);
+
+        if (! $isSessionResource) {
+            throw ConnectorException::of(ConnectorFailure::Misconfigured);
         }
 
         $apiUrl = $decoded['apiUrl'] ?? null;
@@ -425,6 +464,12 @@ final class EmailConnector implements PlatformConnector
         // The bearer token is about to be sent here. A session document naming
         // a plain-http endpoint would put it on the wire in clear, so this is
         // refused rather than followed (invariant I5).
+        //
+        // MalformedResponse and not Misconfigured, deliberately: the check
+        // above has already established this *is* a JMAP server, so the fault
+        // is in what that server said, not in what the user typed. Both are
+        // terminal, so neither is retried; the difference is which sentence
+        // reaches integrations.sync_error.
         if (! is_string($apiUrl) || ! self::isHttpsUrl($apiUrl)) {
             throw ConnectorException::of(ConnectorFailure::MalformedResponse);
         }
@@ -572,16 +617,32 @@ final class EmailConnector implements PlatformConnector
         throw ConnectorException::of(match (true) {
             // 401 for an absent or rejected bearer token, 403 for a token the
             // server knows but will not let read this account. Both terminal.
-            // RFC 8620 describes the authentication mechanism (section 2, and
-            // the security considerations in section 8) without pinning a
-            // status code per condition, so this mapping is a reading of it —
-            // recorded as inferred in the fixtures README, and one of the rows
-            // a live recording would settle.
+            // The live recording settled the 401 half: the measured server
+            // answers 401 for a malformed token and for a well-formed unknown
+            // one alike, with a one-line text/plain body. The 403 half stayed
+            // inferred — a trial account has no second account to be refused —
+            // and RFC 8620 pins no status code per condition (section 2,
+            // section 8), so it remains a reading of the specification.
             in_array($response->status(), [401, 403], true) => ConnectorFailure::InvalidCredentials,
             // No JMAP session resource at that URL — the pasted session URL is
             // wrong, which is a setting rather than a credential.
+            //
+            // The recording falsified this for the server it measured: an
+            // unknown path answers a 302 to a documentation page, and a garbage
+            // suffix on the session URL answers 200 with the whole session
+            // document. Kept for JMAP servers that do answer 404; see the
+            // fixtures README, "What the recording falsified".
             $response->status() === 404 => ConnectorFailure::Misconfigured,
             $response->status() === 429 => ConnectorFailure::RateLimited,
+            // A 3xx that reached this far means the client could not resolve
+            // the redirect: the chain was exhausted, or there was no usable
+            // Location. Redirects themselves are normal and are followed —
+            // RFC 8620 section 2 makes /.well-known/jmap an autodiscovery path
+            // servers are expected to redirect from, so refusing 3xx outright
+            // would break conforming servers. One that cannot be followed is a
+            // wrong URL, though, and mapping it to Unreachable spent five queue
+            // attempts blaming the platform for a value the user typed.
+            $response->status() >= 300 && $response->status() < 400 => ConnectorFailure::Misconfigured,
             // RFC 8620 section 3.6.1: a request-level problem — `notRequest`,
             // `notJSON`, `unknownCapability`, `limit`. Terminal, not transient:
             // the request shape or the declared capabilities are what the server

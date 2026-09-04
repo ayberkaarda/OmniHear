@@ -1,6 +1,6 @@
 {
-  "type": "about:blank",
-  "status": 429,
+  "status": "429",
+  "trace_id": "ti_5a0d92f6c34b18e7d5f602ab91c34e78",
   "title": "Too Many Requests",
   "detail": "The account request budget was exceeded."
 }

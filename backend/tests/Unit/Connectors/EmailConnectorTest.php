@@ -18,13 +18,13 @@ uses(TestCase::class);
 | A shared mailbox over JMAP
 |--------------------------------------------------------------------------
 |
-| Every fixture here is synthesised from RFC 8620 and RFC 8621, not captured —
-| contracts/fixtures/platforms/email/README.md says, with section numbers, what
-| the RFCs document and what is inferred. Expectations are derived from the
-| fixture at run time for the same reason they are in the App Store, Zendesk and
-| Trustpilot tests: the content is replaceable (these files are due to be
-| re-recorded against a live account, envelope-real), the shape is what has to
-| hold.
+| The envelope of every fixture here was recorded from a live JMAP account on
+| 2026-09-05; the messages inside it were not. contracts/fixtures/platforms/
+| email/README.md separates the two line by line and marks what the recording
+| settled, what it falsified and what is still inferred. Expectations are
+| derived from the fixture at run time for the same reason they are in the App
+| Store, Zendesk and Trustpilot tests: the content is replaceable, the shape is
+| what has to hold.
 |
 | **The fake dispatches on the request, never on a call counter.** One logical
 | page of this connector is up to three HTTP calls — a session GET, a
@@ -41,7 +41,7 @@ uses(TestCase::class);
 const EMC_SESSION_URL = 'https://jmap.example.invalid/.well-known/jmap';
 const EMC_TOKEN = 'jmap-LIVE-abcdefghijklmnopqrstuvwxyz-0123456789';
 const EMC_MAILBOX = 'Support';
-const EMC_MAILBOX_ID = 'mbx-support';
+const EMC_MAILBOX_ID = 'Mb6';
 const EMC_PAGE_SIZE = 3;
 const EMC_LOOKBACK = 30;
 
@@ -113,10 +113,23 @@ function emcEmail(string $file, string $id): array
     throw new RuntimeException("No message {$id} in {$file}.");
 }
 
-/** The server state a fixture's Email/get establishes. */
+/**
+ * The token a fixture leaves behind — the state the connector will store and
+ * send as the next `sinceState`.
+ *
+ * On a change response that is `Email/changes.newState`, **not** the chained
+ * `Email/get.state`. The live recording showed the two differ: a request capped
+ * with `maxChanges` answered a `newState` part-way through the change log while
+ * the chained `Email/get` answered the account's current state. Reading the
+ * token off `Email/get` would skip every change between the two.
+ */
 function emcState(string $file): string
 {
-    return (string) emcArgs($file, 'Email/get')['state'];
+    try {
+        return (string) emcArgs($file, 'Email/changes')['newState'];
+    } catch (RuntimeException) {
+        return (string) emcArgs($file, 'Email/get')['state'];
+    }
 }
 
 function emcCursor(string $token): string
@@ -412,6 +425,71 @@ it('refuses to send the token to a session url that is not https', function (str
     'not a url at all' => ['jmap.example.invalid'],
 ]);
 
+/*
+|--------------------------------------------------------------------------
+| A mis-pasted session URL — the recorded 302, and the recorded 200 that is fine
+|--------------------------------------------------------------------------
+|
+| The live recording (2026-09-05) killed the assumption this connector's 404
+| branch rested on. The measured server has no 404 for a wrong session URL: an
+| unknown path answers 302 to a documentation page, and the HTTP client follows
+| it, so what actually comes back is 200 and a page of HTML. Before this group
+| existed that surfaced as MalformedResponse — "The platform returned a response
+| this connector could not parse", which blames the mail provider for the one
+| mistake the user is most likely to have made themselves.
+|
+| The discriminator these tests pin down is not the status code. It is whether
+| the body is a JMAP Session resource at all, because the same recording showed
+| <session-url>/<garbage> answering 200 with a complete, usable session
+| document. That case is harmless and must keep working.
+|
+*/
+
+it('reports a session url that lands on a web page as a setting, not a fault', function () {
+    // The recorded body behind the 302: the client follows the redirect and
+    // this is what it finds at the other end.
+    emcServeDefault(['session' => [emcRaw('error-wrong-path-redirect.txt'), 200]]);
+
+    $failure = emcFailure(fn () => emcConnector()->fetchPage(null));
+
+    expect($failure)->toBe(ConnectorFailure::Misconfigured)
+        ->and($failure->isTransient())->toBeFalse()
+        ->and($failure->safeMessage())->toBe('The integration settings are incomplete for this platform.');
+});
+
+it('reports a session url that lands on some other json api as a setting', function () {
+    // JSON, valid, and not a Session resource — what a URL pointing at the
+    // wrong service answers. The recorded 400 document serves as one.
+    emcServeDefault(['session' => [emcRaw('error-not-request.json'), 200]]);
+
+    expect(emcFailure(fn () => emcConnector()->fetchPage(null)))
+        ->toBe(ConnectorFailure::Misconfigured);
+});
+
+it('reports a redirect the client did not follow as a setting, not an outage', function () {
+    // If the redirect chain is exhausted or carries no usable Location, the 3xx
+    // reaches the connector. A JMAP server answering the session URL with a
+    // redirect the client cannot resolve is a wrong URL, not a bad afternoon,
+    // so it must not be retried.
+    emcServeDefault(['session' => [emcRaw('error-wrong-path-redirect.txt'), 302]]);
+
+    $failure = emcFailure(fn () => emcConnector()->fetchPage(null));
+
+    expect($failure)->toBe(ConnectorFailure::Misconfigured)
+        ->and($failure->isTransient())->toBeFalse();
+});
+
+it('still accepts a session url with a stray suffix that resolves anyway', function () {
+    // The other half of the recording: the measured server ignores a trailing
+    // path segment and answers the full session document. Nothing about that is
+    // broken and the checks above must not turn it into an error.
+    emcServeDefault();
+
+    $page = emcConnector(sessionUrl: EMC_SESSION_URL.'/omnihear-stray-suffix')->fetchPage(null);
+
+    expect($page->items)->not->toBeEmpty();
+});
+
 it('refuses to follow a session document that points the token at a plain-http api', function () {
     $session = PlatformFixture::json('email', 'session.json');
     $session['apiUrl'] = 'http://attacker.example.invalid/jmap/api/';
@@ -480,7 +558,7 @@ it('matches the mailbox name exactly and refuses a name that is merely a prefix 
     'exact' => ['Support', EMC_MAILBOX_ID],
     'a user who typed it in lower case' => ['support', EMC_MAILBOX_ID],
     'surrounding whitespace' => ['  Support  ', EMC_MAILBOX_ID],
-    'a different folder' => ['Archive', 'mbx-archive'],
+    'a different folder' => ['Archive', 'Mb1'],
     'a prefix of a real name' => ['Suppor', null],
     'a name no mailbox has' => ['Destek', null],
 ]);
@@ -601,7 +679,7 @@ it('maps every field of a plain-text message from the fixture', function () {
     emcServeDefault();
 
     $items = emcConnector()->fetchPage(null)->items;
-    $email = emcEmail('page-1.json', 'em-0001');
+    $email = emcEmail('page-1.json', 'Emsg00000001');
 
     $item = collect($items)->firstWhere('externalId', $email['id']);
 
@@ -639,7 +717,7 @@ it('falls back to the server preview when the message is html only', function ()
     emcServeDefault();
 
     $items = emcConnector()->fetchPage(null)->items;
-    $email = emcEmail('page-1.json', 'em-0002');
+    $email = emcEmail('page-1.json', 'Emsg00000002');
 
     // Guard the premise: this message really is the HTML-only one.
     expect($email['textBody'][0]['type'])->toBe('text/html');
@@ -658,7 +736,7 @@ it('uses the local part of the address when the sender has no display name', fun
     emcServeDefault();
 
     $items = emcConnector()->fetchPage(null)->items;
-    $email = emcEmail('page-1.json', 'em-0003');
+    $email = emcEmail('page-1.json', 'Emsg00000003');
 
     expect($email['from'][0]['name'])->toBeNull();
 
@@ -675,7 +753,7 @@ it('keeps a message whose body is empty but whose subject is not', function () {
     emcServeDefault();
 
     $page = emcConnector()->fetchPage(emcCursor(emcState('changes-1.json')));
-    $email = emcEmail('changes-2-last.json', 'em-0006');
+    $email = emcEmail('changes-2-last.json', 'Emsg00000006');
 
     // Guard the premise: no text at all, in either the body value or preview.
     expect(trim((string) $email['bodyValues']['1']['value']))->toBe('')
@@ -692,7 +770,7 @@ it('keeps a message whose body is empty but whose subject is not', function () {
 it('skips a message with neither a subject nor any text', function () {
     emcServeDefault([
         'Email/changes:'.emcState('changes-1.json') => [
-            emcVariant('changes-2-last.json', 'em-0006', 'subject', '   '),
+            emcVariant('changes-2-last.json', 'Emsg00000006', 'subject', '   '),
             200,
         ],
     ]);
@@ -703,32 +781,32 @@ it('skips a message with neither a subject nor any text', function () {
 
     // A blank row would sit in the inbox and spend a unit of analysis quota on
     // nothing — the same rule Trustpilot applies to a review with no words.
-    expect($ids)->toBe(['em-0007']);
+    expect($ids)->toBe(['Emsg00000007']);
 });
 
 it('excludes a message that lives outside the watched mailbox', function () {
     emcServeDefault();
 
     $page = emcConnector()->fetchPage(emcCursor(emcState('page-1.json')));
-    $outsider = emcEmail('changes-1.json', 'em-0005');
+    $outsider = emcEmail('changes-1.json', 'Emsg00000005');
 
     // Guard the premise: Email/changes is account-wide (RFC 8621 section 4.3),
     // so this message really was handed to the connector.
     expect($outsider['mailboxIds'])->not->toHaveKey(EMC_MAILBOX_ID)
-        ->and(collect(emcEmails('changes-1.json'))->pluck('id'))->toContain('em-0005');
+        ->and(collect(emcEmails('changes-1.json'))->pluck('id'))->toContain('Emsg00000005');
 
     $ids = collect($page->items)->pluck('externalId')->all();
 
     // Without the client-side check a company watching "Support" would ingest
     // its own Sent and Archive folders as customer feedback.
-    expect($ids)->toBe(['em-0004']);
+    expect($ids)->toBe(['Emsg00000004']);
 });
 
 it('keeps a message that is in the watched mailbox and another one at the same time', function () {
     emcServeDefault();
 
     $items = emcConnector()->fetchPage(null)->items;
-    $email = emcEmail('page-1.json', 'em-0003');
+    $email = emcEmail('page-1.json', 'Emsg00000003');
 
     expect($email['mailboxIds'])->toHaveCount(2)
         ->and(collect($items)->pluck('externalId'))->toContain($email['id']);
@@ -736,14 +814,14 @@ it('keeps a message that is in the watched mailbox and another one at the same t
 
 it('ignores a message whose mailbox membership the server did not report', function () {
     emcServeDefault([
-        'Email/query' => [emcVariant('page-1.json', 'em-0001', 'mailboxIds', []), 200],
+        'Email/query' => [emcVariant('page-1.json', 'Emsg00000001', 'mailboxIds', []), 200],
     ]);
 
     $ids = collect(emcConnector()->fetchPage(null)->items)->pluck('externalId')->all();
 
     // An absent membership map means the server said nothing about where the
     // message lives. Ingesting it would be a guess.
-    expect($ids)->not->toContain('em-0001')
+    expect($ids)->not->toContain('Emsg00000001')
         ->and($ids)->toHaveCount(count(emcEmails('page-1.json')) - 1);
 });
 
@@ -882,12 +960,12 @@ it('maps an http status onto the right fixed failure', function (int $status, st
 
     expect(emcFailure(fn () => emcConnector()->fetchPage(null)))->toBe($expected);
 })->with([
-    'rejected token' => [401, 'error-unauthorized.json', ConnectorFailure::InvalidCredentials],
+    'rejected token' => [401, 'error-unauthorized.txt', ConnectorFailure::InvalidCredentials],
     'token cannot read the account' => [403, 'error-forbidden.json', ConnectorFailure::InvalidCredentials],
     'no session resource there' => [404, 'error-not-found.json', ConnectorFailure::Misconfigured],
     'request refused' => [400, 'error-not-request.json', ConnectorFailure::Misconfigured],
     'budget exhausted' => [429, 'error-rate-limited.json', ConnectorFailure::RateLimited],
-    'server down' => [503, 'error-unauthorized.json', ConnectorFailure::Unreachable],
+    'server down' => [503, 'error-unauthorized.txt', ConnectorFailure::Unreachable],
 ]);
 
 it('maps a method-level error onto the right fixed failure', function (string $file, string $phase, ConnectorFailure $expected) {
@@ -917,7 +995,7 @@ it('refuses a response that is not a jmap envelope', function (string $body) {
 
     expect(emcFailure(fn () => emcConnector()->fetchPage(null)))->toBe(ConnectorFailure::MalformedResponse);
 })->with([
-    'no methodResponses' => ['{"sessionState":"sess-0001"}'],
+    'no methodResponses' => ['{"sessionState":"sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"}'],
     'methodResponses is not a list' => ['{"methodResponses":"nope"}'],
     'not json at all' => ['<html>gateway</html>'],
 ]);
@@ -929,8 +1007,12 @@ it('refuses a response it cannot read rather than guessing at it', function (str
 
     expect(emcFailure(fn () => emcConnector()->fetchPage(null)))->toBe($expected);
 })->with([
-    // A JMAP server that answers something else entirely at the session URL.
-    ['session is not an object', ConnectorFailure::MalformedResponse],
+    // Something that is not a JMAP Session resource at the session URL. Since
+    // the live recording this is Misconfigured rather than MalformedResponse:
+    // the measured server answers a wrong path with a redirect to a web page,
+    // so "not a session resource" is overwhelmingly the user's URL and not the
+    // platform misbehaving. See the session-URL group above.
+    ['session is not an object', ConnectorFailure::Misconfigured],
     // A real server behind the wrong URL: a setting is wrong, not a credential.
     ['session names no mail account', ConnectorFailure::Misconfigured],
     ['the mailbox list is not a list', ConnectorFailure::MalformedResponse],
@@ -977,7 +1059,7 @@ it('reads past junk in the mailbox list', function () {
 });
 
 it('skips a message the server returned without an id', function () {
-    emcServeDefault(['Email/query' => [emcVariant('page-1.json', 'em-0001', 'id', '  '), 200]]);
+    emcServeDefault(['Email/query' => [emcVariant('page-1.json', 'Emsg00000001', 'id', '  '), 200]]);
 
     // There is nothing to key the row on, so there is no row: the unique index
     // that makes I2 work is (integration_id, external_id).
@@ -991,7 +1073,7 @@ it('falls back to the preview when a body part carries no usable part id', funct
         return $body;
     }), 200]]);
 
-    $email = emcEmail('page-1.json', 'em-0001');
+    $email = emcEmail('page-1.json', 'Emsg00000001');
     $item = collect(emcConnector()->fetchPage(null)->items)->firstWhere('externalId', $email['id']);
 
     expect($item->body)->toBe($email['subject']."\n\n".$email['preview']);
@@ -1008,7 +1090,7 @@ it('leaves the author null when the sender is not usable', function (string $cas
         return $body;
     }), 200]]);
 
-    $item = collect(emcConnector()->fetchPage(null)->items)->firstWhere('externalId', 'em-0003');
+    $item = collect(emcConnector()->fetchPage(null)->items)->firstWhere('externalId', 'Emsg00000003');
 
     // The message is still feedback — only the attribution is missing, and
     // `feedbacks.author` is nullable for exactly that.
@@ -1062,7 +1144,7 @@ it('reports a mistyped mailbox as misconfigured rather than as no feedback yet',
 });
 
 it('reports a rejected token through the safe message', function () {
-    emcServeDefault(['session' => [emcRaw('error-unauthorized.json'), 401]]);
+    emcServeDefault(['session' => [emcRaw('error-unauthorized.txt'), 401]]);
 
     $health = emcConnector()->healthCheck();
 
@@ -1090,12 +1172,15 @@ it('exposes the configured ceilings', function () {
 */
 
 it('keeps every recorded address, sender name and host synthetic', function () {
+    // Every file, not only the .json ones: the recorded 401 body is text/plain
+    // and the recorded redirect page is HTML, and a promise that skips the two
+    // files that are not JSON is a promise with a hole in it.
     $files = array_values(array_filter(
         scandir(dirname(PlatformFixture::path('email', 'session.json'))) ?: [],
-        static fn (string $name): bool => str_ends_with($name, '.json'),
+        static fn (string $name): bool => ! in_array($name, ['.', '..'], true),
     ));
 
-    expect($files)->toHaveCount(15);
+    expect($files)->toHaveCount(16);
 
     foreach ($files as $file) {
         $raw = emcRaw($file);
@@ -1121,6 +1206,42 @@ it('keeps every recorded address, sender name and host synthetic', function () {
                 expect($name === null || preg_match('/^sender-\d{2}$/', (string) $name) === 1)
                     ->toBeTrue("Fixture {$file} carries a display name that is not synthetic.");
             }
+
+            // The recording introduced this field: a real server answers a
+            // Message-ID whose domain is the sending host. It is an address,
+            // so it is covered by the address sweep above, but it is asserted
+            // here too because it is the field most likely to be reintroduced
+            // verbatim by whoever re-records these files next.
+            foreach ($email['messageId'] as $messageId) {
+                expect($messageId)->toEndWith('@example.invalid');
+            }
         }
+    }
+
+    // The session names the account holder twice, in two different shapes.
+    $session = PlatformFixture::json('email', 'session.json');
+
+    expect($session['username'])->toEndWith('@example.invalid');
+
+    foreach ($session['accounts'] as $account) {
+        expect($account['name'])->toEndWith('@example.invalid');
+    }
+});
+
+it('records states short enough for the cursor column', function () {
+    // MAX_TOKEN_LENGTH is 200 and integrations.sync_cursor is varchar(255).
+    // Before the live recording that ceiling was a guess sized to the column;
+    // the recording measured real states at four characters, so this asserts
+    // the recorded fixtures stay in the range the connector was built for
+    // rather than restating the constant.
+    $states = [];
+
+    foreach (['page-1.json', 'changes-1.json', 'changes-2-last.json', 'changes-none.json', 'page-recovered.json'] as $file) {
+        $states[] = emcState($file);
+    }
+
+    foreach ($states as $state) {
+        expect(mb_strlen($state))->toBeLessThanOrEqual(200)
+            ->and($state)->toMatch('/^J\d+$/');
     }
 });

@@ -27,9 +27,10 @@ use Tests\Support\PlatformFixture;
 | the ON CONFLICT insert, the cursor promotion rule, the PII masking, the
 | failure recording.
 |
-| The fixtures are synthesised from RFC 8620 and RFC 8621 — see
-| contracts/fixtures/platforms/email/README.md for what the RFCs document, what
-| is inferred, and what a live recording would settle.
+| The fixture envelopes were recorded from a live JMAP account on 2026-09-05 and
+| the messages inside them were written for this repository — see
+| contracts/fixtures/platforms/email/README.md for which is which, and for what
+| the recording settled, falsified and left inferred.
 |
 | The fake dispatches on the request body, never on a call counter: one logical
 | page here is up to three HTTP calls and a second run legitimately starts the
@@ -41,7 +42,7 @@ use Tests\Support\PlatformFixture;
 const EMI_SESSION_URL = 'https://jmap.example.invalid/.well-known/jmap';
 const EMI_TOKEN = 'jmap-LIVE-zyxwvutsrqponmlkjihgfedcba-9876543210';
 const EMI_MAILBOX = 'Support';
-const EMI_MAILBOX_ID = 'mbx-support';
+const EMI_MAILBOX_ID = 'Mb6';
 const EMI_PAGE_SIZE = 3;
 
 /** @return array{0: Company, 1: Integration} */
@@ -133,9 +134,22 @@ function emiEmail(string $file, string $id): array
     throw new RuntimeException("No message {$id} in {$file}.");
 }
 
+/**
+ * The token a fixture leaves behind.
+ *
+ * `Email/changes.newState` when the fixture is a change response, and only then
+ * the chained `Email/get.state`. The live recording showed the two differ on a
+ * capped change window: `newState` sits part-way through the change log while
+ * `Email/get` answers the account's current state, so taking the token from
+ * `Email/get` would silently skip every change between them.
+ */
 function emiState(string $file): string
 {
-    return (string) emiArgs($file, 'Email/get')['state'];
+    try {
+        return (string) emiArgs($file, 'Email/changes')['newState'];
+    } catch (RuntimeException) {
+        return (string) emiArgs($file, 'Email/get')['state'];
+    }
 }
 
 function emiCursor(string $token): string
@@ -331,7 +345,7 @@ it('stores the mapped fields of a message under the right tenant', function () {
 
     runFetch($company, $integration);
 
-    $email = emiEmail('page-1.json', 'em-0001');
+    $email = emiEmail('page-1.json', 'Emsg00000001');
 
     $row = asTenant($company, fn () => Feedback::query()
         ->where('external_id', $email['id'])
@@ -382,7 +396,7 @@ it('masks the sender address out of the raw payload it keeps', function () {
 
     runFetch($company, $integration);
 
-    $email = emiEmail('page-1.json', 'em-0001');
+    $email = emiEmail('page-1.json', 'Emsg00000001');
 
     $row = asTenant($company, fn () => Feedback::query()
         ->where('external_id', $email['id'])
@@ -402,7 +416,7 @@ it('joins the subject onto a message whose body is empty rather than dropping it
 
     runFetch($company, $integration);
 
-    $email = emiEmail('changes-2-last.json', 'em-0006');
+    $email = emiEmail('changes-2-last.json', 'Emsg00000006');
 
     // The premise: no words anywhere but the subject line.
     expect(trim((string) $email['bodyValues']['1']['value']))->toBe('')
@@ -428,12 +442,12 @@ it('never ingests a message that lives outside the watched mailbox', function ()
 
     runFetch($company, $integration);
 
-    $outsider = emiEmail('changes-1.json', 'em-0005');
+    $outsider = emiEmail('changes-1.json', 'Emsg00000005');
 
     // The premise: Email/changes is account-wide (RFC 8621 section 4.3), so the
     // server really did hand this message to the connector.
     expect($outsider['mailboxIds'])->not->toHaveKey(EMI_MAILBOX_ID)
-        ->and($outsider['mailboxIds'])->toHaveKey('mbx-archive');
+        ->and($outsider['mailboxIds'])->toHaveKey('Mb1');
 
     $stored = asTenant($company, fn () => Feedback::query()->pluck('external_id')->all());
     sort($stored);
@@ -442,7 +456,7 @@ it('never ingests a message that lives outside the watched mailbox', function ()
     // would ingest its own Sent and Archive folders as customer feedback.
     expect($stored)->toBe(emiIngestableIds('changes-1.json', 'changes-2-last.json'))
         ->and($stored)->not->toContain($outsider['id'])
-        ->and($stored)->toBe(['em-0004', 'em-0006', 'em-0007']);
+        ->and($stored)->toBe(['Emsg00000004', 'Emsg00000006', 'Emsg00000007']);
 });
 
 it('walks the whole change chain in one run and promotes the last state', function () {
@@ -593,11 +607,11 @@ it('writes a sync_error that carries no credential material', function (int $sta
         ->and($reloaded->sync_error)->not->toContain('UPSTREAM-ECHO-BODY')
         ->and($reloaded->status)->toBe('error');
 })->with([
-    'rejected token' => [401, 'error-unauthorized.json', 'The platform rejected the integration credentials.'],
+    'rejected token' => [401, 'error-unauthorized.txt', 'The platform rejected the integration credentials.'],
     'unreadable account' => [403, 'error-forbidden.json', 'The platform rejected the integration credentials.'],
     'no session resource' => [404, 'error-not-found.json', 'The integration settings are incomplete for this platform.'],
     'refused request' => [400, 'error-not-request.json', 'The integration settings are incomplete for this platform.'],
-    'upstream down' => [500, 'error-unauthorized.json', 'The platform could not be reached.'],
+    'upstream down' => [500, 'error-unauthorized.txt', 'The platform could not be reached.'],
 ]);
 
 it('logs nothing that contains the api token, on the failure path or the happy one', function () {

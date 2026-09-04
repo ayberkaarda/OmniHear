@@ -1,6 +1,6 @@
 {
-  "type": "about:blank",
-  "status": 403,
+  "status": "403",
+  "trace_id": "ti_2b8f61d0a7c34e95f0d21b6e8a4c7f13",
   "title": "Forbidden",
   "detail": "The token is not permitted to read this account."
 }

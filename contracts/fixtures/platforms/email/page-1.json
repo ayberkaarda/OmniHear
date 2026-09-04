@@ -3,37 +3,49 @@
     [
       "Email/query",
       {
-        "accountId": "acct-01",
-        "queryState": "eq-0001",
+        "accountId": "u7c1e05b3",
+        "queryState": "J417:0",
         "canCalculateChanges": true,
         "position": 0,
+        "total": 3,
+        "collapseThreads": false,
         "ids": [
-          "em-0001",
-          "em-0002",
-          "em-0003"
-        ]
+          "Emsg00000001",
+          "Emsg00000002",
+          "Emsg00000003"
+        ],
+        "sort": [
+          {
+            "property": "receivedAt",
+            "isAscending": false
+          }
+        ],
+        "filter": {
+          "inMailbox": "Mb6",
+          "after": "2026-08-05T00:00:00Z"
+        }
       },
       "q0"
     ],
     [
       "Email/get",
       {
-        "accountId": "acct-01",
-        "state": "emstate-0001",
+        "accountId": "u7c1e05b3",
+        "state": "J417",
         "notFound": [],
         "list": [
           {
-            "id": "em-0001",
-            "blobId": "blob-0001",
-            "threadId": "th-0001",
+            "id": "Emsg00000001",
+            "blobId": "G6d310123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000001",
             "mailboxIds": {
-              "mbx-support": true
+              "Mb6": true
             },
-            "size": 2841,
+            "size": 2004,
             "receivedAt": "2026-09-01T09:15:00Z",
-            "sentAt": "2026-09-01T09:14:41Z",
+            "sentAt": "2026-09-01T12:14:41+03:00",
             "messageId": [
-              "0001.1756716881@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d91113b0af9@example.invalid"
             ],
             "from": [
               {
@@ -43,14 +55,19 @@
             ],
             "subject": "Kargo gecikmesi hakkında",
             "hasAttachment": false,
-            "preview": "Siparişim üç gün geç geldi ve kimse bilgi vermedi.",
+            "preview": "Siparişim üç gün geç geldi ve kimse bilgi vermedi. Destek hattını iki kez aradım, her seferinde farklı bir teslim tarihi söylendi.",
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0001-1",
-                "size": 231,
+                "blobId": "G70310123456789abcdef0123456789abcdef0123",
+                "size": 140,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -62,17 +79,17 @@
             }
           },
           {
-            "id": "em-0002",
-            "blobId": "blob-0002",
-            "threadId": "th-0002",
+            "id": "Emsg00000002",
+            "blobId": "G6d320123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000002",
             "mailboxIds": {
-              "mbx-support": true
+              "Mb6": true
             },
-            "size": 5120,
+            "size": 1857,
             "receivedAt": "2026-09-01T08:40:00Z",
-            "sentAt": "2026-09-01T08:39:52Z",
+            "sentAt": "2026-09-01T04:39:52-04:00",
             "messageId": [
-              "0002.1756714792@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d91125e5060@example.invalid"
             ],
             "from": [
               {
@@ -86,10 +103,15 @@
             "textBody": [
               {
                 "partId": "2",
-                "blobId": "blob-0002-2",
-                "size": 1402,
+                "blobId": "G70320123456789abcdef0123456789abcdef0123",
+                "size": 119,
+                "name": null,
                 "type": "text/html",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -101,18 +123,18 @@
             }
           },
           {
-            "id": "em-0003",
-            "blobId": "blob-0003",
-            "threadId": "th-0003",
+            "id": "Emsg00000003",
+            "blobId": "G6d330123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000003",
             "mailboxIds": {
-              "mbx-support": true,
-              "mbx-archive": true
+              "Mb6": true,
+              "Mb1": true
             },
-            "size": 1904,
+            "size": 1850,
             "receivedAt": "2026-09-01T07:05:00Z",
-            "sentAt": "2026-09-01T07:04:12Z",
+            "sentAt": "2026-09-01T10:04:12+03:00",
             "messageId": [
-              "0003.1756709052@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d91138195c7@example.invalid"
             ],
             "from": [
               {
@@ -122,14 +144,19 @@
             ],
             "subject": "Fatura adresimi değiştiremiyorum",
             "hasAttachment": true,
-            "preview": "Hesap ayarlarından fatura adresini kaydettiğimde eski adres geri geliyor.",
+            "preview": "Hesap ayarlarından fatura adresini kaydettiğimde eski adres geri geliyor. Ekran görüntüsünü ekte gönderiyorum.",
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0003-1",
-                "size": 174,
+                "blobId": "G70330123456789abcdef0123456789abcdef0123",
+                "size": 118,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -145,5 +172,5 @@
       "g0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

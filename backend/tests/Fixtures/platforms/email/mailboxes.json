@@ -3,38 +3,62 @@
     [
       "Mailbox/get",
       {
-        "accountId": "acct-01",
-        "state": "mbox-0001",
+        "accountId": "u7c1e05b3",
+        "state": "J417",
         "notFound": [],
         "list": [
           {
-            "id": "mbx-inbox",
+            "id": "Mb0",
             "name": "Inbox",
             "parentId": null,
             "role": "inbox"
           },
           {
-            "id": "mbx-support",
-            "name": "Support",
-            "parentId": null,
-            "role": null
-          },
-          {
-            "id": "mbx-archive",
+            "id": "Mb1",
             "name": "Archive",
             "parentId": null,
             "role": "archive"
           },
           {
-            "id": "mbx-sent",
+            "id": "Mb2",
+            "name": "Drafts",
+            "parentId": null,
+            "role": "drafts"
+          },
+          {
+            "id": "Mb3",
+            "name": "Scheduled",
+            "parentId": null,
+            "role": "scheduled"
+          },
+          {
+            "id": "Mb4",
             "name": "Sent",
             "parentId": null,
             "role": "sent"
+          },
+          {
+            "id": "Mb5",
+            "name": "Spam",
+            "parentId": null,
+            "role": "junk"
+          },
+          {
+            "id": "Mb6",
+            "name": "Support",
+            "parentId": null,
+            "role": null
+          },
+          {
+            "id": "Mb7",
+            "name": "Trash",
+            "parentId": null,
+            "role": "trash"
           }
         ]
       },
       "m0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

@@ -1,6 +1,6 @@
 {
-  "type": "about:blank",
-  "status": 404,
+  "status": "404",
+  "trace_id": "ti_9e3c47a15bd82f60c7194ae35b0d8f26",
   "title": "Not Found",
   "detail": "No JMAP session resource at this URL."
 }

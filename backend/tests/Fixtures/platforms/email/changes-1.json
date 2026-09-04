@@ -3,15 +3,17 @@
     [
       "Email/changes",
       {
-        "accountId": "acct-01",
-        "oldState": "emstate-0001",
-        "newState": "emstate-0002",
+        "accountId": "u7c1e05b3",
+        "oldState": "J417",
+        "newState": "J462",
         "hasMoreChanges": true,
         "created": [
-          "em-0004",
-          "em-0005"
+          "Emsg00000004",
+          "Emsg00000005"
         ],
-        "updated": [],
+        "updated": [
+          "Emsg00000001"
+        ],
         "destroyed": []
       },
       "c0"
@@ -19,22 +21,22 @@
     [
       "Email/get",
       {
-        "accountId": "acct-01",
-        "state": "emstate-0002",
+        "accountId": "u7c1e05b3",
+        "state": "J503",
         "notFound": [],
         "list": [
           {
-            "id": "em-0004",
-            "blobId": "blob-0004",
-            "threadId": "th-0004",
+            "id": "Emsg00000004",
+            "blobId": "G6d340123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000004",
             "mailboxIds": {
-              "mbx-support": true
+              "Mb6": true
             },
-            "size": 3312,
+            "size": 1787,
             "receivedAt": "2026-09-02T11:20:00Z",
-            "sentAt": "2026-09-02T11:19:31Z",
+            "sentAt": "2026-09-02T14:19:31+03:00",
             "messageId": [
-              "0004.1756812571@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d9114a4db2e@example.invalid"
             ],
             "from": [
               {
@@ -44,14 +46,19 @@
             ],
             "subject": "İade sürecinde dönüş alamadım",
             "hasAttachment": false,
-            "preview": "İki hafta boyunca hiçbir dönüş alamadım.",
+            "preview": "İade sürecinde iki hafta boyunca hiçbir dönüş alamadım, sonunda bankadan itiraz etmek zorunda kaldım.",
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0004-1",
-                "size": 198,
+                "blobId": "G70340123456789abcdef0123456789abcdef0123",
+                "size": 109,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -63,17 +70,17 @@
             }
           },
           {
-            "id": "em-0005",
-            "blobId": "blob-0005",
-            "threadId": "th-0005",
+            "id": "Emsg00000005",
+            "blobId": "G6d350123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000005",
             "mailboxIds": {
-              "mbx-archive": true
+              "Mb1": true
             },
-            "size": 1180,
+            "size": 1710,
             "receivedAt": "2026-09-02T10:02:00Z",
-            "sentAt": "2026-09-02T10:01:44Z",
+            "sentAt": "2026-09-02T13:01:44+03:00",
             "messageId": [
-              "0005.1756807304@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d9115c82095@example.invalid"
             ],
             "from": [
               {
@@ -83,14 +90,19 @@
             ],
             "subject": "Bülten aboneliği",
             "hasAttachment": false,
-            "preview": "Bu ileti arşiv klasöründe, izlenen klasörde değil.",
+            "preview": "Bu ileti arşiv klasöründe duruyor, izlenen klasörde değil, bu yüzden alınmaması gerekiyor.",
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0005-1",
-                "size": 96,
+                "blobId": "G70350123456789abcdef0123456789abcdef0123",
+                "size": 98,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "us-ascii",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -106,5 +118,5 @@
       "g0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

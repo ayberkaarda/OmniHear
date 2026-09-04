@@ -3,35 +3,47 @@
     [
       "Email/query",
       {
-        "accountId": "acct-01",
-        "queryState": "eq-0009",
+        "accountId": "u7c1e05b3",
+        "queryState": "J571:0",
         "canCalculateChanges": true,
         "position": 0,
+        "total": 1,
+        "collapseThreads": false,
         "ids": [
-          "em-0008"
-        ]
+          "Emsg00000008"
+        ],
+        "sort": [
+          {
+            "property": "receivedAt",
+            "isAscending": false
+          }
+        ],
+        "filter": {
+          "inMailbox": "Mb6",
+          "after": "2026-08-05T00:00:00Z"
+        }
       },
       "q0"
     ],
     [
       "Email/get",
       {
-        "accountId": "acct-01",
-        "state": "emstate-0009",
+        "accountId": "u7c1e05b3",
+        "state": "J571",
         "notFound": [],
         "list": [
           {
-            "id": "em-0008",
-            "blobId": "blob-0008",
-            "threadId": "th-0008",
+            "id": "Emsg00000008",
+            "blobId": "G6d380123456789abcdef0123456789abcdef0123",
+            "threadId": "Athr00000008",
             "mailboxIds": {
-              "mbx-support": true
+              "Mb6": true
             },
-            "size": 1740,
+            "size": 1794,
             "receivedAt": "2026-09-03T08:30:00Z",
-            "sentAt": "2026-09-03T08:29:37Z",
+            "sentAt": "2026-09-03T11:29:37+03:00",
             "messageId": [
-              "0008.1756888177@example.invalid"
+              "5d41402a-bc4b-2a76-b971-9d911931f0ca@example.invalid"
             ],
             "from": [
               {
@@ -41,14 +53,19 @@
             ],
             "subject": "Şifre sıfırlama bağlantısı gelmiyor",
             "hasAttachment": false,
-            "preview": "Şifre sıfırlama bağlantısı hiç ulaşmadı, spam klasörüne de baktım.",
+            "preview": "Şifre sıfırlama bağlantısı hiç ulaşmadı, spam klasörüne de baktım. Üç kez denedim, aynı sonuç.",
             "textBody": [
               {
                 "partId": "1",
-                "blobId": "blob-0008-1",
-                "size": 160,
+                "blobId": "G70380123456789abcdef0123456789abcdef0123",
+                "size": 110,
+                "name": null,
                 "type": "text/plain",
-                "charset": "utf-8"
+                "charset": "utf-8",
+                "disposition": null,
+                "cid": null,
+                "language": null,
+                "location": null
               }
             ],
             "bodyValues": {
@@ -64,5 +81,5 @@
       "g0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

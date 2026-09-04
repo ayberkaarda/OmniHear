@@ -3,9 +3,9 @@
     [
       "Email/changes",
       {
-        "accountId": "acct-01",
-        "oldState": "emstate-0003",
-        "newState": "emstate-0003",
+        "accountId": "u7c1e05b3",
+        "oldState": "J488",
+        "newState": "J488",
         "hasMoreChanges": false,
         "created": [],
         "updated": [],
@@ -16,13 +16,13 @@
     [
       "Email/get",
       {
-        "accountId": "acct-01",
-        "state": "emstate-0003",
+        "accountId": "u7c1e05b3",
+        "state": "J488",
         "notFound": [],
         "list": []
       },
       "g0"
     ]
   ],
-  "sessionState": "sess-0001"
+  "sessionState": "sess-01;dc-eu1;j-1;p-9f8e7d6c5b;s-1a2b3c4d5e6f7a8b;v-7"
 }

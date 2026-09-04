@@ -1,5 +1,6 @@
 {
-  "type": "urn:ietf:params:jmap:error:notRequest",
-  "status": 400,
-  "detail": "The request body is not a valid JMAP Request object."
+  "status": "400",
+  "trace_id": "ti_4d7b0c9e18af2635bd410a77ce9f5283",
+  "title": "Bad Request",
+  "detail": "Not a valid JMAP request (no 'using' array)"
 }
