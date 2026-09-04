@@ -47,6 +47,27 @@ use Throwable;
  * re-delivered copy from spending quota; `ai_analyses.feedback_id UNIQUE` plus
  * updateOrCreate makes the write itself idempotent even if both of those are
  * bypassed.
+ *
+ * # Reprocess mode
+ *
+ * `$reprocess` is set only by App\Console\Commands\ReprocessAnalysesCommand,
+ * which re-runs analyses whose `model_version` no longer matches the analyzer.
+ * It turns off exactly two things and nothing else:
+ *
+ * 1. the `analyzed` early return - the whole point is to redo an analysed row;
+ * 2. the quota reservation - **a model change is our cost, not the
+ *    customer's.** The company did not ask for the second analysis and must
+ *    not pay a second unit for it, so the counter is neither reserved nor
+ *    released and spec 7.2's "one unit per successful analysis the customer
+ *    requested" stays true.
+ *
+ * Everything else is identical: same uniqueness key, same broadcast, same
+ * retry and backoff policy. One consequence is deliberate and load bearing -
+ * a failing reprocess restores the feedback's previous status instead of
+ * parking it in `pending_analysis`. A parked row is picked up by the
+ * post-upgrade sweep (spec 7.5), which dispatches an ordinary, quota-spending
+ * job; a failed reprocess would then bill the customer for our retry while
+ * the analysis it already paid for still sits in `ai_analyses`.
  */
 final class AnalyzeFeedbackJob extends TenantAwareJob implements ShouldBeUnique
 {
@@ -72,6 +93,7 @@ final class AnalyzeFeedbackJob extends TenantAwareJob implements ShouldBeUnique
         int $companyId,
         public readonly int $feedbackId,
         public readonly ?string $correlationId = null,
+        public readonly bool $reprocess = false,
     ) {
         parent::__construct($companyId);
 
@@ -112,18 +134,28 @@ final class AnalyzeFeedbackJob extends TenantAwareJob implements ShouldBeUnique
             return;
         }
 
-        if ($feedback->analysis_status === Feedback::STATUS_ANALYZED) {
+        if (! $this->reprocess && $feedback->analysis_status === Feedback::STATUS_ANALYZED) {
             return;
         }
 
         $counter = app(QuotaCounter::class);
-        $reservation = $counter->reserve($this->companyId);
+        $reservation = null;
 
-        if ($reservation === null) {
-            $this->park($feedback);
+        // A reprocess spends no quota: it re-runs *our* model change, so the
+        // counter is left exactly where it was. Skipping reserve() is what
+        // makes that true, and skipping it here - rather than releasing
+        // afterwards - is what keeps it true when the analyzer then fails.
+        if (! $this->reprocess) {
+            $reservation = $counter->reserve($this->companyId);
 
-            return;
+            if ($reservation === null) {
+                $this->park($feedback);
+
+                return;
+            }
         }
+
+        $previousStatus = (string) $feedback->analysis_status;
 
         $feedback->update(['analysis_status' => Feedback::STATUS_ANALYZING]);
 
@@ -134,9 +166,17 @@ final class AnalyzeFeedbackJob extends TenantAwareJob implements ShouldBeUnique
                 $this->correlationId ?? (string) Str::uuid(),
             );
         } catch (Throwable $e) {
-            // The slot was reserved for an analysis that never happened.
-            $counter->release($this->companyId);
-            $feedback->update(['analysis_status' => Feedback::STATUS_PENDING]);
+            if ($reservation !== null) {
+                // The slot was reserved for an analysis that never happened.
+                $counter->release($this->companyId);
+            }
+
+            // A reprocess goes back where it came from; see the class docblock
+            // for why `pending_analysis` would be the wrong resting place for
+            // a row that already has a paid-for analysis.
+            $feedback->update([
+                'analysis_status' => $this->reprocess ? $previousStatus : Feedback::STATUS_PENDING,
+            ]);
 
             throw $e;
         }
@@ -152,7 +192,9 @@ final class AnalyzeFeedbackJob extends TenantAwareJob implements ShouldBeUnique
             $result->modelVersion,
         );
 
-        $this->warnIfThresholdCrossed($reservation);
+        if ($reservation !== null) {
+            $this->warnIfThresholdCrossed($reservation);
+        }
     }
 
     /**
@@ -236,21 +278,30 @@ final class AnalyzeFeedbackJob extends TenantAwareJob implements ShouldBeUnique
      * The reserved quota unit was already released by the catch in
      * handleForTenant(), on this and on every earlier attempt.
      *
+     * A reprocess is the exception: the status is left alone. The catch in
+     * handleForTenant() already put the row back the way it was, and its
+     * previous analysis is still in `ai_analyses` - marking that `failed`
+     * would report a working analysis as broken and, once a human retried it,
+     * charge the customer for our model change.
+     *
      * Runs outside handle(), so the tenant context has to be established here
      * as well - the queue calls failed() directly.
      */
     public function failed(?Throwable $e): void
     {
-        app(TenantContext::class)->runFor($this->companyId, function (): void {
-            Feedback::query()
-                ->whereKey($this->feedbackId)
-                ->update(['analysis_status' => Feedback::STATUS_FAILED]);
-        });
+        if (! $this->reprocess) {
+            app(TenantContext::class)->runFor($this->companyId, function (): void {
+                Feedback::query()
+                    ->whereKey($this->feedbackId)
+                    ->update(['analysis_status' => Feedback::STATUS_FAILED]);
+            });
+        }
 
         Log::error('ai.analysis_dead_lettered', [
             'company_id' => $this->companyId,
             'feedback_id' => $this->feedbackId,
             'attempts' => $this->tries,
+            'reprocess' => $this->reprocess,
             'reason' => $e?->getMessage(),
         ]);
     }

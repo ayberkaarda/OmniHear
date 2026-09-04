@@ -379,6 +379,36 @@ it('deletes an integration as the owner', function () {
     expect(asTenant($company, fn () => Integration::query()->find($integration->id)))->toBeNull();
 });
 
+it('drops the cached KPI payload so a deleted integration stops being counted', function () {
+    // feedbacks.integration_id and, under it, ai_analyses.feedback_id both
+    // cascadeOnDelete, so deleting one channel silently empties the tables
+    // total_feedbacks, analyzed_count, both breakdowns and the trend are
+    // computed from. Without a forget at the delete in
+    // IntegrationController::destroy, the dashboard's main cards would keep
+    // showing the deleted channel's numbers for up to the cache TTL - a
+    // user-triggered action whose staleness is immediately visible.
+    Queue::fake();
+    config(['overview.cache.ttl' => 60]);
+
+    [$company, $user] = tenant();
+    $integration = Integration::factory()->for($company)->create();
+    Feedback::factory()->count(2)->for($company)->for($integration)->create();
+
+    // Prime the cache with the integration's feedback counted in.
+    $this->actingAs($user, 'sanctum')->getJson('/api/v1/overview/kpis')
+        ->assertOk()
+        ->assertJsonPath('total_feedbacks', 2);
+
+    $this->actingAs($user, 'sanctum')->deleteJson('/api/v1/integrations/'.$integration->id)
+        ->assertNoContent();
+
+    // Without the forget, this would still answer 2 - the stale entry primed
+    // above - even though the cascade already removed the feedback rows.
+    $this->actingAs($user->fresh(), 'sanctum')->getJson('/api/v1/overview/kpis')
+        ->assertOk()
+        ->assertJsonPath('total_feedbacks', 0);
+});
+
 it('refuses anyone but the owner deleting an integration', function (string $role) {
     [$company, $user] = tenant($role);
     $integration = Integration::factory()->for($company)->create();

@@ -103,6 +103,20 @@ itself is built and is a genuine deterministic hash (ADR-0004,
 exists — but the command that consumes it was never scheduled.
 
 ### Staging deploy and production promotion
+
+> **Amended 2026-09-03 (user decision).** This entry and the K8s one below were
+> filed as *unscheduled* — work nobody had gotten to. That was the wrong
+> classification. The user has stated the constraint directly: OmniHear is a
+> portfolio project and **will never be deployed**. There is no staging, no
+> production, and no cluster, not now and not later. Both items are therefore
+> **out of scope**, not deferred, and they leave the denominator: spec §11 is
+> closed rather than outstanding. The reason given below was already the right
+> reason; only its tense was wrong.
+>
+> This also sharpens D-05. "Public when the project is finished" now has a
+> reachable threshold — the remaining in-scope items — instead of waiting on a
+> deployment that was never going to come.
+
 Spec §11 (deploy) implies an environment-promotion pipeline. `.github/workflows/`
 contains only `ci.yml` (test/build/lint on push); no `staging`, `deploy`, or
 `promote` workflow, no `grep` hit for those words in any workflow file.
@@ -112,6 +126,10 @@ target infrastructure to deploy to — there is no environment to promote into
 yet.
 
 ### K8s manifests
+
+> **Amended 2026-09-03 (user decision).** Out of scope, not deferred — see the
+> amendment under "Staging deploy and production promotion" above.
+
 Spec §2 calls the container images "K8s-ready" as a forward-looking property,
 not a requirement to ship manifests. `infra/` contains only
 `docker-compose.dev.yml` and its supporting `docker/` Dockerfiles — no `k8s/`

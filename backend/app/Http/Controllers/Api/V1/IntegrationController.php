@@ -13,6 +13,7 @@ use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
 use App\Support\Connectors\IntegrationSyncLock;
 use App\Support\Http\ApiErrorCode;
+use App\Support\Overview\KpiCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -32,6 +33,7 @@ class IntegrationController extends Controller
     public function __construct(
         private readonly IntegrationSyncLock $lock,
         private readonly AuditLogger $audit,
+        private readonly KpiCache $kpis,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -97,7 +99,18 @@ class IntegrationController extends Controller
 
         Gate::authorize('delete', $model);
 
+        $companyId = (int) $model->company_id;
+
         $model->delete();
+
+        // feedbacks.integration_id and, under it, ai_analyses.feedback_id both
+        // cascadeOnDelete, so this one delete removes the channel's feedback
+        // and analyses too. total_feedbacks, analyzed_count, both breakdowns
+        // and the trend all move - the dashboard's main cards - and this is a
+        // user-triggered, immediately visible action, so the cache is dropped
+        // here rather than left to the TTL. Same pattern as
+        // AccountController::destroy.
+        $this->kpis->forget($companyId);
 
         return response()->json(null, 204);
     }

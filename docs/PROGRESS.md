@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-03 · Current: **W8 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-04 · Current: **W9 complete; local gate green, E2E awaiting CI** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -24,6 +24,7 @@ commit messages; `git log` is the archive.
 | **W6** | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, ARCHITECTURE, ADR-0009/0010, ai-service JSON log | **green** — E2E 46.5 s, DB shows 3 analyzed / 2 pending_analysis · pytest 274 |
 | **W7** | history rewrite (done) · quota gate + invitations · security review + its seven findings + KVKK PII + self-hosted fonts | **green** — pest **1046 passed, 4870 assertions**, coverage **98.9%** · pytest **282** · jest **290** · build:gate raw 337.88/347, transfer 94.46/105 |
 | **W8** | Google Play ∥ Trustpilot connectors (spec §2: 2 of 6 channels → 4), factory/config wiring, `dropdb` guard false positive | **green** — pest **1259 passed, 5524 assertions**, coverage **98.8%**, 349.5 s · guards **122** · unchanged: pytest 282, jest 290, build:gate raw 337.93/347, transfer 94.46/105 |
+| **W9** | CI download retry+resume ∥ Horizon queue coverage ∥ reprocess command + Redis KPI cache (invalidated on upgrade and channel deletion too); plus a W8 unordered-`pluck` flake the gate caught | **local green, E2E awaiting CI** — pest **1297 passed, 5658 assertions**, coverage **98.9%**, 367.2 s · guards **122** · pytest **295** (was 282) · jest **290** · build:gate raw 337.93/347, transfer 94.46/105 · Horizon measured live: `analysis` queue 5 → 0 |
 
 Parallelism budget, measured rather than assumed: wave 1 finished with three opus
 tracks, wave 2 lost all three to a session rate limit, and the difference was track
@@ -33,21 +34,10 @@ leaves a diagnosable tree.
 
 ## Now
 
-**Latest gate**, re-run by the main thread: guards 116/116 · pint 229 files ·
-composer validate/audit/platform-reqs clean · pest **813 passed, 3299 assertions**,
-coverage **98.1%** · pytest **270 passed** · tokens 63/2/0 · i18n **329/329** ·
-typecheck 0 · eslint 0 · jest **193/193** · build:gate raw **332.22/347 kB**,
-transfer **93.53/105 kB** · compose 0. CI `33670011911`: five jobs green, backend
-690 passed / 4 skipped, ai-service 270 passed — the ONNX weights are cached and
-fetched, so the real engine is covered on a clean machine for the first time.
-
-Those 4 skips were the **live cross-service tests**: no analyzer in the backend job.
-That is the gap carried since F1 ("nothing in the gate connects two services", and
-the first genuinely signed request between them returned 401). The backend job now
-starts the analyzer with `SENTIMENT_BACKEND=lexicon` and runs them — the contract
-under test is HMAC-over-raw-bytes, the correlation id and the response shape, not
-model quality, and the test asserts enum membership rather than a particular label.
-Verified: `SENTIMENT_BACKEND=lexicon pytest` is 270 passed.
+**Latest gate** is the W9 row below, re-run by the main thread. One line did not
+run: `npx playwright test`, because port 4200 was held by an unrelated project's
+dev server on this machine. CI is the authority on that line and its run id
+turns the row green.
 
 **A green CI run is not automatically evidence.** The first one reported *534 warnings,
 69 passed* for the backend and *11 skipped* for the AI service and went green anyway.
@@ -65,10 +55,6 @@ events, so neither side references a class the other has not written yet.
 
 ### Still open
 
-- **`backend/config/horizon.php` was never published**, so Horizon watches `['default']`
-  only and `AnalyzeFeedbackJob`'s `analysis` queue is never drained. compose carries
-  `AI_ANALYSIS_QUEUE: default` as a stopgap, marked as one. The fix is a supervisor
-  watching both queues; until then the queue separation the backend designed is off.
 - **Three of the four connectors have never touched a live account.** Zendesk, Google
   Play and Trustpilot are synthesised from published documentation, each with a fixture
   README separating documented from inferred; App Store is the only one recorded from a
@@ -90,11 +76,10 @@ the machine that wrote it, and realtime delivery had only ever been asserted.
 | id | question | default | decide by |
 |---|---|---|---|
 | D-01 | `.claude/` + `CLAUDE.md` public in repo? | **decided: keep.** Narrow reading of the no-attribution rule, confirmed by behaviour: the note was written 01:56:27 and `14a51d8` at 01:58:14 deliberately kept them tracked | closed |
-| D-03 | Move root spec file to `docs/OMNIHEAR-SPEC.md` | move | before next large commit |
-| D-04 | Spec §2 erratum: "Laravel 11 (PHP 8.3)" → "Laravel 13 (PHP 8.3)" | apply | F2 start |
 | D-05 | Repo visibility | **decided 2026-09-02: stays private; goes public when the project is finished.** Actions billing was unblocked separately, so CI now runs on the private repo | closed |
 | D-07 | Angular initial-bundle budget | **decided: two thresholds re-derived from the measured floor (ADR-0007).** raw 320kb in `angular.json`, brotli transfer 100 kB in `scripts/bundle-check.mjs`; Trap 2 rewritten with a ratchet | closed |
 | D-08 | **Angular 18 is out of support** (angular.dev: v2-v19 no longer supported). Upgrade is required regardless of the budget | target v22 (Active); also turns `provideExperimentalZonelessChangeDetection` into the stable `provideZonelessChangeDetection` and closes that deviation. Own phase, own gate, after wave 2 | schedule after wave 2 |
+| D-09 | Is spec §11 (staging deploy, prod promotion) and are K8s manifests in scope? | **decided 2026-09-03: no — portfolio project, never deployed.** Out of scope, not deferred; ADR-0010 amended, spec erratum E-7. Leaves the completion denominator and gives D-05 a reachable threshold | closed |
 | D-06 | Real App Store review text is already in history (`24ac570`). Rewriting the fixtures does not remove it; going public later publishes the history | rewrite fixtures now, history rewrite before the flip (cheapest today at 4 commits) | before going public |
 
 ## Known deviations from spec
@@ -116,4 +101,6 @@ cap. Read it at the start of a session; it is where the traps are recorded.
 
 `docs/adr/` — 0001 monorepo · 0002 container-authoritative runtime · 0003 Laravel 13 ·
 0004 local inference over LLM · 0005 zoneless change detection · 0006 sentiment palette
-with lightness separation.
+with lightness separation · 0007 bundle budget from the measured floor · 0008 Angular 22
+and threshold rebasing · 0009 feedbacks partitioning deferred · 0010 deliberate scope
+exclusions (amended 2026-09-03: deploy and K8s are out of scope, not deferred).

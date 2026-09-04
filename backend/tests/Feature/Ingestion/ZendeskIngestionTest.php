@@ -235,9 +235,16 @@ it('keeps going past an empty page instead of treating it as the end', function 
 
     FetchFeedbackJob::dispatchSync($company->id, $integration->id);
 
+    // Set comparison, not sequence: zdIngestableIds() returns its ids sorted,
+    // so this side is sorted to match. The query carries no orderBy and
+    // PostgreSQL is free to return the rows in any order. Do not remove the
+    // sort; what is under test is which rows survived the empty page, not the
+    // order they arrived in.
+    $stored = asTenant($company, fn () => Feedback::query()->pluck('external_id')->all());
+    sort($stored);
+
     expect($served)->toBeGreaterThan(1)
-        ->and(asTenant($company, fn () => Feedback::query()->pluck('external_id')->all()))
-        ->toBe(zdIngestableIds('page-2-end.json'));
+        ->and($stored)->toBe(zdIngestableIds('page-2-end.json'));
 });
 
 it('stops at the runners page ceiling when the export never ends', function () {

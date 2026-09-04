@@ -141,23 +141,6 @@ services:
       # network path from this one.
       REVERB_HOST: reverb
       REVERB_SCHEME: http
-      # STOPGAP, and it should be deleted rather than kept.
-      #
-      # AnalyzeFeedbackJob dispatches onto config('ai.queue'), which defaults to
-      # "analysis" so a burst of ingestion cannot starve it. Horizon, however,
-      # is running on the package's own defaults because backend/config/horizon.php
-      # has never been published, and those defaults watch ["default"] and
-      # nothing else. The measured effect in this stack: FetchFeedbackJob ran,
-      # five comments were ingested, five AnalyzeFeedbackJob payloads piled up in
-      # omnihear_database_queues:analysis, and not one of them was ever
-      # executed - so nothing is ever analysed in a `docker compose up` stack.
-      #
-      # The fix belongs in the backend: publish config/horizon.php and give a
-      # supervisor both queues. Until that lands, sending analysis to the queue
-      # Horizon does watch is what makes the pipeline run at all. Remove this
-      # line the moment the Horizon config exists, or the queue separation the
-      # backend deliberately designed will stay switched off in development.
-      AI_ANALYSIS_QUEUE: default
     ports:
       - "8000:8000"
     depends_on:
@@ -233,23 +216,6 @@ services:
       # from `event(new FeedbackAnalyzed(...))` until this was added.
       REVERB_HOST: reverb
       REVERB_SCHEME: http
-      # STOPGAP, and it should be deleted rather than kept.
-      #
-      # AnalyzeFeedbackJob dispatches onto config('ai.queue'), which defaults to
-      # "analysis" so a burst of ingestion cannot starve it. Horizon, however,
-      # is running on the package's own defaults because backend/config/horizon.php
-      # has never been published, and those defaults watch ["default"] and
-      # nothing else. The measured effect in this stack: FetchFeedbackJob ran,
-      # five comments were ingested, five AnalyzeFeedbackJob payloads piled up in
-      # omnihear_database_queues:analysis, and not one of them was ever
-      # executed - so nothing is ever analysed in a `docker compose up` stack.
-      #
-      # The fix belongs in the backend: publish config/horizon.php and give a
-      # supervisor both queues. Until that lands, sending analysis to the queue
-      # Horizon does watch is what makes the pipeline run at all. Remove this
-      # line the moment the Horizon config exists, or the queue separation the
-      # backend deliberately designed will stay switched off in development.
-      AI_ANALYSIS_QUEUE: default
     depends_on:
       backend:
         condition: service_started

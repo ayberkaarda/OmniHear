@@ -392,8 +392,15 @@ it('keeps going past an empty page instead of treating it as the end', function 
 
     FetchFeedbackJob::dispatchSync($company->id, $integration->id);
 
-    expect(asTenant($company, fn () => Feedback::query()->pluck('external_id')->all()))
-        ->toBe(gpiIngestableIds('page-2-end.json'));
+    // Set comparison, not sequence: gpiIngestableIds() returns its ids sorted,
+    // so this side is sorted to match. The query carries no orderBy and
+    // PostgreSQL is free to return the rows in any order, which made this
+    // assertion pass alone and fail inside the full suite. Do not remove the
+    // sort; what is under test is which rows exist, not the order they arrived.
+    $stored = asTenant($company, fn () => Feedback::query()->pluck('external_id')->all());
+    sort($stored);
+
+    expect($stored)->toBe(gpiIngestableIds('page-2-end.json'));
 
     // The run saw an empty page, so the runner must not promote: everything
     // that page might have held is older than the new high-water mark and would

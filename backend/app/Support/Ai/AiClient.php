@@ -2,10 +2,12 @@
 
 namespace App\Support\Ai;
 
+use Closure;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * The Laravel half of the `/v1/analyze` contract (invariant I7).
@@ -60,6 +62,82 @@ class AiClient
     }
 
     /**
+     * The analyzer's liveness and build identity.
+     *
+     * Two deliberate differences from analyze():
+     *
+     * 1. **No signature.** The route is unauthenticated on the analyzer side -
+     *    ai-service/app/routers/health.py declares no `verify_signature`
+     *    dependency, unlike both /v1/analyze routes - so a signature would be
+     *    ignored. It would also make the probe depend on a configured shared
+     *    secret, and the moment an operator most needs this endpoint is the
+     *    moment the configuration is wrong. Nothing leaves the process here
+     *    but a GET with no body, so there is nothing for a signature to bind.
+     * 2. **The path is `/health`, not `/v1/health`.** Only the analyze routes
+     *    are versioned; see contracts/ai-openapi.json, which is generated from
+     *    the running application.
+     *
+     * The response shape is contractual enough to be validated: the reprocess
+     * workflow (App\Console\Commands\ReprocessAnalysesCommand) selects rows on
+     * `model_version`, so a health body without one must fail loudly rather
+     * than let the command compare every stored analysis against null and
+     * re-queue the entire table.
+     *
+     * @return array{status: string, service: string, model_version: string, sentiment_backend: string}
+     *
+     * @throws AiServiceUnavailableException
+     */
+    public function health(?string $correlationId = null): array
+    {
+        $correlationId ??= (string) Str::uuid();
+        $path = '/health';
+
+        $response = $this->perform(
+            $path,
+            $correlationId,
+            fn (): Response => Http::withHeaders([
+                'X-Correlation-Id' => $correlationId,
+                'Accept' => 'application/json',
+            ])
+                ->timeout($this->timeout)
+                ->get($this->baseUrl.$path),
+        );
+
+        return $this->healthPayload($response);
+    }
+
+    /**
+     * @return array{status: string, service: string, model_version: string, sentiment_backend: string}
+     *
+     * @throws AiServiceUnavailableException
+     */
+    private function healthPayload(Response $response): array
+    {
+        $body = (array) $response->json();
+        $payload = [];
+        $missing = [];
+
+        foreach (['status', 'service', 'model_version', 'sentiment_backend'] as $field) {
+            $value = $body[$field] ?? null;
+
+            if (! is_string($value) || $value === '') {
+                $missing[] = $field;
+
+                continue;
+            }
+
+            $payload[$field] = $value;
+        }
+
+        if ($missing !== []) {
+            throw AiServiceUnavailableException::invalidResponse($missing);
+        }
+
+        /** @var array{status: string, service: string, model_version: string, sentiment_backend: string} $payload */
+        return $payload;
+    }
+
+    /**
      * Sign and send one request.
      *
      * @param  array<string, mixed>  $payload
@@ -94,17 +172,38 @@ class AiClient
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
         );
 
-        $started = microtime(true);
-
-        try {
-            $response = Http::withHeaders([
+        return $this->perform(
+            $path,
+            $correlationId,
+            fn (): Response => Http::withHeaders([
                 'X-Signature' => $this->sign($body),
                 'X-Correlation-Id' => $correlationId,
                 'Accept' => 'application/json',
             ])
                 ->timeout($this->timeout)
                 ->withBody($body, 'application/json')
-                ->post($this->baseUrl.$path);
+                ->post($this->baseUrl.$path),
+        );
+    }
+
+    /**
+     * Transport, logging and error mapping - the part every call shares.
+     *
+     * Kept in one place so a second endpoint cannot quietly acquire different
+     * failure semantics from analyze(): the same ConnectionException mapping,
+     * the same PII-free log line, the same non-2xx to
+     * AiServiceUnavailableException translation.
+     *
+     * @param  Closure(): Response  $send
+     *
+     * @throws AiServiceUnavailableException
+     */
+    private function perform(string $path, string $correlationId, Closure $send): Response
+    {
+        $started = microtime(true);
+
+        try {
+            $response = $send();
         } catch (ConnectionException $e) {
             Log::warning('ai.request_failed', [
                 'correlation_id' => $correlationId,

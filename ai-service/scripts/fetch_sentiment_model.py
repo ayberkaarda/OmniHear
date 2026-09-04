@@ -17,13 +17,26 @@ check is what makes "the weights are pinned" a fact rather than a hope.
 Model: ``Xenova/bert-base-multilingual-uncased-sentiment`` (ONNX export of
 ``nlptown/bert-base-multilingual-uncased-sentiment``, MIT). Total download
 ~171 MB; the int8 quantised graph is used, not the 541 MB fp32 one.
+
+Downloads are retried with exponential backoff and resumed from wherever a
+previous attempt left off (HTTP Range) rather than restarted from zero —
+a single ~170 MB file over a flaky connection is exactly the case where
+that matters (see the truncated-download failure this was built to fix).
+A file only ever lands at its final target path once its size **and**
+its SHA-256 both match the pin; until then it lives under a ``.part``
+suffix in the same directory, so ``skip {filename} (already present)``
+can trust that anything it finds at the target is complete and verified.
 """
 
 from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
+import socket
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -62,6 +75,39 @@ FILES: dict[str, tuple[str, str, int]] = {
 
 _CHUNK = 1024 * 1024
 
+# Network I/O tuning. Bounded attempts + exponential backoff, not infinite
+# retry: a permanently unreachable host must still fail the build.
+_MAX_ATTEMPTS = 5
+_BACKOFF_BASE_SECONDS = 2.0
+_REQUEST_TIMEOUT_SECONDS = 30
+
+# Caught around a single download attempt and retried. HTTPError is a
+# URLError subclass, so a 5xx (or any non-4xx HTTP error) falls through to
+# this bucket too — only a 4xx (other than 416, handled separately) is
+# treated as permanent. ContentTooShortError is also a URLError subclass;
+# it is what _fetch_once raises itself when a response body comes up short.
+#
+# OSError is the outer net, and it is here for a specific hole: ssl.SSLError
+# (a mid-stream TLS failure, which is exactly what a dropped 168 MB download
+# looks like on a bad link) is an OSError but *not* a ConnectionError, so the
+# narrower entries below would have let it fail the build on the first try.
+# The cost of the wider net is that a genuinely local fault - no space on the
+# device, no permission to write the .part file - is retried five times before
+# it gives up. That is noise in the log, not a wrong outcome, and it buys
+# coverage of every transport failure this script cannot enumerate in advance.
+_TRANSIENT_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    urllib.error.URLError,
+    OSError,
+    TimeoutError,
+    socket.timeout,
+    http.client.IncompleteRead,
+    ConnectionError,
+)
+
+
+class _PermanentError(RuntimeError):
+    """A download failure that retrying cannot fix (e.g. HTTP 404)."""
+
 
 def sha256_of(path: Path) -> str:
     digest = hashlib.sha256()
@@ -93,19 +139,131 @@ def verify(dest: Path, *, strict: bool) -> list[str]:
     return problems
 
 
-def download(dest: Path, *, force: bool) -> None:
-    dest.mkdir(parents=True, exist_ok=True)
-    for filename, (remote_path, _, _) in FILES.items():
-        target = dest / filename
-        if target.is_file() and not force:
-            print(f"skip {filename} (already present)")
-            continue
-        url = BASE_URL + remote_path
-        print(f"get  {url}")
+def _fetch_once(url: str, partial: Path, expected_size: int) -> int:
+    """Perform one download attempt into ``partial``, resuming if possible.
+
+    Returns the resulting size of ``partial`` on success. Raises
+    ``_PermanentError`` for a non-retryable HTTP error (4xx other than 416).
+    Any other failure is left to propagate as one of the exception types in
+    ``_TRANSIENT_EXCEPTIONS`` (or a plain ``urllib.error.ContentTooShortError``
+    that this function raises itself when the body comes up short), for the
+    caller to retry.
+    """
+    offset = partial.stat().st_size if partial.is_file() else 0
+    headers = {"Range": f"bytes={offset}-"} if offset else {}
+    request = urllib.request.Request(url, headers=headers)
+    try:
         # nosec: a pinned https URL to a public model registry, verified by
         # the sha256 check that follows.
-        urllib.request.urlretrieve(url, target)  # noqa: S310
-        print(f"     -> {target} ({target.stat().st_size} bytes, sha256 {sha256_of(target)})")
+        response = urllib.request.urlopen(request, timeout=_REQUEST_TIMEOUT_SECONDS)  # noqa: S310
+    except urllib.error.HTTPError as exc:
+        if offset and exc.code == 416:
+            # Our partial is already at or past what the server has (e.g. it
+            # changed, or we somehow over-wrote). Discard it and restart.
+            print(f"     range not satisfiable at byte {offset}, restarting from 0")
+            partial.unlink(missing_ok=True)
+            return _fetch_once(url, partial, expected_size)
+        if 400 <= exc.code < 500:
+            raise _PermanentError(f"HTTP {exc.code} {exc.reason}") from exc
+        raise
+
+    status = getattr(response, "status", None) or response.getcode()
+    if offset and status == 200:
+        # The server ignored our Range header and is sending the full body
+        # from byte 0 again. Appending onto the partial file would silently
+        # produce a corrupt file, so start over instead.
+        print("     server ignored Range header, restarting from byte 0")
+        offset = 0
+        mode = "wb"
+    elif offset and status == 206:
+        print(f"     resuming from byte {offset}")
+        mode = "ab"
+    elif offset:
+        raise urllib.error.URLError(f"unexpected HTTP status {status} for a ranged request")
+    else:
+        mode = "wb"
+
+    content_length = response.getheader("Content-Length")
+    expected_total = offset + int(content_length) if content_length is not None else expected_size
+
+    written = offset
+    with partial.open(mode) as handle:
+        while True:
+            chunk = response.read(_CHUNK)
+            if not chunk:
+                break
+            handle.write(chunk)
+            written += len(chunk)
+
+    if written < expected_total:
+        raise urllib.error.ContentTooShortError(
+            f"retrieval incomplete: got only {written} out of {expected_total} bytes",
+            None,
+        )
+    return written
+
+
+def _download_with_retries(filename: str, url: str, partial: Path, expected_size: int) -> None:
+    for attempt in range(1, _MAX_ATTEMPTS + 1):
+        print(f"get  {url} (attempt {attempt}/{_MAX_ATTEMPTS})")
+        try:
+            _fetch_once(url, partial, expected_size)
+            return
+        except _PermanentError as exc:
+            raise RuntimeError(f"{filename}: permanent failure, not retrying: {exc}") from exc
+        except _TRANSIENT_EXCEPTIONS as exc:
+            if attempt == _MAX_ATTEMPTS:
+                raise RuntimeError(
+                    f"{filename}: giving up after {_MAX_ATTEMPTS} attempts: {exc}"
+                ) from exc
+            delay = _BACKOFF_BASE_SECONDS * (2 ** (attempt - 1))
+            print(f"     attempt {attempt} failed ({exc}); retrying in {delay:.0f}s")
+            time.sleep(delay)
+
+
+def _fetch_file(
+    filename: str,
+    remote_path: str,
+    expected_sha: str,
+    expected_size: int,
+    dest: Path,
+    *,
+    force: bool,
+) -> None:
+    target = dest / filename
+    partial = dest / f"{filename}.part"
+
+    if target.is_file() and not force:
+        print(f"skip {filename} (already present)")
+        return
+
+    if force:
+        target.unlink(missing_ok=True)
+        partial.unlink(missing_ok=True)
+
+    url = BASE_URL + remote_path
+    _download_with_retries(filename, url, partial, expected_size)
+
+    # Hash the whole finished file, not just whatever this attempt appended —
+    # a resumed download must be verified end to end.
+    actual_size = partial.stat().st_size
+    actual_sha = sha256_of(partial)
+    if actual_size != expected_size or actual_sha != expected_sha:
+        partial.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"{filename}: verification failed after download "
+            f"(size {actual_size}, expected {expected_size}; "
+            f"sha256 {actual_sha}, expected {expected_sha})"
+        )
+
+    partial.replace(target)
+    print(f"     -> {target} ({actual_size} bytes, sha256 {actual_sha})")
+
+
+def download(dest: Path, *, force: bool) -> None:
+    dest.mkdir(parents=True, exist_ok=True)
+    for filename, (remote_path, expected_sha, expected_size) in FILES.items():
+        _fetch_file(filename, remote_path, expected_sha, expected_size, dest, force=force)
 
 
 def main() -> int:
@@ -133,7 +291,11 @@ def main() -> int:
         return 0
 
     if not arguments.verify_only:
-        download(arguments.dest, force=arguments.force)
+        try:
+            download(arguments.dest, force=arguments.force)
+        except RuntimeError as exc:
+            print(f"FAIL {exc}", file=sys.stderr)
+            return 1
 
     problems = verify(arguments.dest, strict=False)
     if problems:

@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SubscriptionActivated;
 use App\Jobs\RequeuePendingAnalysisJob;
 use App\Models\Company;
+use App\Support\Overview\KpiCache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Log;
  */
 class ActivateSubscriptionPlan
 {
+    public function __construct(private readonly KpiCache $kpis) {}
+
     public function handle(SubscriptionActivated $event): void
     {
         $company = Company::query()->find($event->companyId);
@@ -40,9 +43,25 @@ class ActivateSubscriptionPlan
                 'plan' => $event->plan,
                 'quota_limit' => (int) $limit,
             ])->save();
+
+            // The KPI payload embeds quota.limit (OverviewController::compute),
+            // so a cached entry now disagrees with the row that just paid for
+            // the new number. Forgetting is done right here, at the write, not
+            // by adding a SubscriptionActivated handler to
+            // InvalidateKpiCache: DiscoverEvents (Finder::create()->files()->in())
+            // registers listeners in unsorted filesystem order, so nothing
+            // guarantees that handler would run *after* this one. If it ran
+            // before, a dashboard request landing in that window would
+            // recompute and re-cache the stale limit, and no test could pin
+            // an ordering that isn't guaranteed to begin with. Forgetting
+            // immediately after the write it depends on is the only version
+            // of this fix that cannot race itself.
+            $this->kpis->forget($company->getKey());
         } else {
             $company->forceFill(['plan' => $event->plan])->save();
 
+            // quota_limit did not change here - the KPI payload's quota.limit
+            // is still correct, so there is nothing to invalidate.
             Log::warning('quota.plan_limit_not_configured', [
                 'company_id' => $event->companyId,
                 'plan' => $event->plan,

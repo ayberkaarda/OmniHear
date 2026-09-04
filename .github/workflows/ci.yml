@@ -221,6 +221,50 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
       - run: npx playwright install --with-deps chromium
+      # ai-service.Dockerfile downloads and SHA-256-verifies ~168 MB of ONNX
+      # weights at build time (ADR-0004) via scripts/fetch_sentiment_model.py.
+      # `docker compose ... up -d --build` below rebuilds every service it
+      # names unconditionally, so without this the weights were re-fetched
+      # from Hugging Face on every single push — which is what turned one
+      # dropped connection into a failed build (CI run 33796748134).
+      #
+      # This caches the whole built image rather than the compose/buildx
+      # layer cache: `docker compose build` on a plain (non-`docker-container`)
+      # buildx driver — the default on a GitHub-hosted runner, and what
+      # `up --build` uses here — does not accept `--cache-from`/`--cache-to`,
+      # so it cannot consume the `type=gha,scope=ai-service` cache the
+      # `docker` job below writes with `docker/build-push-action`. Verified
+      # with `docker compose -f infra/docker-compose.dev.yml up --dry-run
+      # --build ai-service`, and separately by tagging a throwaway image
+      # `omnihear-ai-service:latest` and dry-running `up` on it *without*
+      # `--build`: compose starts the existing image with no build step at
+      # all, which is what the split below relies on.
+      #
+      # The cache key covers everything that ends up in the running image
+      # (Dockerfile, dependency + app source, the fetch script's pins) but
+      # deliberately not the rest of scripts/: multi-stage build discards
+      # everything under /build except the venv, app/ and the weights, so a
+      # change to e.g. train_category_model.py cannot affect this image and
+      # must not bust the cache.
+      - name: Cache ai-service image
+        id: ai-service-image-cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/ai-service-image.tar
+          key: ai-service-image-${{ hashFiles('infra/docker/ai-service.Dockerfile', 'ai-service/pyproject.toml', 'ai-service/app/**', 'ai-service/scripts/fetch_sentiment_model.py') }}
+      - name: Load cached ai-service image
+        if: steps.ai-service-image-cache.outputs.cache-hit == 'true'
+        working-directory: .
+        run: docker load -i /tmp/ai-service-image.tar
+      # Cache miss: build it once here (this is the only place a fresh
+      # checkout ever re-fetches the weights) and save it so the next run
+      # with unchanged inputs hits the branch above instead.
+      - name: Build ai-service image (cache miss)
+        if: steps.ai-service-image-cache.outputs.cache-hit != 'true'
+        working-directory: .
+        run: |
+          docker compose -f infra/docker-compose.dev.yml build ai-service
+          docker save omnihear-ai-service:latest -o /tmp/ai-service-image.tar
       # The three things a developer does once by hand and then never thinks
       # about again — which is exactly why a clean checkout is the only place
       # they surface.
@@ -246,7 +290,11 @@ jobs:
       - name: Start the stack
         working-directory: .
         run: |
-          docker compose -f infra/docker-compose.dev.yml up -d --build             postgres redis mailpit ai-service backend horizon reverb
+          # ai-service is deliberately left out of --build: it was already built
+          # (cache hit) or just built (cache miss) above, and `up` without
+          # --build uses that existing image as-is rather than rebuilding it.
+          docker compose -f infra/docker-compose.dev.yml up -d ai-service
+          docker compose -f infra/docker-compose.dev.yml up -d --build             postgres redis mailpit backend horizon reverb
       - name: Wait for the stack
         working-directory: .
         run: |

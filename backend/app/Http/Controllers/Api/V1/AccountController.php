@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Support\Audit\AuditAction;
 use App\Support\Audit\AuditLogger;
+use App\Support\Overview\KpiCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,10 @@ use Laravel\Sanctum\PersonalAccessToken;
  */
 class AccountController extends Controller
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly KpiCache $kpis,
+    ) {}
 
     public function destroy(Request $request): JsonResponse
     {
@@ -70,6 +74,14 @@ class AccountController extends Controller
 
             $company->delete();
         });
+
+        // The cascade empties the tables the dashboard aggregates, but nothing
+        // in the database reaches into Redis. Without this, the erased
+        // tenant's KPI entry would outlive the rows it was computed from for
+        // the length of its TTL - a copy of data the user was told is gone
+        // (spec 8), and a live entry under a key that a re-created company can
+        // only miss by luck.
+        $this->kpis->forget($companyId);
 
         // The compliance record that outlives the tenant. Ids only: the point
         // of the endpoint is that the personal data is gone (invariant I5).

@@ -209,3 +209,25 @@ sosyal connector'ları, backend'in `/analyze/batch` kullanımı, `model_version`
 reprocess komutu, staging/prod deploy, K8s manifest'leri, Redis KPI cache) her
 biri gerekçesiyle ADR-0010'da listelidir. Her biri kodda doğrulanarak yazılmıştır.
 
+
+### E-7 — §11: staging/prod deploy ve K8s manifest'leri — **kapsam dışı**
+
+*2026-09-03 · ADR-0010 eki · kullanıcı kararı*
+
+E-6 bu iki maddeyi "bilinçli olarak inşa edilmeyen" listesine koyuyordu; ADR-0010
+ise gerekçe olarak "deploy edilecek bir altyapı yok" diyordu. Gerekçe doğruydu,
+sınıflandırma yanlıştı: ikisi de **ertelenmiş** iş gibi yazılmıştı.
+
+Kullanıcı kısıtı doğrudan koydu: OmniHear bir **portfolyo projesidir ve hiçbir
+zaman deploy edilmeyecektir.** Staging yok, production yok, cluster yok — şimdi
+de yok, sonra da olmayacak. Dolayısıyla §11 **kapanır**, açık kalmaz; bu iki
+madde tamamlanma paydasından çıkar.
+
+Bunun spec'in geri kalanına dokunmadığı yer önemlidir: §2'nin "K8s-ready imajlar"
+ifadesi imajların bir özelliğidir, manifest teslim etme zorunluluğu değil (ADR-0010
+bunu zaten böyle okumuştu), ve §9'un CI/CD satırının lint → test → Docker build
+kısmı kuruludur — düşen yalnızca "staging deploy" ve "manuel onaylı prod
+promotion" adımlarıdır.
+
+Yan etkisi: PROGRESS D-05'in "proje bitince public" eşiği artık ölçülebilir bir
+şeye bağlıdır — kalan kapsam-içi maddeler — hiç gelmeyecek bir deploy'a değil.

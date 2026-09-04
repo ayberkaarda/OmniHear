@@ -47,6 +47,35 @@ it('raises the quota limit from config and re-queues the backlog', function () {
     );
 });
 
+it('drops the cached KPI payload so the new quota limit is served immediately', function () {
+    // The dashboard's quota.limit (OverviewController::compute) is cached per
+    // tenant (App\Support\Overview\KpiCache). Without a forget at the write in
+    // ActivateSubscriptionPlan, a request landing inside the TTL right after
+    // an upgrade would keep answering the pre-upgrade limit here while
+    // QuotaStore - a different source, backing the paywall/meter - already
+    // reports the new one: two different limits on one screen, at the moment
+    // the customer just paid.
+    Queue::fake();
+    config(['overview.cache.ttl' => 60]);
+    config(['quota.plans.pro.quota_limit' => 2000]);
+
+    [$company, $user] = tenant();
+    $company->forceFill(['plan' => 'free', 'quota_limit' => 200])->save();
+
+    // Prime the cache with the pre-upgrade limit.
+    $this->actingAs($user, 'sanctum')->getJson('/api/v1/overview/kpis')
+        ->assertOk()
+        ->assertJsonPath('quota.limit', 200);
+
+    SubscriptionActivated::dispatch($company->id, 'stripe', 'pro');
+
+    // Without the forget, this would still answer 200 - the stale entry
+    // primed above - even though companies.quota_limit is already 2000.
+    $this->actingAs($user->fresh(), 'sanctum')->getJson('/api/v1/overview/kpis')
+        ->assertOk()
+        ->assertJsonPath('quota.limit', 2000);
+});
+
 it('leaves the existing limit alone when the plan has no configured quota', function () {
     Queue::fake();
     Log::spy();
