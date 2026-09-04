@@ -359,7 +359,11 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
     // The platform list is served by GET /integrations/platforms, so this select
     // is populated from config/connectors.php rather than a copy of it.
     await page.getByLabel('Platform').selectOption('fixture');
-    await page.getByLabel('fixture_set').fill('default');
+    // 'Fixture set', not 'fixture_set': this step used to find the field by its
+    // raw key, which only worked because `settingLabel()` had no entry for it
+    // and fell back to rendering the key. Labelling it fixed the UI and broke
+    // this locator — the test had been depending on the defect.
+    await page.getByLabel('Fixture set').fill('default');
 
     const created = page.waitForResponse(
       (response) =>
