@@ -29,6 +29,11 @@ use Laravel\Sanctum\PersonalAccessToken;
  * against a single account. The per-token counter is what makes that walk
  * finite — five wrong codes and the token is gone, so the password has to be
  * re-presented (and the login limiter met) to get another one.
+ *
+ * The counter lives in the cache, as does `throttle:public`, so both reset
+ * together if the cache is lost; the bound that survives that is the token's
+ * own five-minute `expires_at` in the database. TwoFactorReplayGuard's docblock
+ * works through what that leaves exposed.
  */
 final class TwoFactorChallenge
 {

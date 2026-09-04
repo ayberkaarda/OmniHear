@@ -86,10 +86,24 @@ final class RecoveryCodes
      * Every remaining hash is compared even after a match, so the work done is
      * the same for a hit and a miss: the number of hashes tried is otherwise a
      * side channel that says how close a guess was to the front of the list.
+     *
+     * # Why the input is lowercased
+     *
+     * `Hash::check` is case-sensitive, and the person typing a recovery code is
+     * by definition the person whose authenticator is gone - typing into a
+     * mobile keyboard that capitalises the first letter of a text field by
+     * default. Without this, `Abcd-efgh` fails, the screen says only that the
+     * code is invalid, and one of five attempts on the challenge token is spent
+     * on a code the user is reading correctly off the page. Five of those and
+     * the emergency route closes.
+     *
+     * The normalisation is lossless rather than lenient: ALPHABET contains no
+     * uppercase letter, so no two distinct codes can be folded onto each other
+     * by lowercasing, and nothing that would have failed starts passing.
      */
     public function consume(User $user, string $code): bool
     {
-        $code = trim($code);
+        $code = self::normalize($code);
         $stored = $this->stored($user);
 
         if ($code === '' || $stored === []) {
@@ -124,6 +138,18 @@ final class RecoveryCodes
         $codes = $user->getAttribute('two_factor_recovery_codes');
 
         return is_array($codes) ? array_values(array_filter($codes, 'is_string')) : [];
+    }
+
+    /**
+     * The comparable form of a submitted code.
+     *
+     * Case only. Deliberately not stripping spaces or re-inserting the hyphen:
+     * those would be guesses about what the user meant, and a code typed
+     * without its separator is a different string, not a differently-cased one.
+     */
+    private static function normalize(string $code): string
+    {
+        return strtolower(trim($code));
     }
 
     private function group(): string

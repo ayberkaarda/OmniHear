@@ -156,9 +156,27 @@ applied before dispatch and no track owned `database/migrations/`, so the
 high-water mark lives in the cache instead, with a TTL matching the longest a
 code stays verifiable. The cost is stated plainly: a cache eviction — or a
 `FLUSHALL` — forgets the mark, and a code observed inside its own ~90-second
-window could be replayed once. The code's own expiry and the per-token attempt
-cap both still stand. The next time the schema is opened, a
-`users.two_factor_last_used_step` column closes it.
+window could be replayed once.
+
+Be precise about what survives that, because the first version of this paragraph
+was not: the per-token attempt counter lives in the **same** cache, and
+`throttle:public` is cache-backed as well, so losing the cache resets every
+guess-limiting mechanism on this endpoint at once. What still stands is the
+code's own expiry and the challenge token's five-minute row in the database.
+
+The exposure is narrow — it needs the attacker to hold the password (a challenge
+token cannot be minted without it), to have observed a code, for the victim to
+have actually spent that code, and for the cache to be lost inside the same
+two-minute window. Compose declares no `maxmemory` policy, so Redis defaults to
+`noeviction` and a full cache errors on write rather than silently forgetting.
+
+The reason to move it to `users.two_factor_last_used_step` is therefore not
+durability but **atomicity**: the current check is read-then-write, so two
+concurrent requests carrying the same code both pass. The column version is a
+conditional `UPDATE … WHERE col IS NULL OR col < ?` with an affected-row check,
+which closes the race as well. When it moves, `destroy()` and `store()` must
+also clear the mark — otherwise disabling and immediately re-enrolling rejects
+the new secret's first code as a replay of the old one's.
 
 ## Secrets and logging (invariant I5)
 

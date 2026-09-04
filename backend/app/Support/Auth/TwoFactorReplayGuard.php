@@ -25,12 +25,23 @@ use Illuminate\Support\Facades\Cache;
  * write. This is the one place where the implementation departs from the
  * contract's letter, and it is reported as such rather than left to be found.
  *
- * What the difference costs, stated plainly: a cache eviction or a flushed
- * Redis forgets the mark, and a code observed inside its own window could then
- * be replayed once. Nothing else about the flow changes — the code still
- * expires on its own within 90 seconds, and the challenge token's attempt
- * counter still bounds guessing. A column would close that residual window and
- * should replace this when the schema is next open.
+ * What the difference costs, stated precisely, because an inaccurate
+ * reassurance in a security comment is worse than the gap it describes - the
+ * next reader stops looking. If the cache is lost, this mark goes, and so does
+ * every other guess-limiting mechanism on the challenge endpoint at the same
+ * moment: TwoFactorChallenge's per-token attempt counter is in this same cache,
+ * and `throttle:public` is cache-backed too. They do not back each other up;
+ * they fail together.
+ *
+ * What survives a cache loss is exactly two things, both outside the cache: a
+ * TOTP code still stops verifying on its own within 90 seconds (Totp::WINDOW),
+ * and the challenge token is still a row in `personal_access_tokens` with a
+ * five-minute `expires_at` that the database enforces. So the residual exposure
+ * is one replay of an observed code, and an attacker's guessing budget reset to
+ * full for the remainder of one five-minute token - not unbounded guessing.
+ *
+ * A column would close the replay half of that and should replace this when the
+ * schema is next open (W11). The counter and the limiter would still be cache.
  *
  * The TTL is the longest a code can still verify (the full window, plus a
  * step's slack), so nothing is remembered for longer than it can be abused.

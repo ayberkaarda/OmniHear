@@ -528,6 +528,47 @@ it('accepts a recovery code and spends it', function () {
         ->assertOk();
 });
 
+it('accepts a recovery code however the phone capitalised it', function () {
+    [$company, $user, $secret, $codes] = twoFactorUser();
+
+    // The person using this route is the person whose authenticator is gone,
+    // typing into a mobile keyboard that capitalises the first letter of a text
+    // field by default. Rejecting `Abcd-efgh` would spend one of five attempts
+    // on a code they are reading off the page correctly, with nothing on screen
+    // to explain why.
+    $this->withToken(challengeTokenFor($user))
+        ->postJson('/api/v1/auth/two-factor/challenge', ['recovery_code' => ucfirst($codes[0])])
+        ->assertOk();
+
+    expect($user->refresh()->two_factor_recovery_codes)->toHaveCount(RecoveryCodes::COUNT - 1);
+
+    // Fully upper-cased, and with the stray whitespace a paste picks up.
+    $this->withToken(challengeTokenFor($user))
+        ->postJson('/api/v1/auth/two-factor/challenge', ['recovery_code' => '  '.strtoupper($codes[1]).' '])
+        ->assertOk();
+
+    expect($user->refresh()->two_factor_recovery_codes)->toHaveCount(RecoveryCodes::COUNT - 2);
+});
+
+it('does not accept anything extra by lowercasing the input', function () {
+    [$company, $user, $secret, $codes] = twoFactorUser();
+    $service = app(RecoveryCodes::class);
+
+    // The alphabet has no uppercase letter, so folding case cannot collide two
+    // distinct codes — the normalisation is lossless, not lenient. Nothing that
+    // should fail starts passing: a wrong code stays wrong in either case, and
+    // the separator and the digits are untouched by strtolower.
+    expect($service->consume($user, strtoupper('zzzz-zzzz')))->toBeFalse()
+        ->and($service->consume($user, str_replace('-', '', $codes[0])))->toBeFalse()
+        ->and($service->consume($user, strtoupper(str_replace('-', '', $codes[0]))))->toBeFalse()
+        ->and($service->consume($user, substr($codes[0], 0, -1)))->toBeFalse()
+        ->and($user->refresh()->two_factor_recovery_codes)->toHaveCount(RecoveryCodes::COUNT);
+
+    // And the real code, upper-cased, still is the real code.
+    expect($service->consume($user, strtoupper($codes[0])))->toBeTrue()
+        ->and($user->refresh()->two_factor_recovery_codes)->toHaveCount(RecoveryCodes::COUNT - 1);
+});
+
 it('refuses an unknown recovery code', function () {
     [$company, $user] = twoFactorUser();
 

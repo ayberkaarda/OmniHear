@@ -53,3 +53,39 @@ Schedule::call(function (IntegrationSyncLock $lock): void {
     ->everyFiveMinutes()
     ->name('ingestion:fetch-feedback')
     ->withoutOverlapping();
+
+/*
+|--------------------------------------------------------------------------
+| Expired token pruning
+|--------------------------------------------------------------------------
+|
+| `personal_access_tokens` only ever grew. Sanctum ships the command and this
+| application never scheduled it, so every row a login has written since F2 is
+| still there — dead, but still looked up by hash on every bearer request that
+| happens to collide on the prefix.
+|
+| W10 did not create the problem; it raised the rate. A correct password from a
+| user with a second factor now writes a five-minute challenge row, and that row
+| is deleted on success and on exhausting the attempt budget — but not when the
+| user simply abandons the flow, which is the ordinary outcome of "I opened
+| login on the wrong device". Those accumulate one per abandoned attempt.
+|
+| The command is not limited to challenge tokens and the retention is chosen
+| with that in mind. It deletes every row whose `expires_at` is more than
+| --hours in the past — expired device sessions and expired API keys as well as
+| challenge tokens — and, because `sanctum.expiration` is set, also every row
+| older than that ceiling plus the same window, which is what finally reaches
+| the legacy `['*']` rows that carry no `expires_at` at all.
+|
+| 24 hours rather than 0: a token that stopped working an hour ago is evidence.
+| "Why did my session end?" and "which credential did the attacker use?" are
+| both answered by a row that is expired and still present, and a prune that ran
+| the moment expiry passed would delete the record mid-incident. A day is long
+| enough to look, short enough that the table does not carry a year of dead rows.
+|
+*/
+
+Schedule::command('sanctum:prune-expired', ['--hours' => 24])
+    ->daily()
+    ->name('auth:prune-expired-tokens')
+    ->withoutOverlapping();
