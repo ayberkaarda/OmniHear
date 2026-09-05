@@ -1,13 +1,8 @@
----
-name: laravel-tenant-resource
-description: OmniHear backend'inde yeni tablo, model, migration, endpoint, CRUD, policy veya factory eklerken multi-tenant izolasyonu doğru kurmak için kullanılır. Tetikleyiciler yeni tablo, yeni model, migration, endpoint, CRUD, policy, factory, resource, multi-tenant, company_id, new model, new endpoint.
----
-
 # Laravel Tenant Resource
 
-OmniHear'da her satır bir `companies.id`'ye bağlıdır. Bu skill, yeni bir tenant-scoped kaynak (model + migration + policy + factory + resource + endpoint) eklerken tenant izolasyonunun **hiçbir katmanda** delinmemesini sağlar.
+OmniHear'da her satır bir `companies.id`'ye bağlıdır. Bu doküman, yeni bir tenant-scoped kaynak (model + migration + policy + factory + resource + endpoint) eklerken tenant izolasyonunun **hiçbir katmanda** delinmemesini sağlar.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
 Yeni bir migration, model, policy, factory, API resource veya CRUD endpoint yazılacağı zaman.
 

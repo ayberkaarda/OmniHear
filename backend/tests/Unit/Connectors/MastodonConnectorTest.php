@@ -3,7 +3,9 @@
 use App\Support\Connectors\ConnectorException;
 use App\Support\Connectors\ConnectorFailure;
 use App\Support\Connectors\ConnectorLimits;
+use App\Support\Connectors\DnsResolver;
 use App\Support\Connectors\MastodonConnector;
+use App\Support\Connectors\OutboundHostPolicy;
 use App\Support\Connectors\SyncCursor;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -11,6 +13,23 @@ use Tests\Support\PlatformFixture;
 use Tests\TestCase;
 
 uses(TestCase::class);
+
+beforeEach(function () {
+    // OutboundHostPolicy resolves the instance host before the fetch, and the
+    // `.invalid` host these fixtures use never resolves on a real resolver. A
+    // permissive fake keeps the SSRF gate on its allow path so the rest of the
+    // suite exercises what it always did; the redirect-hop test below binds its
+    // own resolver to drive the reject path.
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+});
+
+afterEach(fn () => OutboundHostPolicy::resolveUsing(null));
 
 /*
 |--------------------------------------------------------------------------
@@ -914,4 +933,71 @@ it('keeps page one full and page two short against the page size these tests use
 
 it('keeps the fixture set small enough to read', function () {
     expect(count(mastodonFixtureFiles()))->toBeLessThanOrEqual(8);
+});
+
+/*
+|--------------------------------------------------------------------------
+| SSRF: a redirect to an internal host is refused, and not followed
+|--------------------------------------------------------------------------
+|
+| The instance URL is tenant-supplied and fetched on the scheduler, so a host
+| that answers 302 -> an internal address must not be followed. OutboundHostPolicy
+| installs an on_redirect check on the client that Guzzle runs *before* it
+| follows a hop; an exception from it cancels the hop.
+|
+| These fixtures use `.invalid` hosts, so the resolver is faked. The first
+| assertion of the first test is the one the whole strategy rests on: that
+| on_redirect actually fires under Http::fake. It does, because Laravel keeps
+| Guzzle's RedirectMiddleware in the handler stack under the fake and a faked
+| 3xx that carries a Location header is followed like any other.
+|
+*/
+
+it('fires on_redirect under Http::fake and refuses a redirect to a link-local host', function () {
+    // social.example.invalid resolves to a public address (allow path); the hop
+    // target 169.254.169.254 is the cloud metadata endpoint (reject path).
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+
+    Http::fake([
+        'social.example.invalid/*' => Http::response('', 302, ['Location' => 'https://169.254.169.254/latest/meta-data/']),
+        '169.254.169.254/*' => Http::response('[]', 200),
+    ]);
+
+    $failure = mastodonFailure(fn () => mastodonConnector()->fetchPage(null));
+
+    // Misconfigured can only come from the on_redirect host check: a 3xx that
+    // reached the connector unfollowed would be the default Unreachable, and a
+    // followed-and-answered hop would be a parsed empty page, not a failure.
+    // So this asserts on_redirect fired.
+    expect($failure)->toBe(ConnectorFailure::Misconfigured)
+        ->and($failure->isTransient())->toBeFalse();
+
+    // And the hop was cancelled before it went out: only the first request.
+    Http::assertSentCount(1);
+});
+
+it('refuses a redirect to loopback the same way', function () {
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+
+    Http::fake([
+        'social.example.invalid/*' => Http::response('', 302, ['Location' => 'https://127.0.0.1/']),
+        '127.0.0.1/*' => Http::response('[]', 200),
+    ]);
+
+    expect(mastodonFailure(fn () => mastodonConnector()->fetchPage(null)))
+        ->toBe(ConnectorFailure::Misconfigured);
+
+    Http::assertSentCount(1);
 });

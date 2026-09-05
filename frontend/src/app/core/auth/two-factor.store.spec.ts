@@ -39,10 +39,12 @@ describe('TwoFactorStore', () => {
   });
 
   it('start() holds the enrolment response without confirming anything', () => {
-    store.start();
+    store.start('correct-horse-battery');
 
     const request = http.expectOne(`${BASE}/two-factor`);
     expect(request.request.method).toBe('POST');
+    // The password re-proves the session before a factor is armed.
+    expect(request.request.body).toEqual({ password: 'correct-horse-battery' });
     request.flush(makeTwoFactorEnrolment(), { status: 201, statusText: 'Created' });
 
     expect(store.enrolling()).toBe(true);
@@ -59,17 +61,38 @@ describe('TwoFactorStore', () => {
    * of having started — invariant I5.
    */
   it('never writes the secret to browser storage', () => {
-    store.start();
+    store.start('correct-horse-battery');
     http.expectOne(`${BASE}/two-factor`).flush(makeTwoFactorEnrolment());
 
     const stored = Object.keys(localStorage).map((key) => localStorage.getItem(key) ?? '');
     expect(stored.some((value) => value.includes('JBSWY3DPEHPK3PXP'))).toBe(false);
   });
 
+  it('start() surfaces the field error of a wrong password and arms nothing', () => {
+    store.start('wrong-password');
+
+    http
+      .expectOne(`${BASE}/two-factor`)
+      .flush(
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'The given data was invalid.',
+          errors: { password: ['The password is incorrect.'] }
+        },
+        { status: 422, statusText: 'Unprocessable Content' }
+      );
+
+    expect(store.starting()).toBe(false);
+    expect(store.startErrors()?.['password']?.[0]).toBe('The password is incorrect.');
+    // No secret was taken on: the section stays exactly where it was.
+    expect(store.enrolling()).toBe(false);
+    expect(store.enrolment()).toBeNull();
+  });
+
   it('refuses to start while two-factor is already confirmed', () => {
     auth.setUser(makeUser({ two_factor_enabled: true }));
 
-    store.start();
+    store.start('correct-horse-battery');
 
     // The count is the assertion: a call that reached the network here would
     // mean the guard is decorative and the server answers 409 instead.
@@ -77,7 +100,7 @@ describe('TwoFactorStore', () => {
   });
 
   it('confirm() drops the secret, keeps the codes and flips the flag', () => {
-    store.start();
+    store.start('correct-horse-battery');
     http.expectOne(`${BASE}/two-factor`).flush(makeTwoFactorEnrolment());
 
     store.confirm('123456');
@@ -94,7 +117,7 @@ describe('TwoFactorStore', () => {
   });
 
   it('confirm() surfaces the field errors of a rejected code and stays enrolling', () => {
-    store.start();
+    store.start('correct-horse-battery');
     http.expectOne(`${BASE}/two-factor`).flush(makeTwoFactorEnrolment());
 
     store.confirm('000000');
@@ -165,7 +188,7 @@ describe('TwoFactorStore', () => {
   });
 
   it('cancelEnrolment() forgets the unconfirmed secret', () => {
-    store.start();
+    store.start('correct-horse-battery');
     http.expectOne(`${BASE}/two-factor`).flush(makeTwoFactorEnrolment());
 
     store.cancelEnrolment();

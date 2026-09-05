@@ -1,8 +1,8 @@
-# Wave 2 — ownership map, seams and endpoint contracts
+# Phase group 2 — ownership map, seams and endpoint contracts
 
-Status: **binding for F4, F5 and F6/F7.** Written by the main thread before the
-wave was dispatched. Three agents work concurrently inside `backend/`, which is a
-much tighter space than wave 1's one-directory-per-track split — so this file
+Status: **binding for F4, F5 and F6/F7.** Written centrally before the
+phase group began. Three workstreams work concurrently inside `backend/`, which is a
+much tighter space than the first round's one-directory-per-workstream split — so this file
 settles, in advance, every file more than one of them would otherwise touch.
 
 Companions: `docs/contracts/http-api-v1.md` (wire conventions, error envelope),
@@ -14,7 +14,7 @@ Companions: `docs/contracts/http-api-v1.md` (wire conventions, error envelope),
 
 Exact and exclusive. If a path is not on your row, you do not write to it.
 
-| track | owns |
+| workstream | owns |
 |---|---|
 | **F4 ingestion** | `app/Support/Connectors/**` · `app/Jobs/FetchFeedbackJob.php` · `app/Http/Controllers/Api/V1/IntegrationController.php` · `app/Http/Requests/Api/V1/Integration/**` · `app/Http/Resources/Api/V1/IntegrationResource.php` · `app/Policies/IntegrationPolicy.php` · `config/connectors.php` · `routes/api/integrations.php` · `routes/console.php` · `tests/Feature/Ingestion/**` · `tests/Unit/Connectors/**` · `contracts/fixtures/platforms/**` |
 | **F5 analysis + quota** | `app/Support/Ai/**` · `app/Jobs/{AnalyzeFeedbackJob,RequeuePendingAnalysisJob}.php` · `app/Listeners/**` · `app/Http/Controllers/Api/V1/{FeedbackController,OverviewController}.php` · `app/Http/Resources/Api/V1/{FeedbackResource,AiAnalysisResource}.php` · `app/Policies/{FeedbackPolicy,AiAnalysisPolicy}.php` · `app/Http/Middleware/EnforceQuota.php` · `app/Broadcasting/**` · `config/ai.php` · `routes/api/feedbacks.php` · `routes/channels.php` · **`bootstrap/app.php`** · `tests/Feature/{Analysis,Quota}/**` · `tests/Feature/Contract/**` |
@@ -22,8 +22,8 @@ Exact and exclusive. If a path is not on your row, you do not write to it.
 
 **Nobody edits** `routes/api.php`, `app/Support/Http/ApiErrorCode.php`,
 `lang/**`, `app/Providers/**`, `app/Models/**`, `database/migrations/**`,
-`infra/**`, `docs/**`, `.claude/**`, `CLAUDE.md`, `frontend/**`, `ai-service/**`.
-If you need something in one of those, **stop and ask the main thread**.
+`infra/**`, `docs/**`, `CONTRIBUTING.md`, `frontend/**`, `ai-service/**`.
+If you need something in one of those, **stop and raise it with the integration owner**.
 
 ### Why those files are already settled
 
@@ -33,7 +33,7 @@ If you need something in one of those, **stop and ask the main thread**.
   the name prefix or the middleware stack, because it is required inside a group
   that already applies them. `routes/api/public/*.php` gets no group at all, so
   a webhook file declares its own full path.
-- **`ApiErrorCode` and `lang/{en,tr}/errors.php`** already contain every wave-2
+- **`ApiErrorCode` and `lang/{en,tr}/errors.php`** already contain every phase-group-2
   code: `INTEGRATION_UNAVAILABLE` (503), `INTEGRATION_INVALID_CREDENTIALS` (422),
   `SYNC_IN_PROGRESS` (409), `AI_SERVICE_UNAVAILABLE` (503),
   `INVALID_WEBHOOK_SIGNATURE` (400), `PAYMENT_PROVIDER_ERROR` (502). Use them.
@@ -49,10 +49,10 @@ If you need something in one of those, **stop and ask the main thread**.
 
 ## 2. The two event seams
 
-Both event classes **already exist in the tree**, written by the main thread, so
-that no track has to reference a class another track has not created yet. This is
+Both event classes **already exist in the tree**, written centrally, so
+that no workstream has to reference a class another workstream has not created yet. This is
 the whole reason they are events rather than direct calls: a direct call would
-mean one agent's test suite cannot run until another agent lands.
+mean one workstream's test suite cannot run until another lands.
 
 ### `App\Events\FeedbackIngested` — F4 fires, F5 listens
 
@@ -202,11 +202,11 @@ invariant I1 on the websocket surface, and it needs its own test.
 
 ## 5. Running tests in parallel
 
-Three agents run `php artisan test` at the same time. A shared database means one
-agent's `RefreshDatabase` truncates another's fixtures mid-run and produces a red
-that has nothing to do with the code. Per CLAUDE.md section 5, each track gets its own:
+Three workstreams run `php artisan test` at the same time. A shared database means one
+workstream's `RefreshDatabase` truncates another's fixtures mid-run and produces a red
+that has nothing to do with the code. Per CONTRIBUTING.md section 3, each workstream gets its own:
 
-| track | database |
+| workstream | database |
 |---|---|
 | F4 | `test_tmp_f4` |
 | F5 | `test_tmp_f5` |
@@ -226,8 +226,8 @@ docker compose -f infra/docker-compose.dev.yml run --rm -e DB_DATABASE=test_tmp_
 
 `backend/tests/bootstrap.php` already honours any `test_tmp_`-prefixed name and
 forces everything else onto `omnihear_test`, so the dev database cannot be hit by
-accident. **Do not drop your database at the end** — the main thread does that at
-integration, following the CLAUDE.md section 8 procedure.
+accident. **Do not drop your database at the end** — the shared teardown does that at
+integration, following the CONTRIBUTING.md section 5 procedure.
 
 Coverage: pcov is now baked into the image, so `--coverage --min=80` works
 directly. It did not before; do not re-add a runtime `pecl install`.

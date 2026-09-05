@@ -23,7 +23,7 @@ return [
     'DISPOSABLE_EMAIL' => 'Geçici e-posta adresleri kabul edilmiyor. Lütfen kurumsal adresinizi kullanın.',
     'SERVER_ERROR' => 'Sunucu tarafında bir hata oluştu.',
 
-    // Wave 2 (F4 ingestion, F5 analysis and quota, F6/F7 payments).
+    // The F4-F7 phase group (F4 ingestion, F5 analysis and quota, F6/F7 payments).
     'INTEGRATION_UNAVAILABLE' => 'Bağlı platform yanıt vermiyor. Otomatik olarak yeniden denenecek.',
     'INTEGRATION_INVALID_CREDENTIALS' => 'Bu entegrasyonun kimlik bilgileri platform tarafından reddedildi.',
     'SYNC_IN_PROGRESS' => 'Bu entegrasyon için zaten bir senkronizasyon çalışıyor.',

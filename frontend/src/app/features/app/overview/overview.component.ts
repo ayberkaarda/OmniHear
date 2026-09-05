@@ -25,7 +25,7 @@ interface Segment<T extends string> {
   readonly percentLabel: string;
   /**
    * The CSS custom property the filled shape is painted with. Read from the
-   * token layer, never a literal: `.claude/skills/omnihear-tokens` section 4
+   * token layer, never a literal: `docs/playbooks/omnihear-tokens` section 4
    * bans raw hex and primitive Tailwind colours in application code.
    */
   readonly fillVar: string;

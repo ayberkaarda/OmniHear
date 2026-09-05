@@ -128,7 +128,7 @@ final readonly class MastodonConnector implements PlatformConnector
         // Misconfigured rather than InvalidCredentials for both: there is no
         // credential on this channel at all, so a refusal here can only be
         // about the settings, and the message the user sees has to say so.
-        if (! self::isHttpsUrl($instanceUrl)) {
+        if (! OutboundHostPolicy::isHttpsUrl($instanceUrl)) {
             throw ConnectorException::of(ConnectorFailure::Misconfigured);
         }
 
@@ -206,6 +206,11 @@ final readonly class MastodonConnector implements PlatformConnector
         $url = rtrim($this->instanceUrl, '/')
             .'/api/v1/timelines/tag/'.rawurlencode($this->hashtag);
 
+        // The instance URL is tenant-supplied and this is the first request that
+        // dereferences it, so the host is checked here before the token-free GET
+        // and again at every redirect hop through the client's allow_redirects.
+        OutboundHostPolicy::assertAllowed($url);
+
         $query = ['limit' => $this->limit()];
 
         if ($token !== null) {
@@ -248,7 +253,13 @@ final readonly class MastodonConnector implements PlatformConnector
     {
         // No Authorization header, by design: the public timeline takes none,
         // and this connector holds no credential to send.
-        return Http::acceptJson()->timeout($this->timeout);
+        //
+        // allow_redirects stays on — a Mastodon-compatible host may redirect the
+        // timeline path — but every hop's target is re-validated by the policy
+        // before it is followed, and only https is followed at all.
+        return Http::acceptJson()
+            ->timeout($this->timeout)
+            ->withOptions(['allow_redirects' => OutboundHostPolicy::redirectOptions()]);
     }
 
     private function limit(): int
@@ -409,21 +420,5 @@ final readonly class MastodonConnector implements PlatformConnector
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
-    }
-
-    /**
-     * The instance URL is pasted by the user and every request goes wherever it
-     * points, so the scheme is whitelisted rather than trusted. Same rule as
-     * EmailConnector's `session_url`.
-     */
-    private static function isHttpsUrl(string $url): bool
-    {
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            return false;
-        }
-
-        return strtolower((string) parse_url($url, PHP_URL_SCHEME)) === 'https'
-            && is_string(parse_url($url, PHP_URL_HOST))
-            && parse_url($url, PHP_URL_HOST) !== '';
     }
 }

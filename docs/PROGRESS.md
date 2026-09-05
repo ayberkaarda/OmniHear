@@ -18,7 +18,7 @@ commit messages; `git log` is the archive.
 | CI | first green run in the repo's history, then hardened so a green run means what it says | closed — `633e347`, `680aa39` + the `failOnWarning` / ONNX-in-CI change |
 | **W3-A** | D-08 Angular 18 -> 22, floor re-measured, thresholds re-based (ADR-0008) | **green** — jest 135/135 unchanged, `npm ls chokidar` 0, zoneless stable, build:gate raw 328.20/347, transfer 92.09/105 |
 | **W3-B** | F2.5 — `verified` enforced, device token revocation, erasure, audit writers, JSON logging, free-domain list | **green** — pest 694 passed, 2303 assertions, coverage 97.9% |
-| **W3-C** | cursor-model test hardening (test-only agent, no production code) | **green** — 39 passed, 81 assertions, no production defect found |
+| **W3-C** | cursor-model test hardening (test-only workstream, no production code) | **green** — 39 passed, 81 assertions, no production defect found |
 | **W4** | frontend data layer ∥ D-06 fixture synthesis + F8 Zendesk | **green** — jest **193/193**, build:gate raw 332.22/347, transfer 93.53/105 · pest **813 passed, 3299 assertions**, coverage **98.1%** |
 | **W5** | realtime, settings, billing flow, SubscriptionGuard ∥ settings endpoints, in-app notifications, Laravel OpenAPI, demo seeder | **green** — jest **284/284**, build:gate raw 335.75/347, transfer 94.09/105 · pest **969 passed, 4535 assertions**, coverage **98.9%** |
 | **W6** | Playwright E2E (register → verify → integrate → sync → inbox → paywall) ∥ READMEs, ARCHITECTURE, ADR-0009/0010, ai-service JSON log | **green** — E2E 46.5 s, DB shows 3 analyzed / 2 pending_analysis · pytest 274 |
@@ -29,11 +29,12 @@ commit messages; `git log` is the archive.
 | **W11** | email connector over JMAP (spec §2: 4 of 6 channels → **5**) ∥ the 2FA replay mark moves from cache to a `users` column, making the check atomic | **green** — CI `33903711379`, seven jobs, E2E 58.3 s, image cache hit for the second run running · pest **1512 passed, 6419 assertions** (identical on a clean checkout), coverage **98.9%** · guards **122** · i18n **480/480** · build:gate raw 339.66/347, transfer 94.88/105 (unmoved) · the replay race test fails 5-of-5 against read-then-write and passes 1-of-5 with the conditional `UPDATE` |
 | **W12** | social connector over the Mastodon hashtag timeline — **6 of 6 channels**, spec §2 complete ∥ MIT licence, the public-facing docs brought to the truth, and the fixture-provenance promise finally tested for Zendesk and Google Play | **green** — CI `33913560354` · pest **1648 passed, 7009 assertions**, coverage **98.9%** · guards **122** · jest **323/56** · i18n **482/482** · build:gate raw 339.66/347, transfer 94.90/105 (unmoved) · **recorded live** from `mastodon.social`, no account: the second channel after App Store to meet a real server |
 | **W13** | closure round: the theme-switch contrast flash found by *looking* at the product, 403 → `Misconfigured`, six raw-key labels, bilingual README with screenshots, D-13 recorded | **green** — CI `33920031959` · pest **1649 passed, 7017 assertions**, coverage **98.9%** · guards **122** · jest **325/56** · i18n **488/488** · pytest 295 · tokens 63/2/0 · build:gate raw 340.70/347, transfer 95.03/105 (unmoved) · **E2E ran locally for the first time**, and found the dev database two migrations behind |
+| **W14** | adversarial security review of the whole tree, then remediation: SSRF via tenant-pasted connector URLs (the headline), the 2FA challenge counter made atomic and per-account, the `pro` quota that a payment never raised, a password gate on 2FA-enrol and email-change, plus smaller fixes; crown-jewel invariants probed and held | **green** — pest **1759 passed, 7223 assertions**, coverage **98.7%** · guards **122** · jest **326/56** · i18n **488/488** · pytest **298** · build:gate raw 340.71/347, transfer 95.03/105 (unmoved) · **E2E passed locally** (found, again, the dev DB a migration behind) · posture recorded in ADR-0011 |
 
-Parallelism budget, measured rather than assumed: wave 1 finished with three opus
-tracks, wave 2 lost all three to a session rate limit, and the difference was track
-size. From W3 on: **at most two writing opus tracks plus one narrow track**, each under
-roughly 25 files, and every agent files a halfway report so a killed session still
+Parallelism budget, measured rather than assumed: the first round finished with three
+parallel workstreams, the second lost all three to a session limit, and the difference was
+workstream size. From W3 on: **at most two writing workstreams plus one narrow one**, each under
+roughly 25 files, and every workstream files a halfway report so an interrupted session still
 leaves a diagnosable tree.
 
 ## Now
@@ -46,17 +47,14 @@ server. The first local run failed and was right to — see the dev-database
 drift in `docs/LESSONS.md`. CI remains the authority, but a two-minute local
 run now catches what used to cost a push.
 
-**A green CI run is not automatically evidence.** The first one reported *534 warnings,
-69 passed* for the backend and *11 skipped* for the AI service and went green anyway.
-Closed: the backend job copies `.env.example`, `phpunit.xml` sets `failOnWarning` and
-`failOnRisky`, the AI job fetches the weights, `pytest -rs` makes a skip visible, and
-Node is pinned by `.nvmrc` so the lockfile is written and read by the same npm.
-**A phase report cites its CI run id, and a skip or a warning is reported, never
-absorbed.**
+**A green CI run is not automatically evidence** — the first reported 534 warnings and
+went green anyway. Hardened (`failOnWarning`/`failOnRisky`, weights fetched, `pytest -rs`,
+`.nvmrc`-pinned Node); the details are in `docs/LESSONS.md`. **A phase report cites its
+CI run id, and a skip or a warning is reported, never absorbed.**
 
-Contracts are written before dispatch so no track guesses at another's shape:
+Contracts are written before implementation so no workstream guesses at another's shape:
 `docs/contracts/{http-api-v1,backend-core,wave2-seams}.md`. Ownership is disjoint by
-top-level directory — the one split that has held across four waves. Where two tracks
+top-level directory — the one split that has held across four rounds. Where two workstreams
 must share a directory, the seams document assigns files and the crossing points are
 events, so neither side references a class the other has not written yet.
 
@@ -86,11 +84,12 @@ the machine that wrote it, and realtime delivery had only ever been asserted.
 
 | id | question | default | decide by |
 |---|---|---|---|
-| D-13 | Remove the AI-tooling trace at completion | **decided 2026-09-04: yes, by porting rather than deleting.** `tenant-scope-guard` and the PHP half of `sensitive-log-guard` become Pest architecture tests — they defend I1 and I5 and are editor-agnostic lint rules; ruff `T20` replaces the Python `print` ban; the other six hooks are agent-only and go. `CLAUDE.md` is **renamed** to `CONTRIBUTING.md`, keeping the invariants, the gate, Traps 1-4 and the destructive-command procedure; the seven playbooks move to `docs/playbooks/`. Two corrections to the first survey: **~30 code files** cite `CLAUDE.md` (`tests/bootstrap.php`, `phpunit.xml`, a runtime message in `bundle-check.mjs:219`, and the binding spec at `OMNIHEAR-SPEC.md:184`), and **14 commit bodies** carry agent vocabulary — `git log` defeats the goal on its own without a final `filter-repo --replace-message`. Order: port, rename, prune, then delete `.claude/` — moving its `attribution` block to user-level settings first, or the deletion commit can itself regain a trailer. Passages that are a decision's *reasoning* (ADR-0001's ownership split, "contracts before dispatch", settings-api 409 to 422) are reworded, never cut | plan recorded |
-| D-01 | `.claude/` + `CLAUDE.md` public in repo? | **superseded by D-13.** Was "keep": Narrow reading of the no-attribution rule, confirmed by behaviour: the note was written 01:56:27 and `14a51d8` at 01:58:14 deliberately kept them tracked | closed |
+| D-14 | Security review remediation scope | **decided 2026-09-05: W14 fixes SSRF (B1), the 2FA challenge counter (B3), the pro quota (B4), the password asymmetry (B9), Stripe tolerance (B12), the validation-error input echo, and the PII mask residue; the rest — B2/B6/B10/B14-17, frontend CSP and token storage, DNS-rebinding residual — are recorded in ADR-0011 with a trigger and a fix shape each, deferred because D-09 makes production-shaped controls untestable.** The probed-and-sound surfaces (I1, I7, ability boundary, injection, webhook signature) are recorded there too, as the portfolio signal | closed |
+| D-13 | Editor-tooling config kept in-repo, or removed for the public release | **decided and done, W14.** The project's engineering rules and playbooks stay — the rules file became `CONTRIBUTING.md` (invariants, the regression gate, Traps 1-4, the destructive-command procedure) and the nine skill playbooks moved to `docs/playbooks/`. The two authoring-time guards worth keeping became gate rules that survive without the tooling: the tenant-scope and log-sensitivity checks are Pest architecture tests under `backend/tests/Feature/Architecture/` (they defend I1 and I5 and are editor-agnostic), and ruff `T20` replaces the Python `print` ban; the CI guards job folded into the backend job. About thirty code and config files referenced the old rules file and were repointed. One item remains for the release itself: a `filter-repo` pass over the commit bodies, which is a history rewrite and so left to the maintainer | closed |
+| D-01 | Editor-tooling config public in-repo? | **superseded by D-13** — the config is removed and its durable content ported to `CONTRIBUTING.md`, `docs/playbooks/` and the architecture tests | closed |
 | D-05 | Repo visibility | **superseded by fact, 2026-09-04.** The row said "stays private until finished" and `docs/LESSONS.md` said Actions minutes were billed because of it. Neither is true: `gh repo view` reports `visibility: PUBLIC`, `isPrivate: false`, since `createdAt 2026-09-03T08:52:06Z`. The W7 rewrite re-created the repository and the new one was public from its first commit — which is also why Actions has been free since W8. Everything that was being held for "before the flip" has been published all along | closed |
 | D-07 | Angular initial-bundle budget | **decided: two thresholds re-derived from the measured floor (ADR-0007).** raw 320kb in `angular.json`, brotli transfer 100 kB in `scripts/bundle-check.mjs`; Trap 2 rewritten with a ratchet | closed |
-| D-08 | **Angular 18 is out of support** (angular.dev: v2-v19 no longer supported). Upgrade is required regardless of the budget | target v22 (Active); also turns `provideExperimentalZonelessChangeDetection` into the stable `provideZonelessChangeDetection` and closes that deviation. Own phase, own gate, after wave 2 | schedule after wave 2 |
+| D-08 | **Angular 18 is out of support** (angular.dev: v2-v19 no longer supported). Upgrade is required regardless of the budget | target v22 (Active); also turns `provideExperimentalZonelessChangeDetection` into the stable `provideZonelessChangeDetection` and closes that deviation. Own phase, own gate, after phase group 2 | schedule after phase group 2 |
 | D-09 | Is spec §11 (staging deploy, prod promotion) and are K8s manifests in scope? | **decided 2026-09-03: no — portfolio project, never deployed.** Out of scope, not deferred; ADR-0010 amended, spec erratum E-7. Leaves the completion denominator and gives D-05 a reachable threshold | closed |
 | D-06 | Real App Store review text was in history (`24ac570`) | **done and verified 2026-09-04.** The rewrite landed: `24ac570`, `24e38a2` and `e122c06` are unreachable from every ref and absent from `origin`; they survive only as dangling local objects awaiting `gc`, which are never pushed. First reachable fixture commit `7d0e927` carries `reviewer-NNN` / `example.invalid` only, and a `git log -S` sweep for key material finds nothing but hook regexes | closed |
 
@@ -115,5 +114,6 @@ cap. Read it at the start of a session; it is where the traps are recorded.
 `docs/adr/` — 0001 monorepo · 0002 container-authoritative runtime · 0003 Laravel 13 ·
 0004 local inference over LLM · 0005 zoneless change detection · 0006 sentiment palette
 with lightness separation · 0007 bundle budget from the measured floor · 0008 Angular 22
-and threshold rebasing · 0009 feedbacks partitioning deferred · 0010 deliberate scope
+and threshold rebasing · 0009 feedbacks partitioning deferred · 0011 security posture and
+deferred hardening · 0010 deliberate scope
 exclusions (amended 2026-09-03: deploy and K8s are out of scope, not deferred).

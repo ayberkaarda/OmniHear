@@ -1,13 +1,8 @@
----
-name: angular-feature-route
-description: OmniHear frontend'inde yeni bir Angular sayfası/route/standalone component eklerken lazy loading, Signal Store ve i18n/WCAG kurallarını doğru uygulamak için kullanılır. Tetikleyiciler yeni sayfa, route, component, standalone, Signal Store, lazy, slice, Angular sayfa, new page, new route.
----
-
 # Angular Feature Route
 
-OmniHear frontend'i Angular 18+ standalone component + Signals + Signal Store kullanır. Bu skill, yeni bir özellik rotası eklerken lazy loading zincirini, guard sırasını, i18n eksiksizliğini ve WCAG 2.1 AA gereksinimlerini sabitler.
+OmniHear frontend'i Angular 18+ standalone component + Signals + Signal Store kullanır. Bu doküman, yeni bir özellik rotası eklerken lazy loading zincirini, guard sırasını, i18n eksiksizliğini ve WCAG 2.1 AA gereksinimlerini sabitler.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
 Yeni bir sayfa/route, standalone component veya Signal Store slice eklenirken.
 

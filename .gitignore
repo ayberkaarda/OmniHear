@@ -94,15 +94,8 @@ docker-compose.override.yml
 Thumbs.db
 desktop.ini
 
-# Obsidian: only relevant if a vault is opened on docs/ (see CLAUDE.md discussion).
+# Obsidian: only relevant if a vault is opened on docs/.
 .obsidian/
-
-# ---------- Claude Code ----------
-# .claude/settings.json and .claude/{hooks,skills}/ ARE committed on purpose —
-# they are the team-wide guard and workflow configuration (CLAUDE.md §10).
-.claude/settings.local.json
-.claude/worktrees/
-.claude/plans/
 
 # ---------- Build / logs / temp ----------
 *.log

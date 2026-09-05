@@ -3,7 +3,7 @@
 These are the fixtures the Laravel side consumes from F5 onwards. Both
 sides reading the same files is what makes the contract a contract, so
 nothing here restates a request or response shape inline — every shape
-comes out of a file (CLAUDE.md §2).
+comes out of a file (CONTRIBUTING.md §2).
 
 Three independent things are checked:
 

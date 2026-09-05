@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Queue;
  * The ingestion -> analysis seam (docs/contracts/wave2-seams.md section 2).
  *
  * These tests drive the event directly and never call into F4's code, which is
- * the whole point of the seam: the two tracks were built in parallel and each
+ * the whole point of the seam: the two workstreams were built in parallel and each
  * side's suite has to be runnable without the other's classes.
  */
 it('registers the listener by auto-discovery, with no provider entry', function () {

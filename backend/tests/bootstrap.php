@@ -18,7 +18,7 @@
 | Horizon queue. Both happened here on 2026-09-02, before this file existed.
 |
 | Overwriting all three layers before the autoloader runs is the only point
-| that is guaranteed to win. CLAUDE.md Trap 4.
+| that is guaranteed to win. CONTRIBUTING.md Trap 4.
 |
 */
 
@@ -63,7 +63,7 @@ if ($currentLimit !== '-1' && $currentLimit !== '') {
 
 $requested = getenv('DB_DATABASE');
 
-// Parallel agents get their own scratch database (CLAUDE.md section 5); anything
+// Parallel test runs get their own scratch database (CONTRIBUTING.md section 3); anything
 // else is forced onto the shared test database, never onto a dev database.
 $database = is_string($requested) && str_starts_with($requested, 'test_tmp_')
     ? $requested

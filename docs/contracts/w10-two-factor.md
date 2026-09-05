@@ -1,6 +1,6 @@
 # W10 — TOTP two-factor contract
 
-Written before dispatch. Backend (track A) and frontend (track B) both build
+Written before implementation. Backend (workstream A) and frontend (workstream B) both build
 against this document and neither guesses at the other's shape.
 
 ## Why this phase exists
@@ -92,7 +92,25 @@ success path.
 
 ### `POST /api/v1/auth/two-factor` — new, session-authenticated
 
-Begins enrolment. Generates a secret, stores it, returns it **once**:
+Begins enrolment. The body **re-proves the password** (security review B9):
+
+```
+{ "password": "<current password>" }
+```
+
+A wrong or missing password is `422 VALIDATION_ERROR` on the `password` field,
+the same envelope `DELETE /auth/two-factor` and `PATCH /settings/password`
+return. This is deliberate and mirrors the disable endpoint: a session alone
+must not be enough to *arm* a factor either, because an attacker on a stolen
+session who enrols their own authenticator — and walks off with the eight
+recovery codes shown once at confirmation — locks the real owner out just as
+completely as one who removes a factor. Beginning and ending a second factor are
+the two moments a session's durability is decided, so both re-prove the
+password. Validation runs before the already-confirmed check, so a caller
+without the password never learns whether a factor was already present.
+
+With the correct password it generates a secret, stores it, and returns it
+**once**:
 
 ```
 201
@@ -137,7 +155,7 @@ code. Only when confirmed.
 
 ## Amended during the phase
 
-Two shapes this document did not name, settled while the tracks were building
+Two shapes this document did not name, settled while the workstreams were building
 and recorded here so the document matches what was shipped:
 
 - **`TWO_FACTOR_NOT_ENABLED`, HTTP 409.** Three endpoints need a "the account is
@@ -152,7 +170,7 @@ and recorded here so the document matches what was shipped:
 
 One deviation is deliberate and is **not** closed. The contract says to store the
 last accepted timestep *on the user*; the migration was already written and
-applied before dispatch and no track owned `database/migrations/`, so the
+applied before implementation and no single workstream owned `database/migrations/`, so the
 high-water mark lives in the cache instead, with a TTL matching the longest a
 code stays verifiable. The cost is stated plainly: a cache eviction — or a
 `FLUSHALL` — forgets the mark, and a code observed inside its own ~90-second
@@ -177,6 +195,34 @@ conditional `UPDATE … WHERE col IS NULL OR col < ?` with an affected-row check
 which closes the race as well. When it moves, `destroy()` and `store()` must
 also clear the mark — otherwise disabling and immediately re-enrolling rejects
 the new secret's first code as a replay of the old one's.
+
+### Both deviations closed (W14)
+
+The replay high-water mark moved to `users.two_factor_last_used_step`
+(migration `2026_09_04_000002`, `App\Support\Auth\TwoFactorReplayGuard`), and
+`store()` / `destroy()` clear it as required above.
+
+The per-token attempt counter has now moved too, for the same atomicity reason
+and two more. It lives in `users.two_factor_challenge_attempts` (migration
+`2026_09_05_000001`), and:
+
+- **Atomic.** `TwoFactorChallenge::recordFailure()` is a single
+  `UPDATE … SET col = COALESCE(col, 0) + 1 … RETURNING`, so concurrent wrong
+  codes no longer collide on a read-modify-write and the five-attempt cap
+  actually fills. `phpunit.xml` pins `CACHE_STORE=array` (per-process), so a
+  cache counter could not be proven under `pcntl` forks in any case; the column
+  can, and is, in `tests/Feature/Auth/TwoFactorChallengeAttemptRaceTest.php`.
+- **Per account, not per token.** The budget lives on the user, so a fresh login
+  no longer refills it. `issue()` additionally revokes the user's earlier
+  challenge tokens so a stockpile cannot be run in parallel.
+- **Reset only by success.** A correct code or recovery code at the challenge
+  clears the counter (`reset()`); the count never blocks a valid second factor,
+  so a legitimate user is never locked out while an attacker's wrong guesses
+  stay counted across tokens and logins.
+
+`throttle:public` remains cache-backed, unchanged — it bounds knock *rate* per
+IP, a different question from the per-account guess *budget* the counter now
+owns durably.
 
 ## Secrets and logging (invariant I5)
 

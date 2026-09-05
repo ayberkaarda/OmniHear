@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\ConfirmTwoFactorRequest;
 use App\Http\Requests\Api\V1\Auth\DisableTwoFactorRequest;
+use App\Http\Requests\Api\V1\Auth\EnableTwoFactorRequest;
 use App\Http\Requests\Api\V1\Auth\TwoFactorChallengeRequest;
 use App\Http\Resources\Api\V1\CompanyResource;
 use App\Http\Resources\Api\V1\UserResource;
@@ -70,8 +71,12 @@ class TwoFactorController extends Controller
      * without support; calling it after confirming is a conflict, because
      * silently replacing a working second factor is how an attacker on a stolen
      * session would migrate it to a device they hold.
+     *
+     * The password is re-proved here (EnableTwoFactorRequest): arming a factor
+     * an attacker holds is as durable a takeover as removing one the owner
+     * holds, so a valid session is deliberately not enough to start it.
      */
-    public function store(Request $request): JsonResponse
+    public function store(EnableTwoFactorRequest $request): JsonResponse
     {
         $user = $this->user($request);
 
@@ -215,7 +220,7 @@ class TwoFactorController extends Controller
         if (! $this->challengeSatisfied($request, $user)) {
             $this->audit->record(AuditAction::TwoFactorChallengeFailed, actor: $user);
 
-            if ($this->challenges->recordFailure($token)) {
+            if ($this->challenges->recordFailure($user)) {
                 $this->destroyChallengeToken($token);
             }
 
@@ -223,6 +228,12 @@ class TwoFactorController extends Controller
         }
 
         $this->destroyChallengeToken($token);
+
+        // A proven second factor is the one event allowed to refill the budget:
+        // clear the per-account attempt counter so a legitimate user who fumbled
+        // a code or two starts fresh, while an attacker's wrong guesses stay
+        // counted across tokens and logins until an actual success like this one.
+        $this->challenges->reset($user);
 
         $user->forceFill(['last_login_ip' => $request->ip()])->save();
 
@@ -270,7 +281,6 @@ class TwoFactorController extends Controller
 
     private function destroyChallengeToken(PersonalAccessToken $token): void
     {
-        $this->challenges->forget($token);
         $token->delete();
     }
 

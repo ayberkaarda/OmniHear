@@ -14,7 +14,7 @@ use Tests\Feature\Payments\PaymentTestKit;
 |--------------------------------------------------------------------------
 |
 | Every payload is loaded from tests/Fixtures/webhooks/stripe/ and signed with
-| the same verifier the application uses (CLAUDE.md section 2).
+| the same verifier the application uses (CONTRIBUTING.md section 2).
 |
 | Event::fake() names the one event it fakes. A blanket Event::fake() also
 | swallows Eloquent's own model events, which is where BelongsToCompany fills
@@ -85,6 +85,31 @@ it('rejects a signature whose timestamp is outside the tolerance window', functi
     PaymentTestKit::post($this, PaymentTestKit::STRIPE_WEBHOOK_URI, $rawBody, $stale)
         ->assertStatus(400)
         ->assertJsonPath('code', 'INVALID_WEBHOOK_SIGNATURE');
+});
+
+it('fails closed when the tolerance is non-positive instead of skipping the timestamp check', function () {
+    Event::fake([SubscriptionActivated::class]);
+
+    // A non-numeric STRIPE_SIGNATURE_TOLERANCE ("", "none", "5m") casts to 0.
+    // The old verifier gated the timestamp check behind `$tolerance > 0`, so a
+    // 0 tolerance silently disabled it and a captured request replayed forever.
+    // config/stripe.php now clamps to >= 1; this pins the verifier's own guard
+    // by forcing the degenerate value straight into config.
+    config(['stripe.signature_tolerance' => 0]);
+
+    [$company] = tenant();
+    $payload = PaymentTestKit::stripeEvent('checkout-session-completed', $company->id);
+    $rawBody = PaymentTestKit::encode($payload);
+
+    // A perfectly fresh, correctly signed request: the only thing wrong is the
+    // tolerance. Before the fix this was accepted with 200.
+    $wellSigned = PaymentTestKit::stripeHeaders($rawBody);
+
+    PaymentTestKit::post($this, PaymentTestKit::STRIPE_WEBHOOK_URI, $rawBody, $wellSigned)
+        ->assertStatus(400)
+        ->assertJsonPath('code', 'INVALID_WEBHOOK_SIGNATURE');
+
+    Event::assertNotDispatched(SubscriptionActivated::class);
 });
 
 it('rejects everything when no signing secret is configured', function () {

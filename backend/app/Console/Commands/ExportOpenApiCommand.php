@@ -18,7 +18,7 @@ use Illuminate\Console\Command;
  * **read-only** (infra/docker-compose.dev.yml), because the backend consumes
  * the shared fixtures and must never write them. That mount is also the only
  * place the contract file exists inside the container, so the command cannot
- * write it in place — and infra/ is not this track's to change. `--print`
+ * write it in place — and infra/ is not this workstream's to change. `--print`
  * puts the document on stdout so the host redirects it into the file, and
  * `--check` reads the committed copy through the same read-only mount.
  *

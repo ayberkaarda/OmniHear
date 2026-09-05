@@ -228,7 +228,11 @@ class IngestionRunner
      */
     private function maskPii(string $body): string
     {
-        return (string) preg_replace('/[\w.+-]+@[\w-]+\.[a-z]{2,}/i', '[email]', $body);
+        // The domain part allows a dot so a multi-label TLD is consumed whole:
+        // without it, `ahmet@sirket.com.tr` masked to `[email].tr`, leaving a
+        // residue. `[a-z]{2,}` still anchors the final label, so a trailing dot
+        // is not swept into the match.
+        return (string) preg_replace('/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i', '[email]', $body);
     }
 
     /**

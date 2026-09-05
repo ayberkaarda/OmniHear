@@ -20,7 +20,7 @@ use Tests\Support\PlatformFixture;
 | Trustpilot, end to end — IngestionRunner against the recorded pages
 |--------------------------------------------------------------------------
 |
-| ConnectorFactory and config/connectors.php are the main thread's files and do
+| ConnectorFactory and config/connectors.php are shared files (owned centrally) and do
 | not know this platform yet, so the connector is constructed directly and
 | injected through the same StubConnectorFactory the rest of the ingestion suite
 | uses. Everything from IngestionRunner down is the real path: the page loop,

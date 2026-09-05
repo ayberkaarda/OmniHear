@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Http;
  * than replacing them, so a second `Http::fake(closure)` inside a test that
  * already installed one leaves the first closure in charge. A two-phase test
  * written that way never reaches its second phase and stays green while
- * proving nothing — it cost both W8 connector tracks a debugging pass.
+ * proving nothing — it cost both W8 connector workstreams a debugging pass.
  *
  * Every multi-phase test below therefore installs exactly one closure, driven
  * by a mutable script, and asserts the request count so a phase that was never

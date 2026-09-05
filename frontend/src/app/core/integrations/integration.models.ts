@@ -20,7 +20,7 @@ export type IntegrationStatus = (typeof INTEGRATION_STATUSES)[number];
  * There is deliberately no `CONNECTABLE_PLATFORMS` constant here any more.
  *
  * It used to mirror `config/connectors.php` by hand, and it drifted the first
- * time the backend changed: Zendesk was added mid-wave and the mismatch was
+ * time the backend changed: Zendesk was added mid-phase and the mismatch was
  * caught by a person rather than by the build. `GET /api/v1/integrations/platforms`
  * now publishes what the connector registry actually holds, and `PlatformsStore`
  * reads it — the same reason `REQUIRED_SETTINGS` and `REQUIRED_CREDENTIALS` are

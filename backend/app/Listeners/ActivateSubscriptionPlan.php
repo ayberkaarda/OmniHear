@@ -17,11 +17,12 @@ use Illuminate\Support\Facades\Log;
  * side, so that neither provider integration has to reach into quota counters
  * or feedback rows.
  *
- * The new limit comes from config/quota.php and from nowhere else. When the
- * plan has no configured limit yet - `plans.pro.quota_limit` is deliberately
- * null until F6/F7 decides the number - the listener leaves the existing limit
- * alone and says so in the log rather than writing a guess into a customer's
- * row. The re-queue still runs: it is idempotent, and any feedback that still
+ * The new limit comes from config/quota.php and from nowhere else. Every known
+ * plan has a configured limit there. If activation ever names a plan with no
+ * limit - an unknown plan, or a config regression - the listener leaves the
+ * existing limit alone and logs an error rather than writing a guess into a
+ * customer's row: that is now a genuine fault, not an expected waypoint. The
+ * re-queue still runs regardless: it is idempotent, and any feedback that still
  * does not fit under the old limit is simply parked again.
  */
 class ActivateSubscriptionPlan
@@ -61,8 +62,11 @@ class ActivateSubscriptionPlan
             $company->forceFill(['plan' => $event->plan])->save();
 
             // quota_limit did not change here - the KPI payload's quota.limit
-            // is still correct, so there is nothing to invalidate.
-            Log::warning('quota.plan_limit_not_configured', [
+            // is still correct, so there is nothing to invalidate. This is an
+            // error, not a warning: every known plan carries a limit in
+            // config/quota.php, so reaching here means an unknown plan was
+            // activated or the config regressed - a real fault to page on.
+            Log::error('quota.plan_limit_not_configured', [
                 'company_id' => $event->companyId,
                 'plan' => $event->plan,
                 'provider' => $event->provider,

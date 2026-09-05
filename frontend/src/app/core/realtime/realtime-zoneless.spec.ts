@@ -14,7 +14,7 @@ const FEEDBACKS = `${environment.apiBaseUrl}/v1/feedbacks`;
 const INTEGRATIONS = `${environment.apiBaseUrl}/v1/integrations`;
 
 /**
- * The zoneless probe, in the shape virtual scroll was probed in last wave.
+ * The zoneless probe, in the shape virtual scroll was probed in the previous phase.
  *
  * The risk this rules out is specific and silent: under
  * `provideZonelessChangeDetection` there is no zone patching `WebSocket`, so a

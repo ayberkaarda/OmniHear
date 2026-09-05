@@ -7,7 +7,7 @@
 |
 | Customer-facing copy for the invitation mail and for the one validation
 | message the accept endpoint can raise. Kept out of the code because
-| CLAUDE.md section 6 forbids hard-coded user text on either side of the
+| CONTRIBUTING.md section 4 forbids hard-coded user text on either side of the
 | stack; the Laravel half lives in lang/{en,tr}.
 |
 */

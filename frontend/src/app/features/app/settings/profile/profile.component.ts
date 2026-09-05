@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { TwoFactorStore } from '../../../../core/auth/two-factor.store';
 import { errorMessageForCode } from '../../../../core/errors/error-messages';
 import { ProfileStore } from '../../../../core/settings/profile.store';
+import { ProfileUpdateBody } from '../../../../core/settings/settings.models';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { InputComponent } from '../../../../shared/ui/form-field/input.component';
 import { formatDate } from '../../../../shared/format/format';
@@ -71,7 +73,42 @@ export class ProfileComponent implements OnInit {
 
   protected readonly detailsForm = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
-    email: ['', [Validators.required, Validators.email]]
+    email: ['', [Validators.required, Validators.email]],
+    // Required only when the email actually moves — see `emailChanged` and the
+    // effect below. A name-only change must never ask for it.
+    password: ['']
+  });
+
+  /**
+   * Whether the typed email differs from the one on the session. The password
+   * field appears, and becomes required, exactly here: moving the address is a
+   * one-step account takeover (the reset link follows the mailbox), so the
+   * server re-proves the password — and the form asks for it only then. The
+   * comparison mirrors the backend's: case- and whitespace-insensitive.
+   */
+  private readonly emailValue = toSignal(this.detailsForm.controls.email.valueChanges, { initialValue: '' });
+  protected readonly emailChanged = computed(() => {
+    const current = (this.user()?.email ?? '').trim().toLowerCase();
+    return this.emailValue().trim().toLowerCase() !== current;
+  });
+
+  /**
+   * Keeps the `password` control's `required` rule in step with `emailChanged`,
+   * and clears the field when it is no longer needed so a typed-then-abandoned
+   * password does not linger. `setValidators` is idempotent, so a repeated true
+   * state never stacks the rule.
+   */
+  private readonly emailPasswordGate = effect(() => {
+    const control = this.detailsForm.controls.password;
+    if (this.emailChanged()) {
+      control.setValidators([Validators.required]);
+    } else {
+      control.clearValidators();
+      if (control.value !== '') {
+        control.setValue('', { emitEvent: false });
+      }
+    }
+    control.updateValueAndValidity({ emitEvent: false });
   });
 
   protected readonly passwordForm = this.fb.group(
@@ -82,6 +119,15 @@ export class ProfileComponent implements OnInit {
     },
     { validators: passwordsMatchValidator('password', 'password_confirmation') }
   );
+
+  /**
+   * The password that begins enrolment. Re-proved for the same reason the
+   * disable form re-proves it: arming a factor an attacker holds is as durable a
+   * takeover as removing one the owner holds (contract `w10-two-factor.md`).
+   */
+  protected readonly enrolStartForm = this.fb.group({
+    password: ['', [Validators.required]]
+  });
 
   protected readonly confirmForm = this.fb.group({
     code: ['', [Validators.required, Validators.pattern(TOTP_CODE_PATTERN)]]
@@ -151,8 +197,16 @@ export class ProfileComponent implements OnInit {
       this.onFieldBlur();
       return;
     }
-    const { name, email } = this.detailsForm.getRawValue();
-    this.store.updateProfile({ name: name.trim(), email: email.trim() });
+    const { name, email, password } = this.detailsForm.getRawValue();
+    const changingEmail = this.emailChanged();
+    const body: ProfileUpdateBody = changingEmail
+      ? { name: name.trim(), email: email.trim(), password }
+      : { name: name.trim(), email: email.trim() };
+    this.store.updateProfile(body);
+    if (changingEmail) {
+      // The password is a secret; it does not linger in the DOM past the submit.
+      this.detailsForm.controls.password.setValue('');
+    }
   }
 
   protected submitPassword(): void {
@@ -170,8 +224,15 @@ export class ProfileComponent implements OnInit {
   /* ---------------------------------------------------------- two-factor */
 
   protected startEnrolment(): void {
+    if (this.enrolStartForm.invalid) {
+      this.enrolStartForm.markAllAsTouched();
+      this.onFieldBlur();
+      return;
+    }
     this.confirmForm.reset({ code: '' });
-    this.twoFactor.start();
+    this.twoFactor.start(this.enrolStartForm.getRawValue().password);
+    // Cleared unconditionally: it is a secret, and the DOM outlives the request.
+    this.enrolStartForm.reset({ password: '' });
   }
 
   protected cancelEnrolment(): void {
@@ -216,6 +277,13 @@ export class ProfileComponent implements OnInit {
     this.twoFactor.dismissRecoveryCodes();
   }
 
+  protected enrolStartError(field: string): string | undefined {
+    this.formTick();
+    return (
+      serverFieldError(this.twoFactor.startErrors(), field) ?? controlErrorMessage(this.enrolStartForm.get(field))
+    );
+  }
+
   protected confirmError(field: string): string | undefined {
     this.formTick();
     return (
@@ -246,7 +314,9 @@ export class ProfileComponent implements OnInit {
   private syncDetailsForm(): void {
     const user = this.user();
     if (user !== null) {
-      this.detailsForm.setValue({ name: user.name, email: user.email });
+      // `password` stays empty: it is only asked for when the email actually
+      // moves (see `emailChanged`), never seeded from the session.
+      this.detailsForm.setValue({ name: user.name, email: user.email, password: '' });
     }
   }
 }

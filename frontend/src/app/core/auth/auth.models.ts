@@ -149,6 +149,15 @@ export function isTwoFactorChallenge(response: LoginResponse): response is TwoFa
  */
 export type TwoFactorChallengeRequest = { code: string } | { recovery_code: string };
 
+/**
+ * `POST /auth/two-factor` request. The password re-proves the session before a
+ * second factor is armed: arming one an attacker holds is as durable a takeover
+ * as removing one the owner holds, so a valid session is deliberately not enough.
+ */
+export interface TwoFactorEnrolmentRequest {
+  password: string;
+}
+
 /** `POST /auth/two-factor` (201). The secret is served here and nowhere else. */
 export interface TwoFactorEnrolmentResponse {
   secret: string;

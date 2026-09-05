@@ -108,6 +108,26 @@ it('redacts the address without mangling the rest of the payload', function () {
         ->and($row->raw_payload['via']['source']['from']['address'])->toBe('[email]');
 });
 
+it('masks an address on a multi-label TLD with no residue', function () {
+    // `sirket.com.tr` is a two-label public suffix. The old domain pattern
+    // `[\w-]+\.[a-z]{2,}` stopped at the last label, masking to `[email].tr` and
+    // leaving the second-level domain on the record. The address must go whole.
+    $page = PlatformFixture::json('zendesk', 'page-2-end.json');
+    $page['tickets'][0]['via']['source']['from']['name'] = 'ahmet@sirket.com.tr';
+
+    Http::fake(['*' => Http::response((string) json_encode($page), 200)]);
+    [$company, $integration] = piiZendeskIntegration();
+
+    FetchFeedbackJob::dispatchSync($company->id, $integration->id);
+
+    $row = asTenant($company, fn () => Feedback::query()
+        ->where('external_id', (string) $page['tickets'][0]['id'])
+        ->firstOrFail());
+
+    expect($row->author)->toBe('[email]')
+        ->and($row->author)->not->toContain('.tr');
+});
+
 it('masks an address that arrives as the author name', function () {
     // Zendesk's `via.source.from.name` falls back to the address when the
     // sender set no display name, and `author` is a listed column.

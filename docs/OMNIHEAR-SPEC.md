@@ -181,7 +181,7 @@ kurulamıyor; tek bir `/health` route'lu iskelet Angular 18'de 245.00 kB, Angula
 22'de 261.29 kB. Yani eşik uygulama kodunu değil framework'ü ölçüyordu.
 
 Hedef **brotli transfer** üzerinden okunur (bugün **94.46 kB**, 250 KB'nin çok
-altında); raw eşik regresyon tripwire'ı olarak korunur ve yükseltilmesi CLAUDE.md
+altında); raw eşik regresyon tripwire'ı olarak korunur ve yükseltilmesi CONTRIBUTING.md
 Tuzak 2'nin atıf tablosu prosedürünü gerektirir.
 
 ### E-4 — §5: `integrations.credentials` "encrypted JSONB" → **encrypted text**

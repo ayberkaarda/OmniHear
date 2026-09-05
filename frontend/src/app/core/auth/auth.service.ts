@@ -82,9 +82,14 @@ export class AuthService {
 
   /* ------------------------------------------------ two-factor: enrolment */
 
-  /** `201`. The secret is served once, here; nothing stores it client-side. */
-  startTwoFactorEnrolment(): Observable<TwoFactorEnrolmentResponse> {
-    return this.http.post<TwoFactorEnrolmentResponse>(`${this.baseUrl}/two-factor`, {});
+  /**
+   * `201`. The secret is served once, here; nothing stores it client-side.
+   *
+   * The password re-proves the session: beginning enrolment on an account is as
+   * durable a takeover, from a stolen session, as removing a factor from one.
+   */
+  startTwoFactorEnrolment(password: string): Observable<TwoFactorEnrolmentResponse> {
+    return this.http.post<TwoFactorEnrolmentResponse>(`${this.baseUrl}/two-factor`, { password });
   }
 
   /**

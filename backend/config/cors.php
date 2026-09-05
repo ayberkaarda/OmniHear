@@ -68,7 +68,7 @@ return [
     'allowed_headers' => ['*'],
 
     // Response headers JavaScript is allowed to read. Empty by default, which
-    // is what hid X-Quota-Remaining from the SPA for the whole of wave 2.
+    // is what hid X-Quota-Remaining from the SPA for the whole of the F4-F7 phase group.
     'exposed_headers' => ['X-Quota-Remaining', 'X-Correlation-Id', 'Retry-After'],
 
     // Cache the preflight for ten minutes. Zero means a second OPTIONS round

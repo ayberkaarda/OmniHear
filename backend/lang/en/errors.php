@@ -24,7 +24,7 @@ return [
     'DISPOSABLE_EMAIL' => 'Disposable email addresses are not accepted. Use your work address.',
     'SERVER_ERROR' => 'Something went wrong on our side.',
 
-    // Wave 2 (F4 ingestion, F5 analysis and quota, F6/F7 payments).
+    // The F4-F7 phase group (F4 ingestion, F5 analysis and quota, F6/F7 payments).
     'INTEGRATION_UNAVAILABLE' => 'The connected platform is not responding. We will retry automatically.',
     'INTEGRATION_INVALID_CREDENTIALS' => 'The credentials for this integration were rejected by the platform.',
     'SYNC_IN_PROGRESS' => 'A sync is already running for this integration.',

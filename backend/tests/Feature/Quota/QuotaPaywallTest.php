@@ -176,7 +176,7 @@ it('reports the reservation against the current limit', function () {
 });
 
 it('is registered under the quota middleware alias', function () {
-    // bootstrap/app.php is this track's file; the alias is what lets the
+    // bootstrap/app.php is this workstream's file; the alias is what lets the
     // ingestion trigger - which does spend quota - opt into the same 402.
     expect(app('router')->getMiddleware())
         ->toHaveKey('quota')

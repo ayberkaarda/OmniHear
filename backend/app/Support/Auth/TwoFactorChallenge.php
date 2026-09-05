@@ -4,7 +4,7 @@ namespace App\Support\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 
 /**
@@ -20,35 +20,58 @@ use Laravel\Sanctum\PersonalAccessToken;
  * `EnforceTokenAbility` refuses it on every authenticated route, so it opens
  * exactly one door and no other.
  *
- * # Why the attempt counter is here and not in the limiter
+ * # Why the attempt counter is per account, in a column, and atomic
  *
  * `throttle:public` is keyed by IP and bounds how fast anyone can knock. It
- * does not bound how many guesses *one* half-authenticated session gets, and
+ * does not bound how many guesses *one* half-authenticated account gets, and
  * those are different questions: an attacker who has the password and a botnet
  * spends one IP allowance per address while walking the same six-digit space
- * against a single account. The per-token counter is what makes that walk
- * finite — five wrong codes and the token is gone, so the password has to be
- * re-presented (and the login limiter met) to get another one.
+ * against a single account. The attempt counter is what makes that walk finite.
  *
- * The counter lives in the cache, as does `throttle:public`, so both reset
- * together if the cache is lost; the bound that survives that is the token's
- * own five-minute `expires_at` in the database. TwoFactorReplayGuard's docblock
- * works through what that leaves exposed.
+ * Three things about it, each fixing a way the W10 cache version failed:
+ *
+ *  - **Atomic.** W10 counted with `Cache::get` + `Cache::put`, a
+ *    read-modify-write. Two wrong-code requests in flight at once both read the
+ *    same count and both write count+1, so five concurrent guesses advanced the
+ *    counter by one and the budget never filled. `recordFailure()` is now a
+ *    single `UPDATE … SET col = COALESCE(col, 0) + 1 … RETURNING` whose returned
+ *    value decides whether the budget is spent — PostgreSQL serialises the
+ *    increments, not this class. Same move, same reason as
+ *    `TwoFactorReplayGuard`.
+ *  - **Per account, not per token.** The count lives on the user, so a fresh
+ *    login minting a new token no longer resets it — an attacker re-presenting
+ *    the password they already hold does not buy a fresh budget. `issue()` also
+ *    revokes any earlier challenge tokens, so a stockpile of them cannot be run
+ *    in parallel.
+ *  - **Reset only by success.** `reset()` returns the count to zero when a full
+ *    session is granted (a correct code or recovery code at the challenge). The
+ *    count is never consulted to *block* a correct code — a valid second factor
+ *    always passes and clears the count — so a legitimate user who fumbled a few
+ *    codes is never locked out, while an attacker's wrong guesses stay counted
+ *    across tokens and logins until someone actually authenticates.
+ *
+ * The counter is a `users` column now, so a cache eviction or a `FLUSHALL` no
+ * longer forgets it; the replay mark it sits beside moved for the same reasons.
  */
 final class TwoFactorChallenge
 {
-    /** Wrong codes a single challenge token survives. */
+    /** Wrong codes an account survives before each challenge token dies on its first miss. */
     public const MAX_ATTEMPTS = 5;
 
     public const TOKEN_NAME = 'two-factor-challenge';
 
-    private const PREFIX = 'two-factor:challenge-attempts:';
-
     /**
      * Mint the challenge credential for a user whose password checked out.
+     *
+     * Any earlier challenge token is revoked first. The per-account attempt
+     * counter is deliberately *not* touched here: refilling the budget on every
+     * login is exactly the hole this closes, so only a proven second factor
+     * (`reset()`) clears it.
      */
     public function issue(User $user): string
     {
+        $user->tokens()->where('name', self::TOKEN_NAME)->delete();
+
         return $user->createToken(
             self::TOKEN_NAME,
             TokenAbility::challenge(),
@@ -98,25 +121,46 @@ final class TwoFactorChallenge
     }
 
     /**
-     * Count one wrong code against the token. True when the budget is now
-     * spent, in which case the caller destroys the token.
+     * Count one wrong code against the account. True when the budget is now
+     * spent, in which case the caller destroys the challenge token.
+     *
+     * The increment and the read of its result are one statement, so concurrent
+     * wrong-code requests cannot collide the way the W10 cache version did: each
+     * caller sees its own distinct post-increment value, and exactly the guesses
+     * that reach the cap are told the budget is spent.
      */
-    public function recordFailure(PersonalAccessToken $token): bool
+    public function recordFailure(User $user): bool
     {
-        $key = self::PREFIX.$token->getKey();
-        $attempts = (int) Cache::get($key, 0) + 1;
+        // tenant-scope: bypass-ok `users` is a documented CompanyScope exemption
+        // (see App\Models\User) and the row is addressed by primary key. Eloquent
+        // cannot express an increment whose post-write value is the return value,
+        // and that atomicity is the whole point (see TwoFactorReplayGuard).
+        $row = DB::selectOne(
+            <<<'SQL'
+            UPDATE users
+               SET two_factor_challenge_attempts = COALESCE(two_factor_challenge_attempts, 0) + 1
+             WHERE id = ?
+            RETURNING two_factor_challenge_attempts
+            SQL,
+            [$user->getKey()],
+        );
 
-        Cache::put($key, $attempts, TokenLifetime::CHALLENGE_MINUTES * 60);
+        // A row that vanished mid-flight cannot be granted more guesses.
+        $attempts = $row === null ? self::MAX_ATTEMPTS : (int) $row->two_factor_challenge_attempts;
 
         return $attempts >= self::MAX_ATTEMPTS;
     }
 
     /**
-     * Forget the counter for a token that is being destroyed, so a recycled id
-     * never inherits a stranger's budget.
+     * Clear the account's attempt budget after a proven second factor.
+     *
+     * Called on a successful challenge - the one event that is allowed to refill
+     * the budget, because it is the one event an attacker walking the code space
+     * cannot manufacture.
      */
-    public function forget(PersonalAccessToken $token): void
+    public function reset(User $user): void
     {
-        Cache::forget(self::PREFIX.$token->getKey());
+        // tenant-scope: bypass-ok same reason as recordFailure() above.
+        DB::update('UPDATE users SET two_factor_challenge_attempts = 0 WHERE id = ?', [$user->getKey()]);
     }
 }

@@ -1,13 +1,13 @@
 # W8 — Google Play and Trustpilot connectors
 
-Status: **binding for W8.** Written by the main thread before dispatch, so two
-connector tracks can run in parallel without either guessing at a shared type or
+Status: **binding for W8.** Written centrally before implementation, so two
+connector workstreams can run in parallel without either guessing at a shared type or
 touching a shared file.
 
 Source of truth for behaviour: `docs/OMNIHEAR-SPEC.md` §2 (six channels), §6.1
 (incremental fetch, full scans forbidden), §8 (credential handling).
 Companion: `docs/contracts/backend-core.md` §1 (the `integrations` row),
-`.claude/skills/platform-connector`.
+`docs/playbooks/platform-connector`.
 
 Closes two of the nine entries in `docs/adr/0010-deliberate-scope-exclusions.md`.
 
@@ -22,20 +22,20 @@ comes from published API documentation, and the fixtures are synthesised from
 it — exactly the position `ZendeskConnector` is already in.
 
 This is a real limitation, not a formality. It means the connectors are correct
-against the documentation and unproven against the wire. Each track therefore
+against the documentation and unproven against the wire. Each workstream therefore
 owes a `README.md` beside its fixtures that separates, field by field, **what is
 documented** from **what is inferred** — the same file `contracts/fixtures/platforms/zendesk/README.md`
 already provides. A reviewer must be able to tell the two apart without opening
 the vendor's docs.
 
-`docs/adr/0010` is updated at the end of the wave to say two of the four missing
+`docs/adr/0010` is updated at the end of the phase to say two of the four missing
 connectors were built and under what evidence.
 
 ---
 
 ## 1. Ownership — disjoint, and enforced by directory
 
-### Track A — `googleplay` (agent, `model: "opus"`)
+### Workstream A — `googleplay`
 
 Root: `C:\dev\SaaaS\backend`. Writes **only** these paths:
 
@@ -48,7 +48,7 @@ backend/tests/Fixtures/platforms/googleplay/**
 contracts/fixtures/platforms/googleplay/**
 ```
 
-### Track B — `trustpilot` (agent, `model: "opus"`)
+### Workstream B — `trustpilot`
 
 Root: `C:\dev\SaaaS\backend`. Writes **only** these paths:
 
@@ -60,7 +60,7 @@ backend/tests/Fixtures/platforms/trustpilot/**
 contracts/fixtures/platforms/trustpilot/**
 ```
 
-### Main thread — nobody else touches these
+### Shared files — nobody else touches these
 
 ```
 backend/config/connectors.php                       platform entries
@@ -71,19 +71,19 @@ frontend/src/locale/messages.xlf, messages.tr.xlf    the label strings
 docs/PROGRESS.md, docs/adr/0010-*.md                 the record
 ```
 
-Neither agent edits `ConnectorFactory` or `config/connectors.php`. They are the
-only files both tracks would need, which is exactly why the main thread owns
-them. **Consequence both agents must design around: the factory cannot build
+Neither workstream edits `ConnectorFactory` or `config/connectors.php`. They are the
+only files both workstreams would need, which is exactly why they are owned centrally.
+**Consequence both workstreams must design around: the factory cannot build
 your connector during your work.** Your tests construct the connector directly
 with `new`, the way `AppStoreConnector`'s unit tests already do. The
-factory-level test is the main thread's, written after both classes land.
+factory-level test is written centrally, after both classes land.
 
 ### Test databases (§5)
 
-Track A: `DB_DATABASE=test_tmp_w8gp php artisan test --filter=GooglePlay`
-Track B: `DB_DATABASE=test_tmp_w8tp php artisan test --filter=Trustpilot`
+Workstream A: `DB_DATABASE=test_tmp_w8gp php artisan test --filter=GooglePlay`
+Workstream B: `DB_DATABASE=test_tmp_w8tp php artisan test --filter=Trustpilot`
 
-Each agent drops its own database when it is finished, by explicit name, one at
+Each workstream drops its own database when it is finished, by explicit name, one at
 a time. Wildcards are forbidden (§8). `omnihear` and `omnihear_test` are never
 touched.
 
@@ -93,7 +93,7 @@ touched.
 
 `PlatformConnector`, `ConnectorPage`, `ConnectorItem`, `ConnectorLimits`,
 `ConnectorHealth`, `ConnectorFailure`, `ConnectorException`, `SyncCursor` and
-`IngestionRunner` are **fixed**. Neither track modifies any of them.
+`IngestionRunner` are **fixed**. Neither workstream modifies any of them.
 
 If a connector cannot be expressed within these types, that is a contract
 finding: stop, report it, and do not widen the interface unilaterally. Both
@@ -114,7 +114,7 @@ bearing and one of them has already cost this project a debugging session:
 
 ---
 
-## 3. Track A — Google Play
+## 3. Workstream A — Google Play
 
 ### The endpoint
 
@@ -166,8 +166,8 @@ walking the feed to its end.
 
 ### Authentication — the part that is new
 
-A service account, not an API key. Two steps, and the second is the reason this
-track is `opus`:
+A service account, not an API key. Two steps, and the second is why this
+workstream carries the real complexity:
 
 1. Build and RS256-sign a JWT asserting `iss = client_email`,
    `scope = https://www.googleapis.com/auth/androidpublisher`,
@@ -217,7 +217,7 @@ credentials:  client_email, private_key
 reasoning as `ConnectorFactory::subdomain()`. Java package syntax only:
 `/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$/`. Anything else is
 `Misconfigured`. **The whitelist regex lives in your connector's constructor**,
-because the factory is not yours to edit; the main thread will not duplicate it.
+because the factory is not yours to edit; the integration step will not duplicate it.
 
 ### Constructor — fixed, the factory is written against this
 
@@ -252,11 +252,11 @@ Do not change these signatures. If one is wrong, say so before writing code.
 
 ### Error mapping
 
-> **Corrected 2026-09-03, mid-wave.** The first version of this table named
+> **Corrected 2026-09-03, mid-phase.** The first version of this table named
 > three `ConnectorFailure` cases that do not exist — `AuthFailed`,
 > `TemporarilyUnavailable`, `UnexpectedResponse`. The enum has exactly six:
 > `Unreachable`, `InvalidCredentials`, `RateLimited`, `DepthLimitExceeded`,
-> `MalformedResponse`, `Misconfigured`. Both tracks caught it and neither
+> `MalformedResponse`, `Misconfigured`. Both workstreams caught it and neither
 > invented a case; the table below is the real vocabulary.
 
 | HTTP | `ConnectorFailure` |
@@ -264,7 +264,7 @@ Do not change these signatures. If one is wrong, say so before writing code.
 | 401, 403 | `InvalidCredentials` |
 | 404 | `Misconfigured` (unknown package, or the account cannot see it) |
 | 429 | `RateLimited` |
-| **400** | `Misconfigured` — **decided mid-wave**, see below |
+| **400** | `Misconfigured` — **decided mid-phase**, see below |
 | 5xx, connection error, timeout | `Unreachable` |
 | unparseable body, `reviews` present but not a list | `MalformedResponse` |
 
@@ -283,7 +283,7 @@ the integration permanently. That recovery was not anticipated by this contract
 and is the connector's own.
 
 **An absent `reviews` key is an empty page, not a malformed response** — also
-decided mid-wave. The protobuf-to-JSON mapping omits empty repeated fields, so an
+decided mid-phase. The protobuf-to-JSON mapping omits empty repeated fields, so an
 application with nothing in the seven-day window answers `{}`, and refusing that
 would report a healthy integration as permanently broken. `{}` and `[]` are
 indistinguishable once decoded, so the pair is accepted together and a *non-empty*
@@ -294,7 +294,7 @@ rather than inventing a second vocabulary.
 
 ---
 
-## 4. Track B — Trustpilot
+## 4. Workstream B — Trustpilot
 
 ### The endpoint
 
@@ -352,7 +352,7 @@ credentials:  api_key
 `business_unit_id` goes into the URL path: whitelist it, do not escape it.
 Trustpilot's ids are 24-character hex; accept `/^[a-f0-9]{24}$/i` and refuse the
 rest as `Misconfigured`. The regex lives in your connector's constructor, for
-the same reason as Track A's.
+the same reason as Workstream A's.
 
 ### Constructor — fixed
 
@@ -369,16 +369,16 @@ public function __construct(
 
 ### Error mapping
 
-Same table as Track A — 401/403 → `InvalidCredentials` covers both a bad key and a
+Same table as Workstream A — 401/403 → `InvalidCredentials` covers both a bad key and a
 business unit the key cannot read; 404 → `Misconfigured`; 429 → `RateLimited`;
 everything else → `Unreachable`. Trustpilot has no equivalent of Google Play's
 stale-token case, so it has no 400 arm.
 
 ---
 
-## 5. Both tracks — what "done" means
+## 5. Both workstreams — what "done" means
 
-A track is done when all of these are true, each with a command and its real
+A workstream is done when all of these are true, each with a command and its real
 output in the report (§2 — a claim without output is not a claim):
 
 - [ ] `healthCheck()` implemented, returning `ConnectorHealth`, and tested for
@@ -395,14 +395,14 @@ output in the report (§2 — a claim without output is not a claim):
 - [ ] A feedback-ingestion test that runs `IngestionRunner` against the fixtures
       through `Http::fake()` and asserts rows land with the right
       `company_id`, `external_id` and `published_at`. **Not `rating`** — corrected
-      mid-wave: `feedbacks` has no such column, so `ConnectorItem::$rating` only
+      mid-phase: `feedbacks` has no such column, so `ConnectorItem::$rating` only
       reaches the database inside `raw_payload`. Assert the mapping directly in
       the unit test and through `raw_payload` at the database layer.
 
 > **`Http::fake()` merges stub callbacks; it does not replace them.** A second
 > `Http::fake(closure)` in a test that already installed one leaves the first in
 > charge, so the later phase of a two-phase test never runs while the test stays
-> green. It cost both tracks a debugging pass. Use one closure driven by a
+> green. It cost both workstreams a debugging pass. Use one closure driven by a
 > mutable script and assert the request count.
 - [ ] An I2 test: the same page ingested twice produces no second row.
 - [ ] An I5 test: force a failure and assert `integrations.sync_error` contains
@@ -410,10 +410,10 @@ output in the report (§2 — a claim without output is not a claim):
 - [ ] `published_at` keeps its offset. Use `toIso8601String()`, never
       `toDateTimeString()` — the latter drops the offset and the column is
       `timestamptz`. This has already been fixed once (`docs/LESSONS.md`).
-- [ ] `vendor/bin/pint --test` clean, and the track's own tests green on its own
+- [ ] `vendor/bin/pint --test` clean, and the workstream's own tests green on its own
       `test_tmp_*` database.
 
-## 6. Rules that travel with the dispatch
+## 6. Rules that travel with the work
 
 - **§1 Git.** `git status`, `diff`, `log`, `ls-files`, `show`, `blame` only. No
   commit, branch, stash, checkout, push, no `gh` write. Leave changes in the

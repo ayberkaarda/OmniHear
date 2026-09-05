@@ -3,7 +3,7 @@
     python -m scripts.export_openapi            # write the file
     python -m scripts.export_openapi --check    # fail if the committed file is stale
 
-``contracts/ai-openapi.json`` is named by CLAUDE.md as *the*
+``contracts/ai-openapi.json`` is named by CONTRIBUTING.md as *the*
 Laravel <-> FastAPI contract, so it must never be hand-edited: it is
 generated from the live Pydantic models, and ``--check`` (called from the
 test suite) turns "the schema changed but the contract file did not" into

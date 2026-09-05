@@ -85,7 +85,7 @@ final readonly class GooglePlayConnector implements PlatformConnector
      * whitelisted rather than escaped — the same reasoning as
      * ConnectorFactory::subdomain(). A value carrying `/`, `?` or `..` could
      * point the authenticated request at a different resource entirely. The
-     * regex lives here because the factory is not this track to edit.
+     * regex lives here because the factory is not this workstream's to edit.
      */
     private const PACKAGE_NAME_PATTERN = '/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$/';
 

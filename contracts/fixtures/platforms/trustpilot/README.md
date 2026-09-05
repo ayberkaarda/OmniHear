@@ -59,7 +59,7 @@ to look first if a real account behaves differently.**
 | `https://www.trustpilot.com/reviews/{reviewId}` as `sourceUrl` | the human-facing permalink, not an API-documented field. The review's own `links` entries point back at the API, which is useless to someone opening the item from the inbox — the same call `ZendeskConnector` makes for its agent deep link |
 | exact key ordering and the presence of every optional key on every review | the field *set* is documented; which keys a real response omits on a given review is not. The fixtures carry the full set, with `null` where a value is absent |
 | `"source": "Organic"` / `"Invitation"` as the value vocabulary | plausible from the documented distinction between organic and invited reviews; not read by the connector |
-| the per-minute request budget | not published as a number. `config/connectors.php` should be set at the conservative end (main thread's file, not this track's) |
+| the per-minute request budget | not published as a number. `config/connectors.php` should be set at the conservative end (a shared file, not this workstream's) |
 
 ### Not covered here at all
 

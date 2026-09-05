@@ -117,7 +117,7 @@ it('returns a secret, a provisioning uri and a server-rendered qr code', functio
     [$company, $user] = tenant();
 
     $response = $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => 'password'])
         ->assertCreated()
         ->assertJsonStructure(['secret', 'otpauth_url', 'qr_svg_data_uri']);
 
@@ -135,7 +135,7 @@ it('renders the qr as an svg data uri rather than shipping a qr library to the b
     [$company, $user] = tenant();
 
     $uri = $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => 'password'])
         ->assertCreated()
         ->json('qr_svg_data_uri');
 
@@ -153,7 +153,7 @@ it('encrypts the pending secret at rest', function () {
     [$company, $user] = tenant();
 
     $secret = $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => 'password'])
         ->assertCreated()
         ->json('secret');
 
@@ -167,7 +167,7 @@ it('replaces an unconfirmed secret when enrolment is started again', function ()
     [$company, $user, $first] = pendingTwoFactorUser();
 
     $second = $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => TWO_FACTOR_PASSWORD])
         ->assertCreated()
         ->json('secret');
 
@@ -179,13 +179,41 @@ it('refuses to start enrolment when a factor is already confirmed', function () 
     [$company, $user, $secret] = twoFactorUser();
 
     $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => TWO_FACTOR_PASSWORD])
         ->assertStatus(409)
         ->assertJsonPath('code', 'TWO_FACTOR_ALREADY_ENABLED');
 
     // The working secret is untouched: silently replacing it is how an attacker
     // on a stolen session would migrate the factor to a device they hold.
     expect($user->refresh()->two_factor_secret)->toBe($secret);
+});
+
+it('refuses to begin enrolment without the account password', function () {
+    [$company, $user] = tenant();
+
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/auth/two-factor')
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonStructure(['errors' => ['password']]);
+
+    // A session alone cannot arm a factor: nothing is written, so an attacker
+    // on a stolen token cannot enrol their own authenticator and walk off with
+    // the recovery codes.
+    expect($user->refresh()->two_factor_secret)->toBeNull()
+        ->and($user->twoFactorPending())->toBeFalse();
+});
+
+it('refuses to begin enrolment with a wrong password', function () {
+    [$company, $user] = tenant();
+
+    $this->actingAs($user, 'sanctum')
+        ->postJson('/api/v1/auth/two-factor', ['password' => 'not-the-password'])
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonStructure(['errors' => ['password']]);
+
+    expect($user->refresh()->two_factor_secret)->toBeNull();
 });
 
 /*
@@ -702,7 +730,7 @@ it('lets a user re-enrol in the same timestep it disabled in', function () {
     expect($guard->lastAcceptedStep($user))->toBeNull();
 
     $fresh = $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => TWO_FACTOR_PASSWORD])
         ->assertCreated()
         ->json('secret');
 
@@ -729,7 +757,7 @@ it('forgets the spent-step mark when a new enrolment replaces the secret', funct
     $guard->spend($user, Totp::timestep(1700000000));
 
     $fresh = $this->actingAs($user, 'sanctum')
-        ->postJson('/api/v1/auth/two-factor')
+        ->postJson('/api/v1/auth/two-factor', ['password' => TWO_FACTOR_PASSWORD])
         ->assertCreated()
         ->json('secret');
 

@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * `model_version` is carried on every row on purpose: when the analyzer is
  * retrained the stored scores stop being comparable with new ones, and this
  * field is what lets a re-analysis sweep find the rows that predate the change
- * (see .claude/skills/ai-contract-sync).
+ * (see docs/playbooks/ai-contract-sync).
  *
  * @mixin AiAnalysis
  */

@@ -43,7 +43,7 @@ export function makeCompany(overrides: Partial<Company> = {}): Company {
 /**
  * The three two-factor response bodies of `docs/contracts/w10-two-factor.md`.
  *
- * Track A's endpoints do not exist while the frontend is built, so these are
+ * Workstream A's endpoints do not exist while the frontend is built, so these are
  * the only description of the wire the specs are allowed to assert against —
  * an inline object in a spec would be a second, drifting copy of the contract.
  */

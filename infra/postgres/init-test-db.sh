@@ -6,7 +6,7 @@
 # which phpunit.xml targets so that RefreshDatabase never truncates the
 # development database.
 #
-# Temporary per-agent databases (test_tmp_<suffix>) are created and
+# Temporary per-run databases (test_tmp_<suffix>) are created and
 # dropped explicitly by name at run time — never by wildcard.
 
 set -euo pipefail

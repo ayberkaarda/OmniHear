@@ -6,7 +6,7 @@
 |--------------------------------------------------------------------------
 |
 | Spec 7.3'teki yumusak uyarinin kullaniciya donuk metinleri. Kod icine
-| gomulmez: CLAUDE.md 6. bolum her iki tarafta da hard-code UI metnini
+| gomulmez: CONTRIBUTING.md 4. bolum her iki tarafta da hard-code UI metnini
 | yasaklar, Laravel tarafinin karsiligi lang/{en,tr} dizinidir.
 |
 */

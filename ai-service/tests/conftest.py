@@ -47,7 +47,7 @@ def make_headers():
 # --- Contract fixture access -------------------------------------------------
 #
 # contracts/fixtures/analyze/ is the shared Laravel <-> FastAPI fixture
-# directory (CLAUDE.md §2: for a shape a fixture covers, no test may treat
+# directory (CONTRIBUTING.md §2: for a shape a fixture covers, no test may treat
 # its own inline JSON as proof). Everything below exists so tests read
 # those files instead of restating the shapes.
 

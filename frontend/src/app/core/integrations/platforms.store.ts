@@ -14,7 +14,7 @@ const EMPTY_FIELDS: readonly PlatformField[] = [];
  * by `CONNECTABLE_PLATFORMS` / `REQUIRED_SETTINGS` / `REQUIRED_CREDENTIALS` in
  * `integration.models.ts`, which were hand-copied from `config/connectors.php`.
  * They drifted the first time anyone changed the backend: Zendesk was added
- * during the previous wave and the mismatch was caught by hand. The next one
+ * during the previous phase and the mismatch was caught by hand. The next one
  * would have reached a user as a `422` on a platform the form offered.
  *
  * The form now renders what the server says it accepts, so the two cannot

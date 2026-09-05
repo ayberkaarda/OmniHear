@@ -123,7 +123,7 @@ written the ratio was 245.00/320 = 76.6%. Its intent (distinguish "the framework
 grew" from "we wrote sloppy code") was right; the measure was wrong, because it
 compared the floor against a number that already contained the allowance.
 
-CLAUDE.md Trap 2 now classifies by **attribution** instead: a raise requires the
+CONTRIBUTING.md Trap 2 now classifies by **attribution** instead: a raise requires the
 per-source table to show the `src/` line did not grow. That is the evidence this
 upgrade actually produced.
 

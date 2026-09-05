@@ -29,7 +29,7 @@ enum AuditAction: string
 
     case AccountErased = 'account.erased';
 
-    // Wave 5 — the settings surface (docs/contracts/settings-api.md section 6:
+    // Phase W5 — the settings surface (docs/contracts/settings-api.md section 6:
     // "every mutating endpoint writes an audit_logs row").
     case ProfileUpdated = 'profile.updated';
     case ProfileEmailChanged = 'profile.email_changed';

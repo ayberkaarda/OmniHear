@@ -1,7 +1,7 @@
 # Settings API — profile, team, API keys, notifications, platforms
 
-Status: **binding for W5.** Written by the main thread before dispatch so the two
-tracks do not guess at each other's shape.
+Status: **binding for W5.** Written centrally before implementation so the two
+workstreams do not guess at each other's shape.
 
 Conventions, pagination and the error envelope come from `docs/contracts/http-api-v1.md`.
 Everything here is behind `auth:sanctum` + `verified` + the tenant scope, i.e. it
@@ -19,7 +19,9 @@ Source of truth: spec §4 (`/app/settings/*`), §7.3, §8.
 
 ### `PATCH /api/v1/settings/profile` -> `200`
 
-`{ "name": "…", "email": "…" }`, both optional.
+`{ "name": "…", "email": "…", "password": "…" }`. `name` and `email` are both
+optional; `password` is required **only when `email` moves the account to a new
+address**, and ignored otherwise.
 
 **Changing the email un-verifies the account** and sends a new verification mail:
 otherwise a user could move their account to an address they do not control and keep
@@ -29,6 +31,17 @@ can react rather than discovering it on the next 403:
 ```json
 { "user": { }, "email_verification_required": true }
 ```
+
+**An email change re-proves the password** (security review B9). Un-verifying the
+account stops an attacker inheriting the *proven* status of the old mailbox, but
+does not by itself stop a stolen session pointing the account at a mailbox the
+attacker controls — from which the reset link then completes the takeover. The
+password gate is that other half. A **name-only** change must not ask for it: the
+rule fires only when the submitted address differs from the one on file (a wrong
+or missing password is then `422 VALIDATION_ERROR` on `password`). This is a
+conditional cross-field rule (`$validator->sometimes()`), so it is deliberately
+absent from the generated OpenAPI request schema, which reads static `rules()`
+only.
 
 The disposable/free-domain policy from registration applies here too — the same
 `DISPOSABLE_EMAIL` code, not a new one.
@@ -171,7 +184,7 @@ never touched — the collision may be the invitee already having an account, wh
 is a different problem from a bad token and must not be "resolved" by attaching
 that account to a new company.
 
-> This said **409** when it was first written, and the implementing agent pushed
+> This said **409** when it was first written, and the implementation pushed
 > back rather than complying. It was right: `ApiErrorCode::status()` maps each code
 > to exactly one status, no 409 code exists, and `abort(409)` would have rendered
 > `{code: "SERVER_ERROR"}`. Adding a code means the catalogue in `http-api-v1.md`
@@ -231,7 +244,7 @@ Another user's notification -> **404**.
 
 This exists because the frontend currently hand-copies `config/connectors.php` into a
 `CONNECTABLE_PLATFORMS` constant. Zendesk was added on the backend while the frontend
-agent was working, and the mismatch was caught by hand — the next one would reach a
+workstream was working, and the mismatch was caught by hand — the next one would reach a
 user as a `422`. The endpoint publishes what the connector registry actually holds, so
 the integration form is server-driven and cannot drift.
 

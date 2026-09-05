@@ -214,7 +214,7 @@ final class EmailConnector implements PlatformConnector
         // request — bearer token included — goes wherever it points. An `http`
         // or `file` scheme would put the token on the wire in clear or on the
         // local filesystem, so the scheme is whitelisted rather than trusted.
-        if (! self::isHttpsUrl($sessionUrl)) {
+        if (! OutboundHostPolicy::isHttpsUrl($sessionUrl)) {
             throw ConnectorException::of(ConnectorFailure::Misconfigured);
         }
 
@@ -432,6 +432,13 @@ final class EmailConnector implements PlatformConnector
             return $this->session;
         }
 
+        // The session URL is tenant-supplied and this is the first request that
+        // dereferences it. Check the host before the GET and — through the
+        // client's allow_redirects — at every redirect hop the autodiscovery
+        // path may take, so the bearer token is never carried to an internal
+        // address (invariant I5).
+        OutboundHostPolicy::assertAllowed($this->sessionUrl);
+
         $decoded = $this->request('GET', $this->sessionUrl)->json();
 
         // Is this a JMAP Session resource at all?
@@ -470,9 +477,17 @@ final class EmailConnector implements PlatformConnector
         // is in what that server said, not in what the user typed. Both are
         // terminal, so neither is retried; the difference is which sentence
         // reaches integrations.sync_error.
-        if (! is_string($apiUrl) || ! self::isHttpsUrl($apiUrl)) {
+        if (! is_string($apiUrl) || ! OutboundHostPolicy::isHttpsUrl($apiUrl)) {
             throw ConnectorException::of(ConnectorFailure::MalformedResponse);
         }
+
+        // The apiUrl is chosen by the server the session URL resolved to, not by
+        // the tenant, so a compromised or hostile JMAP server could point the
+        // token — about to be POSTed here — at an internal address the session
+        // URL itself would never have passed. The scheme check above stays
+        // MalformedResponse (the fault is in what a JMAP server said); the host
+        // check is the policy's, and a private target is Misconfigured.
+        OutboundHostPolicy::assertAllowed($apiUrl);
 
         $capabilities = $decoded['capabilities'] ?? null;
 
@@ -662,7 +677,12 @@ final class EmailConnector implements PlatformConnector
     {
         return Http::withToken($this->apiToken)
             ->acceptJson()
-            ->timeout($this->timeout);
+            ->timeout($this->timeout)
+            // Redirects stay on for the /.well-known/jmap autodiscovery path
+            // (RFC 8620 section 2), but every hop's target is re-validated by the
+            // policy before it is followed and only https is followed at all, so
+            // the token cannot be redirected to an internal address.
+            ->withOptions(['allow_redirects' => OutboundHostPolicy::redirectOptions()]);
     }
 
     /*
@@ -1063,16 +1083,5 @@ final class EmailConnector implements PlatformConnector
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
-    }
-
-    private static function isHttpsUrl(string $url): bool
-    {
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            return false;
-        }
-
-        return strtolower((string) parse_url($url, PHP_URL_SCHEME)) === 'https'
-            && is_string(parse_url($url, PHP_URL_HOST))
-            && parse_url($url, PHP_URL_HOST) !== '';
     }
 }

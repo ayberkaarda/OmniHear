@@ -1,19 +1,15 @@
----
-name: omnihear-tokens
-description: OmniHear renk/token kuralları — sentiment (duygu) kırmızı-yeşil skalası ve açıklık ayrımı zorunluluğu, category (kategori) rozetleri, platform/kaynak ikonları, integration status, quota/402 renkleri, light/dark semantic token sözlüğü, .dark tema mekaniği ve Tailwind eşlemesi. Yeni Angular bileşeni, badge/rozet, chip/çip, KPI kartı, inbox satırı, filtre, grafik yazarken veya tokens.json / tokens.css / tailwind.config.js değiştirirken yükle. Triggers: sentiment color, duygu rengi, kategori rozeti, category badge, token, tema, dark mode, koyu tema, platform ikonu, quota banner, paywall, 402, kontrast, WCAG, renk körlüğü, colorblind, deuteranopi, tailwind theme, ThemeService, grafik rengi.
----
-
 # OmniHear Tokens
 
-Bu skill **kural** verir; değer vermez. Değerlerin tek kaynağı `frontend/src/styles/tokens.json`.
+Yeni bir Angular bileşeni, rozet, çip, KPI kartı, inbox satırı, filtre veya grafik yazarken ve `tokens.json` / `tokens.css` / `tailwind.config.js` dosyalarına dokunurken okunur.
+
+Bu doküman **kural** verir; değer vermez. Değerlerin tek kaynağı `frontend/src/styles/tokens.json`.
 
 Katmanlar:
-- **Tasarım dosyası** (`OmniHear Foundations.dc.html`, Claude Design) = niyet
+- **Tasarım dosyası** (`OmniHear Foundations`) = niyet
 - **`tokens.json`** = gerçek, tek kaynak
-- **Bu skill** = kurallar + prosedür
+- **Bu doküman** = kurallar + prosedür
 - **`tokens.css`** = üretilmiş çıktı, **elle düzenlenmez**
 
-Grafik türü/legend/tooltip metodolojisi → `dataviz`. Görsel yön, tipografi kişiliği → `frontend-design`.
 
 ## 1. Karar tablosu — veri boyutu → kanal
 

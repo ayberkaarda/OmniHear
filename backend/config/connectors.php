@@ -254,7 +254,7 @@ return [
             'limit' => (int) env('SOCIAL_LIMIT', 40),
             'timeout' => (int) env('SOCIAL_TIMEOUT', 30),
             // Deliberately well under the documented 300 requests per 5
-            // minutes (60/min) — the connector track's measured
+            // minutes (60/min) — the connector workstream's measured
             // recommendation in docs/contracts/w12-social-connector.md.
             'rate_limit' => ['max_attempts' => 20, 'decay_seconds' => 60],
             'retry_after' => 60,

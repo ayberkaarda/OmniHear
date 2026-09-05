@@ -20,7 +20,7 @@ The `pcntl` gap is not cosmetic: `php artisan horizon` cannot run on this host u
 configuration, because the extension does not exist for Windows PHP builds. A queue
 worker that cannot start is not a version mismatch, it is a missing capability.
 
-The F1 backend agent initially worked around dependency resolution by declaring fake
+The F1 backend workstream initially worked around dependency resolution by declaring fake
 `ext-pcntl` / `ext-posix` versions in `config.platform`. That makes Composer resolve, but
 it writes a falsehood into a file every environment reads — CI, containers, and any
 reviewer.

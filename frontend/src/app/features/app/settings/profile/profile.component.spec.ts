@@ -76,8 +76,21 @@ describe('ProfileComponent', () => {
     email.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
+    // The address moved, so the form now asks for the password (contract
+    // section 1); the request does not fire until it is supplied.
     buttonWith('Save changes').click();
-    http.expectOne(PROFILE).flush({
+    http.expectNone(PROFILE);
+
+    const password = inputs()[2];
+    expect(password.type).toBe('password');
+    password.value = 'correct-horse-battery';
+    password.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    buttonWith('Save changes').click();
+    const request = http.expectOne(PROFILE);
+    expect(request.request.body).toEqual({ name: 'Ada Lovelace', email: 'grace@navy.mil', password: 'correct-horse-battery' });
+    request.flush({
       user: makeUser({ email: 'grace@navy.mil', email_verified_at: null }),
       email_verification_required: true
     });
@@ -140,8 +153,21 @@ describe('ProfileComponent', () => {
   }
 
   function startEnrolment(): void {
+    // Enrolment re-proves the password (contract w10-two-factor.md), so the
+    // off-state carries a password field the button submits.
+    const form = element.querySelector('[data-testid="two-factor-enrol-start-form"]');
+    expect(form).toBeTruthy();
+    const password = form!.querySelector('input') as HTMLInputElement;
+    expect(password.type).toBe('password');
+    password.value = 'correct-horse-battery';
+    password.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
     buttonWith('Set up two-step verification').click();
-    http.expectOne(TWO_FACTOR).flush(makeTwoFactorEnrolment(), { status: 201, statusText: 'Created' });
+    const request = http.expectOne(TWO_FACTOR);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ password: 'correct-horse-battery' });
+    request.flush(makeTwoFactorEnrolment(), { status: 201, statusText: 'Created' });
     fixture.detectChanges();
   }
 

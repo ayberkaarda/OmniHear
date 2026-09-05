@@ -66,7 +66,7 @@ it('un-verifies the account when the email changes and says so', function () {
     [$company, $user] = tenant();
 
     actingAs($user, 'sanctum')
-        ->patchJson('/api/v1/settings/profile', ['email' => 'ada@newcorp.io'])
+        ->patchJson('/api/v1/settings/profile', ['email' => 'ada@newcorp.io', 'password' => 'password'])
         ->assertOk()
         ->assertJsonPath('user.email', 'ada@newcorp.io')
         ->assertJsonPath('user.email_verified_at', null)
@@ -95,7 +95,7 @@ it('refuses a disposable address with the registration code', function () {
     [$company, $user] = tenant();
 
     actingAs($user, 'sanctum')
-        ->patchJson('/api/v1/settings/profile', ['email' => 'someone@mailinator.com'])
+        ->patchJson('/api/v1/settings/profile', ['email' => 'someone@mailinator.com', 'password' => 'password'])
         ->assertStatus(422)
         ->assertJsonPath('code', 'DISPOSABLE_EMAIL');
 
@@ -107,7 +107,7 @@ it('refuses an address another account already holds', function () {
     $other = User::factory()->for($company)->create();
 
     actingAs($user, 'sanctum')
-        ->patchJson('/api/v1/settings/profile', ['email' => $other->email])
+        ->patchJson('/api/v1/settings/profile', ['email' => $other->email, 'password' => 'password'])
         ->assertStatus(422)
         ->assertJsonPath('code', 'VALIDATION_ERROR')
         ->assertJsonStructure(['errors' => ['email']]);
@@ -118,13 +118,67 @@ it('audits a profile update and separately an email change', function () {
     [$company, $user] = tenant();
 
     actingAs($user, 'sanctum')
-        ->patchJson('/api/v1/settings/profile', ['name' => 'Ada', 'email' => 'ada@newcorp.io'])
+        ->patchJson('/api/v1/settings/profile', ['name' => 'Ada', 'email' => 'ada@newcorp.io', 'password' => 'password'])
         ->assertOk();
 
     $actions = asTenant($company, fn () => AuditLog::query()->pluck('action')->all());
 
     expect($actions)->toContain(AuditAction::ProfileUpdated->value)
         ->and($actions)->toContain(AuditAction::ProfileEmailChanged->value);
+});
+
+/*
+|--------------------------------------------------------------------------
+| PATCH /settings/profile — the password gate on an email change
+|--------------------------------------------------------------------------
+|
+| Moving the address is a one-step account takeover: the reset link follows the
+| mailbox. A stolen session must re-prove the password to do it. A change of
+| name is not that, and must not be taxed with a password prompt.
+*/
+
+it('lets a name-only change through without asking for a password', function () {
+    Notification::fake();
+    [$company, $user] = tenant();
+
+    actingAs($user, 'sanctum')
+        ->patchJson('/api/v1/settings/profile', ['name' => 'Ada Lovelace'])
+        ->assertOk()
+        ->assertJsonPath('user.name', 'Ada Lovelace');
+
+    expect($user->fresh()->name)->toBe('Ada Lovelace');
+});
+
+it('refuses an email change that does not carry the account password', function () {
+    Notification::fake();
+    [$company, $user] = tenant();
+    $original = $user->email;
+
+    actingAs($user, 'sanctum')
+        ->patchJson('/api/v1/settings/profile', ['email' => 'ada@newcorp.io'])
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonStructure(['errors' => ['password']]);
+
+    // The address did not move and no re-verification mail went out: a stolen
+    // session cannot redirect the reset flow to a mailbox it controls.
+    expect($user->fresh()->email)->toBe($original);
+    Notification::assertNothingSent();
+});
+
+it('refuses an email change carrying a wrong password', function () {
+    Notification::fake();
+    [$company, $user] = tenant();
+    $original = $user->email;
+
+    actingAs($user, 'sanctum')
+        ->patchJson('/api/v1/settings/profile', ['email' => 'ada@newcorp.io', 'password' => 'not-the-password'])
+        ->assertStatus(422)
+        ->assertJsonPath('code', 'VALIDATION_ERROR')
+        ->assertJsonStructure(['errors' => ['password']]);
+
+    expect($user->fresh()->email)->toBe($original);
+    Notification::assertNothingSent();
 });
 
 /*

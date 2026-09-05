@@ -19,7 +19,7 @@ X [ERROR] bundle initial exceeded maximum budget.
 
 Nothing was gamed to get there: the `budgets` block was not moved, no
 `--localize=false`, no non-production configuration. The number was measured and
-brought back for a decision, which is what CLAUDE.md Trap 2 asks for.
+brought back for a decision, which is what CONTRIBUTING.md Trap 2 asks for.
 
 The load-bearing measurement is the floor. In the same tree, with `app.routes.ts`
 reduced to a single `/health` route and `app.config.ts` / `app.component.ts` at
@@ -48,9 +48,9 @@ framework growth**, which is the assumption the original threshold rested on.
 
 Two further facts constrain the answer. Spec §4 says "hedefi" — a target — while
 §2 is titled "Değiştirilemez Kısıtlar"; the "(raw, Angular budget measurement)"
-qualifier was CLAUDE.md's addition, not the spec's. And the part of §4 that *is*
+qualifier was CONTRIBUTING.md's addition, not the spec's. And the part of §4 that *is*
 a constraint — the page tree — cannot be built under 250 kB raw. Under §0, the
-spec wins over CLAUDE.md, so the page tree stands and the threshold is re-derived.
+spec wins over CONTRIBUTING.md, so the page tree stands and the threshold is re-derived.
 
 ## Decision
 
@@ -70,7 +70,7 @@ configuration cannot be swapped. It also reads `angular.json` and fails if the
 raw threshold there disagrees with its own constant — the threshold deliberately
 lives in two places so that raising it cannot be slipped past a diff.
 
-CLAUDE.md Trap 2 is rewritten with a **ratchet**: the threshold may always fall,
+CONTRIBUTING.md Trap 2 is rewritten with a **ratchet**: the threshold may always fall,
 but raising it requires (1) a framework-floor re-measurement showing the floor is
 at least 90% of the current threshold — otherwise the overage is application code
 and the code gets fixed instead, (2) an ADR with a per-chunk raw delta table

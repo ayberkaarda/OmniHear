@@ -16,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
  *
  * "In-app" is delivered over the same private company channel as
  * FeedbackAnalyzed rather than through a stored notification, because the
- * schema for this wave carries no notifications table and migrations are
+ * schema for this phase carries no notifications table and migrations are
  * frozen. A banner driven off the live channel plus the email is the part of
  * spec 7.3 that can be honoured without a schema change; a persisted
  * notification centre is noted as follow-up work.

@@ -36,7 +36,7 @@ use Throwable;
  * on.
  *
  * The work is done inline rather than dispatched to a queue job. Two reasons:
- * `app/Jobs/**` belongs to other tracks in this wave
+ * `app/Jobs/**` belongs to other workstreams in this phase
  * (docs/contracts/wave2-seams.md section 1), and the work itself is one upsert
  * plus one event dispatch — far inside any provider timeout. `$work` is a
  * closure, so moving it behind a job later touches this file and nothing else.

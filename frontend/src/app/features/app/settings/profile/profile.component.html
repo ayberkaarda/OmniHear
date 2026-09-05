@@ -50,6 +50,18 @@
         (blurred)="onFieldBlur()"
       />
 
+      @if (emailChanged()) {
+        <app-input
+          formControlName="password"
+          type="password"
+          [label]="currentPasswordLabel"
+          [required]="true"
+          autocomplete="current-password"
+          [error]="detailsError('password')"
+          (blurred)="onFieldBlur()"
+        />
+      }
+
       @if (isVerified()) {
         <p class="text-xs text-[var(--text-muted)]">
           <span i18n="Email verification state@@settings.profile.verifiedOn">Address confirmed on</span>
@@ -303,11 +315,27 @@
         <p class="text-sm text-[var(--text-secondary)]" data-testid="two-factor-off" i18n="@@settings.twoFactor.off">
           Two-step verification is off. Your password is the only thing protecting this account.
         </p>
-        <div>
-          <app-button [loading]="startingEnrolment()" (pressed)="startEnrolment()">
-            <span i18n="@@settings.twoFactor.enable">Set up two-step verification</span>
-          </app-button>
-        </div>
+        <form
+          [formGroup]="enrolStartForm"
+          class="flex flex-col gap-3"
+          data-testid="two-factor-enrol-start-form"
+          (submit)="$event.preventDefault(); startEnrolment()"
+        >
+          <app-input
+            formControlName="password"
+            type="password"
+            [label]="currentPasswordLabel"
+            [required]="true"
+            autocomplete="current-password"
+            [error]="enrolStartError('password')"
+            (blurred)="onFieldBlur()"
+          />
+          <div>
+            <app-button type="submit" [loading]="startingEnrolment()" (pressed)="startEnrolment()">
+              <span i18n="@@settings.twoFactor.enable">Set up two-step verification</span>
+            </app-button>
+          </div>
+        </form>
       }
     </section>
   }

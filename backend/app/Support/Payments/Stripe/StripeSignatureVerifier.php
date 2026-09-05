@@ -8,7 +8,7 @@ use App\Support\Payments\WebhookSignatureException;
  * Verifies a `Stripe-Signature` header against the raw request body.
  *
  * Implemented directly rather than through stripe-php. Adding the SDK would
- * mean editing composer.json and rewriting vendor/ while two other agents are
+ * mean editing composer.json and rewriting vendor/ while two other workstreams are
  * running `php artisan test` in the same working tree; the scheme itself is
  * twenty lines and fully specified, so the dependency buys nothing here.
  *
@@ -50,7 +50,15 @@ final class StripeSignatureVerifier
 
         $tolerance = (int) config('stripe.signature_tolerance', 300);
 
-        if ($tolerance > 0 && abs(time() - $timestamp) > $tolerance) {
+        // Fail closed. A non-positive tolerance - a mis-set or non-numeric env
+        // cast to 0 - must not mean "skip the timestamp check and accept a replay
+        // of any age". config/stripe.php already clamps to >= 1; this rejects
+        // rather than trusts anything that slips past that.
+        if ($tolerance <= 0) {
+            throw new WebhookSignatureException(self::PROVIDER, 'tolerance_not_configured');
+        }
+
+        if (abs(time() - $timestamp) > $tolerance) {
             throw new WebhookSignatureException(self::PROVIDER, 'timestamp_outside_tolerance');
         }
 

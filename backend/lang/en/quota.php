@@ -6,7 +6,7 @@
 |--------------------------------------------------------------------------
 |
 | Customer-facing copy for the soft warning of spec 7.3. Kept out of the code
-| because CLAUDE.md section 6 forbids hard-coded user text on either side of
+| because CONTRIBUTING.md section 4 forbids hard-coded user text on either side of
 | the stack; the Laravel half lives in lang/{en,tr}.
 |
 */

@@ -5,7 +5,7 @@ before parsing it (see that module's docstring), which means the request
 bodies are *not* FastAPI body parameters — and so FastAPI cannot see them
 when it builds the schema. Left alone, ``contracts/ai-openapi.json`` would
 document two POST endpoints that take no body, and the Laravel side would
-have to guess the request shape. CLAUDE.md names that file as *the*
+have to guess the request shape. CONTRIBUTING.md names that file as *the*
 Laravel <-> FastAPI contract, so guessing is exactly what must not happen.
 
 This module fills the gap **without hand-writing any field list**. The

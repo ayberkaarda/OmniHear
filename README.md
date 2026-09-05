@@ -168,12 +168,11 @@ frontend/      Angular 22 standalone + Signals · TailwindCSS · @angular/locali
 ai-service/    Python 3.12 · FastAPI · Pydantic v2 · pytest · Ruff — see ai-service/README.md
 contracts/     OpenAPI schema + fixtures shared by backend and ai-service tests
 infra/         docker-compose.dev.yml, Dockerfiles
-docs/          ADRs (docs/adr/), ARCHITECTURE.md, PROGRESS.md, LESSONS.md
-.claude/       hooks/ · skills/ · settings.json
+docs/          ADRs (docs/adr/), playbooks (docs/playbooks/), ARCHITECTURE.md, PROGRESS.md, LESSONS.md
 ```
 
 Per-directory setup: `ai-service/README.md`, `frontend/README.md`. The
-backend has no separate README pass in this documentation wave — its
+backend has no separate README pass in this documentation round — its
 Laravel-generated one is unchanged.
 
 ## Operations notes

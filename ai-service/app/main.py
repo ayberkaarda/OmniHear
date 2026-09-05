@@ -3,6 +3,8 @@ and exception handlers that enforce the uniform error contract
 {"code", "message", "correlation_id"}.
 """
 
+from collections.abc import Iterable, Mapping
+
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -47,6 +49,21 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
     return JSONResponse(status_code=exc.status_code, content=content)
 
 
+def _format_validation_errors(errors: Iterable[Mapping[str, object]]) -> str:
+    """Summarize Pydantic/FastAPI validation errors without echoing input.
+
+    Each error dict may carry an `input` key holding the raw,
+    attacker-controlled value that failed validation (that's what
+    `str(exc)` embeds). This renders only `loc` and `msg`, so a rejected
+    request never reflects its own field values back in the response.
+    """
+    parts = []
+    for error in errors:
+        loc = ".".join(str(segment) for segment in error.get("loc", ())) or "body"
+        parts.append(f"{loc}: {error.get('msg', 'invalid value')}")
+    return "; ".join(parts) or "invalid request"
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
     request: Request, exc: RequestValidationError
@@ -58,5 +75,9 @@ async def validation_exception_handler(
     """
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-        content={"code": "VALIDATION_ERROR", "message": str(exc), "correlation_id": None},
+        content={
+            "code": "VALIDATION_ERROR",
+            "message": _format_validation_errors(exc.errors()),
+            "correlation_id": None,
+        },
     )

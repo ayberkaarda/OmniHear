@@ -3,7 +3,9 @@
 use App\Support\Connectors\ConnectorException;
 use App\Support\Connectors\ConnectorFailure;
 use App\Support\Connectors\ConnectorLimits;
+use App\Support\Connectors\DnsResolver;
 use App\Support\Connectors\EmailConnector;
+use App\Support\Connectors\OutboundHostPolicy;
 use App\Support\Connectors\SyncCursor;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
@@ -12,6 +14,23 @@ use Tests\Support\PlatformFixture;
 use Tests\TestCase;
 
 uses(TestCase::class);
+
+beforeEach(function () {
+    // OutboundHostPolicy resolves every session/apiUrl host before the fetch,
+    // and the `.invalid` hosts these fixtures use never resolve on a real
+    // resolver. A permissive fake keeps the SSRF gate on its allow path so the
+    // rest of the suite exercises what it always did; the redirect-hop test
+    // below binds its own resolver to drive the reject path.
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+});
+
+afterEach(fn () => OutboundHostPolicy::resolveUsing(null));
 
 /*
 |--------------------------------------------------------------------------
@@ -1244,4 +1263,91 @@ it('records states short enough for the cursor column', function () {
         expect(mb_strlen($state))->toBeLessThanOrEqual(200)
             ->and($state)->toMatch('/^J\d+$/');
     }
+});
+
+/*
+|--------------------------------------------------------------------------
+| SSRF: a session URL that redirects to an internal host is refused
+|--------------------------------------------------------------------------
+|
+| The /.well-known/jmap autodiscovery path is expected to redirect (RFC 8620
+| section 2) and the client follows it — so the hop target is where the bearer
+| token would be sent. OutboundHostPolicy runs on_redirect before each hop is
+| followed; a hop to an internal address is cancelled and the token never leaves.
+|
+| The `.invalid` host is faked to resolve. The first test's first assertion is
+| the one the strategy rests on — that on_redirect fires under Http::fake — and
+| it does: Laravel keeps Guzzle's RedirectMiddleware in the stack under the fake,
+| and a faked 3xx carrying a Location header is followed like any other.
+|
+*/
+
+it('fires on_redirect under Http::fake and refuses a session redirect to link-local', function () {
+    // jmap.example.invalid resolves public (allow); the hop target is the cloud
+    // metadata endpoint (reject).
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+
+    Http::fake([
+        'jmap.example.invalid/*' => Http::response('', 302, ['Location' => 'https://169.254.169.254/latest/meta-data/']),
+        '169.254.169.254/*' => Http::response(emcRaw('session.json'), 200),
+    ]);
+
+    $failure = emcFailure(fn () => emcConnector()->fetchPage(null));
+
+    // Misconfigured is reachable here only through the on_redirect host check: a
+    // 3xx that reached the connector unfollowed is mapped Misconfigured too, but
+    // then a second request would have gone out to the metadata host. The count
+    // assertion below is what separates the two, and it is what confirms the hop
+    // was cancelled — i.e. that on_redirect fired.
+    expect($failure)->toBe(ConnectorFailure::Misconfigured)
+        ->and($failure->isTransient())->toBeFalse();
+
+    Http::assertSentCount(1);
+});
+
+it('refuses a session redirect to loopback and sends no second request', function () {
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+
+    Http::fake([
+        'jmap.example.invalid/*' => Http::response('', 302, ['Location' => 'https://127.0.0.1:6379/']),
+        '127.0.0.1/*' => Http::response(emcRaw('session.json'), 200),
+    ]);
+
+    expect(emcFailure(fn () => emcConnector()->fetchPage(null)))
+        ->toBe(ConnectorFailure::Misconfigured);
+
+    Http::assertSentCount(1);
+});
+
+it('refuses a session document whose apiUrl points at an internal host', function () {
+    // The apiUrl is chosen by the server, not the tenant: a hostile JMAP server
+    // could answer a valid session document naming an internal apiUrl to have
+    // the token POSTed there. That is caught by the policy, not the scheme check.
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
+
+    $session = PlatformFixture::json('email', 'session.json');
+    $session['apiUrl'] = 'https://127.0.0.1/jmap/api/';
+
+    emcServeDefault(['session' => [(string) json_encode($session), 200]]);
+
+    expect(emcFailure(fn () => emcConnector()->fetchPage(null)))
+        ->toBe(ConnectorFailure::Misconfigured);
 });

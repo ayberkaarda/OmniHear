@@ -29,7 +29,7 @@ final class QuotaSnapshot
      * The alternative - "used >= 80% of limit" - is true for every increment
      * after the crossing and would mail the owner once per analysis. A flag
      * column on `companies` would also work, but the schema is frozen for this
-     * wave and the transition test is both cheaper and race-free: exactly one
+     * phase and the transition test is both cheaper and race-free: exactly one
      * increment can return the threshold value.
      */
     public function crossedWarningThreshold(float $fraction): bool

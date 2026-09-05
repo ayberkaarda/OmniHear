@@ -1,13 +1,8 @@
----
-name: platform-connector
-description: OmniHear'a App Store, Google Play, Zendesk, Trustpilot gibi yeni bir kanal entegrasyonu/connector eklerken veya mevcut birini değiştirirken kullanılır. Tetikleyiciler entegrasyon, integration, connector, App Store, Google Play, Zendesk, Trustpilot, FetchFeedbackJob, ingestion, senkronizasyon, sync.
----
-
 # Platform Connector
 
-OmniHear farklı kanallardan (App Store, Google Play, Zendesk, Trustpilot, e-posta, sosyal medya) geri bildirim çeker. Bu skill, yeni bir platform connector'ının artımlı çekim, credential güvenliği ve hata izolasyonu kurallarına uymasını sağlar.
+OmniHear farklı kanallardan (App Store, Google Play, Zendesk, Trustpilot, e-posta, sosyal medya) geri bildirim çeker. Bu doküman, yeni bir platform connector'ının artımlı çekim, credential güvenliği ve hata izolasyonu kurallarına uymasını sağlar.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
 Yeni bir platform için connector eklenirken, mevcut bir connector'ın senkron mantığı değiştirilirken, ya da "entegrasyon neden duruyor/hata veriyor" tarzı bir hata ayıklama isteğinde.
 

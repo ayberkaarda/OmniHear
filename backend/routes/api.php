@@ -166,8 +166,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authenticated) {
         Route::delete('account', [AccountController::class, 'destroy'])->name('account.destroy');
     });
 
-    // Authenticated tenant surface. Each wave-2 phase owns exactly one file in
-    // routes/api/, so parallel tracks never edit the same route file — this
+    // Authenticated tenant surface. Each phase in the F4-F7 phase group owns exactly one file in
+    // routes/api/, so parallel workstreams never edit the same route file — this
     // split exists for that reason and for no other. Requiring them inside the
     // group means a domain file cannot accidentally diverge on the middleware
     // stack, because it never declares one.

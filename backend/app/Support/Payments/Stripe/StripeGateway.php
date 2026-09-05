@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Http;
  *
  * Uses the HTTP client rather than stripe-php for the reason given in
  * StripeSignatureVerifier: the SDK would mean rewriting vendor/ underneath two
- * other agents mid-wave, and everything this class needs is one form POST.
+ * other parallel workstreams mid-phase, and everything this class needs is one form POST.
  * `Http::fake()` against tests/Fixtures/webhooks/stripe/ then covers it with no
  * live account, which is the constraint this phase was built under.
  */

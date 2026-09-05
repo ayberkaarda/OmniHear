@@ -13,7 +13,7 @@ use Tests\TestCase;
  * Two things it exists to guarantee:
  *
  *  - Every payload comes from a file under tests/Fixtures/webhooks/, never
- *    from inline JSON (CLAUDE.md section 2). A test may substitute the tenant
+ *    from inline JSON (CONTRIBUTING.md section 2). A test may substitute the tenant
  *    id — the fixture cannot know which company id the database will hand out —
  *    but the *shape* is always the fixture's.
  *  - Signatures are computed by the same code the application verifies with. A

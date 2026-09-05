@@ -21,6 +21,18 @@ namespace App\Http\Requests\Api\V1\Integration;
 final class IntegrationSettingFormats
 {
     /**
+     * The obviously-internal host names, refused at create time so a plainly
+     * wrong value gets a 422 the user can act on rather than a sync error hours
+     * later. Names only, deliberately: a form request must not make a network
+     * call, so the DNS resolution and IP-range test that catch a public name
+     * pointing at a private address are the connector's job at fetch time
+     * (App\Support\Connectors\OutboundHostPolicy). This mirrors that policy's
+     * name rules — bare `localhost`, any `.localhost`/`.internal`/`.local`
+     * suffix (which also covers `metadata.google.internal`).
+     */
+    private const BLOCKED_HOST = 'not_regex:/^https:\/\/([^\/?#:]*\.)?(localhost|internal|local)(:\d+)?([\/?#]|$)/i';
+
+    /**
      * The public name of the extra rule, or null when a setting is validated as
      * a plain string.
      *
@@ -68,7 +80,7 @@ final class IntegrationSettingFormats
             // included, goes wherever this URL points. Mirrors
             // EmailConnector::isHttpsUrl(); a non-https value would otherwise be
             // accepted here and only fail once the connector runs, hours later.
-            'session_url' => ['max:2048', 'url', 'regex:/^https:\/\//i'],
+            'session_url' => ['max:2048', 'url', 'regex:/^https:\/\//i', self::BLOCKED_HOST],
             // The mailbox is matched by name against the fetched list
             // (EmailConnector::mailboxId()), not substituted into a request, so
             // it needs no URL/path whitelist. The one gap worth closing here is
@@ -81,7 +93,7 @@ final class IntegrationSettingFormats
             // verbatim: a non-https value would otherwise be accepted here
             // and only fail once MastodonConnector::isHttpsUrl() runs, hours
             // later. Same rule, reused rather than duplicated.
-            'instance_url' => ['max:2048', 'url', 'regex:/^https:\/\//i'],
+            'instance_url' => ['max:2048', 'url', 'regex:/^https:\/\//i', self::BLOCKED_HOST],
             // Substituted into the Mastodon timeline URL path, so it is
             // whitelisted rather than escaped — the same discipline as
             // Trustpilot's business_unit_id and Google Play's package_name.

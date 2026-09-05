@@ -27,7 +27,7 @@ export interface TrendMark {
  * 15.62 kB. Thirty points and one line do not justify spending the budget the
  * rest of the application still has to fit in.
  *
- * Two rules from `.claude/skills/omnihear-tokens` shape what is drawn:
+ * Two rules from `docs/playbooks/omnihear-tokens` shape what is drawn:
  *
  * - **Colour is never the only channel** (section 6). A mark's vertical
  *   position relative to the zero baseline says the same thing its colour does,

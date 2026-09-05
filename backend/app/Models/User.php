@@ -49,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_secret',
         'two_factor_recovery_codes',
         'two_factor_last_used_step',
+        'two_factor_challenge_attempts',
         'last_login_ip',
     ];
 
@@ -72,6 +73,12 @@ class User extends Authenticatable implements MustVerifyEmail
             // its second factor, and no client has a use for it.
             // See App\Support\Auth\TwoFactorReplayGuard.
             'two_factor_last_used_step' => 'integer',
+            // The per-account challenge attempt budget: how many wrong second
+            // factors this account has burned since its last successful one.
+            // Hidden as well as cast — it describes the account's authentication
+            // state, and no client has a use for it. It is written atomically
+            // and never through this cast; see App\Support\Auth\TwoFactorChallenge.
+            'two_factor_challenge_attempts' => 'integer',
         ];
     }
 

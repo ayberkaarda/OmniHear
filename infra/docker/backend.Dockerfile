@@ -36,7 +36,7 @@ RUN apk add --no-cache \
     && docker-php-ext-enable redis pcov \
     && apk del .build-deps
 
-# pcov is installed at build time on purpose. CLAUDE.md §2 makes
+# pcov is installed at build time on purpose. CONTRIBUTING.md §2 makes
 # `php artisan test --coverage --min=80` a mandatory gate command, and this image
 # shipped with no coverage driver at all — `php -m` listed neither xdebug nor pcov.
 # Installing it at run time does not work either: the `apk del .build-deps` above

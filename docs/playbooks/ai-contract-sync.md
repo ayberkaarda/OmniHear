@@ -1,13 +1,8 @@
----
-name: ai-contract-sync
-description: Laravel backend ile FastAPI ai-service arasındaki /v1/analyze sözleşmesini değiştirirken kullanılır — Pydantic modeli, OpenAPI şeması ve Laravel DTO/FormRequest'in senkron kalmasını sağlar. Tetikleyiciler Pydantic, /v1/analyze, batch, OpenAPI, contract, DTO, FormRequest, model_version, şema değişikliği, ai-service.
----
-
 # AI Contract Sync
 
-`ai-service` (FastAPI/Pydantic v2) ve `backend` (Laravel) arasındaki `/v1/analyze` sözleşmesi tek bir kaynaktan (`contracts/ai-openapi.json`) türer. Bu skill, şema değişikliğinde iki tarafın senkron kalmasını ve kırıcı değişikliklerin `model_version` bump'ı gerektirdiğini sabitler.
+`ai-service` (FastAPI/Pydantic v2) ve `backend` (Laravel) arasındaki `/v1/analyze` sözleşmesi tek bir kaynaktan (`contracts/ai-openapi.json`) türer. Bu doküman, şema değişikliğinde iki tarafın senkron kalmasını ve kırıcı değişikliklerin `model_version` bump'ı gerektirdiğini sabitler.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
 `ai-service`'teki bir Pydantic modeli değiştiğinde, Laravel DTO/FormRequest'i güncellenirken, veya `/v1/analyze` ya da `/v1/analyze/batch` uç noktalarına dokunulduğunda.
 

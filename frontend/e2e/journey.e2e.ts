@@ -225,6 +225,13 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
     await page.goto('/app/settings/profile');
     await expect(page.getByTestId('two-factor-off')).toBeVisible();
 
+    // Enrolment re-proves the password (contract w10-two-factor.md, §B9): arming
+    // a factor from a stolen session is as durable a takeover as removing one.
+    // The account knows its password — it registered with it — so it supplies
+    // it here, scoped to the enrolment form so it is not the password form's
+    // "Current password" field.
+    await page.getByTestId('two-factor-enrol-start-form').getByLabel('Current password').fill(PASSWORD);
+
     const enrolled = page.waitForResponse(
       (response) =>
         /\/api\/v1\/auth\/two-factor$/.test(new URL(response.url()).pathname) &&

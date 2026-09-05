@@ -1,6 +1,6 @@
 # W11 — email connector (JMAP) contract
 
-Written before dispatch. Track A builds against this; the main thread wires it
+Written before implementation. Workstream A builds against this; the integration step wires it
 afterwards using the W8 recipe (`8558e84`).
 
 ## Why JMAP and not Gmail
@@ -123,7 +123,7 @@ an empty text body, and a message whose `from` has no display name.
 - `Http::fake()` **merges** stub callbacks rather than replacing them: a second
   `Http::fake(closure)` leaves the first in charge and the later phase silently
   never runs. One closure driven by a mutable script, with the request count
-  asserted. This cost both W8 connector tracks a debugging pass.
+  asserted. This cost both W8 connector workstreams a debugging pass.
 - Assertions over ingested rows must not depend on database row order — a
   `pluck()` with no `orderBy` compared by `toBe()` passed alone and failed in the
   suite as recently as W9.
@@ -164,3 +164,26 @@ answers a `newState` part-way through the change log while the `Email/get` in th
 same response answers the account's current state. The connector already took the
 token from `newState`, so no code changed — but a reader who assumed the two
 agree would have introduced a silent gap.
+
+## Outbound host policy (SSRF)
+
+The session URL is tenant-supplied, the bearer token follows it, and the
+`/.well-known/jmap` autodiscovery path is expected to redirect — so the host the
+token actually reaches is not fixed at configuration time. `App\Support\
+Connectors\OutboundHostPolicy` closes that: before the session GET, before the
+POST to the session document's `apiUrl`, and again at every redirect hop, the
+target host must be https and must resolve entirely to public addresses.
+Loopback, link-local (the cloud metadata endpoint included), RFC 1918 and the
+other reserved ranges are refused as `Misconfigured`; a host that does not
+resolve is `Unreachable`. Redirects stay enabled — Guzzle's `on_redirect` runs
+the same check before each hop and cancels a hop to an internal address, so
+autodiscovery keeps working while the token cannot be redirected inward. The
+`apiUrl` non-https check stays `MalformedResponse` (the fault is in what a JMAP
+server said); the host check layered under it is the policy's.
+
+**Residual, out of scope by decision:** DNS rebinding. The policy validates the
+addresses a host resolves to at check time; it does not pin the connection to
+them. Closing it needs `CURLOPT_RESOLVE` pinning with a hand-rolled redirect
+loop, unexercisable under `Http::fake` and unprovable without a live target, and
+with no production deployment (D-09) there is nothing to rebind against. Recorded
+for the ADR.

@@ -1,13 +1,8 @@
----
-name: quota-paywall-flow
-description: OmniHear'da kota sayacı, 402 paywall akışı ve pending_analysis birikimi ile ilgili backend/frontend kodu yazarken kullanılır. Tetikleyiciler kota, quota, 402, QUOTA_EXCEEDED, paywall, X-Quota-Remaining, pending_analysis, plan yükseltme, upgrade, kota doldu.
----
-
 # Quota Paywall Flow
 
-Ücretsiz plan `quota_limit = 200`. Kota dolunca analiz **durmaz** — yorumlar `pending_analysis` durumunda birikir, kota yükseltilince otomatik requeue edilir. Bu skill sayacın atomikliğini, 402 gövde şeklini ve Angular tarafındaki paywall modalını sabitler.
+Ücretsiz plan `quota_limit = 200`. Kota dolunca analiz **durmaz** — yorumlar `pending_analysis` durumunda birikir, kota yükseltilince otomatik requeue edilir. Bu doküman sayacın atomikliğini, 402 gövde şeklini ve Angular tarafındaki paywall modalını sabitler.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
 Kota sayacına dokunan bir job/controller, 402 yanıtı üreten bir middleware, ya da paywall modalı/interceptor'ı yazılacağı zaman.
 
@@ -54,7 +49,7 @@ class AnalyzeFeedbackJob implements ShouldQueue
 }
 ```
 
-`pending_analysis` feedback'ler **silinmez**, sonraki abonelik aktivasyonunda (`payment-webhook` skill'indeki requeue akışı) tekrar dispatch edilir.
+`pending_analysis` feedback'ler **silinmez**, sonraki abonelik aktivasyonunda (`payment-webhook` dokümanındaki requeue akışı) tekrar dispatch edilir.
 
 ### 3. HTTP 402 gövdesi + `X-Quota-Remaining` header
 

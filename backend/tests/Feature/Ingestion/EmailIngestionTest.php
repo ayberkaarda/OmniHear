@@ -5,7 +5,9 @@ use App\Models\Company;
 use App\Models\Feedback;
 use App\Models\Integration;
 use App\Support\Connectors\ConnectorLimits;
+use App\Support\Connectors\DnsResolver;
 use App\Support\Connectors\EmailConnector;
+use App\Support\Connectors\OutboundHostPolicy;
 use App\Support\Connectors\SyncCursor;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Event;
@@ -20,7 +22,7 @@ use Tests\Support\PlatformFixture;
 | A shared mailbox, end to end — IngestionRunner against the recorded pages
 |--------------------------------------------------------------------------
 |
-| ConnectorFactory and config/connectors.php are the main thread's files and do
+| ConnectorFactory and config/connectors.php are shared files (owned centrally) and do
 | not know this platform yet, so the connector is constructed directly and
 | injected through the same StubConnectorFactory the rest of the ingestion suite
 | uses. Everything from IngestionRunner down is the real path: the page loop,
@@ -242,7 +244,7 @@ function emiKey(object $request): string
  * **`Http::fake()` merges stub callbacks rather than replacing them**: a second
  * `Http::fake(closure)` leaves the first one in charge, so a test that re-arms
  * the fake for its second phase silently keeps getting the first phase's
- * answers. That cost both W8 connector tracks a debugging pass. Re-arming the
+ * answers. That cost both W8 connector workstreams a debugging pass. Re-arming the
  * script the installed closure reads is the only form that works.
  *
  * @param  array<string, array{0: string, 1: int}>  $script
@@ -302,7 +304,19 @@ beforeEach(function () {
     // reaches the analysis listener, which calls the real analyzer over HTTP.
     // That service is up in the dev stack and absent in CI (docs/LESSONS.md).
     Event::fake([FeedbackIngested::class]);
+    // OutboundHostPolicy resolves the session/apiUrl host before the fetch, and
+    // the `.invalid` host these fixtures use never resolves on a real resolver;
+    // a permissive fake keeps the SSRF gate on its allow path.
+    OutboundHostPolicy::resolveUsing(new class implements DnsResolver
+    {
+        public function resolve(string $host): array
+        {
+            return ['93.184.216.34'];
+        }
+    });
 });
+
+afterEach(fn () => OutboundHostPolicy::resolveUsing(null));
 
 /*
 |--------------------------------------------------------------------------

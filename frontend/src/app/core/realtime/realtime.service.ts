@@ -58,7 +58,7 @@ interface EchoLike {
  * enter the initial chunk. This service is therefore reached only from inside
  * the authenticated shell — never from `app.config.ts`, never from a route the
  * landing or auth pages can touch — and the libraries themselves load from an
- * `import()` that runs after `connect()` is called. CLAUDE.md Trap 2 calls a
+ * `import()` that runs after `connect()` is called. CONTRIBUTING.md Trap 2 calls a
  * library in the initial chunk a class C failure: the threshold does not move,
  * the code does.
  *

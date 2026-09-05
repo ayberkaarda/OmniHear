@@ -1313,6 +1313,26 @@
             },
             "post": {
                 "operationId": "auth_two_factor_store",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "password": {
+                                        "description": "Must equal the authenticated user current password.",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "password"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "description": "Validated by App\\Http\\Requests\\Api\\V1\\Auth\\EnableTwoFactorRequest.",
+                    "required": true
+                },
                 "responses": {
                     "201": {
                         "content": {
@@ -1363,6 +1383,16 @@
                             }
                         },
                         "description": "NOT_FOUND"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": "VALIDATION_ERROR"
                     },
                     "429": {
                         "content": {

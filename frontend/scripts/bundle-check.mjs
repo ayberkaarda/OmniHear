@@ -20,7 +20,7 @@
  *
  * Why it re-reads angular.json: the raw threshold now lives in two places, and
  * they must agree. Raising it therefore requires editing both, which makes the
- * change impossible to slip past a diff. See CLAUDE.md Trap 2 for the procedure
+ * change impossible to slip past a diff. See CONTRIBUTING.md Trap 2 for the procedure
  * a raise has to follow.
  *
  * Thresholds: ADR-0007 derived them from the measured framework floor;
@@ -216,7 +216,7 @@ if (leaked.length > 0) {
   fail(
     'pusher-js / laravel-echo reached the INITIAL bundle: ' +
       `${leaked.join(', ')}. Realtime must load through a dynamic import() from inside the ` +
-      'authenticated shell (docs/contracts/realtime.md section 3). CLAUDE.md Trap 2 class C: ' +
+      'authenticated shell (docs/contracts/realtime.md section 3). CONTRIBUTING.md Trap 2 class C: ' +
       'the threshold does not move, the code does.',
   );
 }

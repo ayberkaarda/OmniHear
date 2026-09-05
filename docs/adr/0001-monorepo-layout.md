@@ -23,7 +23,6 @@ One repository:
 backend/     Laravel · frontend/   Angular · ai-service/  FastAPI
 contracts/   OpenAPI schema + fixtures shared by both backends
 infra/       compose + Dockerfiles · docs/  ADRs, PROGRESS
-.claude/     hooks + skills + settings
 ```
 
 `contracts/` is the reason. It holds `ai-openapi.json` and the analyze fixtures that the
@@ -42,12 +41,12 @@ Pest suite and the pytest suite both read.
 ## Consequences
 
 **Positive.** One clone, one `docker compose up`. A contract change and both consumers
-move in a single commit. File ownership for parallel agents maps cleanly onto top-level
-directories, which is how work is split (`backend/` to one agent, `frontend/` to another).
+move in a single commit. File ownership for parallel workstreams maps cleanly onto top-level
+directories, which is how work is split (`backend/` to one workstream, `frontend/` to another).
 
 **Negative.** CI must path-filter, or every push runs all three suites. Repository size
 grows with three dependency trees (mitigated by `.gitignore`). Directory-level access
 control is not possible, unlike separate repositories.
 
-**Follow-on.** Top-level directories are the unit of agent file ownership; two agents are
-never assigned the same directory in one wave.
+**Follow-on.** Top-level directories are the unit of workstream file ownership; two workstreams are
+never assigned the same directory in one phase.

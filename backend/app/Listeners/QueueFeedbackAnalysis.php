@@ -11,7 +11,7 @@ use App\Jobs\AnalyzeFeedbackJob;
  * F4 announces that a genuinely new feedback row exists; this listener is the
  * only thing that turns that into an AnalyzeFeedbackJob. Keeping the dispatch
  * on this side means ingestion never has to know about quota, the analyzer or
- * the retry policy - and that the two tracks could be built in parallel.
+ * the retry policy - and that the two workstreams could be built in parallel.
  *
  * Auto-discovered: Laravel scans app/Listeners and registers by the handle()
  * type hint, so no provider edit is needed.

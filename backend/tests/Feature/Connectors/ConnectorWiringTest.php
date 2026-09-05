@@ -19,7 +19,7 @@ use function Pest\Laravel\actingAs;
 |
 | GooglePlayConnector, GooglePlayAccessToken, TrustpilotConnector,
 | EmailConnector and MastodonConnector already have their own green unit and
-| ingestion tests on another track (email's:
+| ingestion tests on another workstream (email's:
 | tests/Unit/Connectors/EmailConnectorTest.php,
 | tests/Feature/Ingestion/EmailIngestionTest.php; social's:
 | tests/Unit/Connectors/MastodonConnectorTest.php). Nothing here re-tests

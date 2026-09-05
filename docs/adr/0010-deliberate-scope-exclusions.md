@@ -8,7 +8,7 @@
 
 ## Context
 
-CLAUDE.md §6 forbids adding features beyond the spec without approval, but it
+CONTRIBUTING.md §4 forbids adding features beyond the spec without approval, but it
 equally forbids letting spec items silently disappear — an unbuilt requirement
 has to be a recorded decision, not an absence nobody can point to. This ADR is
 that record: one entry per spec-mandated item this codebase does not build,
@@ -49,7 +49,7 @@ value on its own, not as an input to a scoring system that does not exist.
 Spec §3.6 asks for Sentry alongside structured logging. No `sentry` reference
 anywhere in `backend/composer.json`, `ai-service/pyproject.toml`, or source.
 **Reason:** the structured JSON logging half of §3.6 is built (Laravel's
-`json` channel, `ai-service/app/logging_config.py` as of this wave) and
+`json` channel, `ai-service/app/logging_config.py` as of this phase) and
 carries a correlation id across both services; an external error-tracking SaaS
 is a separate integration with its own account/DSN management that no phase
 has taken on.
@@ -78,9 +78,9 @@ Trustpilot, email, and social have no connector class, no entry in
 `ConnectorFactory`, and — per `docs/PROGRESS.md`'s "Open after W4" — even
 Zendesk's shape was synthesised from documentation rather than verified
 against a live account. **Reason:** each connector is its own ingestion,
-auth, and fixture-synthesis effort (see `platform-connector` skill); F4/F8
+auth, and fixture-synthesis effort (see the `platform-connector` playbook); F4/F8
 built two real feeds plus the test fixture, and the remaining four were never
-dispatched.
+built.
 
 ### The backend's use of `/analyze/batch`
 Spec §6.3 offers a batch endpoint for bulk work. `ai-service` implements it
@@ -162,7 +162,7 @@ already states why the corresponding feature was not attempted. The
 alternative to writing this ADR at all was to leave these absences implicit
 in `docs/PROGRESS.md`'s prose tables. Rejected: PROGRESS has a 120-line cap
 and closed phases collapse to one row, so it cannot durably hold nine
-individually-justified exclusions — precisely the failure mode CLAUDE.md §6
+individually-justified exclusions — precisely the failure mode CONTRIBUTING.md §4
 warns about, where an unbuilt requirement is indistinguishable from an
 oversight.
 

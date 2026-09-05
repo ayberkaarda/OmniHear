@@ -7,7 +7,7 @@ return [
     | API credentials
     |--------------------------------------------------------------------------
     |
-    | Never committed. `config/services.php` is shared by every track, so the
+    | Never committed. `config/services.php` is shared by every workstream, so the
     | payment providers get their own files (docs/contracts/wave2-seams.md).
     |
     | Both values default to null. A missing key is treated as a hard failure at
@@ -49,9 +49,15 @@ return [
     | (invariant I3) stops the business logic from running twice, but the
     | tolerance is what stops the request from being accepted at all.
     |
+    | Clamped to at least 1 so it fails closed. A non-numeric env - `""`,
+    | `"none"`, `"5m"` - casts to 0, and a tolerance of 0 would make the verifier
+    | skip the timestamp check silently and accept a replay of any age. `max(1,…)`
+    | keeps the window narrow rather than absent; the verifier rejects a
+    | non-positive value outright as a second line of defence.
+    |
     */
 
-    'signature_tolerance' => (int) env('STRIPE_SIGNATURE_TOLERANCE', 300),
+    'signature_tolerance' => max(1, (int) env('STRIPE_SIGNATURE_TOLERANCE', 300)),
 
     /*
     |--------------------------------------------------------------------------

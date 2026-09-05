@@ -26,7 +26,7 @@ use Tests\Support\PlatformFixture;
 | Google Play, end to end through IngestionRunner
 |--------------------------------------------------------------------------
 |
-| ConnectorFactory and config/connectors.php belong to the main thread, so at
+| ConnectorFactory and config/connectors.php are shared files (owned centrally), so at
 | the time this file was written the factory had no googleplay arm and could not
 | build this connector at all (docs/contracts/w8-connectors.md section 1). The
 | factory is therefore stood in for below with one that builds the connector
@@ -34,7 +34,7 @@ use Tests\Support\PlatformFixture;
 | and credentials.{client_email,private_key} — so that everything downstream of
 | the factory, which is the whole ingestion path, is exercised for real.
 |
-| The factory-level test is the main thread's, once the arm exists.
+| The factory-level test belongs centrally, once the arm exists.
 |
 | The service-account key is generated in-process. No key material is committed,
 | and the fixtures under tests/Fixtures/platforms/googleplay/ are synthesised
@@ -73,7 +73,7 @@ function gpiKeys(): array
 }
 
 /**
- * Stands in for the ConnectorFactory arm the main thread owns.
+ * Stands in for the ConnectorFactory arm owned centrally.
  */
 function useGooglePlayConnector(int $maxPages = 10, int $maxResults = 100): void
 {

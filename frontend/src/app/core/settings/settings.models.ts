@@ -27,6 +27,12 @@ export interface ProfileResponse {
 export interface ProfileUpdateBody {
   readonly name?: string;
   readonly email?: string;
+  /**
+   * Required by the API only when `email` moves the account to a new address —
+   * a change of address is a one-step takeover (the reset link follows the
+   * mailbox), so it re-proves the password. Omitted for a name-only change.
+   */
+  readonly password?: string;
 }
 
 export interface PasswordUpdateBody {

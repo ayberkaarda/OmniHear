@@ -46,6 +46,7 @@ export class TwoFactorStore {
   private readonly disablingSignal = signal(false);
   private readonly regeneratingSignal = signal(false);
 
+  private readonly startErrorsSignal = signal<FieldErrors | null>(null);
   private readonly confirmErrorsSignal = signal<FieldErrors | null>(null);
   private readonly disableErrorsSignal = signal<FieldErrors | null>(null);
   private readonly regenerateErrorsSignal = signal<FieldErrors | null>(null);
@@ -57,6 +58,7 @@ export class TwoFactorStore {
   readonly confirming = this.confirmingSignal.asReadonly();
   readonly disabling = this.disablingSignal.asReadonly();
   readonly regenerating = this.regeneratingSignal.asReadonly();
+  readonly startErrors = this.startErrorsSignal.asReadonly();
   readonly confirmErrors = this.confirmErrorsSignal.asReadonly();
   readonly disableErrors = this.disableErrorsSignal.asReadonly();
   readonly regenerateErrors = this.regenerateErrorsSignal.asReadonly();
@@ -68,29 +70,37 @@ export class TwoFactorStore {
   readonly enrolling = computed(() => this.enrolmentSignal() !== null);
 
   /**
-   * Asks the API for a secret and a QR.
+   * Asks the API for a secret and a QR, re-proving the password first.
+   *
+   * The password re-proves the session because arming a factor is as durable a
+   * takeover, from a stolen session, as removing one (contract
+   * `w10-two-factor.md`). A wrong one comes back as a `422` on the `password`
+   * field, surfaced through `startErrors` so the form can name it.
    *
    * Calling it again before confirmation replaces the unconfirmed secret
    * server-side, so the screen simply shows whatever the newest call returned.
    */
-  start(): void {
+  start(password: string): void {
     if (this.startingSignal() || this.enabled()) {
       return;
     }
     this.startingSignal.set(true);
+    this.startErrorsSignal.set(null);
     this.confirmErrorsSignal.set(null);
     this.recoveryCodesSignal.set(null);
     this.recoveryOriginSignal.set(null);
 
-    this.auth.startTwoFactorEnrolment().subscribe({
+    this.auth.startTwoFactorEnrolment(password).subscribe({
       next: (enrolment) => {
         this.startingSignal.set(false);
         this.enrolmentSignal.set(enrolment);
       },
-      error: () => {
-        // The interceptor has already surfaced the code; leaving the section in
-        // its previous state is the honest outcome of a failed start.
+      error: (error: unknown) => {
+        // A wrong password is a field-level failure the form must name; the
+        // section otherwise stays in its previous state, which is the honest
+        // outcome of a failed start.
         this.startingSignal.set(false);
+        this.startErrorsSignal.set(fieldErrorsOf(error));
       }
     });
   }
@@ -188,6 +198,7 @@ export class TwoFactorStore {
     this.confirmingSignal.set(false);
     this.disablingSignal.set(false);
     this.regeneratingSignal.set(false);
+    this.startErrorsSignal.set(null);
     this.confirmErrorsSignal.set(null);
     this.disableErrorsSignal.set(null);
     this.regenerateErrorsSignal.set(null);

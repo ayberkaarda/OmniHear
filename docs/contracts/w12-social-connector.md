@@ -1,6 +1,6 @@
 # W12 — social connector (Mastodon hashtag timeline)
 
-The sixth and last channel of spec §2. Written before dispatch.
+The sixth and last channel of spec §2. Written before implementation.
 
 ## Why Mastodon, and what it costs honestly
 
@@ -85,17 +85,17 @@ same judgement that skips a Trustpilot review with no text.
 is ever built from a response body — `ConnectorFailure`'s six fixed sentences.
 `rate_limit` sits well under the documented 300 per 5 minutes.
 
-**`403` is missing from that table and it matters.** The connector track kept to
+**`403` is missing from that table and it matters.** The connector workstream kept to
 the contract's letter and left it in the `default → Unreachable` arm, which means
 a suspended or defederated instance is retried five times before it gives up.
 `Unreachable` is retryable by design; a 403 here is a standing decision by the
 server, not a blip. Map it to `Misconfigured` when this contract is next opened —
 recorded rather than fixed silently, because it changes retry behaviour and the
-track was right not to take that on its own.
+workstream was right not to take that on its own.
 
 ## Live recording — the easiest in the project
 
-This channel needs no account, so the recording happens inside the track:
+This channel needs no account, so the recording happens inside the workstream:
 `mastodon.social`, a neutral hashtag, `?limit=40`. Discipline is the App Store
 precedent — **envelope real, content synthetic**: `account.*` becomes
 `poster-NN`, every `url`/`uri`/instance host becomes something under
@@ -118,3 +118,19 @@ Watches a hashtag, not mentions. Federation reach depends on the instance — a
 small server sees less of the network than `mastodon.social`. An instance with
 public preview disabled needs a token, which this connector does not implement;
 it surfaces as `InvalidCredentials`.
+
+## Outbound host policy (SSRF)
+
+`instance_url` is tenant-supplied and fetched on the five-minute scheduler, so a
+host answering a redirect to an internal address would turn the scheduler into a
+confused deputy. `App\Support\Connectors\OutboundHostPolicy` — shared with the
+e-mail connector — checks the instance host before the timeline GET and again at
+every redirect hop: https only, and the host must resolve entirely to public
+addresses. Loopback, link-local (the cloud metadata endpoint included), RFC 1918
+and the other reserved ranges are refused as `Misconfigured`; a host that does
+not resolve is `Unreachable`. Redirects stay on — a Mastodon-compatible host may
+redirect the path — but Guzzle's `on_redirect` runs the same check before each
+hop and cancels one aimed inward.
+
+**Residual, out of scope by decision:** DNS rebinding, for the same reason and
+with the same recorded-for-the-ADR status as the e-mail connector (w11).

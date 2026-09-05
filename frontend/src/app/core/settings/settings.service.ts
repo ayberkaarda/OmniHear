@@ -137,7 +137,7 @@ export class SettingsService {
   /**
    * Replaces the hand-copied `CONNECTABLE_PLATFORMS` constant. The registry is
    * the server's, so the integration form cannot drift from it — which it
-   * already did once, when Zendesk was added on the backend mid-wave.
+   * already did once, when Zendesk was added on the backend mid-phase.
    */
   platforms(): Observable<PlatformListResponse> {
     return this.http.get<PlatformListResponse>(this.platformsUrl);

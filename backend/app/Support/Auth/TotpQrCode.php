@@ -14,7 +14,7 @@ use BaconQrCode\Writer;
  *
  * The obvious alternative is a QR library in the SPA. It is the wrong one for
  * this codebase: the enrolment screen is a lazy route but a QR encoder is a
- * general dependency, and CLAUDE.md Trap 2 classifies a new library appearing
+ * general dependency, and CONTRIBUTING.md Trap 2 classifies a new library appearing
  * in the bundle as class C — the threshold does not move for it, the library
  * comes out. Drawing it here costs one small string on one request and keeps
  * `frontend/`'s initial bundle exactly where it is.

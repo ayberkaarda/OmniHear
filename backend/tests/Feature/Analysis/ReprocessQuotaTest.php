@@ -19,7 +19,7 @@ use Tests\Support\AiServiceFake;
  * absence of a call, because the counter is a database column and the only
  * honest question is where it ended up.
  *
- * The analyzer responses come from contracts/fixtures/analyze/ (CLAUDE.md
+ * The analyzer responses come from contracts/fixtures/analyze/ (CONTRIBUTING.md
  * section 2: a shape the fixtures cover may not be proved with inline JSON).
  */
 beforeEach(function () {

@@ -1,6 +1,6 @@
 # Realtime — Reverb, channel authorization, and the client seam
 
-Status: **binding for W5.** Written by the main thread before dispatch. The server
+Status: **binding for W5.** Written centrally before implementation. The server
 half already exists and is tested; this file records what it emits so the client
 does not have to guess, and states the one constraint that shapes the client design.
 
@@ -63,7 +63,7 @@ the two together are more than the entire budget.
 Therefore realtime **must not enter the initial bundle**. It is loaded with a
 dynamic `import()` from inside the authenticated app shell, after auth resolves —
 never from `app.config.ts`, never from a route that the landing or auth pages reach.
-CLAUDE.md Trap 2 classifies a library in the initial chunk as **class C**: the
+CONTRIBUTING.md Trap 2 classifies a library in the initial chunk as **class C**: the
 threshold does not move, the code does.
 
 `angular.json` gains an `anyScript` budget when the realtime chunk lands, so the

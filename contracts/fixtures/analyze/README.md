@@ -3,7 +3,7 @@
 Shared scenarios for the Laravel <-> FastAPI analysis contract. **Both**
 sides consume these files: the FastAPI side in
 `ai-service/tests/test_contract_fixtures.py`, the Laravel side from F5
-onwards. Per CLAUDE.md §2, a test may not treat its own inline JSON as
+onwards. Per CONTRIBUTING.md §2, a test may not treat its own inline JSON as
 proof for a shape these fixtures already cover.
 
 The schema they conform to is `contracts/ai-openapi.json`, which is

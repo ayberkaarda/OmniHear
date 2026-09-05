@@ -144,7 +144,7 @@ class IntegrationController extends Controller
 
         FetchFeedbackJob::dispatch((int) $integration->company_id, (int) $integration->id);
 
-        // Not a lang key: lang/ is owned by the main thread for this wave, and
+        // Not a lang key: lang/ is owned centrally for this phase, and
         // messages.php has no ingestion entry yet. Flagged in the phase report.
         return response()->json(['message' => 'Sync queued.'], 202);
     }

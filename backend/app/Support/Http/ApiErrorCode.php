@@ -22,9 +22,9 @@ enum ApiErrorCode: string
     case DisposableEmail = 'DISPOSABLE_EMAIL';
     case ServerError = 'SERVER_ERROR';
 
-    // Wave 2. Added by the main thread before F4/F5/F6-F7 were dispatched: this
+    // The F4-F7 phase group. Added centrally before F4/F5/F6-F7 began: this
     // enum and the two lang files are the one part of the error contract all
-    // three tracks touch, so they are settled here rather than merged afterwards.
+    // three workstreams touch, so they are settled here rather than merged afterwards.
     case IntegrationUnavailable = 'INTEGRATION_UNAVAILABLE';
     case IntegrationInvalidCredentials = 'INTEGRATION_INVALID_CREDENTIALS';
     case SyncInProgress = 'SYNC_IN_PROGRESS';

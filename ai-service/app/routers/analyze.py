@@ -13,6 +13,7 @@ below for the only fields that are permitted.
 
 import logging
 import time
+from collections.abc import Iterable, Mapping
 
 from fastapi import APIRouter, Depends, status
 from pydantic import ValidationError
@@ -61,6 +62,21 @@ def get_analyzer() -> SentimentAnalyzer:
     return get_pipeline()
 
 
+def _format_validation_errors(errors: Iterable[Mapping[str, object]]) -> str:
+    """Summarize validation errors without echoing the offending input.
+
+    Pydantic's error dicts carry an `input` key holding the raw,
+    attacker-controlled value that failed validation (that's what
+    `str(exc)` embeds). This renders only `loc` and `msg`, so a rejected
+    request body is never reflected back in the response.
+    """
+    parts = []
+    for error in errors:
+        loc = ".".join(str(segment) for segment in error.get("loc", ())) or "body"
+        parts.append(f"{loc}: {error.get('msg', 'invalid value')}")
+    return "; ".join(parts) or "invalid request"
+
+
 def _validation_error(exc: ValidationError, correlation_id: str | None) -> ApiError:
     errors = exc.errors()
     is_batch_too_large = any(
@@ -76,7 +92,7 @@ def _validation_error(exc: ValidationError, correlation_id: str | None) -> ApiEr
     return ApiError(
         status.HTTP_422_UNPROCESSABLE_CONTENT,
         "VALIDATION_ERROR",
-        str(exc),
+        _format_validation_errors(errors),
         correlation_id,
     )
 

@@ -1,6 +1,6 @@
 # Backend core contract — schema + tenancy seam
 
-Status: **binding for F2+**. Written by the main thread before the F2 wave, so
+Status: **binding for F2+**. Written centrally before the F2 phase began, so
 that F4 (ingestion), F5 (quota pipeline) and F6/F7 (payments) can be built
 against fixed table and class names without re-litigating the foundation.
 
@@ -14,7 +14,7 @@ Source of truth for behaviour: `docs/OMNIHEAR-SPEC.md` sections 5, 6, 7.
 All migrations land in F2 as **one coherent schema**, even for tables whose
 behaviour arrives later. Splitting them across phases would mean a later phase
 editing an earlier phase's migration, which is exactly the merge conflict the
-parallel wave exists to avoid.
+parallel phase exists to avoid.
 
 PostgreSQL 16. All timestamps are `timestamptz`. All FKs are `bigint` with
 `ON DELETE CASCADE` unless noted.

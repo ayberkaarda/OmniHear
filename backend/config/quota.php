@@ -8,9 +8,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The number of feedback analyses a company may consume. Spec 7.2 fixes the
-    | free plan at 200. The `pro` value is decided in the payments phase (F6/F7)
-    | and is deliberately null until then so that a wrong number cannot leak
-    | into production by accident.
+    | free plan at 200. The `pro` plan is sold at 5000 — the number a successful
+    | payment raises the tenant's limit to (see App\Listeners\ActivateSubscriptionPlan).
     |
     | Nothing outside this file hard-codes a quota number.
     |
@@ -21,7 +20,7 @@ return [
             'quota_limit' => 200,
         ],
         'pro' => [
-            'quota_limit' => null,
+            'quota_limit' => 5000,
         ],
     ],
 

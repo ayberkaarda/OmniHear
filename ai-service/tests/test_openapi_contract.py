@@ -1,6 +1,6 @@
 """contracts/ai-openapi.json must never drift from the Pydantic models.
 
-CLAUDE.md names that file as *the* Laravel <-> FastAPI contract. It is
+CONTRIBUTING.md names that file as *the* Laravel <-> FastAPI contract. It is
 generated, not written, so the only failure mode left is forgetting to
 regenerate it — which is what these tests turn red.
 """

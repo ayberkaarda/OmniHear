@@ -127,7 +127,7 @@ it('renders the warning email from the translation catalogue', function () {
 
     $mail = QuotaWarningNotification::forCompany($company, 8, 10)->toMail($owner);
 
-    // CLAUDE.md section 6: no hard-coded user-facing text. A missing key would
+    // CONTRIBUTING.md section 4: no hard-coded user-facing text. A missing key would
     // surface here as the key itself.
     expect($mail->subject)->toContain('80')
         ->and($mail->subject)->not->toContain('quota.warning')

@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
  *
  * The enums must stay identical to ai-service/app/schemas.py and to
  * App\Models\AiAnalysis. Changing one of the three is a contract change; see
- * .claude/skills/ai-contract-sync.
+ * docs/playbooks/ai-contract-sync.
  */
 final class AnalysisResult
 {

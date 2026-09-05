@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Schema;
  *
  * W10 shipped the mark in the cache, and
  * `docs/contracts/w10-two-factor.md` recorded why: the W10 migration was
- * already applied and no track owned `database/migrations/`. The reason to
+ * already applied and no single workstream owned `database/migrations/`. The reason to
  * move it is not durability, it is **atomicity**. A cache mark is read,
  * compared and written by application code, so two requests carrying the same
  * code both pass the comparison before either writes — a challenge token plus

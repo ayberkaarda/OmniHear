@@ -46,7 +46,21 @@ app = ["models/*.json"]
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+# T20 bans print(): this service logs structured JSON with a correlation id
+# carried across both services, and a stray print() bypasses that entirely —
+# unformatted, uncorrelated, invisible to anything reading the log stream.
+# scripts/ is exempt below: it is build tooling that runs at image build time
+# and its output is meant for a human watching a docker build.
+select = ["E", "F", "I", "UP", "B", "T20"]
+
+# The ban applies to the service, not to the tooling around it. `app/` is
+# clean; every violation was in these two, and in both places printing is the
+# point: scripts/ narrates a docker build to whoever is watching it, and the
+# latency test prints the timings it measured so a regression is legible in CI
+# output rather than only in an assertion message.
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["T20"]
+"tests/*" = ["T20"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

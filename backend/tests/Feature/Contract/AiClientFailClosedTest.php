@@ -63,7 +63,7 @@ it('still signs and sends once a secret is configured', function () {
     config(['ai.hmac_secret' => 'a-real-shared-secret']);
 
     // The 200 body is a shape contracts/fixtures/analyze/ already covers, so
-    // it comes from there rather than from inline JSON (CLAUDE.md section 2).
+    // it comes from there rather than from inline JSON (CONTRIBUTING.md section 2).
     Http::fake([
         '*/v1/analyze' => Http::response(AiServiceFake::successBody(), 200),
     ]);

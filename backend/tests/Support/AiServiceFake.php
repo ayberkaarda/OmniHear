@@ -9,9 +9,9 @@ use RuntimeException;
  * Access to the shared `/v1/analyze` contract fixtures, plus the HTTP fakes
  * built out of them.
  *
- * CLAUDE.md section 2: for a shape the fixtures already cover, a test may not
+ * CONTRIBUTING.md section 2: for a shape the fixtures already cover, a test may not
  * treat its own inline JSON as proof. The analyzer's 200 body is such a shape,
- * so every test in this track that needs an analyzer response takes it from
+ * so every test in this workstream that needs an analyzer response takes it from
  * contracts/fixtures/analyze/ - the same files
  * ai-service/tests/test_contract_fixtures.py consumes.
  *
@@ -20,7 +20,7 @@ use RuntimeException;
  * The dev compose stack bind-mounts only `../backend` into the backend
  * container, so `contracts/` is not visible from inside it. Until
  * infra/docker-compose.dev.yml gains `- ../contracts:/srv/contracts:ro` (an
- * infra/** file this track may not edit), the suite has to be run with the
+ * infra/** file this workstream may not edit), the suite has to be run with the
  * mount supplied on the command line:
  *
  *   docker compose -f infra/docker-compose.dev.yml run --rm \

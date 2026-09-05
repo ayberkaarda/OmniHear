@@ -1,13 +1,8 @@
----
-name: payment-webhook
-description: Stripe veya Iyzico ödeme webhook endpoint'i yazarken/değiştirirken imza doğrulama, replay koruması ve abonelik aktivasyonunu doğru kurmak için kullanılır. Tetikleyiciler Stripe, Iyzico, webhook, checkout.session.completed, imza doğrulama, signature, abonelik, subscription, replay, ödeme.
----
-
 # Payment Webhook
 
-OmniHear'da Stripe (global) ve Iyzico (TR) webhook'ları abonelik durumunu değiştirir ve kota dolduğu için bekleyen (`pending_analysis`) yorumları yeniden kuyruğa alır. Bu skill, imza doğrulama, replay koruması ve HTTP yanıt kodu politikasını sabitler.
+OmniHear'da Stripe (global) ve Iyzico (TR) webhook'ları abonelik durumunu değiştirir ve kota dolduğu için bekleyen (`pending_analysis`) yorumları yeniden kuyruğa alır. Bu doküman, imza doğrulama, replay koruması ve HTTP yanıt kodu politikasını sabitler.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
 Yeni bir webhook route/controller/job yazılacağı, mevcut biri değiştirileceği veya "abonelik neden aktive olmadı" gibi bir hata ayıklama isteği geldiğinde.
 

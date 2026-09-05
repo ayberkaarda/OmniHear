@@ -23,7 +23,7 @@ npm start          # ng serve, http://localhost:4200
 ## Commands that matter
 
 These are the ones the project's regression gate actually checks — see
-`CLAUDE.md` §2 ("Trap 1" and "Trap 2") for why the obvious-looking alternatives
+`CONTRIBUTING.md` §2 ("Trap 1" and "Trap 2") for why the obvious-looking alternatives
 (`tsc --noEmit`, a relaxed `ng build`) do not catch what these do.
 
 | Command | What it checks | Why the naive version is not enough |
@@ -74,7 +74,7 @@ The app runs with `provideZonelessChangeDetection()` (stable as of Angular 20;
 the polyfills list carries no `zone.js` — confirmed 1.84 kB in the bundle table
 above, `zone.js` alone is normally ~36 kB). Re-adding `zone.js` is a conscious
 architecture change, not a dependency bump, and is not done without approval
-(`CLAUDE.md` Trap 2). It matters when choosing a third-party library: one that
+(`CONTRIBUTING.md` Trap 2). It matters when choosing a third-party library: one that
 depends on `NgZone` to trigger change detection produces stale UI under this
 app — state changes, the view doesn't — because nothing re-renders unless a
 signal is read. Zoneless compatibility is a selection criterion for any new

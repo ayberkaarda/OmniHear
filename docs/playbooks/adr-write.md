@@ -1,15 +1,10 @@
----
-name: adr-write
-description: OmniHear için mimari bir karar kaydı (ADR) yazarken kullanılır. Tetikleyiciler ADR, mimari karar, karar kaydı, architecture decision, neden X seçtik, architecture decision record.
----
-
 # ADR Write
 
 Mimari bir kararı (teknoloji seçimi, veri modeli değişikliği, entegrasyon stratejisi vb.) gelecekte referans alınabilecek şekilde kayıt altına almak için kullanılır.
 
-## Ne zaman yükle
+## Ne zaman okunur
 
-Kullanıcı "bunu neden böyle yaptık", "ADR yaz", "mimari karar kaydı" dediğinde, ya da önemli bir tasarım kararı (ör. hangi kuyruk sürücüsü, hangi ödeme sağlayıcı sırası, kota sayacının atomiklik stratejisi) alınıp gerekçelendirilmesi gerektiğinde.
+Önemli bir tasarım kararı (ör. hangi kuyruk sürücüsü, hangi ödeme sağlayıcı sırası, kota sayacının atomiklik stratejisi) alınıp gerekçesinin gelecekte referans alınabilecek şekilde kayıt altına alınması gerektiğinde.
 
 ## Adımlar
 
@@ -85,7 +80,7 @@ Her ADR en az bir gerçek alternatif içerir ve her biri **neden elendiğini som
 
 ### 5. Yazma dili
 
-Doküman içi teknik terimler, kod parçaları, dosya/tablo adları İngilizce kalır; düzyazı (Bağlam, Karar, Sonuçlar açıklamaları) Türkçe yazılır — CLAUDE.md §0.6 ile tutarlı.
+Doküman içi teknik terimler, kod parçaları, dosya/tablo adları İngilizce kalır; düzyazı (Bağlam, Karar, Sonuçlar açıklamaları) Türkçe yazılır — deponun dil kuralıyla (CONTRIBUTING.md §6) tutarlı.
 
 ### 6. Sözleşme dokümanlarıyla ilişki
 
@@ -99,4 +94,4 @@ ADR bir doküman olduğu için otomatik test kapsamına girmez. Bunun yerine **y
 - [ ] En az bir gerçek alternatif var, her biri somut gerekçeyle elenmiş.
 - [ ] "Sonuçlar" hem olumlu hem olumsuz/borç maddesi içeriyor — yalnızca artıları listelemek yasak.
 - [ ] "İlgili spec bölümü" referansı var ve gerçekten var olan bir dosya/bölüme işaret ediyor.
-- [ ] Kararın kod/config değişikliği gerektiriyorsa, bu ADR'nin kendisi kod yazmaz — ilgili sub-agent'a ayrı görev olarak devredilir.
+- [ ] Kararın kod/config değişikliği gerektiriyorsa, bu ADR'nin kendisi kod yazmaz; kod değişikliği ayrı bir iş olarak, ADR kapsamı dışında yapılır.
