@@ -1,6 +1,6 @@
 # PROGRESS
 
-Updated: 2026-09-05 · Current: **W13 green (CI `33920031959`); spec complete at 6/6 channels** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
+Updated: 2026-09-05 · Current: **W14 green (CI `33979566100`); spec complete, security reviewed, tooling ported** · Spec: `docs/OMNIHEAR-SPEC.md` (its **Errata** section overrides the original line it contradicts)
 
 > Hard cap: 120 lines. A closed phase collapses to one row. Phase report bodies do
 > not live here — their numbers land in the table.
@@ -29,7 +29,7 @@ commit messages; `git log` is the archive.
 | **W11** | email connector over JMAP (spec §2: 4 of 6 channels → **5**) ∥ the 2FA replay mark moves from cache to a `users` column, making the check atomic | **green** — CI `33903711379`, seven jobs, E2E 58.3 s, image cache hit for the second run running · pest **1512 passed, 6419 assertions** (identical on a clean checkout), coverage **98.9%** · guards **122** · i18n **480/480** · build:gate raw 339.66/347, transfer 94.88/105 (unmoved) · the replay race test fails 5-of-5 against read-then-write and passes 1-of-5 with the conditional `UPDATE` |
 | **W12** | social connector over the Mastodon hashtag timeline — **6 of 6 channels**, spec §2 complete ∥ MIT licence, the public-facing docs brought to the truth, and the fixture-provenance promise finally tested for Zendesk and Google Play | **green** — CI `33913560354` · pest **1648 passed, 7009 assertions**, coverage **98.9%** · guards **122** · jest **323/56** · i18n **482/482** · build:gate raw 339.66/347, transfer 94.90/105 (unmoved) · **recorded live** from `mastodon.social`, no account: the second channel after App Store to meet a real server |
 | **W13** | closure round: the theme-switch contrast flash found by *looking* at the product, 403 → `Misconfigured`, six raw-key labels, bilingual README with screenshots, D-13 recorded | **green** — CI `33920031959` · pest **1649 passed, 7017 assertions**, coverage **98.9%** · guards **122** · jest **325/56** · i18n **488/488** · pytest 295 · tokens 63/2/0 · build:gate raw 340.70/347, transfer 95.03/105 (unmoved) · **E2E ran locally for the first time**, and found the dev database two migrations behind |
-| **W14** | adversarial security review of the whole tree, then remediation: SSRF via tenant-pasted connector URLs (the headline), the 2FA challenge counter made atomic and per-account, the `pro` quota that a payment never raised, a password gate on 2FA-enrol and email-change, plus smaller fixes; crown-jewel invariants probed and held | **green** — pest **1759 passed, 7223 assertions**, coverage **98.7%** · guards **122** · jest **326/56** · i18n **488/488** · pytest **298** · build:gate raw 340.71/347, transfer 95.03/105 (unmoved) · **E2E passed locally** (found, again, the dev DB a migration behind) · posture recorded in ADR-0011 |
+| **W14** | adversarial security review of the whole tree, then remediation: SSRF via tenant-pasted connector URLs (the headline), the 2FA challenge counter made atomic and per-account, the `pro` quota that a payment never raised, a password gate on 2FA-enrol and email-change, plus smaller fixes; crown-jewel invariants probed and held | **green** — CI `33979566100`, six jobs (the guards job folded into the backend suite as the architecture tests) · pest **1759 passed, 7223 assertions**, coverage **98.7%** · jest **326/56** · i18n **488/488** · pytest **298** · build:gate raw 340.71/347, transfer 95.03/105 (unmoved) · posture recorded in ADR-0011 |
 
 Parallelism budget, measured rather than assumed: the first round finished with three
 parallel workstreams, the second lost all three to a session limit, and the difference was
@@ -39,13 +39,13 @@ leaves a diagnosable tree.
 
 ## Now
 
-**Latest gate** is the W13 row above, confirmed by CI `33920031959`. `npx
-playwright test` **can** now run on this machine, which had been assumed
-impossible: port 4200 is held by the compose `frontend` service serving this
-very app, so with `CI` unset Playwright reuses it instead of starting a second
-server. The first local run failed and was right to — see the dev-database
-drift in `docs/LESSONS.md`. CI remains the authority, but a two-minute local
-run now catches what used to cost a push.
+**Latest gate** is the W14 row above, confirmed by CI `33979566100` — six jobs
+now that the guards job has folded into the backend suite as the architecture
+tests. The end-to-end journey can run on this machine (leave `CI` unset and
+Playwright reuses the compose frontend on 4200 rather than starting its own);
+its first local run each phase has twice caught the dev database sitting a
+migration behind, which CI, building schema from scratch, cannot see. CI remains
+the authority.
 
 **A green CI run is not automatically evidence** — the first reported 534 warnings and
 went green anyway. Hardened (`failOnWarning`/`failOnRisky`, weights fetched, `pytest -rs`,
