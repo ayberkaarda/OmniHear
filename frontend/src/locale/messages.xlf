@@ -3977,74 +3977,10 @@
       <trans-unit id="dataTable.loading" datatype="html">
         <source>Loading data…</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">5,7</context>
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.html</context>
+          <context context-type="linenumber">132</context>
         </context-group>
         <note priority="1" from="description">Data table loading announcement</note>
-      </trans-unit>
-      <trans-unit id="dataTable.error.title" datatype="html">
-        <source> Something went wrong </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">14,16</context>
-        </context-group>
-        <note priority="1" from="description">Data table error title</note>
-      </trans-unit>
-      <trans-unit id="dataTable.error.description" datatype="html">
-        <source> We couldn&apos;t load this data. Please try again. </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">17,21</context>
-        </context-group>
-        <note priority="1" from="description">Data table error description</note>
-      </trans-unit>
-      <trans-unit id="dataTable.error.retry" datatype="html">
-        <source>Retry</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">24,28</context>
-        </context-group>
-        <note priority="1" from="description">Data table retry action</note>
-      </trans-unit>
-      <trans-unit id="dataTable.empty.title" datatype="html">
-        <source>No data yet</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">34,37</context>
-        </context-group>
-        <note priority="1" from="description">Data table default empty title</note>
-      </trans-unit>
-      <trans-unit id="dataTable.selectAll" datatype="html">
-        <source>Select all rows</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">62,63</context>
-        </context-group>
-        <note priority="1" from="description">Select-all checkbox label</note>
-      </trans-unit>
-      <trans-unit id="dataTable.selectRow" datatype="html">
-        <source>Select row</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">113,114</context>
-        </context-group>
-        <note priority="1" from="description">Row selection checkbox label</note>
-      </trans-unit>
-      <trans-unit id="kpiCard.delta.increase" datatype="html">
-        <source>Increased</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
-          <context context-type="linenumber">29,32</context>
-        </context-group>
-        <note priority="1" from="description">Screen-reader only KPI delta direction</note>
-      </trans-unit>
-      <trans-unit id="kpiCard.delta.decrease" datatype="html">
-        <source>Decreased</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
-          <context context-type="linenumber">32,38</context>
-        </context-group>
-        <note priority="1" from="description">Screen-reader only KPI delta direction</note>
       </trans-unit>
       <trans-unit id="modal.close" datatype="html">
         <source>Close</source>

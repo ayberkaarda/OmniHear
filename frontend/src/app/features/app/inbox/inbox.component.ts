@@ -19,7 +19,7 @@ import { FeedbackListStore } from '../../../core/feedback/feedback-list.store';
 import { PLATFORMS, Platform } from '../../../core/integrations/integration.models';
 import { IntegrationsStore } from '../../../core/integrations/integrations.store';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
-import { EmptyStateConfig } from '../../../shared/ui/data-table/data-table.types';
+import { EmptyStateConfig } from '../../../shared/ui/empty-state/empty-state.types';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { IconName } from '../../../shared/ui/icon/icon.types';
