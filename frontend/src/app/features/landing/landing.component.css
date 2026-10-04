@@ -6,6 +6,9 @@
 .lp-figure { font-size: clamp(3.5rem, 2.6rem + 3vw, 5.5rem); line-height: 1; letter-spacing: var(--tracking-tight); }
 .lp-mark { background: var(--highlight); color: inherit; border-radius: var(--radius-sm); padding: 0 0.12em; }
 
+/* Anchors under the sticky 4rem header: a jump lands below it, not behind it. */
+.lp-alias { display: block; height: 0; scroll-margin-top: 4rem; }
+
 .lp-focus:focus-visible { outline: 2px solid var(--ring-focus); outline-offset: 2px; }
 .lp-navlink { border-radius: var(--radius-md); padding: 6px 10px; font-size: var(--font-size-sm); color: var(--text-secondary); transition: color var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard); }
 .lp-navlink:hover { color: var(--text-primary); background: var(--bg-surface-hover); }

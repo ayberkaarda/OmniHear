@@ -46,6 +46,36 @@ describe('LandingComponent', () => {
     expect(element.querySelector('footer')).toBeTruthy();
   });
 
+  it('keeps the earlier section fragments working inside their sections', () => {
+    const aliases: Record<string, string> = { integrations: 'sources', features: 'analysis' };
+    for (const [old, current] of Object.entries(aliases)) {
+      const anchor = element.querySelector(`#${old}`) as HTMLElement;
+      expect(anchor).toBeTruthy();
+      expect(anchor.closest('section')?.id).toBe(current);
+      expect(anchor.classList.contains('lp-alias')).toBe(true);
+      expect(anchor.getAttribute('aria-hidden')).toBe('true');
+      expect(anchor.textContent).toBe('');
+    }
+  });
+
+  it('scrolls to the fragment of a cold load once the sections have rendered', async () => {
+    window.history.replaceState(null, '', '#integrations');
+    const scrolled: string[] = [];
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function (this: Element) {
+      scrolled.push(this.id);
+    };
+    try {
+      const cold = TestBed.createComponent(LandingComponent);
+      cold.detectChanges();
+      await cold.whenStable();
+      expect(scrolled).toEqual(['integrations']);
+    } finally {
+      Element.prototype.scrollIntoView = original;
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  });
+
   it('uses the brand logo component in the header and footer', () => {
     expect(element.querySelector('header app-logo')).toBeTruthy();
     expect(element.querySelector('footer app-logo')).toBeTruthy();

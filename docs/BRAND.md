@@ -226,6 +226,9 @@ Rules:
 
 - **Spacing:** 4 px base (`--space-unit`). Use 4, 8, 12, 16, 24, 32, 48, 64.
   Inbox rows: 12 vertical, 16 horizontal. Card padding: 16 (dense) or 24.
+  `--space-unit` is a reference token: it documents the base and nothing
+  consumes it. Tailwind's spacing scale and the px values in component styles
+  are written out, so changing the token alone does not move any spacing.
 - **Radius:** one documented system. `radius-sm` 4 for chips and checkboxes,
   `radius-md` 8 for controls (buttons, inputs), `radius-lg` 12 for cards and
   panels, `radius-xl` 16 for modals and sheets, `radius-full` only for avatars
@@ -314,7 +317,7 @@ the same meaning; only values changed. Nothing was removed or renamed.
 | `tracking-tight` | added | -0.02em, display headings (Tailwind `tracking-display`) |
 | `tracking-label` | added | 0.06em, label style (Tailwind `tracking-label`) |
 | `radius-xl` | added | 16 px, modals and sheets |
-| `space-unit` | added | 4 px base |
+| `space-unit` | added | 4 px base; reference only, no consumers |
 | `duration-fast`, `duration-base`, `duration-slow` | added | Motion durations |
 | `ease-standard`, `ease-emphasized` | added | Motion curves |
 | `brand` family | value change | Was slate blue; now ink (light) / paper (dark). Cobalt moved to `brand-text` and `signal`. |

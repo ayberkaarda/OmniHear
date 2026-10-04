@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { afterNextRender, ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ButtonStyleDirective } from '../../shared/ui/button/button-style.directive';
@@ -75,6 +76,22 @@ const EMAIL = $localize`:@@landing.source.email.name:E-mail`;
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingComponent {
+  /**
+   * A cold load of `/#pricing` (or an older `/#integrations` / `/#features`
+   * link, kept alive by alias anchors in the template) arrives before this
+   * page has rendered, so the browser's own fragment jump finds nothing.
+   * Repeat it once the sections exist; `scrollIntoView` honours the
+   * `scroll-margin-top` that clears the sticky header.
+   */
+  constructor() {
+    const document = inject(DOCUMENT);
+    afterNextRender(() => {
+      const id = decodeURIComponent(document.defaultView?.location.hash.slice(1) ?? '');
+      const target = id ? document.getElementById(id) : null;
+      target?.scrollIntoView?.();
+    });
+  }
+
   /** Free-plan analysis allowance, spec 7.2. Mirrors backend `config/quota.php`. */
   protected readonly freePlanQuota = 200;
 
