@@ -968,7 +968,7 @@
         <note priority="1" from="description">Connection status picker label</note>
       </trans-unit>
       <trans-unit id="integrations.status.active" datatype="html">
-        <source>Active — sync on schedule</source>
+        <source>Active: sync on schedule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
           <context context-type="linenumber">171</context>
@@ -976,7 +976,7 @@
         <note priority="1" from="description">Connection state option</note>
       </trans-unit>
       <trans-unit id="integrations.status.paused" datatype="html">
-        <source>Paused — do not sync</source>
+        <source>Paused: do not sync</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
           <context context-type="linenumber">172</context>

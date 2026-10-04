@@ -162,7 +162,7 @@ describe('application route tree', () => {
    */
   const LIVE_SCREEN_BUSY_SELECTOR: Readonly<Record<string, string>> = {
     'app/overview': '[data-testid="kpi-skeleton"]',
-    'app/inbox': '[data-testid="data-table-loading"]',
+    'app/inbox': '[data-testid="inbox-results"][aria-busy="true"]',
     'app/inbox/:id': '[data-testid="detail-skeleton"]',
     'app/integrations': '[data-testid="integrations-skeleton"]',
     // The five settings screens stopped being placeholders in this phase, so

@@ -170,8 +170,8 @@ export class IntegrationsComponent implements OnInit, OnDestroy {
   protected readonly deleteTitle = $localize`:Delete dialog title@@integrations.dialog.deleteTitle:Disconnect channel`;
   protected readonly platformFieldLabel = $localize`:Platform picker label@@integrations.field.platform:Platform`;
   protected readonly statusFieldLabel = $localize`:Connection status picker label@@integrations.field.status:Connection state`;
-  protected readonly statusActiveLabel = $localize`:Connection state option@@integrations.status.active:Active — sync on schedule`;
-  protected readonly statusPausedLabel = $localize`:Connection state option@@integrations.status.paused:Paused — do not sync`;
+  protected readonly statusActiveLabel = $localize`:Connection state option@@integrations.status.active:Active: sync on schedule`;
+  protected readonly statusPausedLabel = $localize`:Connection state option@@integrations.status.paused:Paused: do not sync`;
   protected readonly credentialsKeepHint = $localize`:Hint above the credential inputs when editing@@integrations.credentials.keepHint:Leave blank to keep the stored credentials. Filling a field replaces it.`;
   protected readonly credentialsWriteOnlyHint = $localize`:Hint explaining credentials are never shown again@@integrations.credentials.writeOnly:Credentials are stored encrypted and are never shown again, not even to you.`;
   protected readonly saveLabel = $localize`:Save the connection dialog@@integrations.action.save:Save`;

@@ -28,16 +28,15 @@ import { freshTotpCode } from './support/totp';
  *    to the guard that raises the wall.
  */
 
-/** The inbox table's column order (`inbox.component.ts` `columns`). */
-const STATUS_COLUMN = 7;
+/**
+ * Analysis states as the inbox row exposes them (`data-status`). An analysed
+ * row shows its verdict instead of a status line, so the state is read from the
+ * attribute rather than from copy on screen.
+ */
+const ANALYSED = 'analyzed';
+const WAITING = 'pending_analysis';
 
-const ANALYSED = 'Analysed';
-const WAITING = 'Waiting for analysis';
-
-const tableRows = (page: Page) => page.locator('[data-testid="data-table-ready"] tbody tr');
-
-const statusCells = (page: Page) =>
-  page.locator(`[data-testid="data-table-ready"] tbody tr td:nth-child(${STATUS_COLUMN})`);
+const tableRows = (page: Page) => page.locator('[data-testid="inbox-row"]');
 
 /**
  * Reloads until `read` settles on the expected value.
@@ -60,7 +59,7 @@ async function reloadUntil(page: Page, read: () => Promise<number>, expected: nu
       async () => {
         await page.reload();
         await page
-          .locator('[data-testid="data-table-ready"], [data-testid="data-table-empty"]')
+          .locator('[data-testid="inbox-list"], [data-testid="inbox-empty"]')
           .first()
           .waitFor({ state: 'visible' });
         return read();
@@ -70,9 +69,8 @@ async function reloadUntil(page: Page, read: () => Promise<number>, expected: nu
     .toBe(expected);
 }
 
-async function countStatus(page: Page, label: string): Promise<number> {
-  const cells = await statusCells(page).allTextContents();
-  return cells.filter((text) => text.trim() === label).length;
+async function countStatus(page: Page, status: string): Promise<number> {
+  return page.locator(`[data-testid="inbox-row"][data-status="${status}"]`).count();
 }
 
 /**

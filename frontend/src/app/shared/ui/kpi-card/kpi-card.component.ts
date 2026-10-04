@@ -21,6 +21,7 @@ const SPARK_HEIGHT = 28;
   standalone: true,
   imports: [IconComponent],
   templateUrl: './kpi-card.component.html',
+  styleUrl: './kpi-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class KpiCardComponent {

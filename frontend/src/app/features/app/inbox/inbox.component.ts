@@ -47,6 +47,8 @@ interface InboxRow {
   readonly sentiment: SentimentLabel | null;
   readonly score: number | null;
   readonly category: FeedbackCategory | null;
+  /** Raw state, exposed as `data-status` so a test can count rows without reading copy. */
+  readonly status: AnalysisStatus;
   /** Only read while there is no analysis to show instead. */
   readonly statusLabel: string;
   readonly statusIcon: IconName;
@@ -102,6 +104,7 @@ const BODY_PREVIEW_LENGTH = 280;
     SelectComponent
   ],
   templateUrl: './inbox.component.html',
+  styleUrl: './inbox.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InboxComponent implements OnInit, OnDestroy {
@@ -364,6 +367,7 @@ function toRow(feedback: Feedback): InboxRow {
     sentiment: analysis === null ? null : analysis.sentiment_label,
     score: analysis === null ? null : analysis.sentiment_score,
     category: analysis === null ? null : analysis.category,
+    status: feedback.analysis_status,
     statusLabel: analysisStatusLabel(feedback.analysis_status),
     statusIcon: STATUS_ICON[feedback.analysis_status] ?? 'info'
   };

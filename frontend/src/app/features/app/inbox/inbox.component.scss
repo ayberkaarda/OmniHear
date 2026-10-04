@@ -1,0 +1,119 @@
+// Inbox-only layout, moved out of global Tailwind utilities so it ships in the
+// inbox's lazy chunk rather than the initial stylesheet.
+
+$lg: 1024px;
+$xl: 1280px;
+
+// Filter strip: a sideways scroller on phones, a grid on wide screens.
+.ib-filters {
+  margin-inline: -1rem;
+  padding: 0 1rem 0.25rem;
+
+  @media (min-width: $lg) {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  @media (min-width: $xl) {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+.ib-filter {
+  width: 10rem;
+}
+
+.ib-filter-date {
+  width: 9rem;
+}
+
+.ib-filter,
+.ib-filter-date {
+  @media (min-width: $lg) {
+    width: auto;
+  }
+}
+
+.ib-bar {
+  min-height: 2.75rem;
+}
+
+.ib-head {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+// Date | comment | labels | received: the column set the header, skeleton and rows share.
+.ib-grid {
+  @media (min-width: $lg) {
+    display: grid;
+    grid-template-columns: 9.5rem minmax(0, 1fr) 10rem 9.5rem;
+    column-gap: 1.5rem;
+  }
+}
+
+.ib-row {
+  padding-block: 0.875rem;
+}
+
+.ib-top {
+  &:focus-visible {
+    --tw-ring-inset: inset;
+  }
+
+  @media (min-width: $lg) {
+    align-items: start;
+  }
+}
+
+.ib-end {
+  justify-self: end;
+}
+
+.ib-narrow {
+  max-width: 28rem;
+}
+
+.ib-meta {
+  order: 2;
+}
+
+.ib-main {
+  order: 1;
+}
+
+.ib-meta,
+.ib-main {
+  @media (min-width: $lg) {
+    order: 0;
+  }
+}
+
+.ib-meta,
+.ib-nudge {
+  @media (min-width: $lg) {
+    padding-top: 0.125rem;
+  }
+}
+
+.ib-text {
+  display: -webkit-box;
+  max-width: 80ch;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.ib-date {
+  @media (min-width: $lg) {
+    padding-top: 0.25rem;
+    text-align: right;
+  }
+}
+
+.ib-page {
+  width: 7rem;
+}
