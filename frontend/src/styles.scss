@@ -7,6 +7,46 @@
 @tailwind utilities;
 
 /*
+ * Brand base (docs/BRAND.md). Only element defaults live here; every colour
+ * comes from tokens.css so light and dark swap together.
+ */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+
+  ::selection {
+    background-color: var(--highlight);
+    color: var(--text-primary);
+  }
+}
+
+/* Motion is feedback, never decoration: under reduced motion it collapses. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
  * ThemeService (src/app/core/theme/theme.service.ts) adds `.theme-changing`
  * to <html> for the instant it toggles `.dark`, so every element's palette
  * swaps in one frame instead of each animating its own colour-affecting
