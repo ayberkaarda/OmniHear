@@ -1,0 +1,9 @@
+.sheet-list { list-style:none; margin:0; padding:0; border-top:1px solid var(--border); }
+.sheet-row { display:flex; flex-wrap:wrap; align-items:center; gap:1.5rem; padding:1.25rem 0; border-bottom:1px solid var(--border); }
+.sheet-row:hover { background:var(--bg-surface-hover); }
+.sheet-placeholder { display:block; height:3rem; background:var(--bg-surface-sunken); }
+.sheet-band > app-input,.sheet-band form > app-input { display:block; padding-block:1rem; border-top:1px solid var(--border); }
+.sheet-check { display:flex; align-items:center; gap:.75rem; min-height:2.75rem; font-family:var(--font-mono); font-size:var(--font-size-xs); }
+.sheet-checkbox { width:1.25rem; height:1.25rem; accent-color:var(--brand); }
+.sheet-checkbox:focus-visible,.sheet-select:focus-visible { outline:2px solid var(--ring-focus); outline-offset:2px; }
+.sheet-select:disabled,.sheet-checkbox:disabled { cursor:not-allowed; opacity:.5; }

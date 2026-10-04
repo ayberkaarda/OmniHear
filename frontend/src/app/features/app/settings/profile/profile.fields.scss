@@ -1,0 +1,7 @@
+.sheet-warning,.sheet-success,.sheet-notice { padding:1rem 0 1rem 1rem; border-left:4px solid currentColor; line-height:1.5; }
+.sheet-warning { color:var(--status-warning); }
+.sheet-success { color:var(--status-success); }
+.sheet-placeholder { display:block; height:3rem; background:var(--bg-surface-sunken); }
+.sheet-band > app-input,.sheet-band form > app-input { display:block; padding-block:1rem; border-top:1px solid var(--border); }
+.sheet-codes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; padding:0; list-style:none; overflow-wrap:anywhere; }
+.sheet-qr { width:176px; height:176px; padding:.5rem; border:1px solid var(--border-strong); }

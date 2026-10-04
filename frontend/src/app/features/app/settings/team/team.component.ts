@@ -33,6 +33,7 @@ type Dialog = 'none' | 'invite' | 'remove';
   standalone: true,
   imports: [ReactiveFormsModule, BadgeComponent, ButtonComponent, InputComponent, SelectComponent, ModalComponent],
   templateUrl: './team.component.html',
+  styleUrls: ['./team.component.scss', './team.fields.scss', './team.layout.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TeamComponent implements OnInit {

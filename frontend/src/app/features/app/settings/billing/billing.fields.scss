@@ -1,0 +1,5 @@
+.sheet-warning,.sheet-success,.sheet-notice { padding:1rem 0 1rem 1rem; border-left:4px solid currentColor; line-height:1.5; }
+.sheet-success { color:var(--status-success); }
+.sheet-notice { color:var(--text-secondary); }
+.sheet-placeholder { display:block; height:3rem; background:var(--bg-surface-sunken); }
+.sheet-band > app-input,.sheet-band form > app-input { display:block; padding-block:1rem; border-top:1px solid var(--border); }

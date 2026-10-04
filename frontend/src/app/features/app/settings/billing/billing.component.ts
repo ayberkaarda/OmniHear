@@ -29,6 +29,7 @@ import { formatCount, formatDate, formatPercent } from '../../../../shared/forma
   standalone: true,
   imports: [ButtonComponent],
   templateUrl: './billing.component.html',
+  styleUrls: ['./billing.component.scss', './billing.fields.scss', './billing.layout.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BillingComponent implements OnInit {
