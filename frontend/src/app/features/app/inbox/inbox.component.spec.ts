@@ -45,7 +45,13 @@ describe('InboxComponent', () => {
     const results = () => element.querySelector('[data-testid="inbox-results"]');
     expect(results()?.getAttribute('data-state')).toBe('loading');
     expect(results()?.getAttribute('aria-busy')).toBe('true');
+    // The skeleton is aria-hidden, so the wait has to be announced in words.
+    const loading = element.querySelector('[data-testid="inbox-loading"]');
+    expect(loading?.textContent?.trim()).toBe('Loading data…');
+    expect(loading?.classList.contains('sr-only')).toBe(true);
+    expect(loading?.closest('[aria-hidden="true"]')).toBeNull();
     settle();
+    expect(element.querySelector('[data-testid="inbox-loading"]')).toBeNull();
     expect(results()?.getAttribute('data-state')).toBe('ready');
     expect(element.querySelector('[data-testid="inbox-list"]')).toBeTruthy();
   });

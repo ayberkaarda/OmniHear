@@ -1,8 +1,40 @@
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { ButtonComponent } from './button.component';
 
+@Component({
+  imports: [ButtonComponent],
+  template: `<app-button [loading]="busy()">Sign in</app-button>`
+})
+class LabelledHostComponent {
+  readonly busy = signal(false);
+}
+
 describe('ButtonComponent', () => {
+  it('keeps its projected label as the accessible name while loading', async () => {
+    await TestBed.configureTestingModule({ imports: [LabelledHostComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(LabelledHostComponent);
+    fixture.componentInstance.busy.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
+    const label = button.querySelector('[data-testid="button-label"]') as HTMLElement;
+    const spinner = button.querySelector('[data-testid="button-spinner"]') as HTMLElement;
+
+    // visibility:hidden / display:none / aria-hidden would drop the label from
+    // the accessibility tree and leave a nameless busy button.
+    expect(label.classList.contains('invisible')).toBe(false);
+    expect(label.classList.contains('hidden')).toBe(false);
+    expect(label.closest('[aria-hidden="true"]')).toBeNull();
+    expect(label.textContent?.trim()).toBe('Sign in');
+    expect(button.getAttribute('aria-label')).toBeNull();
+    expect(button.getAttribute('aria-busy')).toBe('true');
+    // The spinner is decoration only and adds nothing to the name.
+    expect(spinner.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('sets aria-busy and blocks clicks while loading', async () => {
     await TestBed.configureTestingModule({
       imports: [ButtonComponent]
@@ -90,7 +122,7 @@ describe('ButtonComponent', () => {
     const root = fixture.nativeElement as HTMLElement;
     const button = root.querySelector('button') as HTMLButtonElement;
     expect(root.querySelector('[data-testid="button-spinner"]')).toBeTruthy();
-    expect(root.querySelector('button > span.invisible')).toBeTruthy();
+    expect(root.querySelector('button > span[data-testid="button-label"].opacity-0')).toBeTruthy();
     expect(button.className).toContain('cursor-progress');
     expect(button.className).not.toContain('text-disabled');
   });

@@ -132,6 +132,8 @@
 
     @switch (listState()) {
       @case ('loading') {
+        <!-- The skeleton is decoration; this is what a screen reader hears while the first page loads. -->
+        <p class="sr-only" role="status" data-testid="inbox-loading" i18n="Data table loading announcement@@dataTable.loading">Loading data…</p>
         <ul class="divide-y divide-[var(--border)]" aria-hidden="true">
           @for (placeholder of skeletonRows; track placeholder) {
             <li class="ib-row ib-grid flex flex-col gap-2.5 px-4">
