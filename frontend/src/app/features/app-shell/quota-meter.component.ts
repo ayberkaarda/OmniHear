@@ -32,12 +32,13 @@ export class QuotaMeterComponent {
 
   protected readonly toneClasses = computed(() => {
     switch (this.level()) {
+      // Quiet while there is room; a tinted plate only once it needs reading.
       case 'exceeded':
-        return 'bg-[var(--quota-exceeded-bg)] text-[var(--quota-exceeded-text)]';
+        return '-mx-3 rounded-control bg-[var(--quota-exceeded-bg)] px-3 py-2.5 text-[var(--quota-exceeded-text)]';
       case 'warning':
-        return 'bg-[var(--quota-warning-bg)] text-[var(--quota-warning-text)]';
+        return '-mx-3 rounded-control bg-[var(--quota-warning-bg)] px-3 py-2.5 text-[var(--quota-warning-text)]';
       default:
-        return 'bg-[var(--quota-ok-bg)] text-[var(--quota-ok-text)]';
+        return 'text-[var(--text-secondary)]';
     }
   });
 

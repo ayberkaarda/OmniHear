@@ -29,9 +29,10 @@ export class ThemeToggleComponent {
 
   protected classesFor(preference: ThemePreference): string {
     const base =
-      'rounded-sm px-2 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]';
+      'h-full rounded px-2.5 text-xs font-medium transition-colors duration-fast ease-standard ' +
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px';
     return this.preference() === preference
-      ? `${base} bg-[var(--bg-surface-selected)] text-[var(--text-primary)]`
+      ? `${base} bg-[var(--bg-surface-raised)] text-[var(--text-primary)] shadow-brand-sm`
       : `${base} text-[var(--text-muted)] hover:text-[var(--text-primary)]`;
   }
 }

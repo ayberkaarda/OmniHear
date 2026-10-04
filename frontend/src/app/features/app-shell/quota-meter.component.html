@@ -1,13 +1,13 @@
 @if (limit() !== null && remaining() !== null) {
-  <div [class]="toneClasses() + ' flex flex-col gap-1.5 rounded-md px-3 py-2'" data-testid="quota-meter">
-    <p class="flex items-center gap-1.5 text-xs font-medium">
-      <app-icon [name]="levelIcon()" size="sm" />
-      <span i18n="@@shell.quota.title">Analyses</span>
-      <span class="ml-auto tabular-nums">{{ used() }} / {{ limit() }}</span>
+  <div [class]="toneClasses() + ' flex flex-col gap-2'" data-testid="quota-meter">
+    <p class="flex items-baseline gap-1.5 text-xs">
+      <span class="flex self-center"><app-icon [name]="levelIcon()" size="sm" /></span>
+      <span class="font-medium" i18n="@@shell.quota.title">Analyses</span>
+      <span class="ml-auto font-mono tabular-nums">{{ used() }}<span class="text-[var(--text-muted)]"> / {{ limit() }}</span></span>
     </p>
 
     <div
-      class="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]"
+      class="h-1 w-full overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]"
       role="progressbar"
       [attr.aria-label]="meterLabel"
       [attr.aria-valuenow]="percentUsed()"
@@ -17,9 +17,10 @@
       <div [class]="barClasses() + ' h-full rounded-full'" [style.width.%]="percentUsed()"></div>
     </div>
 
-    <p class="text-xs tabular-nums">
-      <span i18n="@@shell.quota.remaining">Remaining:</span>
-      <span class="font-medium">{{ remaining() }}</span>
+    <p class="text-xs text-[var(--text-muted)]">
+      <span i18n="@@shell.quota.remaining">Remaining:</span>&ngsp;<span class="font-mono font-medium tabular-nums text-[var(--text-secondary)]">{{
+        remaining()
+      }}</span>
     </p>
   </div>
 }

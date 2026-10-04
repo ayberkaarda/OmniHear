@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 import { DEFAULT_PER_PAGE } from '../../../core/api/pagination';
@@ -18,12 +18,15 @@ import {
 import { FeedbackListStore } from '../../../core/feedback/feedback-list.store';
 import { PLATFORMS, Platform } from '../../../core/integrations/integration.models';
 import { IntegrationsStore } from '../../../core/integrations/integrations.store';
+import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
-import { DataTableComponent } from '../../../shared/ui/data-table/data-table.component';
-import { ColumnDef, DataTableState, EmptyStateConfig } from '../../../shared/ui/data-table/data-table.types';
+import { EmptyStateConfig } from '../../../shared/ui/data-table/data-table.types';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { IconComponent } from '../../../shared/ui/icon/icon.component';
+import { IconName } from '../../../shared/ui/icon/icon.types';
 import { InputComponent } from '../../../shared/ui/form-field/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/ui/form-field/select.component';
-import { EM_DASH, formatCount, formatDateTime, formatScore, truncate } from '../../../shared/format/format';
+import { EM_DASH, formatCount, formatDateTime, truncate } from '../../../shared/format/format';
 import {
   analysisStatusLabel,
   categoryLabel,
@@ -31,12 +34,40 @@ import {
   sentimentLabel
 } from '../../../shared/labels/domain-labels';
 
+type ListState = 'loading' | 'empty' | 'error' | 'ready';
+
+/** One inbox line, already formatted: the template only places it. */
+interface InboxRow {
+  readonly id: number;
+  readonly author: string;
+  readonly source: string;
+  readonly published: string;
+  readonly publishedIso: string | null;
+  readonly body: string;
+  readonly sentiment: SentimentLabel | null;
+  readonly score: number | null;
+  readonly category: FeedbackCategory | null;
+  /** Only read while there is no analysis to show instead. */
+  readonly statusLabel: string;
+  readonly statusIcon: IconName;
+}
+
+const STATUS_ICON: Readonly<Record<AnalysisStatus, IconName>> = {
+  pending_analysis: 'pause-circle',
+  analyzing: 'info',
+  analyzed: 'check-circle',
+  failed: 'x-circle'
+};
+
+const SKELETON_ROWS = 8;
+
 /** Typing must not fire a request per keystroke; every other control is a discrete choice. */
 const SEARCH_DEBOUNCE_MS = 300;
 
 const PER_PAGE_CHOICES = [25, 50, 100] as const;
 
-const BODY_PREVIEW_LENGTH = 120;
+/** Two clamped lines hold roughly this much; the cut keeps the DOM honest for long tickets. */
+const BODY_PREVIEW_LENGTH = 280;
 
 /**
  * `/app/inbox` — the feedback list of `GET /api/v1/feedbacks`.
@@ -60,14 +91,22 @@ const BODY_PREVIEW_LENGTH = 120;
 @Component({
   selector: 'app-inbox',
   standalone: true,
-  imports: [ReactiveFormsModule, DataTableComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    BadgeComponent,
+    ButtonComponent,
+    EmptyStateComponent,
+    IconComponent,
+    InputComponent,
+    SelectComponent
+  ],
   templateUrl: './inbox.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InboxComponent implements OnInit, OnDestroy {
   private readonly store = inject(FeedbackListStore);
   private readonly integrations = inject(IntegrationsStore);
-  private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
 
   private readonly subscriptions = new Subscription();
@@ -75,8 +114,8 @@ export class InboxComponent implements OnInit, OnDestroy {
   private syncingFromStore = false;
 
   protected readonly items = this.store.items;
-  /** `data-table` takes a mutable array; the store deliberately hands out a readonly one. */
-  protected readonly rows = computed(() => [...this.store.items()]);
+  protected readonly rows = computed<readonly InboxRow[]>(() => this.items().map(toRow));
+  protected readonly skeletonRows = Array.from({ length: SKELETON_ROWS }, (_, index) => index);
   protected readonly meta = this.store.meta;
   protected readonly page = this.store.page;
   protected readonly perPage = this.store.perPage;
@@ -103,18 +142,20 @@ export class InboxComponent implements OnInit, OnDestroy {
 
   /**
    * A refresh that already has rows on screen stays in `ready`: swapping the
-   * table for skeletons on every debounced keystroke makes the list flicker
-   * and loses the user's scroll position.
+   * list for skeletons on every debounced keystroke makes it flicker and loses
+   * the user's scroll position. A failed refresh keeps its rows too; the error
+   * banner above says what happened.
    */
-  protected readonly tableState = computed<DataTableState>(() => {
+  protected readonly listState = computed<ListState>(() => {
     const state = this.store.state();
-    if (state === 'error') {
+    const count = this.items().length;
+    if (state === 'error' && count === 0) {
       return 'error';
     }
-    if (state === 'idle' || (state === 'loading' && this.items().length === 0)) {
+    if (state === 'idle' || (state === 'loading' && count === 0)) {
       return 'loading';
     }
-    return this.items().length === 0 ? 'empty' : 'ready';
+    return count === 0 ? 'empty' : 'ready';
   });
 
   protected readonly refreshing = computed(() => this.store.state() === 'loading' && this.items().length > 0);
@@ -132,55 +173,18 @@ export class InboxComponent implements OnInit, OnDestroy {
         }
   );
 
-  protected readonly columns = computed<ColumnDef<Feedback>[]>(() => [
-    {
-      key: 'published_at',
-      header: $localize`:Inbox table column@@inbox.column.published:Published`,
-      width: 160,
-      cell: (row) => formatDateTime(row.published_at)
-    },
-    {
-      key: 'platform',
-      header: $localize`:Inbox table column@@inbox.column.platform:Source`,
-      width: 120,
-      cell: (row) => (row.platform === null ? EM_DASH : platformLabel(row.platform))
-    },
-    {
-      key: 'author',
-      header: $localize`:Inbox table column@@inbox.column.author:Author`,
-      width: 150,
-      cell: (row) => row.author ?? EM_DASH
-    },
-    {
-      key: 'body',
-      header: $localize`:Inbox table column@@inbox.column.comment:Comment`,
-      min: 240,
-      cell: (row) => truncate(row.body, BODY_PREVIEW_LENGTH)
-    },
-    {
-      key: 'sentiment',
-      header: $localize`:Inbox table column@@inbox.column.sentiment:Sentiment`,
-      width: 150,
-      // Label *and* score, never colour alone: a data-table cell renders plain
-      // text, so the words are the whole signal here.
-      cell: (row) =>
-        row.analysis === null
-          ? EM_DASH
-          : `${sentimentLabel(row.analysis.sentiment_label)} ${formatScore(row.analysis.sentiment_score)}`
-    },
-    {
-      key: 'category',
-      header: $localize`:Inbox table column@@inbox.column.category:Category`,
-      width: 150,
-      cell: (row) => (row.analysis === null ? EM_DASH : categoryLabel(row.analysis.category))
-    },
-    {
-      key: 'analysis_status',
-      header: $localize`:Inbox table column@@inbox.column.status:Status`,
-      width: 170,
-      cell: (row) => analysisStatusLabel(row.analysis_status)
-    }
-  ]);
+  protected readonly publishedHeader = $localize`:Inbox table column@@inbox.column.published:Published`;
+  protected readonly platformHeader = $localize`:Inbox table column@@inbox.column.platform:Source`;
+  protected readonly authorHeader = $localize`:Inbox table column@@inbox.column.author:Author`;
+  protected readonly commentHeader = $localize`:Inbox table column@@inbox.column.comment:Comment`;
+  protected readonly sentimentHeader = $localize`:Inbox table column@@inbox.column.sentiment:Sentiment`;
+  protected readonly categoryHeader = $localize`:Inbox table column@@inbox.column.category:Category`;
+  protected readonly statusHeader = $localize`:Inbox table column@@inbox.column.status:Status`;
+
+  /** Same edge and height as `app-input` / `app-select` at size `sm`, so the filter strip lines up. */
+  protected readonly dateInputClasses =
+    'h-8 w-full rounded-control border border-[var(--border-strong)] bg-[var(--bg-surface)] px-2.5 text-xs ' +
+    'text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]';
 
   protected readonly sentimentOptions = computed<SelectOption[]>(() => [
     { value: '', label: this.anySentimentLabel },
@@ -283,10 +287,6 @@ export class InboxComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  protected onRowActivate(row: Feedback): void {
-    void this.router.navigate(['/app/inbox', row.id]);
-  }
-
   protected onRetry(): void {
     this.store.load();
   }
@@ -348,6 +348,25 @@ export class InboxComponent implements OnInit, OnDestroy {
 
     this.store.setFilters(filters);
   }
+}
+
+function toRow(feedback: Feedback): InboxRow {
+  const analysis = feedback.analysis;
+  return {
+    id: feedback.id,
+    author: feedback.author ?? EM_DASH,
+    source: feedback.platform === null ? EM_DASH : platformLabel(feedback.platform),
+    published: formatDateTime(feedback.published_at),
+    publishedIso: feedback.published_at,
+    body: truncate(feedback.body, BODY_PREVIEW_LENGTH),
+    // Label *and* score through the badge, never colour alone. No analysis
+    // means no verdict at all: a blank is not a neutral zero.
+    sentiment: analysis === null ? null : analysis.sentiment_label,
+    score: analysis === null ? null : analysis.sentiment_score,
+    category: analysis === null ? null : analysis.category,
+    statusLabel: analysisStatusLabel(feedback.analysis_status),
+    statusIcon: STATUS_ICON[feedback.analysis_status] ?? 'info'
+  };
 }
 
 /**

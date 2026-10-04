@@ -9,6 +9,7 @@ import { PlatformsStore } from '../../../core/integrations/platforms.store';
 import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { InputComponent } from '../../../shared/ui/form-field/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/ui/form-field/select.component';
 import { ModalComponent } from '../../../shared/ui/modal/modal.component';
@@ -55,6 +56,7 @@ type DialogMode = 'none' | 'create' | 'edit' | 'delete';
     BadgeComponent,
     ButtonComponent,
     EmptyStateComponent,
+    IconComponent,
     InputComponent,
     SelectComponent,
     ModalComponent
