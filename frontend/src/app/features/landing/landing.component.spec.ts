@@ -88,11 +88,34 @@ describe('LandingComponent', () => {
     }
   });
 
-  it('marks the inbox preview as sample data and lifts exactly one row out of it', () => {
-    const preview = element.querySelector('figure[aria-label]') as HTMLElement;
-    expect(preview.textContent).toContain('Sample data');
-    expect(preview.querySelectorAll('li.lp-pulled')).toHaveLength(1);
-    expect(preview.querySelectorAll('li').length).toBe(5);
+  it('marks the hero feed as sample data and puts the marker on exactly one phrase in it', () => {
+    const feed = element.querySelector('figure[aria-label]') as HTMLElement;
+    expect(feed.textContent).toContain('Sample data');
+    expect(feed.querySelectorAll('li')).toHaveLength(5);
+    const marked = feed.querySelectorAll('.marker');
+    expect(marked).toHaveLength(1);
+    expect(marked[0].textContent).toBe('crashes every time');
+  });
+
+  it('sets the second hero line on the marker', () => {
+    const marker = element.querySelector('h1 .marker') as HTMLElement;
+    expect(marker.textContent?.trim()).toBe('One inbox.');
+  });
+
+  it('draws a voiceprint whose bars use only the sentiment colours', () => {
+    const bars = Array.from(element.querySelectorAll<HTMLElement>('[role="img"] i'));
+    expect(bars.length).toBeGreaterThan(60);
+    for (const bar of bars) {
+      expect(bar.style.background).toMatch(/^var\(--sentiment-(negative|neutral|positive)-fill\)$/);
+    }
+  });
+
+  it('shows the full reading when no observer drives the steps', () => {
+    const analysis = element.querySelector('#analysis') as HTMLElement;
+    expect(analysis.querySelectorAll('[data-read-step]')).toHaveLength(5);
+    expect(analysis.querySelectorAll('dl .on')).toHaveLength(4);
+    expect(analysis.querySelectorAll('blockquote .on')).toHaveLength(3);
+    expect(analysis.textContent).toContain('−0.82');
   });
 
   it('states the free-plan allowance from the spec instead of a made-up number', () => {

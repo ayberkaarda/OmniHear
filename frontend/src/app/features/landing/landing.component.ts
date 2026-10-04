@@ -1,170 +1,141 @@
 import { DOCUMENT } from '@angular/common';
-import { afterNextRender, ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ButtonStyleDirective } from '../../shared/ui/button/button-style.directive';
-import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { LogoComponent } from '../../shared/ui/logo/logo.component';
 
 type Sentiment = 'negative' | 'neutral' | 'positive';
-type Category = 'complaint' | 'praise' | 'bug' | 'featureRequest';
 
-interface PreviewRow {
+interface FeedRow {
   source: string;
   author: string;
   time: string;
-  /** Kept exactly as the customer wrote it, in their own language. */
-  text: string;
-  sentiment: Sentiment;
   score: string;
-  category: Category;
-  /** The one row lifted out of the list, like the signal slice of the mark. */
-  pulled?: boolean;
-  /** Hidden below `md` so the phone composition keeps three rows around the pulled one. */
+  sentiment: Sentiment;
+  /** Language the customer wrote in; also keeps the uppercase labels right under a Turkish page. */
+  lang: 'en' | 'tr';
+  /** Kept exactly as the customer wrote it. `mark` is the phrase the marker lands on. */
+  before: string;
+  mark?: string;
+  after?: string;
+  /** Hidden on phones, so the narrow feed keeps three rows around the marked one. */
   wideOnly?: boolean;
 }
 
-interface Source {
+interface Channel {
   name: string;
   what: string;
   how: string;
 }
 
-const SENTIMENT_LABEL: Record<Sentiment, string> = {
-  negative: $localize`:@@landing.preview.sentiment.negative:Negative`,
-  neutral: $localize`:@@landing.preview.sentiment.neutral:Neutral`,
-  positive: $localize`:@@landing.preview.sentiment.positive:Positive`
-};
-
-const CATEGORY_LABEL: Record<Category, string> = {
-  complaint: $localize`:@@landing.preview.category.complaint:Complaint`,
-  praise: $localize`:@@landing.preview.category.praise:Praise`,
-  bug: $localize`:@@landing.preview.category.bug:Bug`,
-  featureRequest: $localize`:@@landing.preview.category.featureRequest:Feature request`
-};
-
-/** Chip colours come from the data palette only; the signal colour never marks data. */
-const SENTIMENT_CHIP: Record<Sentiment, string> = {
-  negative: 'border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] text-[var(--sentiment-negative-text)]',
-  neutral: 'border-[var(--sentiment-neutral-border)] bg-[var(--sentiment-neutral-bg)] text-[var(--sentiment-neutral-text)]',
-  positive: 'border-[var(--sentiment-positive-border)] bg-[var(--sentiment-positive-bg)] text-[var(--sentiment-positive-text)]'
-};
-
-const CATEGORY_CHIP: Record<Category, string> = {
-  complaint: 'border-[var(--category-complaint-border)] bg-[var(--category-complaint-bg)] text-[var(--category-complaint-text)]',
-  praise: 'border-[var(--category-praise-border)] bg-[var(--category-praise-bg)] text-[var(--category-praise-text)]',
-  bug: 'border-[var(--category-bug-border)] bg-[var(--category-bug-bg)] text-[var(--category-bug-text)]',
-  featureRequest:
-    'border-[var(--category-feature-request-border)] bg-[var(--category-feature-request-bg)] text-[var(--category-feature-request-text)]'
-};
+interface ReadStep {
+  title: string;
+  body: string;
+}
 
 const EMAIL = $localize`:@@landing.source.email.name:E-mail`;
+
+/** Number of bars in the hero voiceprint; phones show the most recent half. */
+const VOICEPRINT_BARS = 144;
+
+/**
+ * Sample voiceprint: one bar per comment, height = |score|, colour = sentiment.
+ * Deterministic (a tiny LCG) so every render and every screenshot is the same.
+ */
+function sampleVoiceprint(): readonly { h: number; s: Sentiment }[] {
+  let seed = 7;
+  const next = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
+  return Array.from({ length: VOICEPRINT_BARS }, () => {
+    const r = next();
+    const s: Sentiment = r < 0.42 ? 'negative' : r < 0.6 ? 'neutral' : 'positive';
+    const h = s === 'neutral' ? 0.08 + next() * 0.14 : 0.26 + next() * 0.7;
+    return { h: Math.round(h * 100), s };
+  });
+}
 
 /**
  * Public marketing page.
  *
  * Static by design: no HTTP call and no store, so it renders for a signed-out
- * visitor and stays in its own lazy chunk. The inbox preview is sample data
- * declared here and labelled as such on the page; the FAQ uses native
- * `<details>/<summary>` so it works without JavaScript.
+ * visitor and stays in its own lazy chunk. Every customer comment on it is
+ * sample data and labelled as such. The FAQ uses native `<details>` so it works
+ * without JavaScript.
+ *
+ * The one scripted motion is the reading in "How a comment is read": an
+ * IntersectionObserver moves `step` as each explanation crosses the middle of
+ * the viewport, and CSS sweeps the marker over the comment. Without an
+ * observer, or under reduced motion, `step` stays at the final state.
  */
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, ButtonStyleDirective, IconComponent, LogoComponent],
+  imports: [RouterLink, ButtonStyleDirective, LogoComponent],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingComponent {
-  /**
-   * A cold load of `/#pricing` (or an older `/#integrations` / `/#features`
-   * link, kept alive by alias anchors in the template) arrives before this
-   * page has rendered, so the browser's own fragment jump finds nothing.
-   * Repeat it once the sections exist; `scrollIntoView` honours the
-   * `scroll-margin-top` that clears the sticky header.
-   */
-  constructor() {
-    const document = inject(DOCUMENT);
-    afterNextRender(() => {
-      const id = decodeURIComponent(document.defaultView?.location.hash.slice(1) ?? '');
-      const target = id ? document.getElementById(id) : null;
-      target?.scrollIntoView?.();
-    });
-  }
-
   /** Free-plan analysis allowance, spec 7.2. Mirrors backend `config/quota.php`. */
   protected readonly freePlanQuota = 200;
 
-  protected readonly sentimentLabel = SENTIMENT_LABEL;
-  protected readonly categoryLabel = CATEGORY_LABEL;
-  protected readonly sentimentChip = SENTIMENT_CHIP;
-  protected readonly categoryChip = CATEGORY_CHIP;
+  protected readonly negativeLabel = $localize`:@@landing.preview.sentiment.negative:Negative`;
+  protected readonly bugLabel = $localize`:@@landing.preview.category.bug:Bug`;
 
-  protected readonly previewRows: readonly PreviewRow[] = [
+  protected readonly feed: readonly FeedRow[] = [
     {
       source: 'Google Play',
       author: 'Deniz Aksoy',
       time: '09:41',
-      text: 'Yeni sürümde senkronizasyon çok daha hızlı, elinize sağlık.',
-      sentiment: 'positive',
       score: '+0.71',
-      category: 'praise',
+      lang: 'tr',
+      sentiment: 'positive',
+      before: 'Yeni sürümde senkronizasyon çok daha hızlı, elinize sağlık.',
       wideOnly: true
     },
     {
       source: 'Zendesk',
       author: 'Marco Ferri',
       time: '09:12',
-      text: 'Could the weekly summary be exported as CSV?',
-      sentiment: 'neutral',
       score: '+0.06',
-      category: 'featureRequest'
+      lang: 'en',
+      sentiment: 'neutral',
+      before: 'Could the weekly summary be exported as CSV?'
     },
     {
       source: 'App Store',
       author: 'Elif Kaya',
       time: '08:57',
-      text: 'Since the last update it crashes every time I open notifications.',
-      sentiment: 'negative',
       score: '−0.82',
-      category: 'bug',
-      pulled: true
+      lang: 'en',
+      sentiment: 'negative',
+      before: 'Since the last update it ',
+      mark: 'crashes every time',
+      after: ' I open notifications.'
     },
     {
       source: EMAIL,
       author: 'Burak Yıldız',
       time: '08:30',
-      text: 'Bu ay faturam iki kez kesildi, iadeyi hâlâ bekliyorum.',
-      sentiment: 'negative',
       score: '−0.47',
-      category: 'complaint'
+      lang: 'tr',
+      sentiment: 'negative',
+      before: 'Bu ay faturam iki kez kesildi, iadeyi hâlâ bekliyorum.'
     },
     {
       source: 'Trustpilot',
       author: 'Hannah Weiss',
       time: '08:04',
-      text: 'Tracking works, but the delivery screen could be clearer.',
-      sentiment: 'neutral',
       score: '−0.12',
-      category: 'complaint',
+      lang: 'en',
+      sentiment: 'neutral',
+      before: 'Tracking works, but the delivery screen could be clearer.',
       wideOnly: true
     }
   ];
 
-  /** The pulled row, read closely. Keyword spans are what the analyser keyed on. */
-  protected readonly specimen: readonly { text: string; keyword?: boolean }[] = [
-    { text: 'Since the last ' },
-    { text: 'update', keyword: true },
-    { text: ' it ' },
-    { text: 'crashes', keyword: true },
-    { text: ' every time I open ' },
-    { text: 'notifications', keyword: true },
-    { text: '.' }
-  ];
+  protected readonly voiceprint = sampleVoiceprint();
 
-  protected readonly specimenKeywords = this.specimen.filter((part) => part.keyword).map((part) => part.text);
-
-  protected readonly sources: readonly Source[] = [
+  protected readonly channels: readonly Channel[] = [
     {
       name: 'App Store',
       what: $localize`:@@landing.source.appStore.what:Customer reviews and star ratings from the public review feed.`,
@@ -196,4 +167,79 @@ export class LandingComponent {
       how: $localize`:@@landing.source.mastodon.how:A hashtag, no account`
     }
   ];
+
+  /** One step per reading; step N switches on the Nth reading on the stage. */
+  protected readonly steps: readonly ReadStep[] = [
+    {
+      title: $localize`:@@landing.read.mark.title:Mark the phrase`,
+      body: $localize`:@@landing.read.mark.body:The marker lands on the words that drove the score, so you see why before you read the rest.`
+    },
+    {
+      title: $localize`:@@landing.read.language.title:Detect the language`,
+      body: $localize`:@@landing.read.language.body:Each comment is read in the language it was written in. Turkish stays Turkish.`
+    },
+    {
+      title: $localize`:@@landing.read.sentiment.title:Score the feeling`,
+      body: $localize`:@@landing.read.sentiment.body:A number from −1 to +1, stored with its confidence and the model version.`
+    },
+    {
+      title: $localize`:@@landing.read.category.title:Sort it`,
+      body: $localize`:@@landing.read.category.body:Complaint, praise, bug or feature request. One per comment.`
+    },
+    {
+      title: $localize`:@@landing.read.keywords.title:Pull the keywords`,
+      body: $localize`:@@landing.read.keywords.body:The words the reading keyed on, so the same problem can be found across channels.`
+    }
+  ];
+
+  protected readonly keywords = ['update', 'crash', 'notifications'];
+
+  /** How far the reading has got, 0 to 5. Starts complete: the static page is the final state. */
+  protected readonly step = signal(5);
+
+  /** True once the observer drives `step`; until then every step reads as current. */
+  protected readonly live = signal(false);
+
+  constructor() {
+    const document = inject(DOCUMENT);
+    const destroyRef = inject(DestroyRef);
+
+    afterNextRender(() => {
+      const view = document.defaultView;
+
+      /*
+       * A cold load of `/#pricing` (or an older `/#integrations` / `/#features`
+       * link, kept alive by alias anchors in the template) arrives before this
+       * page has rendered, so the browser's own fragment jump finds nothing.
+       * Repeat it once the sections exist; `scroll-margin-top` clears the header.
+       */
+      const id = decodeURIComponent(view?.location.hash.slice(1) ?? '');
+      const target = id ? document.getElementById(id) : null;
+      target?.scrollIntoView?.();
+
+      const reduce = view?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? true;
+      if (!view || reduce || typeof view.IntersectionObserver !== 'function') {
+        return;
+      }
+      const items = Array.from(document.querySelectorAll<HTMLElement>('[data-read-step]'));
+      if (!items.length) {
+        return;
+      }
+      this.step.set(0);
+      this.live.set(true);
+      const observer = new view.IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              this.step.set(Number(entry.target.getAttribute('data-read-step')));
+            }
+          }
+        },
+        // A thin band across the middle of the viewport: a step is "current" while it crosses it.
+        { rootMargin: '-48% 0px -48% 0px' }
+      );
+      items.forEach((item) => observer.observe(item));
+      destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
 }

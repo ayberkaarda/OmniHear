@@ -6,250 +6,185 @@
 >
 
 <header class="sticky top-0 z-[var(--z-sticky)] border-b border-[var(--border)] bg-[var(--bg-canvas)]">
-  <div class="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-4 md:px-8">
-    <a routerLink="/" class="lp-focus -m-1 rounded-control p-1"><app-logo variant="full" [size]="26" /></a>
+  <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12 flex h-16 items-center gap-8">
+    <a routerLink="/" class="lp-f -m-1 rounded-control p-1"><app-logo variant="full" [size]="26" /></a>
 
-    <nav
-      class="ml-4 hidden items-center gap-1 lg:flex"
-      i18n-aria-label="Landing section nav label@@landing.nav.label"
-      aria-label="Page sections"
-    >
-      <a href="#sources" class="lp-navlink lp-focus" i18n="@@landing.nav.sources">Sources</a>
-      <a href="#analysis" class="lp-navlink lp-focus" i18n="@@landing.nav.analysis">How it reads</a>
-      <a href="#pricing" class="lp-navlink lp-focus" i18n="@@landing.nav.pricing">Pricing</a>
-      <a href="#faq" class="lp-navlink lp-focus" i18n="@@landing.nav.faq">Questions</a>
+    <nav class="hidden items-center gap-6 lg:flex" i18n-aria-label="Landing section nav label@@landing.nav.label" aria-label="Page sections">
+      <a href="#sources" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.channels">Channels</a>
+      <a href="#analysis" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.analysis">How it reads</a>
+      <a href="#pricing" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.pricing">Pricing</a>
+      <a href="#faq" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.faq">Questions</a>
     </nav>
 
-    <div class="ml-auto flex items-center gap-1 sm:gap-2">
-      <a routerLink="/auth/login" appButtonStyle variant="ghost" size="sm" i18n="@@landing.nav.signIn">Sign in</a>
-      <a routerLink="/auth/register" appButtonStyle variant="primary" size="sm" i18n="@@landing.cta.start">Start free</a>
+    <div class="ml-auto flex items-center gap-4">
+      <a routerLink="/auth/login" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.signIn">Sign in</a>
+      <a routerLink="/auth/register" appButtonStyle variant="primary" size="md" i18n="@@landing.cta.start">Start free</a>
     </div>
   </div>
 </header>
 
-<main id="main-content" class="bg-[var(--bg-canvas)] text-[var(--text-primary)]">
-  <!-- Hero: the promise on the left, the product it describes on the right. -->
-  <section class="overflow-x-clip">
-    <div
-      class="mx-auto grid max-w-[1200px] items-center gap-10 px-4 pb-16 pt-10 md:px-8 md:pt-14 lg:min-h-[min(calc(100dvh-4rem),700px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-12"
-    >
-      <div class="max-w-xl">
-        <h1 class="lp-display font-bold text-[var(--text-primary)]">
+<main id="main-content" class="overflow-x-clip bg-[var(--bg-canvas)] text-[var(--text-primary)]">
+  <!-- Hero: the promise as a poster, the inbox it describes beside it, the channels and their voiceprint under both. -->
+  <section class="pt-6 md:pt-14">
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-14">
+      <div>
+        <h1 class="lp-h1">
           <span class="block" i18n="@@landing.hero.titleLine1">Every voice.</span>
-          <span class="block" i18n="@@landing.hero.titleLine2">One inbox.</span>
+          <span class="block"><span class="marker marker-sweep" i18n="@@landing.hero.titleLine2">One inbox.</span></span>
         </h1>
-        <p class="mt-6 max-w-[34rem] text-lg text-[var(--text-secondary)]" i18n="@@landing.hero.subtitle">
-          Reviews, tickets, e-mails and posts from six channels land in one list, each one read, scored and sorted.
+        <p class="mt-6 max-w-[34rem] text-lg text-[var(--text-secondary)] lg:text-xl" i18n="@@landing.hero.lede">
+          Reviews, tickets, e-mails and posts from six channels land in one list. Each one read, scored and sorted.
         </p>
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a routerLink="/auth/register" appButtonStyle variant="primary" size="lg" class="lp-press" i18n="@@landing.cta.start"
-            >Start free</a
-          >
-          <a href="#analysis" appButtonStyle variant="secondary" size="lg" class="lp-press" i18n="@@landing.hero.secondaryCta"
-            >See how it reads</a
-          >
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a routerLink="/auth/register" appButtonStyle variant="primary" size="lg" i18n="@@landing.cta.start">Start free</a>
+          <a href="#analysis" class="lp-link lp-f" i18n="@@landing.hero.howLink">See how a comment is read</a>
         </div>
       </div>
 
-      <figure
-        class="relative mr-3 md:mr-6"
-        i18n-aria-label="@@landing.preview.label"
-        aria-label="Example of the OmniHear inbox"
-      >
-        <div class="rounded-card border border-[var(--border)] bg-[var(--bg-surface)] shadow-brand-sm">
-          <div class="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3">
-            <app-logo variant="mark" [size]="18" aria-hidden="true" />
-            <span class="text-sm font-semibold" i18n="@@landing.preview.title">Inbox</span>
-            <span class="text-xs text-[var(--text-muted)]" i18n="@@landing.preview.today">Today</span>
-            <span
-              class="ml-auto rounded-sm border border-[var(--border)] bg-[var(--bg-surface-sunken)] px-1.5 py-0.5 text-xs text-[var(--text-muted)]"
-              i18n="@@landing.preview.sample"
-              >Sample data</span
+      <figure class="border-t border-[var(--border)] pt-4 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0" i18n-aria-label="@@landing.feed.label" aria-label="Sample comments arriving in the inbox">
+        <figcaption class="lp-lbl flex justify-between pb-2">
+          <span i18n="@@landing.feed.title">Heard this morning</span>
+          <span i18n="@@landing.feed.sample">Sample data</span>
+        </figcaption>
+        <ol>
+          @for (row of feed; track row.author; let i = $index) {
+            <li
+              [attr.lang]="row.lang"
+              class="lp-row grid grid-cols-[4rem_1fr] gap-3 border-t border-[var(--border)] py-3.5"
+              [class.lp-hot]="row.mark"
+              [class.lp-wide]="row.wideOnly"
+              [style.--i]="i"
+              [style.--s]="'var(--sentiment-' + row.sentiment + '-fill)'"
+              [style.--st]="'var(--sentiment-' + row.sentiment + '-text)'"
             >
-          </div>
-
-          <ol class="lp-rows py-1">
-            @for (row of previewRows; track row.author; let i = $index) {
-              <li
-                class="lp-row relative grid gap-x-4 gap-y-1.5 px-4 py-3 md:grid-cols-[6.5rem_minmax(0,1fr)_auto]"
-                [class.lp-wide]="row.wideOnly"
-                [class.lp-pulled]="row.pulled"
-                [style.--i]="i"
-              >
-                <span class="flex items-center gap-2 md:items-start md:pt-0.5">
-                  <span
-                    class="rounded-sm border border-[var(--source-border)] bg-[var(--source-bg)] px-1.5 py-0.5 text-xs font-medium text-[var(--source-text)]"
-                    >{{ row.source }}</span
-                  >
-                  <span class="font-mono text-xs tabular-nums text-[var(--text-muted)] md:hidden">{{ row.time }}</span>
-                </span>
-                <span class="min-w-0">
-                  <span class="block text-xs text-[var(--text-muted)]"
-                    >{{ row.author }}<span class="hidden md:inline">, <span class="font-mono tabular-nums">{{ row.time }}</span></span></span
-                  >
-                  <span class="mt-0.5 block text-sm text-[var(--text-primary)]">{{ row.text }}</span>
-                  @if (row.pulled) {
-                    <span class="mt-1.5 block text-xs font-medium text-[var(--brand-text)]" i18n="@@landing.preview.pulled"
-                      >Needs a reply</span
-                    >
-                  }
-                </span>
-                <span class="flex flex-wrap items-start gap-1.5 md:flex-col md:items-end">
-                  <span class="lp-chip" [class]="sentimentChip[row.sentiment]"
-                    >{{ sentimentLabel[row.sentiment] }}
-                    <span class="font-mono tabular-nums">{{ row.score }}</span></span
-                  >
-                  <span class="lp-chip" [class]="categoryChip[row.category]">{{ categoryLabel[row.category] }}</span>
-                </span>
-              </li>
-            }
-          </ol>
-        </div>
+              <span class="lp-score font-mono tabular-nums">{{ row.score }}</span>
+              <div>
+                <p class="lp-q">
+                  {{ row.before }}@if (row.mark) {<span class="marker marker-sweep lp-late">{{ row.mark }}</span>{{ row.after }}}
+                </p>
+                <span class="lp-lbl mt-1.5 block">{{ row.source }}, {{ row.time }} / {{ row.author }}</span>
+              </div>
+            </li>
+          }
+        </ol>
       </figure>
+    </div>
+
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12 mt-10 grid gap-5 border-t border-[var(--border)] py-6 md:grid-cols-[270px_1fr] md:items-center md:gap-10">
+      <ul class="lp-chs flex flex-wrap gap-x-4 gap-y-1 text-xl text-[var(--text-secondary)]" i18n-aria-label="@@landing.strip.label" aria-label="Channels">
+        @for (channel of channels; track channel.name) {
+          <li>{{ channel.name }}</li>
+        }
+      </ul>
+      <div class="lp-vp flex h-16 items-center gap-0.5" role="img" i18n-aria-label="@@landing.voiceprint.label" aria-label="Voiceprint of sample comments: one bar per comment, height is the strength of the sentiment">
+        @for (bar of voiceprint; track $index) {
+          <i class="flex-1" [style.height.%]="bar.h" [style.background]="'var(--sentiment-' + bar.s + '-fill)'"></i>
+        }
+      </div>
     </div>
   </section>
 
-  <!-- Sources: six lines into the board. Hairlines, not cards. -->
-  <section id="sources" class="scroll-mt-16 border-t border-[var(--border)]">
+  <!-- Channels: six full-width rows, the name set like a poster; hover sweeps the marker under it. -->
+  <section id="sources" class="scroll-mt-16 border-t border-[var(--border)] py-20 lg:py-28">
     <!-- Earlier id of this section; keeps shared /#integrations links landing here. -->
     <span id="integrations" class="lp-alias" aria-hidden="true"></span>
-    <div class="mx-auto grid max-w-[1200px] gap-10 px-4 py-20 md:px-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14 lg:py-28">
-      <div class="lg:sticky lg:top-28 lg:self-start">
-        <h2 class="lp-heading font-bold" i18n="@@landing.sources.title">Six channels. One list.</h2>
-        <p class="mt-4 max-w-[28rem] text-base text-[var(--text-secondary)]" i18n="@@landing.sources.body">
-          Connect a channel once. Collection then runs on a schedule and fetches only what is new.
-        </p>
-      </div>
-
-      <ul class="grid gap-px overflow-hidden rounded-card border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 xl:grid-cols-3">
-        @for (source of sources; track source.name) {
-          <li class="flex flex-col bg-[var(--bg-canvas)] p-5 sm:min-h-[11rem] sm:p-6">
-            <h3 class="text-xl font-semibold">{{ source.name }}</h3>
-            <p class="mt-2 text-sm text-[var(--text-secondary)]">{{ source.what }}</p>
-            <p class="mt-auto flex items-center gap-2 pt-6 font-mono text-xs text-[var(--text-muted)]">
-              <app-icon name="link" size="sm" />{{ source.how }}
-            </p>
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12">
+      <h2 class="lp-h2" i18n="@@landing.sources.title">Six channels. One list.</h2>
+      <p class="mt-4 max-w-[34rem] text-lg text-[var(--text-secondary)]" i18n="@@landing.sources.body">
+        Connect a channel once. Collection then runs on a schedule and fetches only what is new.
+      </p>
+      <ul class="mt-12">
+        @for (channel of channels; track channel.name) {
+          <li class="lp-ch grid items-baseline gap-x-8 gap-y-2 border-t border-[var(--border)] py-6 md:grid-cols-[5fr_5fr_3fr]">
+            <h3 class="lp-ch-name"><span class="lp-sw">{{ channel.name }}</span></h3>
+            <p class="text-[var(--text-secondary)]">{{ channel.what }}</p>
+            <p class="lp-lbl lp-how">{{ channel.how }}</p>
           </li>
         }
       </ul>
     </div>
   </section>
 
-  <!-- Analysis: one comment, read closely. -->
-  <section id="analysis" class="scroll-mt-16 border-t border-[var(--border)] bg-[var(--bg-surface)]">
+  <!-- How a comment is read: the stage holds still, the steps scroll past it, the marker sweeps once per step. -->
+  <section id="analysis" class="scroll-mt-16 border-t border-[var(--border)] py-20 lg:py-28">
     <!-- Earlier id of this section; keeps shared /#features links landing here. -->
     <span id="features" class="lp-alias" aria-hidden="true"></span>
-    <div class="mx-auto max-w-[1200px] px-4 py-20 md:px-8 lg:py-28">
-      <h2 class="lp-heading max-w-2xl font-bold" i18n="@@landing.analysis.title">How a comment is read</h2>
-      <p class="mt-4 max-w-[38rem] text-base text-[var(--text-secondary)]" i18n="@@landing.analysis.body">
-        Every comment gets the same three passes. The result is stored with its confidence and the model version, so any
-        label can be traced.
-      </p>
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12">
+      <h2 class="lp-h2" i18n="@@landing.analysis.title">How a comment is read</h2>
+      <p class="mt-4 max-w-[34rem] text-lg text-[var(--text-secondary)]" i18n="@@landing.analysis.lede">One comment from the inbox above, read the way every comment is read.</p>
 
-      <figure class="mt-12 border-l-2 border-[var(--signal)] pl-5 md:mt-16 md:pl-8">
-        <figcaption class="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
-          <span
-            class="rounded-sm border border-[var(--source-border)] bg-[var(--source-bg)] px-1.5 py-0.5 font-medium text-[var(--source-text)]"
-            >App Store</span
-          >
-          <span>Elif Kaya, <span class="font-mono tabular-nums">08:57</span></span>
-        </figcaption>
-        <blockquote class="lp-quote mt-4 max-w-4xl font-medium text-[var(--text-primary)]">
-          <p>
-            “@for (part of specimen; track $index) {@if (part.keyword) {<mark class="lp-mark">{{ part.text }}</mark>} @else {<span>{{ part.text }}</span>}}”
-          </p>
-        </blockquote>
-      </figure>
+      <div class="mt-12 grid md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:gap-12">
+        <figure class="lp-stage">
+          <figcaption class="lp-lbl">App Store, 08:57 / Elif Kaya</figcaption>
+          <blockquote class="lp-big">
+            <p>
+              Since the last <span class="lp-sw lp-kw" [class.on]="step() >= 5">update</span> it
+              <span class="lp-sw lp-mk" [class.on]="step() >= 1">crashes every time</span> I open
+              <span class="lp-sw lp-kw" [class.on]="step() >= 5">notifications</span>.
+            </p>
+          </blockquote>
+          <dl class="lp-cells">
+            <div [class.on]="step() >= 2">
+              <dt class="lp-lbl" i18n="@@landing.analysis.language.term">Language</dt>
+              <dd><span class="lp-num font-mono tabular-nums">EN</span><span i18n="@@landing.read.language.value">English</span></dd>
+            </div>
+            <div [class.on]="step() >= 3">
+              <dt class="lp-lbl" i18n="@@landing.analysis.sentiment.term">Sentiment</dt>
+              <dd class="text-[var(--sentiment-negative-text)]"><span class="lp-num font-mono tabular-nums">&#8722;0.82</span> {{ negativeLabel }}</dd>
+            </div>
+            <div [class.on]="step() >= 4">
+              <dt class="lp-lbl" i18n="@@landing.analysis.category.term">Category</dt>
+              <dd><span class="mr-2 inline-block h-2.5 w-2.5 bg-[var(--category-bug-fill)]" aria-hidden="true"></span>{{ bugLabel }}</dd>
+            </div>
+            <div [class.on]="step() >= 5">
+              <dt class="lp-lbl" i18n="@@landing.analysis.keywords.term">Keywords</dt>
+              <dd class="flex flex-wrap gap-1.5">
+                @for (keyword of keywords; track keyword) {
+                  <span class="bg-[var(--highlight)] px-1.5 font-mono text-xs">{{ keyword }}</span>
+                }
+              </dd>
+            </div>
+          </dl>
+        </figure>
 
-      <dl class="mt-12 grid gap-px overflow-hidden rounded-card border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-4">
-        <div class="bg-[var(--bg-surface)] p-5">
-          <dt class="text-xs font-medium text-[var(--text-muted)]" i18n="@@landing.analysis.language.term">Language</dt>
-          <dd class="mt-2 text-sm font-medium" i18n="@@landing.analysis.language.value">English, detected</dd>
-        </div>
-        <div class="bg-[var(--bg-surface)] p-5">
-          <dt class="text-xs font-medium text-[var(--text-muted)]" i18n="@@landing.analysis.sentiment.term">Sentiment</dt>
-          <dd class="mt-2">
-            <span class="lp-chip" [class]="sentimentChip.negative"
-              >{{ sentimentLabel.negative }} <span class="font-mono tabular-nums">&#8722;0.82</span></span
-            >
-            <span class="mt-2 block text-xs text-[var(--text-muted)]" i18n="@@landing.analysis.sentiment.scale"
-              >On a scale from &#8722;1 to +1</span
-            >
-          </dd>
-        </div>
-        <div class="bg-[var(--bg-surface)] p-5">
-          <dt class="text-xs font-medium text-[var(--text-muted)]" i18n="@@landing.analysis.category.term">Category</dt>
-          <dd class="mt-2">
-            <span class="lp-chip" [class]="categoryChip.bug">{{ categoryLabel.bug }}</span>
-            <span class="mt-2 block text-xs text-[var(--text-muted)]" i18n="@@landing.analysis.category.note"
-              >One of complaint, praise, bug or feature request</span
-            >
-          </dd>
-        </div>
-        <div class="bg-[var(--bg-surface)] p-5">
-          <dt class="text-xs font-medium text-[var(--text-muted)]" i18n="@@landing.analysis.keywords.term">Keywords</dt>
-          <dd class="mt-2 flex flex-wrap gap-1.5">
-            @for (keyword of specimenKeywords; track keyword) {
-              <span class="rounded-sm bg-[var(--highlight)] px-1.5 py-0.5 font-mono text-xs text-[var(--text-primary)]">{{ keyword }}</span>
-            }
-          </dd>
-        </div>
-      </dl>
+        <ol class="lp-steps">
+          @for (item of steps; track item.title; let i = $index) {
+            <li [attr.data-read-step]="i + 1" [class.on]="step() === i + 1 || !live()">
+              <h3 class="lp-step-t">{{ item.title }}</h3>
+              <p>{{ item.body }}</p>
+            </li>
+          }
+        </ol>
+      </div>
     </div>
   </section>
 
-  <!-- Pricing: one plan you can use today, one that is announced. -->
-  <section id="pricing" class="scroll-mt-16 border-t border-[var(--border)]">
-    <div class="mx-auto max-w-[1200px] px-4 py-20 md:px-8 lg:py-28">
-      <h2 class="lp-heading font-bold" i18n="@@landing.pricing.title">Pricing</h2>
-
-      <div class="mt-10 grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-0">
-        <div class="lg:border-r lg:border-[var(--border)] lg:pr-14">
-          <h3 class="text-sm font-semibold text-[var(--text-secondary)]" i18n="@@landing.pricing.free.name">Free</h3>
-          <p class="mt-3 flex flex-wrap items-baseline gap-x-3">
-            <span class="lp-figure font-bold tabular-nums">{{ freePlanQuota }}</span>
+  <!-- Pricing: the free allowance as a poster number, the paid plan stated plainly beside it. -->
+  <section id="pricing" class="scroll-mt-16 border-t border-[var(--border)] py-20 lg:py-28">
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12">
+      <h2 class="lp-h2" i18n="@@landing.pricing.title">Pricing</h2>
+      <div class="mt-12 grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div>
+          <h3 class="lp-lbl" i18n="@@landing.pricing.free.name">Free</h3>
+          <p class="mt-2 flex flex-wrap items-baseline gap-x-4">
+            <span class="lp-quota font-mono tabular-nums">{{ freePlanQuota }}</span>
             <span class="text-lg text-[var(--text-secondary)]" i18n="@@landing.pricing.free.unit">analyses, no card required</span>
           </p>
-          <ul class="mt-8 grid gap-3 text-base text-[var(--text-secondary)] sm:grid-cols-2">
-            <li class="flex gap-2.5">
-              <app-icon name="check" size="sm" class="mt-1 text-[var(--text-primary)]" /><span i18n="@@landing.pricing.free.item1"
-                >All six channels</span
-              >
-            </li>
-            <li class="flex gap-2.5">
-              <app-icon name="check" size="sm" class="mt-1 text-[var(--text-primary)]" /><span i18n="@@landing.pricing.free.item2"
-                >Sentiment and category on every comment</span
-              >
-            </li>
-            <li class="flex gap-2.5">
-              <app-icon name="check" size="sm" class="mt-1 text-[var(--text-primary)]" /><span i18n="@@landing.pricing.free.item3"
-                >Unlimited team members</span
-              >
-            </li>
-            <li class="flex gap-2.5">
-              <app-icon name="check" size="sm" class="mt-1 text-[var(--text-primary)]" /><span i18n="@@landing.pricing.free.item4"
-                >Each comment counted once, never twice</span
-              >
-            </li>
+          <ul class="mt-8 grid gap-2.5 text-[var(--text-secondary)]">
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.free.item1">All six channels</li>
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.free.item2">Sentiment and category on every comment</li>
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.free.item3">Unlimited team members</li>
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.free.item4">Each comment counted once, never twice</li>
           </ul>
-          <a
-            routerLink="/auth/register"
-            appButtonStyle
-            variant="primary"
-            size="lg"
-            class="lp-press mt-10"
-            i18n="@@landing.cta.start"
-            >Start free</a
-          >
+          <a routerLink="/auth/register" appButtonStyle variant="primary" size="lg" class="mt-10" i18n="@@landing.cta.start">Start free</a>
         </div>
-
-        <div class="border-t border-[var(--border)] pt-10 lg:border-t-0 lg:pl-14 lg:pt-0">
-          <h3 class="text-sm font-semibold text-[var(--text-secondary)]" i18n="@@landing.pricing.pro.name">Pro</h3>
-          <p class="mt-3 text-2xl font-semibold" i18n="@@landing.pricing.pro.price">Price announced at launch</p>
-          <ul class="mt-8 flex flex-col gap-3 text-base text-[var(--text-secondary)]">
-            <li i18n="@@landing.pricing.pro.item1">A larger analysis allowance</li>
-            <li i18n="@@landing.pricing.pro.item2">Waiting comments analysed right after the upgrade</li>
-            <li i18n="@@landing.pricing.pro.item3">Everything in Free</li>
+        <div class="rounded-card bg-[var(--bg-surface)] p-5 sm:p-6 lg:self-start">
+          <h3 class="lp-lbl" i18n="@@landing.pricing.pro.name">Pro</h3>
+          <p class="lp-d mt-3 text-4xl" i18n="@@landing.pricing.pro.price">Price announced at launch</p>
+          <ul class="mt-8 grid gap-2.5 text-[var(--text-secondary)]">
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.pro.item1">A larger analysis allowance</li>
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.pro.item2">Waiting comments analysed right after the upgrade</li>
+            <li class="border-l-2 border-[var(--signal)] pl-3" i18n="@@landing.pricing.pro.item3">Everything in Free</li>
           </ul>
           <p class="mt-8 text-sm text-[var(--text-muted)]" i18n="@@landing.pricing.pro.note">
             Billing is not open yet. Free accounts hear about it first.
@@ -260,41 +195,40 @@
   </section>
 
   <!-- Questions: plain answers, native disclosure. -->
-  <section id="faq" class="scroll-mt-16 border-t border-[var(--border)] bg-[var(--bg-surface)]">
-    <div class="mx-auto grid max-w-[1200px] gap-8 px-4 py-20 md:px-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14 lg:py-28">
-      <h2 class="lp-heading font-bold" i18n="@@landing.faq.title">Questions</h2>
-
-      <div class="divide-y divide-[var(--border)] border-y border-[var(--border)]">
-        <details class="lp-faq group">
-          <summary class="lp-focus" i18n="@@landing.faq.q1">Which channels can I connect?</summary>
-          <p i18n="@@landing.faq.a1">
+  <section id="faq" class="scroll-mt-16 border-t border-[var(--border)] py-20 lg:py-28">
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12 grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
+      <h2 class="lp-h2" i18n="@@landing.faq.title">Questions</h2>
+      <div class="border-b border-[var(--border)]">
+        <details class="lp-faq">
+          <summary class="lp-f flex cursor-pointer justify-between gap-4 border-t border-[var(--border)] py-5 text-xl font-semibold" i18n="@@landing.faq.q1">Which channels can I connect?</summary>
+          <p class="max-w-[65ch] pb-5 text-[var(--text-secondary)]" i18n="@@landing.faq.a1">
             App Store, Google Play, Zendesk, Trustpilot, a JMAP e-mail inbox and a Mastodon hashtag. Each connection can be
             paused without losing the comments already collected.
           </p>
         </details>
-        <details class="lp-faq group">
-          <summary class="lp-focus" i18n="@@landing.faq.q2">Can another company see my feedback?</summary>
-          <p i18n="@@landing.faq.a2">
+        <details class="lp-faq">
+          <summary class="lp-f flex cursor-pointer justify-between gap-4 border-t border-[var(--border)] py-5 text-xl font-semibold" i18n="@@landing.faq.q2">Can another company see my feedback?</summary>
+          <p class="max-w-[65ch] pb-5 text-[var(--text-secondary)]" i18n="@@landing.faq.a2">
             No. Every record carries your company identifier and every query is filtered by it, so a request for a record
             that belongs to someone else is answered as if it did not exist.
           </p>
         </details>
-        <details class="lp-faq group">
-          <summary class="lp-focus" i18n="@@landing.faq.q3">Where are channel credentials kept?</summary>
-          <p i18n="@@landing.faq.a3">
+        <details class="lp-faq">
+          <summary class="lp-f flex cursor-pointer justify-between gap-4 border-t border-[var(--border)] py-5 text-xl font-semibold" i18n="@@landing.faq.q3">Where are channel credentials kept?</summary>
+          <p class="max-w-[65ch] pb-5 text-[var(--text-secondary)]" i18n="@@landing.faq.a3">
             Encrypted in the database. They are never written to a log or an error message.
           </p>
         </details>
-        <details class="lp-faq group">
-          <summary class="lp-focus" i18n="@@landing.faq.q4">What happens when the allowance runs out?</summary>
-          <p i18n="@@landing.faq.a4">
+        <details class="lp-faq">
+          <summary class="lp-f flex cursor-pointer justify-between gap-4 border-t border-[var(--border)] py-5 text-xl font-semibold" i18n="@@landing.faq.q4">What happens when the allowance runs out?</summary>
+          <p class="max-w-[65ch] pb-5 text-[var(--text-secondary)]" i18n="@@landing.faq.a4">
             Collection continues and new comments are kept, waiting to be analysed. Nothing is deleted; once the plan is
             upgraded the waiting comments are analysed automatically.
           </p>
         </details>
-        <details class="lp-faq group">
-          <summary class="lp-focus" i18n="@@landing.faq.q5">Which languages are supported?</summary>
-          <p i18n="@@landing.faq.a5">
+        <details class="lp-faq">
+          <summary class="lp-f flex cursor-pointer justify-between gap-4 border-t border-[var(--border)] py-5 text-xl font-semibold" i18n="@@landing.faq.q5">Which languages are supported?</summary>
+          <p class="max-w-[65ch] pb-5 text-[var(--text-secondary)]" i18n="@@landing.faq.a5">
             Comments are analysed in the language they were written in, detected automatically. The interface itself is
             available in Turkish and English.
           </p>
@@ -303,46 +237,34 @@
     </div>
   </section>
 
-  <!-- Closing: the mark, one sentence, one action. -->
-  <section class="border-t border-[var(--border)]">
-    <div class="mx-auto flex max-w-[1200px] flex-col items-start gap-8 px-4 py-20 md:flex-row md:items-center md:gap-12 md:px-8 lg:py-28">
-      <app-logo variant="mark" [size]="88" aria-hidden="true" class="shrink-0" />
-      <div class="max-w-2xl">
-        <h2 class="lp-heading font-bold" i18n="@@landing.closing.title">Start with the channel you read least.</h2>
-        <p class="mt-3 text-base text-[var(--text-secondary)]" i18n="@@landing.closing.body">
+  <!-- Closing: one sentence with the marker on it, one action. -->
+  <section class="scroll-mt-16 border-t border-[var(--border)] py-20 lg:py-28">
+    <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12">
+      <h2 class="lp-h1 lp-close">
+        <span class="block" i18n="@@landing.closing.titleLead">Start with the channel</span>
+        <span class="block"><span class="marker" i18n="@@landing.closing.titleMark">you read least.</span></span>
+      </h2>
+      <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <a routerLink="/auth/register" appButtonStyle variant="primary" size="lg" i18n="@@landing.cta.start">Start free</a>
+        <p class="max-w-[34rem] text-[var(--text-secondary)]" i18n="@@landing.closing.body">
           Connect it in a few minutes and see what customers have already said there.
         </p>
       </div>
-      <a
-        routerLink="/auth/register"
-        appButtonStyle
-        variant="primary"
-        size="lg"
-        class="lp-press shrink-0 md:ml-auto"
-        i18n="@@landing.cta.start"
-        >Start free</a
-      >
     </div>
   </section>
 </main>
 
 <footer class="border-t border-[var(--border)] bg-[var(--bg-canvas)]">
-  <div
-    class="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-10 text-sm text-[var(--text-muted)] md:flex-row md:items-center md:justify-between md:px-8"
-  >
+  <div class="mx-auto max-w-[90rem] px-4 md:px-8 lg:px-12 flex flex-col gap-6 py-10 text-sm text-[var(--text-muted)] md:flex-row md:items-center md:justify-between">
     <div class="flex flex-col gap-2">
       <app-logo variant="full" [size]="22" />
       <p i18n="@@landing.footer.tagline">Every voice. One inbox.</p>
     </div>
-    <nav
-      class="flex flex-wrap items-center gap-x-5 gap-y-2"
-      i18n-aria-label="Footer nav label@@landing.footer.navLabel"
-      aria-label="Footer"
-    >
-      <a href="#sources" class="lp-footlink lp-focus" i18n="@@landing.nav.sources">Sources</a>
-      <a href="#pricing" class="lp-footlink lp-focus" i18n="@@landing.nav.pricing">Pricing</a>
-      <a routerLink="/auth/login" class="lp-footlink lp-focus" i18n="@@landing.nav.signIn">Sign in</a>
-      <a routerLink="/auth/register" class="lp-footlink lp-focus" i18n="@@landing.cta.start">Start free</a>
+    <nav class="flex flex-wrap items-center gap-x-6 gap-y-2" i18n-aria-label="Footer nav label@@landing.footer.navLabel" aria-label="Footer">
+      <a href="#sources" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.channels">Channels</a>
+      <a href="#pricing" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.pricing">Pricing</a>
+      <a routerLink="/auth/login" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.nav.signIn">Sign in</a>
+      <a routerLink="/auth/register" class="lp-f text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]" i18n="@@landing.cta.start">Start free</a>
     </nav>
   </div>
 </footer>
