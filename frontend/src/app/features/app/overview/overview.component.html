@@ -1,23 +1,49 @@
-<section class="flex flex-col gap-4">
-  <header class="flex flex-col gap-1">
-    <h1 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.overview.title">Overview</h1>
-    <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.overview.subtitle">
-      Sentiment and category trends across every connected channel.
-    </p>
+<section class="mx-auto flex w-full max-w-[90rem] flex-col gap-6">
+  <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-semibold tracking-display text-[var(--text-primary)]" i18n="@@app.overview.title">Overview</h1>
+      <p class="max-w-[65ch] text-sm text-[var(--text-secondary)]" i18n="@@app.overview.subtitle">
+        Sentiment and category trends across every connected channel.
+      </p>
+    </div>
+
+    @if (kpis()) {
+      <p class="text-xs text-[var(--text-muted)]" data-testid="overview-quota">
+        <!-- &ngsp; survives Angular's default whitespace collapsing, which would
+             otherwise join these two spans into "used:60". -->
+        <span i18n="Overview quota line@@overview.quota.label">Analysis quota used:</span>&ngsp;<span
+          class="font-mono tabular-nums text-[var(--text-secondary)]"
+          >{{ quotaUsedLabel() }}</span
+        >
+      </p>
+    }
   </header>
 
   @if (errorMessage(); as message) {
     <div
-      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      class="flex flex-wrap items-center gap-3 rounded-card border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
       role="alert"
       data-testid="overview-error"
     >
+      <app-icon name="alert-triangle" size="sm" />
       <span class="flex-1">{{ message }}</span>
       <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
     </div>
   }
 
-  <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+  @if (isEmpty()) {
+    <div
+      class="flex items-start gap-3 rounded-card border ov-dashed border-[var(--border-strong)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-secondary)]"
+      data-testid="overview-empty"
+    >
+      <span class="mt-0.5 flex text-[var(--text-muted)]"><app-icon name="link" size="sm" /></span>
+      <span i18n="Overview empty state@@overview.empty.hint">
+        No comments have been collected yet. Connect a channel on the Integrations screen to start.
+      </span>
+    </div>
+  }
+
+  <div class="ov-kpis grid grid-cols-2 gap-3">
     <app-kpi-card
       [title]="totalLabel"
       [value]="kpis()?.total_feedbacks ?? null"
@@ -46,112 +72,88 @@
     />
   </div>
 
-  <app-sentiment-trend [points]="trend()" [loading]="loading()" />
+  <!-- The trend is the reading; the two breakdowns sit beside it as its key. -->
+  <div class="grid gap-6 xl:grid-cols-3">
+    <app-sentiment-trend class="ov-wide block" [points]="trend()" [loading]="loading()" />
 
-  <div class="grid gap-4 lg:grid-cols-2">
-    <section class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-      <h2 class="text-sm font-semibold text-[var(--text-primary)]" i18n="Overview panel heading@@overview.sentiment.title">
-        Sentiment mix
-      </h2>
+    <div class="flex flex-col gap-6">
+      <section class="flex flex-col gap-5 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+        <h2 class="text-sm font-semibold text-[var(--text-primary)]" i18n="Overview panel heading@@overview.sentiment.title">
+          Sentiment mix
+        </h2>
 
-      @if (loading()) {
-        <div class="h-3 w-full animate-pulse rounded-full bg-[var(--bg-surface-sunken)]"></div>
-      } @else if (analysedTotal() === 0) {
-        <p class="text-sm text-[var(--text-muted)]" i18n="Overview panel empty state@@overview.sentiment.empty">
-          Nothing has been analysed yet, so there is no mix to show.
-        </p>
-      } @else {
-        <!-- Fixed stack order: negative, then neutral, then positive. The legend
-             below repeats that order, so the sequence carries the meaning even
-             where the colours do not. -->
-        <div class="flex h-3 w-full overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]" data-testid="sentiment-bar">
-          @for (segment of sentimentSegments(); track segment.key) {
-            @if (segment.count > 0) {
-              <span
-                class="flex items-center justify-center text-[9px] font-medium tabular-nums text-[var(--text-inverse)]"
-                [style.width.%]="segment.share * 100"
-                [style.backgroundColor]="segment.fillVar"
-                [attr.aria-hidden]="true"
-                >@if (segment.share >= 0.12) {
-                  {{ segment.percentLabel }}
-                }</span
-              >
+        @if (loading()) {
+          <div class="flex flex-col gap-3" aria-hidden="true">
+            <div class="h-2 w-full animate-pulse rounded-full bg-[var(--bg-surface-sunken)]"></div>
+            <div class="h-24 w-full animate-pulse rounded-control bg-[var(--bg-surface-sunken)]"></div>
+          </div>
+        } @else if (analysedTotal() === 0) {
+          <p class="text-sm text-[var(--text-muted)]" i18n="Overview panel empty state@@overview.sentiment.empty">
+            Nothing has been analysed yet, so there is no mix to show.
+          </p>
+        } @else {
+          <!-- Fixed stack order: negative, then neutral, then positive. The legend
+               below repeats that order, so the sequence carries the meaning even
+               where the colours do not. A 2 px gap keeps neighbours apart in greyscale. -->
+          <div class="flex h-2 w-full gap-0.5 overflow-hidden rounded-full" data-testid="sentiment-bar" aria-hidden="true">
+            @for (segment of sentimentSegments(); track segment.key) {
+              @if (segment.count > 0) {
+                <span class="h-full" [style.width.%]="segment.share * 100" [style.backgroundColor]="segment.fillVar"></span>
+              }
             }
-          }
-        </div>
+          </div>
 
-        <ul class="flex flex-col gap-1.5">
-          @for (segment of sentimentSegments(); track segment.key) {
-            <li>
-              <button
-                type="button"
-                class="flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-sm hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-                (click)="goToSentiment(segment.key)"
-              >
-                <app-badge kind="sentiment" [value]="segment.key" size="sm" />
-                <span class="flex-1 text-right tabular-nums text-[var(--text-primary)]">{{ countOf(segment) }}</span>
-                <span class="w-12 text-right tabular-nums text-[var(--text-muted)]">{{ segment.percentLabel }}</span>
-              </button>
-            </li>
-          }
-        </ul>
-      }
-    </section>
+          <ul class="ov-list flex flex-col">
+            @for (segment of sentimentSegments(); track segment.key) {
+              <li>
+                <button
+                  type="button"
+                  class="flex w-full items-center gap-3 rounded-control px-2 py-2 text-left text-sm transition-colors duration-fast ease-standard hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px"
+                  (click)="goToSentiment(segment.key)"
+                >
+                  <app-badge kind="sentiment" [value]="segment.key" size="sm" />
+                  <span class="flex-1 text-right font-mono tabular-nums text-[var(--text-primary)]">{{ countOf(segment) }}</span>
+                  <span class="w-12 text-right font-mono text-xs tabular-nums text-[var(--text-muted)]">{{ segment.percentLabel }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
 
-    <section class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-      <h2 class="text-sm font-semibold text-[var(--text-primary)]" i18n="Overview panel heading@@overview.category.title">
-        What people are writing about
-      </h2>
+      <section class="flex flex-col gap-4 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+        <h2 class="text-sm font-semibold text-[var(--text-primary)]" i18n="Overview panel heading@@overview.category.title">
+          What people are writing about
+        </h2>
 
-      @if (loading()) {
-        <div class="h-20 w-full animate-pulse rounded bg-[var(--bg-surface-sunken)]"></div>
-      } @else {
-        <ul class="flex flex-col gap-2">
-          @for (segment of categorySegments(); track segment.key) {
-            <li>
-              <button
-                type="button"
-                class="flex w-full items-center gap-3 rounded-md px-1 py-1 text-left text-sm hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-                (click)="goToCategory(segment.key)"
-              >
-                <span class="w-36 shrink-0">
-                  <app-badge kind="category" [value]="segment.key" size="sm" />
-                </span>
-                <!-- Magnitude only. The category itself is carried by the badge's
-                     icon and label, so the bar stays a neutral brand fill rather
-                     than repeating a colour that would then need a decal. -->
-                <span class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]">
-                  <span
-                    class="block h-full rounded-full"
-                    [style.width.%]="segment.share * 100"
-                    [style.backgroundColor]="segment.fillVar"
-                  ></span>
-                </span>
-                <span class="w-10 text-right tabular-nums text-[var(--text-primary)]">{{ countOf(segment) }}</span>
-              </button>
-            </li>
-          }
-        </ul>
-      }
-    </section>
+        @if (loading()) {
+          <div class="ov-skel w-full animate-pulse rounded-control bg-[var(--bg-surface-sunken)]" aria-hidden="true"></div>
+        } @else {
+          <ul class="ov-list flex flex-col" data-testid="category-list">
+            @for (segment of categorySegments(); track segment.key) {
+              <li>
+                <button
+                  type="button"
+                  class="flex w-full flex-col gap-2 rounded-control px-2 py-2.5 text-left transition-colors duration-fast ease-standard hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px"
+                  (click)="goToCategory(segment.key)"
+                >
+                  <span class="flex w-full items-center gap-3">
+                    <app-badge kind="category" [value]="segment.key" size="sm" />
+                    <span class="flex-1 text-right font-mono text-sm tabular-nums text-[var(--text-primary)]">{{ countOf(segment) }}</span>
+                    <span class="w-12 text-right font-mono text-xs tabular-nums text-[var(--text-muted)]">{{ segment.percentLabel }}</span>
+                  </span>
+                  <!-- Magnitude only. The category itself is carried by the badge's
+                       icon and label, so the bar stays a neutral ink fill rather
+                       than repeating a colour that would then need a decal. -->
+                  <span class="block h-1 w-full overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]" aria-hidden="true">
+                    <span class="block h-full rounded-full" [style.width.%]="segment.share * 100" [style.backgroundColor]="segment.fillVar"></span>
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
   </div>
-
-  @if (kpis()) {
-    <p class="text-xs text-[var(--text-muted)]" data-testid="overview-quota">
-      <!-- &ngsp; survives Angular's default whitespace collapsing, which would
-           otherwise join these two spans into "used:60". A CSS gap would need
-           the paragraph to become a flex container; this is one inline text
-           line, so the space belongs in the text. -->
-      <span i18n="Overview quota line@@overview.quota.label">Analysis quota used:</span>&ngsp;<span
-        class="tabular-nums"
-        >{{ quotaUsedLabel() }}</span
-      >
-    </p>
-  }
-
-  @if (isEmpty()) {
-    <p class="text-sm text-[var(--text-secondary)]" data-testid="overview-empty" i18n="Overview empty state@@overview.empty.hint">
-      No comments have been collected yet. Connect a channel on the Integrations screen to start.
-    </p>
-  }
 </section>

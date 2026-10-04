@@ -4,24 +4,19 @@
   [disabled]="isDisabled()"
   [attr.aria-busy]="loading() ? 'true' : null"
   [attr.aria-label]="ariaLabel() ?? null"
+  [attr.data-variant]="variant()"
   (click)="onClick($event)"
 >
   @if (loading()) {
-    <svg
-      [class]="spinnerClasses()"
-      class="animate-spin"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path
-        class="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      ></path>
-    </svg>
+    <span class="absolute inset-0 flex items-center justify-center" data-testid="button-spinner" aria-hidden="true">
+      <svg [class]="spinnerClasses()" class="animate-spin" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+        <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-opacity="0.25" stroke-width="1.5" />
+        <path d="M14.25 8A6.25 6.25 0 0 0 8 1.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </span>
   }
-  <ng-content></ng-content>
+  <!-- Hidden by paint only (not visibility/display), so the label still names the button while it is busy. -->
+  <span class="inline-flex items-center justify-center gap-[inherit]" [class.opacity-0]="loading()" data-testid="button-label">
+    <ng-content></ng-content>
+  </span>
 </button>

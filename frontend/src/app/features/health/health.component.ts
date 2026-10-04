@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 
 import { HealthService } from '../../core/health/health.service';
+import { LogoComponent } from '../../shared/ui/logo/logo.component';
 
 type HealthState = 'loading' | 'success' | 'error';
 
 @Component({
     selector: 'app-health',
-    imports: [],
+    imports: [LogoComponent],
     templateUrl: './health.component.html',
     styleUrl: './health.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

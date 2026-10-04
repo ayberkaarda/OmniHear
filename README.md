@@ -24,8 +24,9 @@ initial bundle budget. Full diagram and data flow: **`docs/ARCHITECTURE.md`**.
 
 ## Screens
 
-All captured from the running application against the demo seed described
-below — not mockups.
+All captured from the running frontend at 1440 px, in the current
+"switchboard" identity (`docs/BRAND.md`), with a sample company's data served
+in place of the API — not mockups.
 
 **Overview** — KPI cards, the 30-day sentiment trend, and the sentiment and
 category breakdowns. The quota panel in the sidebar is at 60/75, which is why
@@ -50,8 +51,8 @@ readable in both themes and for red-green colour blindness (ADR-0006).
 
 ![Overview in dark theme](docs/screenshots/overview-dark.png)
 
-**Integrations and landing** — the connection cards with per-channel health,
-and the public page.
+**Integrations and landing** — one row per connection with its health and
+last sync, and the public page.
 
 ![Integrations](docs/screenshots/integrations.png)
 ![Landing](docs/screenshots/landing.png)

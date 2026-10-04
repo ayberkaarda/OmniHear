@@ -1,5 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Injector,
+  OnDestroy,
+  signal,
+  viewChild
+} from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { AuthStore } from '../../core/auth/auth.store';
@@ -7,42 +22,117 @@ import { PaywallModalComponent } from '../../core/paywall/paywall-modal.componen
 import { RealtimeBridge } from '../../core/realtime/realtime.bridge';
 import { ButtonComponent } from '../../shared/ui/button/button.component';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
+import { IconName } from '../../shared/ui/icon/icon.types';
+import { LogoComponent } from '../../shared/ui/logo/logo.component';
+import { trapTabKey } from '../../shared/ui/modal/focus-trap';
 import { QuotaMeterComponent } from './quota-meter.component';
 import { ThemeToggleComponent } from './theme-toggle.component';
+
+type Section = 'overview' | 'inbox' | 'integrations' | 'settings';
+
+interface NavItem {
+  readonly section: Section;
+  readonly link: string;
+  readonly icon: IconName;
+}
+
+/** Order is the order on screen, in the rail and in the phone tab bar alike. */
+const NAV: readonly NavItem[] = [
+  { section: 'overview', link: '/app/overview', icon: 'eye' },
+  { section: 'inbox', link: '/app/inbox', icon: 'mail' },
+  { section: 'integrations', link: '/app/integrations', icon: 'link' },
+  { section: 'settings', link: '/app/settings', icon: 'user' }
+];
+
+const RAIL_LINK =
+  'relative flex h-9 items-center gap-3 rounded-control px-3 text-sm transition-colors duration-fast ease-standard ' +
+  'hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]';
+const TAB_LINK =
+  'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px';
+const LINK_ACTIVE = 'shell-selected font-medium text-[var(--text-primary)]';
+
+/** Tailwind `lg`: from here up the rail carries the account block and the sheet is hidden. */
+const WIDE_QUERY = '(min-width: 1024px)';
+
+const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/?#]+))?/;
 
 /**
  * Chrome for every `/app/**` screen: skip link, primary navigation landmark,
  * identity/quota rail and the single `<main>` the child routes render into.
+ *
+ * Wide screens get a quiet rail on the left; phones get a sticky top bar and a
+ * tab bar along the bottom edge, where a thumb reaches it. Both carry the same
+ * four destinations. The account block (quota, theme, sign out) sits at the
+ * foot of the rail and, on phones, behind the avatar button in the top bar.
  */
 @Component({
-    selector: 'app-app-shell',
-    imports: [
-        RouterOutlet,
-        RouterLink,
-        RouterLinkActive,
-        IconComponent,
-        ButtonComponent,
-        QuotaMeterComponent,
-        ThemeToggleComponent,
-        PaywallModalComponent
-    ],
-    templateUrl: './app-shell.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-app-shell',
+  imports: [
+    NgTemplateOutlet,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    IconComponent,
+    ButtonComponent,
+    LogoComponent,
+    QuotaMeterComponent,
+    ThemeToggleComponent,
+    PaywallModalComponent
+  ],
+  templateUrl: './app-shell.component.html',
+  styleUrl: './app-shell.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:keydown.escape)': 'dismissAccount()',
+    '(window:resize)': 'closeAccountIfWide()'
+  }
 })
 export class AppShellComponent implements OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly authStore = inject(AuthStore);
   private readonly realtime = inject(RealtimeBridge);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
+
+  private readonly accountTrigger = viewChild<ElementRef<HTMLButtonElement>>('accountTrigger');
+  private readonly accountSheet = viewChild<ElementRef<HTMLElement>>('accountSheet');
+
+  protected readonly nav = NAV;
 
   protected readonly user = this.authStore.user;
   protected readonly company = this.authStore.company;
   protected readonly emailVerified = this.authStore.isEmailVerified;
   protected readonly signingOut = signal(false);
 
+  /** Phone-only account sheet behind the avatar button. */
+  protected readonly accountOpen = signal(false);
+
   protected readonly userInitial = computed(() => this.user()?.name.trim().charAt(0).toUpperCase() ?? '?');
 
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects)
+    ),
+    { initialValue: this.router.url }
+  );
+
+  /** Where the user is, for the breadcrumb in the top bar. */
+  protected readonly location = computed(() => {
+    const match = SECTION_PATTERN.exec(this.url());
+    if (!match) {
+      return null;
+    }
+    const section = match[1] as Section;
+    // Only the inbox has a record level worth naming; settings sub-pages carry their own nav.
+    const record = section === 'inbox' && match[2] && /^\d+$/.test(match[2]) ? match[2] : null;
+    return { section, record };
+  });
+
   protected readonly primaryNavLabel = $localize`:Primary navigation landmark label@@shell.nav.primary:Primary`;
+  protected readonly themeGroupHeading = $localize`:Theme switch group label@@shell.theme.label:Colour theme`;
   protected readonly signOutLabel = $localize`:Sign out button label@@shell.signOut:Sign out`;
 
   /**
@@ -61,11 +151,62 @@ export class AppShellComponent implements OnDestroy {
         this.realtime.start();
       }
     });
+
+    // A navigation always lands on a fresh screen, never under an open sheet.
+    effect(() => {
+      this.url();
+      this.accountOpen.set(false);
+    });
   }
 
-  /** Leaving `/app/**` — sign-out, a dead token, or a plain navigation — closes the socket. */
+  /** Leaving `/app/**` (sign-out, a dead token, or a plain navigation) closes the socket. */
   ngOnDestroy(): void {
     this.realtime.stop();
+  }
+
+  protected railLinkClasses(active: boolean): string {
+    return `${RAIL_LINK} ${active ? LINK_ACTIVE : 'text-[var(--text-secondary)]'}`;
+  }
+
+  protected tabClasses(active: boolean): string {
+    return `${TAB_LINK} ${active ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`;
+  }
+
+  /**
+   * The sheet behaves like the shared modal: focus moves into it on open, Tab
+   * is contained by the same `trapTabKey`, and the page behind it is `inert`.
+   */
+  protected toggleAccount(): void {
+    if (this.accountOpen()) {
+      this.dismissAccount();
+      return;
+    }
+    this.accountOpen.set(true);
+    afterNextRender(() => this.accountSheet()?.nativeElement.focus(), { injector: this.injector });
+  }
+
+  /** Escape or a tap on the scrim: close and hand focus back to the avatar that opened it. */
+  protected dismissAccount(): void {
+    if (!this.accountOpen()) {
+      return;
+    }
+    this.accountOpen.set(false);
+    // The trigger sits in the header, which is inert until this render lands.
+    afterNextRender(() => this.accountTrigger()?.nativeElement.focus(), { injector: this.injector });
+  }
+
+  protected onSheetKeydown(event: KeyboardEvent): void {
+    const sheet = this.accountSheet()?.nativeElement;
+    if (event.key === 'Tab' && sheet) {
+      trapTabKey(sheet, event);
+    }
+  }
+
+  /** Widening past `lg` hides the sheet; it must not leave an inert page with nothing open. */
+  protected closeAccountIfWide(): void {
+    if (this.accountOpen() && typeof matchMedia === 'function' && matchMedia(WIDE_QUERY).matches) {
+      this.accountOpen.set(false);
+    }
   }
 
   protected onSignOut(): void {

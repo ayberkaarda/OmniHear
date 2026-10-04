@@ -1,25 +1,49 @@
 <button
   type="button"
-  class="flex w-full flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 text-left transition-colors hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 disabled:cursor-default disabled:hover:bg-[var(--bg-surface)]"
+  class="flex w-full flex-col gap-3 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] p-4 text-left transition-[color,background-color,border-color,box-shadow,transform] duration-fast ease-standard hover:bg-[var(--bg-surface-hover)] enabled:active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)] kpi"
   [disabled]="isSkeleton()"
   [attr.aria-busy]="loading() ? 'true' : null"
   (click)="onActivate()"
 >
-  <span class="text-sm font-medium text-[var(--text-secondary)]">{{ title() }}</span>
+  <span class="truncate text-sm font-medium leading-5 text-[var(--text-secondary)]">{{ title() }}</span>
 
-  @if (isSkeleton()) {
-    <span class="h-7 w-24 animate-pulse rounded bg-[var(--bg-surface-sunken)]" data-testid="kpi-skeleton"></span>
-  } @else {
-    <span class="text-2xl font-semibold tabular-nums text-[var(--text-primary)]">{{ displayValue() }}</span>
-  }
+  <span class="kpi-row flex items-end justify-between gap-4">
+    @if (isSkeleton()) {
+      <span class="mb-1 h-6 w-24 animate-pulse rounded bg-[var(--bg-surface-sunken)]" data-testid="kpi-skeleton"></span>
+    } @else {
+      <span class="kpi-value kpi-num font-semibold tracking-display text-[var(--text-primary)]">{{ displayValue() }}</span>
+    }
+
+    @if (!isSkeleton() && sparkPoints()) {
+      <svg
+        [attr.viewBox]="sparkViewBox"
+        class="kpi-spark mb-1 w-24 shrink-0 text-[var(--text-muted)]"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <polyline
+          [attr.points]="sparkPoints()"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+    }
+  </span>
 
   @if (!isSkeleton() && (formattedDelta() || deltaLabel())) {
-    <span class="flex items-center gap-1 text-xs" [class]="deltaToneClass()">
-      @if (deltaIcon()) {
-        <app-icon [name]="deltaIcon()!" size="sm" />
-      }
+    <span class="kpi-foot flex flex-wrap items-center text-xs leading-4">
       @if (formattedDelta()) {
-        <span class="tabular-nums">{{ formattedDelta() }}</span>
+        <span class="inline-flex items-center gap-0.5 font-medium" [class]="deltaToneClass()">
+          @if (deltaIcon()) {
+            <app-icon [name]="deltaIcon()!" size="sm" />
+          }
+          <span class="kpi-num">{{ formattedDelta() }}</span>
+        </span>
       }
       @if (deltaLabel()) {
         <span class="text-[var(--text-muted)]">{{ deltaLabel() }}</span>
@@ -33,11 +57,5 @@
         }
       }
     </span>
-  }
-
-  @if (!isSkeleton() && sparkPoints()) {
-    <svg [attr.viewBox]="sparkViewBox" class="h-7 w-full text-[var(--text-muted)]" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-      <polyline [attr.points]="sparkPoints()" fill="none" stroke="currentColor" stroke-width="1.5" />
-    </svg>
   }
 </button>

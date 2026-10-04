@@ -1,12 +1,21 @@
 import { ChangeDetectionStrategy, Component, computed, forwardRef, input, output, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { FormFieldSize, nextFieldId, SIZE_INPUT_CLASSES } from './form-field-base';
+import { IconComponent } from '../icon/icon.component';
+import {
+  controlClasses,
+  ERROR_CLASSES,
+  FormFieldSize,
+  HELPER_CLASSES,
+  LABEL_CLASSES,
+  nextFieldId,
+  SIZE_INPUT_CLASSES
+} from './form-field-base';
 
 @Component({
   selector: 'app-textarea',
   standalone: true,
-  imports: [],
+  imports: [IconComponent],
   templateUrl: './textarea.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -30,6 +39,10 @@ export class TextareaComponent implements ControlValueAccessor {
   readonly rows = input(4);
 
   readonly blurred = output<void>();
+
+  protected readonly labelClasses = LABEL_CLASSES;
+  protected readonly helperClasses = HELPER_CLASSES;
+  protected readonly errorClasses = ERROR_CLASSES;
 
   protected readonly fieldId = nextFieldId('app-textarea');
   protected readonly errorId = `${this.fieldId}-error`;
@@ -72,15 +85,9 @@ export class TextareaComponent implements ControlValueAccessor {
   }
 
   protected readonly textareaClasses = computed(() => {
-    const base =
-      'w-full rounded-md border bg-[var(--bg-surface)] text-[var(--text-primary)] ' +
-      'placeholder:text-[var(--text-muted)] transition-colors py-2 ' +
-      'focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)] ' +
-      'disabled:opacity-50 disabled:cursor-not-allowed';
-    const borderColor = this.error() ? 'border-[var(--sentiment-negative-border)]' : 'border-[var(--border)]';
-    // Text sizing only — the fixed input heights don't apply to a multi-row textarea.
+    // Text sizing only: the fixed input heights don't apply to a multi-row textarea.
     const textSize = SIZE_INPUT_CLASSES[this.size()].replace(/\bh-\d+\b/, '').trim();
-    return [base, borderColor, textSize].join(' ');
+    return [controlClasses(!!this.error()), 'min-h-[5rem] resize-y py-2 leading-6', textSize].join(' ');
   });
 
   protected onInput(event: Event): void {

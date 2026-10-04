@@ -2,7 +2,7 @@
   @if (step() === 'credentials') {
     @if (challengeExpired()) {
       <p
-        class="mb-4 rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-sm text-[var(--sentiment-negative-text)]"
+        class="mb-4 border-l-2 border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-sm text-[var(--sentiment-negative-text)]"
         role="alert"
         data-testid="two-factor-expired"
         i18n="Notice when the two-factor challenge could not be completed@@auth.twoFactor.expired"
@@ -11,7 +11,7 @@
       </p>
     }
 
-    <form [formGroup]="form" class="flex flex-col gap-4" novalidate (ngSubmit)="onSubmit()">
+    <form [formGroup]="form" class="flex flex-col gap-6" novalidate (ngSubmit)="onSubmit()">
       <app-input
         formControlName="email"
         type="email"
@@ -35,7 +35,7 @@
       <div class="flex justify-end">
         <a
           routerLink="/auth/forgot-password"
-          class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
           i18n="@@auth.login.forgotLink"
           >Forgot your password?</a
         >
@@ -48,7 +48,7 @@
   } @else {
     <form
       [formGroup]="challengeForm"
-      class="flex flex-col gap-4"
+      class="flex flex-col gap-6"
       novalidate
       data-testid="two-factor-form"
       (ngSubmit)="onChallengeSubmit()"
@@ -86,7 +86,7 @@
         @if (usingRecoveryCode()) {
           <button
             type="button"
-            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
             data-testid="two-factor-use-app"
             i18n="@@auth.twoFactor.useApp"
             (click)="useRecoveryCode(false)"
@@ -96,7 +96,7 @@
         } @else {
           <button
             type="button"
-            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
             data-testid="two-factor-use-recovery"
             i18n="@@auth.twoFactor.useRecovery"
             (click)="useRecoveryCode(true)"
@@ -107,7 +107,7 @@
 
         <button
           type="button"
-          class="rounded-sm text-[var(--text-secondary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+          class="rounded-sm text-[var(--text-secondary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
           data-testid="two-factor-cancel"
           i18n="@@auth.twoFactor.back"
           (click)="cancelChallenge()"
@@ -123,7 +123,7 @@
       <span i18n="@@auth.login.noAccount">Do not have an account yet?</span>
       <a
         routerLink="/auth/register"
-        class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
         i18n="@@auth.login.registerLink"
         >Create one</a
       >

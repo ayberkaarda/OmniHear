@@ -58,6 +58,9 @@ describe('LoginComponent', () => {
     const element = fixture.nativeElement as HTMLElement;
 
     expect(element.querySelector('h1')?.textContent).toBeTruthy();
+    expect(element.querySelectorAll('main')).toHaveLength(1);
+    expect(element.querySelector('.auth-brand app-logo')).toBeTruthy();
+    expect(element.querySelector('main .auth-form form')).toBeTruthy();
     const inputs = Array.from(element.querySelectorAll('input'));
     expect(inputs).toHaveLength(2);
     for (const input of inputs) {

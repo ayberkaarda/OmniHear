@@ -5,6 +5,7 @@ import { errorMessageForCode } from '../../../core/errors/error-messages';
 import { FeedbackDetailStore } from '../../../core/feedback/feedback-detail.store';
 import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { EM_DASH, formatDateTime, formatPercent, formatScore } from '../../../shared/format/format';
 import { analysisStatusLabel, platformLabel } from '../../../shared/labels/domain-labels';
 
@@ -24,8 +25,9 @@ import { analysisStatusLabel, platformLabel } from '../../../shared/labels/domai
 @Component({
   selector: 'app-inbox-detail',
   standalone: true,
-  imports: [RouterLink, BadgeComponent, ButtonComponent],
+  imports: [RouterLink, BadgeComponent, ButtonComponent, IconComponent],
   templateUrl: './inbox-detail.component.html',
+  styleUrl: './inbox-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InboxDetailComponent {
@@ -57,6 +59,11 @@ export class InboxDetailComponent {
   });
 
   protected readonly sentimentScore = computed(() => formatScore(this.analysis()?.sentiment_score));
+  /** -1..+1 mapped onto 0..100 % of the scale track. */
+  protected readonly scorePosition = computed(() => {
+    const score = this.analysis()?.sentiment_score ?? 0;
+    return Math.min(100, Math.max(0, ((score + 1) / 2) * 100));
+  });
   protected readonly confidencePercent = computed(() => formatPercent(this.analysis()?.confidence));
   protected readonly confidenceWidth = computed(() => (this.analysis()?.confidence ?? 0) * 100);
 

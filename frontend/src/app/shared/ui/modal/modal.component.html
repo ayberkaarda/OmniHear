@@ -1,26 +1,33 @@
 @if (open()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-[var(--bg-overlay)]" tabindex="-1" (click)="onBackdropClick()" aria-hidden="true"></div>
+  <div class="modal-layer">
+    <div
+      class="modal-backdrop fixed inset-0 bg-[var(--bg-overlay)]"
+      tabindex="-1"
+      (click)="onBackdropClick()"
+      aria-hidden="true"
+    ></div>
 
     <div
       #dialogEl
-      [class]="sizeClasses() + ' relative flex max-h-[calc(100vh-2rem)] flex-col rounded-lg bg-[var(--bg-surface-raised)] shadow-[var(--shadow-md)]'"
+      [class]="sizeClasses() + ' modal-sheet'"
       [attr.role]="role()"
+      [attr.data-role]="role()"
       aria-modal="true"
       [attr.aria-labelledby]="titleId"
       tabindex="-1"
       (keydown)="onKeydown($event)"
     >
-      <div class="flex items-center justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+      <div class="flex items-start justify-between gap-4 px-6 pb-2 pt-5">
         <h2
           #titleEl
           [id]="titleId"
           tabindex="-1"
-          class="text-base font-semibold text-[var(--text-primary)] focus:outline-none"
+          class="modal-title"
         >
           {{ title() }}
         </h2>
         <app-button
+          class="-mr-2 shrink-0"
           variant="ghost"
           size="sm"
           [iconOnly]="true"
@@ -28,15 +35,15 @@
           i18n-ariaLabel="Modal close button label@@modal.close"
           (pressed)="onCloseButtonClick()"
         >
-          <app-icon name="x" size="sm" />
+          <app-icon name="x" size="md" />
         </app-button>
       </div>
 
-      <div class="flex-1 overflow-y-auto px-5 py-4">
+      <div class="flex-1 overflow-y-auto px-6 pb-5 pt-1 text-sm leading-6 text-[var(--text-secondary)]">
         <ng-content select="[modalBody]"></ng-content>
       </div>
 
-      <div class="flex items-center justify-end gap-2 border-t border-[var(--border)] px-5 py-4">
+      <div class="modal-footer">
         <ng-content select="[modalFooter]"></ng-content>
       </div>
     </div>

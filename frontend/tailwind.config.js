@@ -4,19 +4,88 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 module.exports = {
   darkMode: 'class',
   content: ['./src/**/*.{html,ts}'],
+
+  // The content scan reads every .ts and .html file, so plain English words in
+  // comments, i18n meanings and code ("filter", "table", "transition") were
+  // being emitted as utilities that no template uses. None of these is a class
+  // in any template; blocking them keeps them out of the initial stylesheet.
+  blocklist: ['container', 'transition', 'blur', 'filter', 'table', 'static', 'visible', 'invisible', 'grow'],
+
+  // Utility families no template uses. Each one also adds its --tw-* reset
+  // variables to the `*, ::before, ::after` and `::backdrop` preflight blocks,
+  // so disabling them shrinks every page's initial CSS, not just the utilities.
+  corePlugins: {
+    borderSpacing: false,
+    touchAction: false,
+    scrollSnapType: false,
+    gradientColorStops: false,
+    blur: false,
+    brightness: false,
+    contrast: false,
+    grayscale: false,
+    hueRotate: false,
+    invert: false,
+    saturate: false,
+    sepia: false,
+    dropShadow: false,
+    filter: false,
+    backdropBlur: false,
+    backdropBrightness: false,
+    backdropContrast: false,
+    backdropGrayscale: false,
+    backdropHueRotate: false,
+    backdropInvert: false,
+    backdropOpacity: false,
+    backdropSaturate: false,
+    backdropSepia: false,
+    backdropFilter: false,
+    contain: false,
+  },
+
   theme: {
     extend: {
-      // The families index.html has been loading since F1 — but nothing ever
-      // bound them, so every screen rendered in the system stack while the CDN
-      // request went out anyway. Self-hosting them (styles/fonts.css) fixed the
-      // privacy half; this line is the half that makes the request worth making.
-      // Tailwind's own defaults stay as the fallback chain.
+      // Brand faces (docs/BRAND.md, "Typography"). Declared in styles/fonts.css,
+      // self-hosted. The first entries mirror --font-sans / --font-mono in
+      // tokens.json; Tailwind's defaults stay as the tail of the chain.
       fontFamily: {
-        sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
-        mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
+        sans: ['"Schibsted Grotesk"', '"Schibsted Grotesk Fallback"', ...defaultTheme.fontFamily.sans],
+        mono: ['"Spline Sans Mono"', ...defaultTheme.fontFamily.mono],
+      },
+
+      // New names only: Tailwind's own `tight` / `rounded-*` scales are left as
+      // they are so existing components do not shift under this change.
+      letterSpacing: {
+        display: 'var(--tracking-tight)',
+        label: 'var(--tracking-label)',
+      },
+
+      borderRadius: {
+        control: 'var(--radius-md)',
+        card: 'var(--radius-lg)',
+        sheet: 'var(--radius-xl)',
+      },
+
+      transitionDuration: {
+        fast: 'var(--duration-fast)',
+        base: 'var(--duration-base)',
+        slow: 'var(--duration-slow)',
+      },
+
+      transitionTimingFunction: {
+        standard: 'var(--ease-standard)',
+        emphasized: 'var(--ease-emphasized)',
+      },
+
+      boxShadow: {
+        'brand-sm': 'var(--shadow-sm)',
+        'brand-md': 'var(--shadow-md)',
       },
 
       colors: {
+        // Signal: the cobalt "lamp" (selection, focus, links). See docs/BRAND.md.
+        signal: 'var(--signal)',
+        'signal-soft': 'var(--signal-soft)',
+
         // Surfaces / structure
         canvas: 'var(--bg-canvas)',
         surface: 'var(--bg-surface)',

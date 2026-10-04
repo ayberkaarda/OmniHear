@@ -1085,8 +1085,8 @@
         <note priority="1" from="description">Connection status picker label</note>
       </trans-unit>
       <trans-unit id="integrations.status.active" datatype="html">
-        <source>Active — sync on schedule</source>
-        <target>Aktif — programa göre senkronize edilir</target>
+        <source>Active: sync on schedule</source>
+        <target>Aktif: programa göre senkronize edilir</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
           <context context-type="linenumber">171</context>
@@ -1094,8 +1094,8 @@
         <note priority="1" from="description">Connection state option</note>
       </trans-unit>
       <trans-unit id="integrations.status.paused" datatype="html">
-        <source>Paused — do not sync</source>
-        <target>Duraklatıldı — senkronize edilmez</target>
+        <source>Paused: do not sync</source>
+        <target>Duraklatıldı: senkronize edilmez</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/app/integrations/integrations.component.ts</context>
           <context context-type="linenumber">172</context>
@@ -3256,45 +3256,61 @@
           <context context-type="linenumber">19,22</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="landing.feature.collect.title" datatype="html">
+        <source>One inbox for every channel</source>
+        <target>Her kanal için tek gelen kutusu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/auth/shared/auth-layout.component.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="landing.nav.label" datatype="html">
         <source>Page sections</source>
         <target>Sayfa bölümleri</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">15,19</context>
+          <context context-type="linenumber">15,17</context>
         </context-group>
         <note priority="1" from="description">Landing section nav label</note>
       </trans-unit>
-      <trans-unit id="landing.nav.features" datatype="html">
-        <source>Features</source>
-        <target>Özellikler</target>
+      <trans-unit id="landing.nav.sources" datatype="html">
+        <source>Sources</source>
+        <target>Kaynaklar</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">21,24</context>
+          <context context-type="linenumber">17,18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">338,339</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.nav.integrations" datatype="html">
-        <source>Integrations</source>
-        <target>Entegrasyonlar</target>
+      <trans-unit id="landing.nav.analysis" datatype="html">
+        <source>How it reads</source>
+        <target>Nasıl okur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">27,30</context>
+          <context context-type="linenumber">18,19</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.pricing" datatype="html">
         <source>Pricing</source>
-        <target>Fiyatlandırma</target>
+        <target>Fiyatlar</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">33,36</context>
+          <context context-type="linenumber">19,20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">339,340</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.faq" datatype="html">
-        <source>FAQ</source>
-        <target>SSS</target>
+        <source>Questions</source>
+        <target>Sorular</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">40,43</context>
+          <context context-type="linenumber">20,23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.signIn" datatype="html">
@@ -3302,239 +3318,203 @@
         <target>Giriş yap</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">44,45</context>
+          <context context-type="linenumber">24,25</context>
         </context-group>
-      </trans-unit>
-      <trans-unit id="landing.nav.getStarted" datatype="html">
-        <source>Get started</source>
-        <target>Hemen başlayın</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">46,50</context>
+          <context context-type="linenumber">340,341</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.hero.eyebrow" datatype="html">
-        <source>Customer feedback intelligence</source>
-        <target>Müşteri geri bildirimi zekâsı</target>
+      <trans-unit id="landing.cta.start" datatype="html">
+        <source>Start free</source>
+        <target>Ücretsiz başla</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">59,62</context>
+          <context context-type="linenumber">25,28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">238,242</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">319,322</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">341,344</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.hero.title" datatype="html">
-        <source> Every customer comment, in one place, already read </source>
-        <target>Her müşteri yorumu tek yerde, okunmuş olarak</target>
+      <trans-unit id="landing.hero.titleLine1" datatype="html">
+        <source>Every voice.</source>
+        <target>Her ses.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">65,67</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.hero.titleLine2" datatype="html">
+        <source>One inbox.</source>
+        <target>Tek kutu.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">39,41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.hero.subtitle" datatype="html">
-        <source> OmniHear collects reviews and support messages from every channel you sell on, then classifies each one by sentiment and by topic, so your team starts the day with the answer instead of the backlog. </source>
-        <target>OmniHear, satış yaptığınız her kanaldaki değerlendirmeleri ve destek mesajlarını toplar, her birini duygusuna ve konusuna göre sınıflandırır; böylece ekibiniz güne yığılmış yorumlarla değil, cevapla başlar.</target>
+        <source> Reviews, tickets, e-mails and posts from six channels land in one list, each one read, scored and sorted. </source>
+        <target>Altı kanaldan gelen yorumlar, talepler, e-postalar ve gönderiler tek listede toplanır; her biri okunur, puanlanır ve sınıflanır.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">68,71</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.hero.primaryCta" datatype="html">
-        <source>Create a free account</source>
-        <target>Ücretsiz hesap oluşturun</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">73,75</context>
+          <context context-type="linenumber">42,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.hero.secondaryCta" datatype="html">
-        <source>See how it works</source>
-        <target>Nasıl çalıştığını görün</target>
+        <source>See how it reads</source>
+        <target>Nasıl okuduğunu görün</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">76,79</context>
+          <context context-type="linenumber">49,52</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.hero.note" datatype="html">
-        <source> No card required. The free plan includes <x id="INTERPOLATION" equiv-text="{{ freePlanQuota }}"/> analyses. </source>
-        <target>Kart gerekmez. Ücretsiz plan <x id="INTERPOLATION" equiv-text="{{ freePlanQuota }}"/> analiz içerir.</target>
+      <trans-unit id="landing.preview.label" datatype="html">
+        <source>Example of the OmniHear inbox</source>
+        <target>OmniHear gelen kutusu örneği</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">80,82</context>
+          <context context-type="linenumber">57,59</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.features.title" datatype="html">
-        <source> What OmniHear does </source>
-        <target>OmniHear ne yapar</target>
+      <trans-unit id="landing.preview.title" datatype="html">
+        <source>Inbox</source>
+        <target>Gelen kutusu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">88,90</context>
+          <context context-type="linenumber">62,63</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.features.subtitle" datatype="html">
-        <source> Collection, analysis and reporting are one pipeline, so nothing is retyped between tools. </source>
-        <target>Toplama, analiz ve raporlama tek bir hattır; araçlar arasında hiçbir şey yeniden yazılmaz.</target>
+      <trans-unit id="landing.preview.today" datatype="html">
+        <source>Today</source>
+        <target>Bugün</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">91,94</context>
+          <context context-type="linenumber">63,65</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.collect.title" datatype="html">
-        <source> One inbox for every channel </source>
-        <target>Her kanal için tek gelen kutusu</target>
+      <trans-unit id="landing.preview.sample" datatype="html">
+        <source>Sample data</source>
+        <target>Örnek veri</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">101,103</context>
+          <context context-type="linenumber">67,69</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.collect.body" datatype="html">
-        <source> Store reviews, support tickets, ratings and social mentions arrive in a single stream, pulled incrementally so nothing is fetched twice. </source>
-        <target>Mağaza değerlendirmeleri, destek talepleri, puanlar ve sosyal medya bahsedişleri tek bir akışta gelir; artımlı çekildiği için hiçbir yorum iki kez alınmaz.</target>
+      <trans-unit id="landing.preview.pulled" datatype="html">
+        <source>Needs a reply</source>
+        <target>Yanıt bekliyor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">104,107</context>
+          <context context-type="linenumber">93,95</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.sentiment.title" datatype="html">
-        <source> Sentiment on every message </source>
-        <target>Her mesajda duygu analizi</target>
+      <trans-unit id="landing.sources.title" datatype="html">
+        <source>Six channels. One list.</source>
+        <target>Altı kanal. Tek liste.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">114,116</context>
+          <context context-type="linenumber">116,117</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.sentiment.body" datatype="html">
-        <source> Each comment gets a positive, neutral or negative label together with a numeric score, so a shift in mood is visible before it reaches your ratings. </source>
-        <target>Her yorum olumlu, nötr veya olumsuz etiketiyle birlikte sayısal bir skor alır; böylece havadaki değişimi puanlarınıza yansımadan önce görürsünüz.</target>
+      <trans-unit id="landing.sources.body" datatype="html">
+        <source> Connect a channel once. Collection then runs on a schedule and fetches only what is new. </source>
+        <target>Bir kanalı bir kez bağlayın. Toplama sonra zamanlanmış olarak çalışır ve yalnızca yeni olanı çeker.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">117,120</context>
+          <context context-type="linenumber">118,120</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.category.title" datatype="html">
-        <source> Sorted into what you can act on </source>
-        <target>Harekete geçebileceğiniz başlıklara ayrılmış</target>
+      <trans-unit id="landing.analysis.title" datatype="html">
+        <source>How a comment is read</source>
+        <target>Bir yorum nasıl okunur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">127,129</context>
+          <context context-type="linenumber">139,140</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.category.body" datatype="html">
-        <source> Complaint, praise, bug report or feature request: the classification routes each comment to the team that can do something about it. </source>
-        <target>Şikâyet, övgü, hata bildirimi veya özellik talebi: sınıflandırma her yorumu bu konuda bir şey yapabilecek ekibe yönlendirir.</target>
+      <trans-unit id="landing.analysis.body" datatype="html">
+        <source> Every comment gets the same three passes. The result is stored with its confidence and the model version, so any label can be traced. </source>
+        <target>Her yorum aynı üç adımdan geçer. Sonuç, güven değeri ve model sürümüyle birlikte saklanır; böylece her etiketin nereden geldiği izlenebilir.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">130,133</context>
+          <context context-type="linenumber">141,145</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.realtime.title" datatype="html">
-        <source> Results appear as they land </source>
-        <target>Sonuçlar geldikçe görünür</target>
+      <trans-unit id="landing.analysis.language.term" datatype="html">
+        <source>Language</source>
+        <target>Dil</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">140,142</context>
+          <context context-type="linenumber">162,163</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.realtime.body" datatype="html">
-        <source> Analysis runs in the background and the dashboard updates itself. No refresh, no waiting on a nightly batch. </source>
-        <target>Analiz arka planda çalışır ve panel kendini günceller. Sayfa yenilemek ya da gece toplu işini beklemek gerekmez.</target>
+      <trans-unit id="landing.analysis.language.value" datatype="html">
+        <source>English, detected</source>
+        <target>İngilizce, otomatik algılandı</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">143,146</context>
+          <context context-type="linenumber">163,165</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.isolation.title" datatype="html">
-        <source> Your data stays yours </source>
-        <target>Verileriniz size ait kalır</target>
+      <trans-unit id="landing.analysis.sentiment.term" datatype="html">
+        <source>Sentiment</source>
+        <target>Duygu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">152,154</context>
+          <context context-type="linenumber">166,168</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.isolation.body" datatype="html">
-        <source> Every record is scoped to your company at the database level, and integration credentials are stored encrypted and never written to a log. </source>
-        <target>Her kayıt veritabanı düzeyinde şirketinize bağlıdır; entegrasyon kimlik bilgileri şifreli saklanır ve hiçbir kayda yazılmaz.</target>
+      <trans-unit id="landing.analysis.sentiment.scale" datatype="html">
+        <source>On a scale from −1 to +1</source>
+        <target>&#8722;1 ile +1 arasındaki ölçekte</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">155,158</context>
+          <context context-type="linenumber">172,175</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.quota.title" datatype="html">
-        <source> Usage you can see </source>
-        <target>Görebildiğiniz kullanım</target>
+      <trans-unit id="landing.analysis.category.term" datatype="html">
+        <source>Category</source>
+        <target>Kategori</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">165,167</context>
+          <context context-type="linenumber">177,179</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feature.quota.body" datatype="html">
-        <source> Remaining analyses are shown on every screen. If the allowance runs out, incoming feedback waits in the queue rather than being dropped. </source>
-        <target>Kalan analiz hakkınız her ekranda görünür. Hak biterse gelen yorumlar silinmez, sırada bekler.</target>
+      <trans-unit id="landing.analysis.category.note" datatype="html">
+        <source>One of complaint, praise, bug or feature request</source>
+        <target>Şikâyet, övgü, hata ya da özellik isteğinden biri</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">168,171</context>
+          <context context-type="linenumber">181,184</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.integrations.title" datatype="html">
-        <source> Where the feedback comes from </source>
-        <target>Geri bildirim nereden geliyor</target>
+      <trans-unit id="landing.analysis.keywords.term" datatype="html">
+        <source>Keywords</source>
+        <target>Anahtar kelimeler</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">179,181</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.integrations.subtitle" datatype="html">
-        <source> Connect a channel once with an API key or an OAuth grant; collection then runs on a schedule. </source>
-        <target>Bir kanalı API anahtarı veya OAuth yetkisiyle bir kez bağlayın; toplama sonrasında zamanlanmış olarak çalışır.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">182,185</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.integration.appStore" datatype="html">
-        <source>App Store reviews</source>
-        <target>App Store değerlendirmeleri</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">189,192</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.integration.googlePlay" datatype="html">
-        <source>Google Play reviews</source>
-        <target>Google Play değerlendirmeleri</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">195,198</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.integration.email" datatype="html">
-        <source>Email inbox</source>
-        <target>E-posta gelen kutusu</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">209,212</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.integration.socialHashtags" datatype="html">
-        <source>Social media hashtags</source>
-        <target>Sosyal medya hashtag'leri</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">214,217</context>
+          <context context-type="linenumber">186,187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.title" datatype="html">
-        <source> Pricing </source>
-        <target>Fiyatlandırma</target>
+        <source>Pricing</source>
+        <target>Fiyatlar</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">225,227</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.pricing.subtitle" datatype="html">
-        <source> Start on the free plan. One analysis is counted once per comment, never twice. </source>
-        <target>Ücretsiz planla başlayın. Bir yorum için analiz yalnızca bir kez sayılır, asla iki kez değil.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">228,231</context>
+          <context context-type="linenumber">200,202</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.name" datatype="html">
@@ -3542,31 +3522,31 @@
         <target>Ücretsiz</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">233,234</context>
+          <context context-type="linenumber">204,205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.unit" datatype="html">
-        <source>analyses included</source>
-        <target>analiz dahil</target>
+        <source>analyses, no card required</source>
+        <target>analiz, kart gerekmez</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">235,236</context>
+          <context context-type="linenumber">207,209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item1" datatype="html">
-        <source>All channel integrations</source>
-        <target>Tüm kanal entegrasyonları</target>
+        <source>All six channels</source>
+        <target>Altı kanalın tamamı</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">239,242</context>
+          <context context-type="linenumber">212,215</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item2" datatype="html">
-        <source>Sentiment and category analysis</source>
-        <target>Duygu ve kategori analizi</target>
+        <source>Sentiment and category on every comment</source>
+        <target>Her yorumda duygu ve kategori</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">244,247</context>
+          <context context-type="linenumber">217,220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item3" datatype="html">
@@ -3574,191 +3554,175 @@
         <target>Sınırsız ekip üyesi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">249,252</context>
+          <context context-type="linenumber">222,225</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.pricing.free.cta" datatype="html">
-        <source>Start for free</source>
-        <target>Ücretsiz başlayın</target>
+      <trans-unit id="landing.pricing.free.item4" datatype="html">
+        <source>Each comment counted once, never twice</source>
+        <target>Her yorum bir kez sayılır, iki kez değil</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">259,263</context>
+          <context context-type="linenumber">227,230</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.name" datatype="html">
         <source>Pro</source>
-        <target>Pro plan</target>
+        <target>Pro</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">265</context>
+          <context context-type="linenumber">244</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.price" datatype="html">
-        <source> Announced at launch </source>
-        <target>Lansmanda duyurulacak</target>
+        <source>Price announced at launch</source>
+        <target>Fiyat lansmanda açıklanacak</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">266,268</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.pricing.pro.unit" datatype="html">
-        <source>billing is not open yet</source>
-        <target>faturalandırma henüz açık değil</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">268,269</context>
+          <context context-type="linenumber">244,245</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.item1" datatype="html">
         <source>A larger analysis allowance</source>
-        <target>Daha yüksek analiz hakkı</target>
+        <target>Daha büyük analiz kotası</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">272,274</context>
+          <context context-type="linenumber">246,247</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.item2" datatype="html">
-        <source>Queued feedback analysed automatically after an upgrade</source>
-        <target>Yükseltmeden sonra sırada bekleyen yorumların otomatik analizi</target>
+        <source>Waiting comments analysed right after the upgrade</source>
+        <target>Bekleyen yorumlar yükseltmenin hemen ardından analiz edilir</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">277,279</context>
+          <context context-type="linenumber">247,248</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.item3" datatype="html">
-        <source>Everything in the free plan</source>
+        <source>Everything in Free</source>
         <target>Ücretsiz plandaki her şey</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">282,284</context>
+          <context context-type="linenumber">248,250</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.pricing.pro.cta" datatype="html">
-        <source>Create an account to be notified</source>
-        <target>Haberdar olmak için hesap oluşturun</target>
+      <trans-unit id="landing.pricing.pro.note" datatype="html">
+        <source> Billing is not open yet. Free accounts hear about it first. </source>
+        <target>Ödeme henüz açık değil. Ücretsiz hesaplar ilk haberdar olur.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">292,295</context>
+          <context context-type="linenumber">251,253</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.title" datatype="html">
-        <source> Frequently asked questions </source>
-        <target>Sık sorulan sorular</target>
+        <source>Questions</source>
+        <target>Sorular</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">302,305</context>
+          <context context-type="linenumber">261,263</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q1" datatype="html">
-        <source> Which channels can I connect? </source>
+        <source>Which channels can I connect?</source>
         <target>Hangi kanalları bağlayabilirim?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">311,312</context>
+          <context context-type="linenumber">265,266</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a1" datatype="html">
-        <source> App Store, Google Play, Zendesk, Trustpilot, an email inbox and social media mentions. Each connection is configured separately and can be paused without losing the comments already collected. </source>
-        <target>App Store, Google Play, Zendesk, Trustpilot, bir e-posta gelen kutusu ve sosyal medya bahsedişleri. Her bağlantı ayrı ayrı yapılandırılır ve halihazırda toplanmış yorumlar kaybolmadan duraklatılabilir.</target>
+        <source> App Store, Google Play, Zendesk, Trustpilot, a JMAP e-mail inbox and a Mastodon hashtag. Each connection can be paused without losing the comments already collected. </source>
+        <target>App Store, Google Play, Zendesk, Trustpilot, bir JMAP e-posta kutusu ve bir Mastodon etiketi. Her bağlantı, toplanmış yorumlar kaybolmadan duraklatılabilir.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">314,316</context>
+          <context context-type="linenumber">267,269</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q2" datatype="html">
-        <source> How is a comment analysed? </source>
-        <target>Bir yorum nasıl analiz edilir?</target>
+        <source>Can another company see my feedback?</source>
+        <target>Başka bir şirket geri bildirimlerimi görebilir mi?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">323,324</context>
+          <context context-type="linenumber">272,273</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a2" datatype="html">
-        <source> Its language is detected first, then the text is scored for sentiment and classified into a topic. The result is stored with the confidence value and the model version that produced it, so an old analysis can always be traced. </source>
-        <target>Önce dili tespit edilir, ardından metin duygu açısından puanlanır ve bir konuya sınıflandırılır. Sonuç, güven değeri ve onu üreten model sürümüyle birlikte saklanır; böylece eski bir analiz her zaman izlenebilir.</target>
+        <source> No. Every record carries your company identifier and every query is filtered by it, so a request for a record that belongs to someone else is answered as if it did not exist. </source>
+        <target>Hayır. Her kayıt şirketinizin kimliğini taşır ve her sorgu buna göre süzülür; başkasına ait bir kayıt istendiğinde, kayıt hiç yokmuş gibi yanıt verilir.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">326,328</context>
+          <context context-type="linenumber">274,276</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q3" datatype="html">
-        <source> Can another company see my feedback? </source>
-        <target>Başka bir şirket yorumlarımı görebilir mi?</target>
+        <source>Where are channel credentials kept?</source>
+        <target>Kanal kimlik bilgileri nerede tutulur?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">336,337</context>
+          <context context-type="linenumber">279,280</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a3" datatype="html">
-        <source> No. Every record carries your company identifier and every query is filtered by it, so a request for a record that belongs to someone else is answered as if it did not exist. </source>
-        <target>Hayır. Her kayıt şirket kimliğinizi taşır ve her sorgu buna göre filtrelenir; başkasına ait bir kayıt istendiğinde yanıt, o kayıt hiç yokmuş gibi verilir.</target>
+        <source> Encrypted in the database. They are never written to a log or an error message. </source>
+        <target>Veritabanında şifreli olarak. Hiçbir zaman bir günlüğe ya da hata mesajına yazılmaz.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">339,341</context>
+          <context context-type="linenumber">281,283</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q4" datatype="html">
-        <source> What happens when the allowance runs out? </source>
-        <target>Analiz hakkı bittiğinde ne olur?</target>
+        <source>What happens when the allowance runs out?</source>
+        <target>Kota dolduğunda ne olur?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">348,349</context>
+          <context context-type="linenumber">285,286</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a4" datatype="html">
         <source> Collection continues and new comments are kept, waiting to be analysed. Nothing is deleted; once the plan is upgraded the waiting comments are analysed automatically. </source>
-        <target>Toplama devam eder ve yeni yorumlar analiz edilmeyi bekleyerek saklanır. Hiçbir şey silinmez; plan yükseltildiğinde bekleyen yorumlar otomatik olarak analiz edilir.</target>
+        <target>Toplama sürer, yeni yorumlar saklanır ve analiz sırası bekler. Hiçbir şey silinmez; plan yükseltildiğinde bekleyen yorumlar kendiliğinden analiz edilir.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">351,353</context>
+          <context context-type="linenumber">287,289</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q5" datatype="html">
-        <source> Which languages are supported? </source>
+        <source>Which languages are supported?</source>
         <target>Hangi diller destekleniyor?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">360,361</context>
+          <context context-type="linenumber">292,293</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a5" datatype="html">
         <source> Comments are analysed in the language they were written in, detected automatically. The interface itself is available in Turkish and English. </source>
-        <target>Yorumlar yazıldıkları dilde analiz edilir; dil otomatik olarak tespit edilir. Arayüzün kendisi Türkçe ve İngilizce olarak sunulur.</target>
+        <target>Yorumlar yazıldıkları dilde analiz edilir, dil otomatik algılanır. Arayüzün kendisi Türkçe ve İngilizce kullanılabilir.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">363,365</context>
+          <context context-type="linenumber">294,296</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.cta.title" datatype="html">
-        <source> Start listening to every channel today </source>
-        <target>Her kanalı dinlemeye bugün başlayın</target>
+      <trans-unit id="landing.closing.title" datatype="html">
+        <source>Start with the channel you read least.</source>
+        <target>En az baktığınız kanalla başlayın.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">374,376</context>
+          <context context-type="linenumber">307,308</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.cta.body" datatype="html">
-        <source> Connect your first channel in a few minutes and see what your customers have already told you. </source>
-        <target>İlk kanalınızı birkaç dakikada bağlayın ve müşterilerinizin size çoktan söylediklerini görün.</target>
+      <trans-unit id="landing.closing.body" datatype="html">
+        <source> Connect it in a few minutes and see what customers have already said there. </source>
+        <target>Birkaç dakikada bağlayın ve müşterilerin orada şimdiye kadar ne söylediğini görün.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">377,379</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.cta.button" datatype="html">
-        <source>Create a free account</source>
-        <target>Ücretsiz hesap oluşturun</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">380,383</context>
+          <context context-type="linenumber">309,311</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.footer.tagline" datatype="html">
-        <source>OmniHear - customer feedback intelligence</source>
-        <target>OmniHear - müşteri geri bildirimi zekâsı</target>
+        <source>Every voice. One inbox.</source>
+        <target>Her ses. Tek kutu.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">390,391</context>
+          <context context-type="linenumber">331,334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.footer.navLabel" datatype="html">
@@ -3766,24 +3730,168 @@
         <target>Alt bilgi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">392,394</context>
+          <context context-type="linenumber">337,338</context>
         </context-group>
         <note priority="1" from="description">Footer nav label</note>
       </trans-unit>
-      <trans-unit id="landing.footer.signIn" datatype="html">
-        <source>Sign in</source>
-        <target>Giriş yap</target>
+      <trans-unit id="landing.preview.sentiment.negative" datatype="html">
+        <source>Negative</source>
+        <target>Olumsuz</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">396,399</context>
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.footer.register" datatype="html">
-        <source>Create account</source>
-        <target>Hesap oluştur</target>
+      <trans-unit id="landing.preview.sentiment.neutral" datatype="html">
+        <source>Neutral</source>
+        <target>Nötr</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">402,406</context>
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.preview.sentiment.positive" datatype="html">
+        <source>Positive</source>
+        <target>Olumlu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.preview.category.complaint" datatype="html">
+        <source>Complaint</source>
+        <target>Şikâyet</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.preview.category.praise" datatype="html">
+        <source>Praise</source>
+        <target>Övgü</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.preview.category.bug" datatype="html">
+        <source>Bug</source>
+        <target>Hata</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.preview.category.featureRequest" datatype="html">
+        <source>Feature request</source>
+        <target>Özellik isteği</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.email.name" datatype="html">
+        <source>E-mail</source>
+        <target>E-posta</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.appStore.what" datatype="html">
+        <source>Customer reviews and star ratings from the public review feed.</source>
+        <target>Herkese açık yorum akışından müşteri yorumları ve yıldız puanları.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.appStore.how" datatype="html">
+        <source>No credentials</source>
+        <target>Kimlik bilgisi gerekmez</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">154</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.googlePlay.what" datatype="html">
+        <source>Reviews of your Android app, newest first.</source>
+        <target>Android uygulamanızın yorumları, en yenisi önce.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">158</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.googlePlay.how" datatype="html">
+        <source>Package name and service account</source>
+        <target>Paket adı ve servis hesabı</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.zendesk.what" datatype="html">
+        <source>Support tickets, read from the incremental export.</source>
+        <target>Destek talepleri, artımlı dışa aktarımdan okunur.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.zendesk.how" datatype="html">
+        <source>Subdomain and API token</source>
+        <target>Alt alan adı ve API belirteci</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.trustpilot.what" datatype="html">
+        <source>Reviews written about your business unit.</source>
+        <target>İşletme biriminiz hakkında yazılan yorumlar.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.trustpilot.how" datatype="html">
+        <source>Business unit ID and API key</source>
+        <target>İşletme birimi kimliği ve API anahtarı</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">169</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.email.what" datatype="html">
+        <source>Messages sent to a shared support address.</source>
+        <target>Ortak destek adresinize gönderilen iletiler.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.email.how" datatype="html">
+        <source>Any JMAP mailbox</source>
+        <target>Herhangi bir JMAP posta kutusu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.mastodon.what" datatype="html">
+        <source>Public posts under a hashtag you choose.</source>
+        <target>Seçtiğiniz etiketle paylaşılan herkese açık gönderiler.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.source.mastodon.how" datatype="html">
+        <source>A hashtag, no account</source>
+        <target>Bir etiket, hesap gerekmez</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="notFound.title" datatype="html">

@@ -51,10 +51,10 @@ describe('realtime under zoneless change detection', () => {
     });
     await fixture.whenStable();
 
-    // Scoped to the table body: the filter selects list every sentiment and
+    // Scoped to the result list: the filter selects list every sentiment and
     // status as <option> text, so a page-wide assertion would pass on the
     // filter bar rather than on the row.
-    const body = (): string => element.querySelector('tbody')?.textContent ?? '';
+    const body = (): string => element.querySelector('[data-testid="inbox-list"]')?.textContent ?? '';
 
     expect(body()).toContain('Waiting for analysis');
     expect(body()).not.toContain('Negative');
@@ -79,7 +79,8 @@ describe('realtime under zoneless change detection', () => {
     expect(body()).toContain('Negative');
     expect(body()).toContain('-0.55');
     expect(body()).toContain('Bug');
-    expect(body()).toContain('Analysed');
+    // An analysed row shows its verdict in place of a status line, so the
+    // proof that the status moved on is the pending label going away.
     expect(body()).not.toContain('Waiting for analysis');
 
     http.verify();

@@ -1,0 +1,30 @@
+// Meter tones. Only the shell renders this, so they ship in its lazy chunk.
+
+// Quiet while there is room; a tinted plate only once it needs reading.
+.qm-plate {
+  margin-inline: -0.75rem;
+  border-radius: var(--radius-md);
+  padding: 0.625rem 0.75rem;
+}
+
+.qm-exceeded {
+  background-color: var(--quota-exceeded-bg);
+  color: var(--quota-exceeded-text);
+}
+
+.qm-warning {
+  background-color: var(--quota-warning-bg);
+  color: var(--quota-warning-text);
+}
+
+.qm-bar-exceeded {
+  background-color: var(--sentiment-negative-fill);
+}
+
+.qm-bar-warning {
+  background-color: var(--category-complaint-fill);
+}
+
+.qm-bar-ok {
+  background-color: var(--sentiment-neutral-fill);
+}

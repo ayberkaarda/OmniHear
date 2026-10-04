@@ -5,6 +5,7 @@ import { AuthStore } from '../../core/auth/auth.store';
 import { QuotaStore } from '../../core/quota/quota.store';
 import { ButtonStyleDirective } from '../../shared/ui/button/button-style.directive';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
+import { LogoComponent } from '../../shared/ui/logo/logo.component';
 
 /**
  * Full-page counterpart of the paywall modal, at `/402`.
@@ -15,8 +16,9 @@ import { IconComponent } from '../../shared/ui/icon/icon.component';
  */
 @Component({
     selector: 'app-paywall-page',
-    imports: [RouterLink, ButtonStyleDirective, IconComponent],
+    imports: [RouterLink, ButtonStyleDirective, IconComponent, LogoComponent],
     templateUrl: './paywall-page.component.html',
+    styleUrl: './paywall-page.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaywallPageComponent {

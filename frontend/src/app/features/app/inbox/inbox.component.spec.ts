@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { environment } from '../../../../environments/environment';
 import { FeedbackListStore } from '../../../core/feedback/feedback-list.store';
@@ -41,16 +41,25 @@ describe('InboxComponent', () => {
     http.verify();
   });
 
-  it('shows the table skeleton while the first page is in flight', () => {
-    expect(element.querySelector('[data-testid="data-table-loading"]')).toBeTruthy();
+  it('shows the row skeleton while the first page is in flight', () => {
+    const results = () => element.querySelector('[data-testid="inbox-results"]');
+    expect(results()?.getAttribute('data-state')).toBe('loading');
+    expect(results()?.getAttribute('aria-busy')).toBe('true');
+    // The skeleton is aria-hidden, so the wait has to be announced in words.
+    const loading = element.querySelector('[data-testid="inbox-loading"]');
+    expect(loading?.textContent?.trim()).toBe('Loading data…');
+    expect(loading?.classList.contains('sr-only')).toBe(true);
+    expect(loading?.closest('[aria-hidden="true"]')).toBeNull();
     settle();
-    expect(element.querySelector('[data-testid="data-table-ready"]')).toBeTruthy();
+    expect(element.querySelector('[data-testid="inbox-loading"]')).toBeNull();
+    expect(results()?.getAttribute('data-state')).toBe('ready');
+    expect(element.querySelector('[data-testid="inbox-list"]')).toBeTruthy();
   });
 
   it('renders the label and the score for sentiment, never colour alone', () => {
     settle(makeFeedbackPage([makeFeedback()]));
 
-    const row = element.querySelector('tbody tr');
+    const row = element.querySelector('[data-testid="inbox-row"]');
     expect(row?.textContent).toContain('Negative');
     expect(row?.textContent).toContain('-0.55');
     expect(row?.textContent).toContain('App Store');
@@ -59,7 +68,7 @@ describe('InboxComponent', () => {
   it('leaves the analysis columns blank rather than inventing a neutral score', () => {
     settle(makeFeedbackPage([makeFeedback({ analysis_status: 'pending_analysis', analysis: null })]));
 
-    const row = element.querySelector('tbody tr');
+    const row = element.querySelector('[data-testid="inbox-row"]');
     expect(row?.textContent).toContain('Waiting for analysis');
     expect(row?.textContent).not.toContain('0.00');
   });
@@ -115,7 +124,7 @@ describe('InboxComponent', () => {
     http.expectOne((candidate) => candidate.url === FEEDBACKS).flush(makeFeedbackPage([], { total: 0 }));
     fixture.detectChanges();
 
-    const empty = element.querySelector('[data-testid="data-table-empty"]');
+    const empty = element.querySelector('[data-testid="inbox-empty"]');
     expect(empty?.textContent).toContain('No comment matches these filters');
 
     (empty?.querySelector('button') as HTMLButtonElement).click();
@@ -142,15 +151,13 @@ describe('InboxComponent', () => {
     fixture.detectChanges();
   });
 
-  it('navigates to the detail route when a row is activated', () => {
+  it('links every row to its detail route', () => {
     settle(makeFeedbackPage([makeFeedback({ id: 42 })]));
 
-    const router = TestBed.inject(Router);
-    const navigate = jest.spyOn(router, 'navigate').mockResolvedValue(true);
-
-    (element.querySelector('tbody tr') as HTMLElement).click();
-
-    expect(navigate).toHaveBeenCalledWith(['/app/inbox', 42]);
+    const row = element.querySelector('[data-testid="inbox-row"]') as HTMLAnchorElement;
+    // A real link, so the row opens with Enter, a middle click or a new tab.
+    expect(row.tagName).toBe('A');
+    expect(row.getAttribute('href')).toBe('/app/inbox/42');
   });
 
   it('walks pages through the contract meta', () => {

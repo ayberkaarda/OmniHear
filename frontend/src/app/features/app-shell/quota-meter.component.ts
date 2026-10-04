@@ -15,6 +15,7 @@ import { IconName } from '../../shared/ui/icon/icon.types';
     selector: 'app-quota-meter',
     imports: [IconComponent],
     templateUrl: './quota-meter.component.html',
+    styleUrl: './quota-meter.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuotaMeterComponent {
@@ -32,23 +33,24 @@ export class QuotaMeterComponent {
 
   protected readonly toneClasses = computed(() => {
     switch (this.level()) {
+      // Quiet while there is room; a tinted plate only once it needs reading.
       case 'exceeded':
-        return 'bg-[var(--quota-exceeded-bg)] text-[var(--quota-exceeded-text)]';
+        return 'qm-plate qm-exceeded';
       case 'warning':
-        return 'bg-[var(--quota-warning-bg)] text-[var(--quota-warning-text)]';
+        return 'qm-plate qm-warning';
       default:
-        return 'bg-[var(--quota-ok-bg)] text-[var(--quota-ok-text)]';
+        return 'text-[var(--text-secondary)]';
     }
   });
 
   protected readonly barClasses = computed(() => {
     switch (this.level()) {
       case 'exceeded':
-        return 'bg-[var(--sentiment-negative-fill)]';
+        return 'qm-bar-exceeded';
       case 'warning':
-        return 'bg-[var(--category-complaint-fill)]';
+        return 'qm-bar-warning';
       default:
-        return 'bg-[var(--sentiment-neutral-fill)]';
+        return 'qm-bar-ok';
     }
   });
 

@@ -22,6 +22,7 @@ import { buildCss } from './tokens-build.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_PATH = path.join(__dirname, '..', 'src', 'styles', 'tokens.json');
 const CSS_PATH = path.join(__dirname, '..', 'src', 'styles', 'tokens.css');
+const INDEX_PATH = path.join(__dirname, '..', 'src', 'index.html');
 
 // ---------------------------------------------------------------------------
 // Reporting
@@ -253,6 +254,25 @@ function runProductionDiff() {
   assertCheck(rebuilt === onDisk, `tokens.css on disk is byte-identical to a fresh build from tokens.json (${CSS_PATH})`);
   if (rebuilt !== onDisk) {
     lines.push(`  on-disk length=${onDisk.length}, rebuilt length=${rebuilt.length}`);
+  }
+
+  // index.html has to carry literal theme-color hexes for the first paint,
+  // before any stylesheet or ThemeService runs. Keep them pinned to the token.
+  let indexHtml;
+  try {
+    indexHtml = readFileSync(INDEX_PATH, 'utf8');
+  } catch (err) {
+    report('FAIL', `could not read ${INDEX_PATH}: ${err.message}`);
+    return;
+  }
+  for (const theme of THEMES) {
+    const pattern = new RegExp(`<meta name="theme-color" content="(#[0-9a-fA-F]{6})" media="\\(prefers-color-scheme: ${theme}\\)">`);
+    const match = pattern.exec(indexHtml);
+    const expected = resolveColor('bg-canvas', theme);
+    assertCheck(
+      match !== null && match[1].toLowerCase() === expected.toLowerCase(),
+      `index.html theme-color (${theme}) ${match ? match[1] : 'missing'} equals bg-canvas ${expected}`
+    );
   }
 }
 

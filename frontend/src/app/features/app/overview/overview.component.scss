@@ -1,0 +1,27 @@
+// Overview-only layout, kept in this lazy chunk instead of the global stylesheet.
+
+$xl: 1280px;
+
+.ov-kpis {
+  @media (min-width: $xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ov-wide {
+  @media (min-width: $xl) {
+    grid-column: span 2 / span 2;
+  }
+}
+
+.ov-dashed {
+  border-style: dashed;
+}
+
+.ov-list {
+  margin-inline: -0.5rem;
+}
+
+.ov-skel {
+  height: 10rem;
+}

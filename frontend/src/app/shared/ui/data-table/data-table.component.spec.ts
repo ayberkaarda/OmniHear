@@ -111,6 +111,22 @@ describe('DataTableComponent', () => {
     expect(rowEls[1].className).toContain('row-highlight');
   });
 
+  it('marks selected rows with is-selected and aria-selected', async () => {
+    await TestBed.configureTestingModule({ imports: [DataTableComponent] }).compileComponents();
+    const fixture = TestBed.createComponent<DataTableComponent<Row>>(DataTableComponent);
+    fixture.componentRef.setInput('columns', COLUMNS);
+    fixture.componentRef.setInput('rows', ROWS);
+    fixture.componentRef.setInput('selection', new Set(['r1']));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const rowEls = (fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr');
+    expect(rowEls[0].className).toContain('is-selected');
+    expect(rowEls[0].getAttribute('aria-selected')).toBe('true');
+    expect(rowEls[1].className).not.toContain('is-selected');
+    expect(rowEls[1].getAttribute('aria-selected')).toBe('false');
+  });
+
   it('emits rowActivate when a row is clicked', async () => {
     await TestBed.configureTestingModule({ imports: [DataTableComponent] }).compileComponents();
     const fixture = TestBed.createComponent<DataTableComponent<Row>>(DataTableComponent);

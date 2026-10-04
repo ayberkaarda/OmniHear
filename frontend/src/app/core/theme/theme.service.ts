@@ -20,6 +20,12 @@ const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
  * it only ever suppresses a transition, never re-enables one.
  */
 const SUPPRESS_TRANSITIONS_CLASS = 'theme-changing';
+/**
+ * The page background token. The browser chrome (`theme-color`) is painted
+ * from it so the address bar matches the canvas under it; read from computed
+ * style rather than repeated here, so `tokens.json` stays the only source.
+ */
+const CANVAS_TOKEN = '--bg-canvas';
 
 function isThemePreference(value: unknown): value is ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system';
@@ -80,6 +86,7 @@ export class ThemeService {
       const resolved = this.resolved();
       if (typeof document !== 'undefined') {
         this.applyResolvedTheme(resolved === 'dark');
+        this.applyBrowserChrome(resolved);
       }
       writeStoredPreference(this.preference());
     });
@@ -119,6 +126,29 @@ export class ThemeService {
       // SSR/test environments without rAF.
       setTimeout(removeSuppression, 0);
     }
+  }
+
+  /**
+   * Native UI (form controls, scrollbars, date pickers) follows CSS
+   * `color-scheme`, and the mobile address bar follows `theme-color`. Both
+   * are declared in index.html against the OS media query only, so a manual
+   * choice that differs from the OS would leave them on the wrong palette.
+   * Pin both to the theme the app actually resolved.
+   */
+  private applyBrowserChrome(resolved: ResolvedTheme): void {
+    const root = document.documentElement;
+    root.style.colorScheme = resolved;
+
+    const canvas =
+      typeof getComputedStyle === 'function' ? getComputedStyle(root).getPropertyValue(CANVAS_TOKEN).trim() : '';
+    if (!canvas) {
+      return;
+    }
+    // Both media-scoped tags get the same value: whichever one the browser
+    // picks, it now reports the app's theme rather than the OS one.
+    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((meta) => {
+      meta.content = canvas;
+    });
   }
 
   private watchSystemPreference(): void {

@@ -1,0 +1,18 @@
+:host { display: block; font-family: var(--font-sans); }
+.status-page { min-height: 100dvh; padding: 32px clamp(24px, 6vw, 64px) 64px; color: var(--text-primary); background: var(--bg-canvas); }
+.page-masthead { max-width: 72rem; margin-inline: auto; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+h1 { font-size: var(--font-size-4xl); line-height: var(--line-height-4xl); font-weight: 700; letter-spacing: var(--tracking-tight); text-wrap: balance; }
+a:focus-visible { outline: 2px solid var(--ring-focus); outline-offset: 2px; }
+@media (max-width: 640px) { h1 { font-size: var(--font-size-3xl); line-height: var(--line-height-3xl); } }
+.quota-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; max-width: 64rem; margin: clamp(64px, 12vh, 128px) auto 0; }
+.quota-icon { display: inline-flex; padding-bottom: 24px; color: var(--quota-exceeded-text); }
+h1 { max-width: 14ch; }
+.quota-lead { margin-top: 24px; color: var(--text-secondary); font-size: var(--font-size-base); line-height: var(--line-height-base); max-width: 45ch; }
+.quota-details { border-left: 1px solid var(--border); padding-left: 48px; align-self: stretch; }
+.quota-reading { padding-block: 24px 32px; border-block: 1px solid var(--border); }
+.quota-reading p { color: var(--text-secondary); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+.quota-count { display: block; margin-top: 16px; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--font-size-3xl); line-height: var(--line-height-3xl); font-variant-numeric: tabular-nums; color: var(--quota-exceeded-text); }
+.quota-meter { height: 4px; margin-top: 24px; background: var(--sentiment-negative-fill); }
+.quota-note { margin-block: 32px; color: var(--text-secondary); font-size: var(--font-size-base); line-height: var(--line-height-base); max-width: 45ch; }
+.quota-actions { display: flex; flex-wrap: wrap; gap: 16px; }
+@media (max-width: 767px) { .quota-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; margin-top: 48px; } .quota-details { border-left: 0; border-top: 1px solid var(--border); padding: 32px 0 0; } }

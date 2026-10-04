@@ -1,8 +1,8 @@
-<div class="flex flex-col gap-1">
-  <label [for]="fieldId" class="text-sm font-medium text-[var(--text-primary)]">
+<div class="flex flex-col gap-1.5">
+  <label [for]="fieldId" [class]="labelClasses">
     {{ label() }}
     @if (required()) {
-      <span class="text-[var(--sentiment-negative-text)]" aria-hidden="true">*</span>
+      <span class="ml-0.5 text-[var(--status-error)]" aria-hidden="true">*</span>
     }
   </label>
 
@@ -20,8 +20,11 @@
   >
 
   @if (error()) {
-    <p [id]="errorId" class="text-xs text-[var(--sentiment-negative-text)]">{{ error() }}</p>
+    <p [id]="errorId" [class]="errorClasses">
+      <app-icon class="mt-px" name="alert-triangle" size="sm" />
+      <span>{{ error() }}</span>
+    </p>
   } @else if (helper()) {
-    <p [id]="helperId" class="text-xs text-[var(--text-muted)]">{{ helper() }}</p>
+    <p [id]="helperId" [class]="helperClasses">{{ helper() }}</p>
   }
 </div>

@@ -6,9 +6,9 @@
       </p>
     }
     @case ('invalid') {
-      <div class="flex flex-col gap-4" role="status" data-testid="invitation-invalid">
+      <div class="flex flex-col gap-6" role="status" data-testid="invitation-invalid">
         <p
-          class="rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] p-4 text-sm text-[var(--sentiment-negative-text)]"
+          class="border-l-2 border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] p-4 text-sm text-[var(--sentiment-negative-text)]"
           i18n="@@auth.invitation.invalid"
         >
           This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a
@@ -18,9 +18,9 @@
     }
     @default {
       @if (invitation(); as pending) {
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-6">
           <div
-            class="flex flex-col gap-1 rounded-md bg-[var(--bg-surface-sunken)] px-3 py-2 text-sm"
+            class="flex flex-col gap-2 border-y border-[var(--border)] py-4 text-sm"
             data-testid="invitation-summary"
           >
             <p class="text-[var(--text-primary)]">
@@ -38,7 +38,7 @@
             Choose a password to finish setting up your account. Your email address is already confirmed.
           </p>
 
-          <form [formGroup]="form" class="flex flex-col gap-4" novalidate (ngSubmit)="onSubmit()">
+          <form [formGroup]="form" class="flex flex-col gap-6" novalidate (ngSubmit)="onSubmit()">
             <app-input
               formControlName="name"
               type="text"
@@ -82,7 +82,7 @@
   <p authFooter>
     <a
       routerLink="/auth/login"
-      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
       i18n="@@auth.invitation.backToLogin"
       >Already have an account? Sign in</a
     >

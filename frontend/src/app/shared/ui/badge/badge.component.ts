@@ -6,7 +6,9 @@ import { IconName } from '../icon/icon.types';
 export type BadgeKind = 'sentiment' | 'category' | 'source' | 'status';
 export type BadgeSize = 'sm' | 'md';
 
-const BASE_CLASSES = 'inline-flex items-center rounded-full border font-medium whitespace-nowrap';
+// Chips use radius-sm (4 px, Tailwind `rounded`) per docs/BRAND.md section 7;
+// radius-full is reserved for avatars and toggles.
+const BASE_CLASSES = 'inline-flex max-w-full items-center rounded border font-medium leading-none whitespace-nowrap';
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
   sm: 'h-5 px-2 text-[11px] gap-1',
@@ -42,15 +44,16 @@ const CATEGORY_ICON: Record<string, IconName> = {
   feature_request: 'lightbulb'
 };
 
-// Status tokens are single flat vars (--status-success etc.), not a {text,bg,border,fill} group,
-// so status badges are rendered as a transparent outline using that one color.
+// Status tokens are single flat vars (--status-success etc.), not a {text,bg,border,fill} group.
+// The status colour carries the text and icon (all five pass 4.5:1 on surfaces); the chip itself
+// stays quiet on the surface with a hairline, so a row of statuses does not shout.
 const STATUS_TONE: Record<string, string> = {
-  active: 'text-[var(--status-success)] border-[var(--status-success)] bg-transparent',
-  success: 'text-[var(--status-success)] border-[var(--status-success)] bg-transparent',
-  warning: 'text-[var(--status-warning)] border-[var(--status-warning)] bg-transparent',
-  error: 'text-[var(--status-error)] border-[var(--status-error)] bg-transparent',
-  info: 'text-[var(--status-info)] border-[var(--status-info)] bg-transparent',
-  paused: 'text-[var(--status-paused)] border-[var(--status-paused)] bg-transparent'
+  active: 'text-[var(--status-success)] border-[var(--border)] bg-[var(--bg-surface)]',
+  success: 'text-[var(--status-success)] border-[var(--border)] bg-[var(--bg-surface)]',
+  warning: 'text-[var(--status-warning)] border-[var(--border)] bg-[var(--bg-surface)]',
+  error: 'text-[var(--status-error)] border-[var(--border)] bg-[var(--bg-surface)]',
+  info: 'text-[var(--status-info)] border-[var(--border)] bg-[var(--bg-surface)]',
+  paused: 'text-[var(--status-paused)] border-[var(--border)] bg-[var(--bg-surface)]'
 };
 
 const STATUS_ICON: Record<string, IconName> = {

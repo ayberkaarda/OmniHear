@@ -24,6 +24,10 @@ describe('HealthComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('[data-testid="health-success"]')).toBeTruthy();
+    expect(compiled.querySelector('main#main-content')).toBeTruthy();
+    expect(compiled.querySelector('app-logo')).toBeTruthy();
+    expect(compiled.querySelector('[role="status"]')?.getAttribute('aria-live')).toBe('polite');
+    expect(compiled.querySelector('[role="status"]')?.getAttribute('aria-busy')).toBe('false');
     expect(healthServiceMock.getHealth).toHaveBeenCalledTimes(1);
   });
 

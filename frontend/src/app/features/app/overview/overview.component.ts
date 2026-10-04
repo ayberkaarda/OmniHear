@@ -12,6 +12,7 @@ import { FeedbackListStore } from '../../../core/feedback/feedback-list.store';
 import { OverviewStore } from '../../../core/overview/overview.store';
 import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { KpiCardComponent } from '../../../shared/ui/kpi-card/kpi-card.component';
 import { formatCount, formatPercent } from '../../../shared/format/format';
 import { categoryLabel, sentimentLabel } from '../../../shared/labels/domain-labels';
@@ -31,7 +32,7 @@ interface Segment<T extends string> {
   readonly fillVar: string;
 }
 
-/** Sentiment fills only. A magnitude bar that carries no sentiment stays neutral brand. */
+/** Sentiment fills only. A magnitude bar that carries no sentiment stays neutral ink. */
 const SENTIMENT_FILL: Readonly<Record<SentimentLabel, string>> = {
   negative: 'var(--sentiment-negative-fill)',
   neutral: 'var(--sentiment-neutral-fill)',
@@ -55,8 +56,9 @@ const NEUTRAL_FILL = 'var(--brand)';
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [KpiCardComponent, BadgeComponent, ButtonComponent, SentimentTrendComponent],
+  imports: [KpiCardComponent, BadgeComponent, ButtonComponent, IconComponent, SentimentTrendComponent],
   templateUrl: './overview.component.html',
+  styleUrl: './overview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OverviewComponent {

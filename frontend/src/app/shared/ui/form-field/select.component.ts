@@ -3,7 +3,15 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { IconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon.types';
-import { FormFieldSize, nextFieldId, SIZE_INPUT_CLASSES } from './form-field-base';
+import {
+  controlClasses,
+  ERROR_CLASSES,
+  FormFieldSize,
+  HELPER_CLASSES,
+  LABEL_CLASSES,
+  nextFieldId,
+  SIZE_INPUT_CLASSES
+} from './form-field-base';
 
 export interface SelectOption {
   value: string;
@@ -39,6 +47,10 @@ export class SelectComponent implements ControlValueAccessor {
   readonly placeholder = input<string | undefined>(undefined);
 
   readonly blurred = output<void>();
+
+  protected readonly labelClasses = LABEL_CLASSES;
+  protected readonly helperClasses = HELPER_CLASSES;
+  protected readonly errorClasses = ERROR_CLASSES;
 
   protected readonly fieldId = nextFieldId('app-select');
   protected readonly errorId = `${this.fieldId}-error`;
@@ -81,14 +93,8 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   protected readonly selectClasses = computed(() => {
-    const base =
-      'w-full appearance-none rounded-md border bg-[var(--bg-surface)] text-[var(--text-primary)] ' +
-      'transition-colors pr-9 ' +
-      'focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)] ' +
-      'disabled:opacity-50 disabled:cursor-not-allowed';
-    const borderColor = this.error() ? 'border-[var(--sentiment-negative-border)]' : 'border-[var(--border)]';
     const padding = this.prefixIcon() ? 'pl-9' : '';
-    return [base, borderColor, SIZE_INPUT_CLASSES[this.size()], padding].join(' ');
+    return [controlClasses(!!this.error()), 'appearance-none cursor-pointer pr-9', SIZE_INPUT_CLASSES[this.size()], padding].join(' ');
   });
 
   protected readonly prefixIconName = computed(() => this.prefixIcon() as IconName | undefined);

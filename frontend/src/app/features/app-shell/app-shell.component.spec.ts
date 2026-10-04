@@ -84,4 +84,69 @@ describe('AppShellComponent', () => {
     expect(stop).toHaveBeenCalled();
     http.expectOne(LOGOUT).flush(null, { status: 204, statusText: 'No Content' });
   });
+
+  describe('phone account sheet', () => {
+    async function openSheet() {
+      TestBed.inject(AuthStore).setSession('1|abc', makeUser(), makeCompany());
+      const fixture = TestBed.createComponent(AppShellComponent);
+      document.body.appendChild(fixture.nativeElement);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const element = fixture.nativeElement as HTMLElement;
+      const trigger = element.querySelector('button[aria-controls="shell-account-sheet"]') as HTMLButtonElement;
+      trigger.focus();
+      trigger.click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const sheet = element.querySelector('#shell-account-sheet') as HTMLElement;
+      return { fixture, element, trigger, sheet };
+    }
+
+    it('opens as a modal dialog, takes focus and makes the page behind it inert', async () => {
+      const { fixture, element, sheet } = await openSheet();
+
+      expect(sheet.getAttribute('role')).toBe('dialog');
+      expect(sheet.getAttribute('aria-modal')).toBe('true');
+      expect(element.querySelector(`#${sheet.getAttribute('aria-labelledby')}`)?.textContent).toContain(makeUser().name);
+      expect(sheet.contains(document.activeElement)).toBe(true);
+      for (const selector of ['main', 'header', '[data-testid="shell-tabbar"]', '[data-testid="shell-rail"]']) {
+        expect(element.querySelector(selector)?.hasAttribute('inert')).toBe(true);
+      }
+
+      fixture.destroy();
+    });
+
+    it('keeps Tab inside the sheet, wrapping at either end', async () => {
+      const { fixture, sheet } = await openSheet();
+      const focusable = Array.from(sheet.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]'));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      last.focus();
+      sheet.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+      expect(document.activeElement).toBe(first);
+
+      first.focus();
+      sheet.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
+      expect(document.activeElement).toBe(last);
+
+      fixture.destroy();
+    });
+
+    it('closes on Escape, lifts inert and returns focus to the avatar that opened it', async () => {
+      const { fixture, element, trigger } = await openSheet();
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(element.querySelector('#shell-account-sheet')).toBeNull();
+      expect(element.querySelector('main')?.hasAttribute('inert')).toBe(false);
+      expect(document.activeElement).toBe(trigger);
+
+      fixture.destroy();
+    });
+  });
 });

@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, output } f
 
 import {
   BUTTON_BASE_CLASSES,
+  BUTTON_DISABLED_CLASSES,
   BUTTON_ICON_ONLY_SIZE_CLASSES,
+  BUTTON_LOADING_CLASSES,
   BUTTON_SIZE_CLASSES,
   BUTTON_VARIANT_CLASSES,
   ButtonSize,
@@ -15,7 +17,7 @@ export type ButtonType = 'button' | 'submit';
 const SPINNER_SIZE_CLASSES: Record<ButtonSize, string> = {
   sm: 'w-3.5 h-3.5',
   md: 'w-4 h-4',
-  lg: 'w-5 h-5'
+  lg: 'w-[18px] h-[18px]'
 };
 
 @Component({
@@ -39,7 +41,12 @@ export class ButtonComponent {
 
   protected readonly classes = computed(() => {
     const sizeClasses = this.iconOnly() ? BUTTON_ICON_ONLY_SIZE_CLASSES[this.size()] : BUTTON_SIZE_CLASSES[this.size()];
-    return [BUTTON_BASE_CLASSES, BUTTON_VARIANT_CLASSES[this.variant()], sizeClasses].join(' ');
+    const stateClasses = this.loading()
+      ? BUTTON_LOADING_CLASSES
+      : this.disabled()
+        ? BUTTON_DISABLED_CLASSES[this.variant()]
+        : '';
+    return [BUTTON_BASE_CLASSES, BUTTON_VARIANT_CLASSES[this.variant()], sizeClasses, stateClasses].join(' ').trim();
   });
 
   protected readonly spinnerClasses = computed(() => SPINNER_SIZE_CLASSES[this.size()]);

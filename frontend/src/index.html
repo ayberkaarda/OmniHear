@@ -2,10 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Frontend</title>
+  <title>OmniHear</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="description" content="Every voice. One inbox. App Store, Google Play, Zendesk, Trustpilot, e-mail and Mastodon feedback in one list, each comment read, scored and sorted.">
+  <meta name="color-scheme" content="light dark">
+  <!-- Literal hexes for the first paint; must equal bg-canvas in styles/tokens.json
+       (npm run tokens:check enforces it). ThemeService repaints both from the
+       token once the app resolves a manual theme choice. -->
+  <meta name="theme-color" content="#f1f3f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101210" media="(prefers-color-scheme: dark)">
+
+  <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OmniHear">
+  <meta property="og:title" content="OmniHear: every voice, one inbox">
+  <meta property="og:description" content="Customer feedback from six channels in one list, each comment read, scored and sorted.">
+  <meta property="og:image" content="/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The OmniHear sliced-disc mark beside the line: Every voice. One inbox.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OmniHear: every voice, one inbox">
+  <meta name="twitter:description" content="Customer feedback from six channels in one list, each comment read, scored and sorted.">
+  <meta name="twitter:image" content="/og-image.png">
 
   <!--
     No third-party font host. IBM Plex used to be pulled from
@@ -33,8 +56,10 @@
         if (isDark) {
           document.documentElement.classList.add('dark');
         }
+        // Native controls follow the resolved theme, not only the OS one.
+        document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
       } catch (e) {
-        // Ignore — worst case is a light-theme first paint that ThemeService corrects.
+        // Ignore: worst case is a light-theme first paint that ThemeService corrects.
       }
     })();
   </script>

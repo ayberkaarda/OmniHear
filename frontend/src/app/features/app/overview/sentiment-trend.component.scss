@@ -1,0 +1,44 @@
+// Trend-only sizing, kept in this lazy chunk instead of the global stylesheet.
+
+$sm: 640px;
+$xl: 1280px;
+
+.tr-skel {
+  height: 14rem;
+}
+
+.tr-scroll {
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.tr-cell {
+  padding: 0.375rem 0.5rem;
+}
+
+.tr-day {
+  font-weight: 400;
+}
+
+// Bottom inset of the y-axis ticks matches the x-axis label row below the chart.
+.tr-ticks {
+  padding-bottom: 1.75rem;
+}
+
+.tr-chart {
+  height: 12rem;
+
+  @media (min-width: $sm) {
+    height: 14rem;
+  }
+
+  @media (min-width: $xl) {
+    flex: 1 1 0%;
+    height: 100%;
+    min-height: 14rem;
+  }
+}
+
+.tr-pt {
+  padding-top: 0.5rem;
+}

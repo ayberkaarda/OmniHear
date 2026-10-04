@@ -1,83 +1,94 @@
-<section class="flex flex-col gap-4">
-  <header class="flex flex-wrap items-start justify-between gap-3">
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+  <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
     <div class="flex flex-col gap-1">
-      <h1 class="text-xl font-semibold tracking-tight text-[var(--text-primary)]" i18n="@@app.integrations.title">
+      <h1 class="text-2xl font-semibold tracking-display text-[var(--text-primary)]" i18n="@@app.integrations.title">
         Integrations
       </h1>
-      <p class="text-sm text-[var(--text-secondary)]" i18n="@@app.integrations.subtitle">
+      <p class="max-w-[65ch] text-sm text-[var(--text-secondary)]" i18n="@@app.integrations.subtitle">
         Connect a channel and follow the health of each connection.
       </p>
     </div>
-    <app-button (pressed)="openCreate()">{{ connectLabel }}</app-button>
+    <app-button (pressed)="openCreate()">
+      <app-icon name="plus" size="sm" />
+      {{ connectLabel }}
+    </app-button>
   </header>
 
   @if (errorMessage(); as message) {
     <div
-      class="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
+      class="flex flex-wrap items-center gap-3 rounded-card border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
       role="alert"
       data-testid="integrations-error"
     >
+      <app-icon name="alert-triangle" size="sm" />
       <span class="flex-1">{{ message }}</span>
       <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
     </div>
   }
 
   @if (loading()) {
-    <div class="grid gap-3 md:grid-cols-2" data-testid="integrations-skeleton" aria-busy="true">
+    <div
+      class="divide-y divide-[var(--border)] rounded-card border border-[var(--border)] bg-[var(--bg-surface)]"
+      data-testid="integrations-skeleton"
+      aria-busy="true"
+    >
       <span class="sr-only" i18n="Integrations loading announcement@@integrations.loading">Loading connections…</span>
-      <span class="h-40 animate-pulse rounded-lg bg-[var(--bg-surface-sunken)]"></span>
-      <span class="h-40 animate-pulse rounded-lg bg-[var(--bg-surface-sunken)]"></span>
+      @for (placeholder of [0, 1]; track placeholder) {
+        <div class="flex flex-col gap-3 px-5 py-5" aria-hidden="true">
+          <span class="h-4 w-32 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+          <span class="h-3.5 w-64 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+        </div>
+      }
     </div>
   } @else if (isEmpty()) {
     <app-empty-state icon="link" [heading]="emptyHeading" [description]="emptyDescription" />
   } @else {
-    <ul class="grid gap-3 md:grid-cols-2">
+    <!-- One line per connection: who it is, how it is doing, what you can do to it. -->
+    <ul class="divide-y divide-[var(--border)] rounded-card border border-[var(--border)] bg-[var(--bg-surface)]">
       @for (integration of items(); track integration.id) {
-        <li class="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <h2 class="text-sm font-semibold text-[var(--text-primary)]">{{ platformLabelOf(integration) }}</h2>
-            <app-badge kind="status" [value]="integration.status" size="sm" />
+        <li
+          class="flex flex-col gap-4 px-5 py-5 lg:grid lg:grid-cols-3 lg:items-center lg:gap-x-8"
+          data-testid="integration-row"
+        >
+          <div class="flex min-w-0 flex-col gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="text-base font-semibold text-[var(--text-primary)]">{{ platformLabelOf(integration) }}</h2>
+              <span class="font-mono text-xs text-[var(--text-muted)]">#{{ integration.id }}</span>
+              <app-badge kind="status" [value]="integration.status" size="sm" />
+            </div>
+
+            @if (settingsOf(integration).length > 0) {
+              <dl class="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+                @for (setting of settingsOf(integration); track setting.key) {
+                  <div class="flex min-w-0 gap-1.5">
+                    <dt class="shrink-0 text-[var(--text-muted)]">{{ setting.label }}</dt>
+                    <dd class="min-w-0 truncate font-mono text-[var(--text-secondary)]">{{ setting.value }}</dd>
+                  </div>
+                }
+              </dl>
+            }
           </div>
 
-          <dl class="flex flex-col gap-1 text-xs">
-            @for (setting of settingsOf(integration); track setting.key) {
-              <div class="flex gap-2">
-                <dt class="text-[var(--text-muted)]">{{ setting.label }}</dt>
-                <dd class="min-w-0 truncate text-[var(--text-secondary)]">{{ setting.value }}</dd>
-              </div>
-            }
-            <div class="flex gap-2">
+          <dl class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
+            <div class="flex flex-col gap-1">
               <dt class="text-[var(--text-muted)]" i18n="Integration card field@@integrations.card.lastSynced">
                 Last sync
               </dt>
-              <dd class="tabular-nums text-[var(--text-secondary)]">{{ lastSynced(integration) }}</dd>
+              <dd class="font-mono tabular-nums text-[var(--text-primary)]">{{ lastSynced(integration) }}</dd>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-col gap-1">
               <dt class="text-[var(--text-muted)]" i18n="Integration card field@@integrations.card.collected">
                 Comments collected
               </dt>
-              <dd class="tabular-nums text-[var(--text-secondary)]">{{ feedbackCount(integration) }}</dd>
+              <dd class="font-mono tabular-nums text-[var(--text-primary)]">{{ feedbackCount(integration) }}</dd>
             </div>
           </dl>
 
-          @if (integration.sync_error) {
-            <p
-              class="rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-2.5 py-2 text-xs text-[var(--sentiment-negative-text)]"
-              role="status"
-              data-testid="integration-sync-error"
-            >
-              <span class="font-medium" i18n="Label above the last sync failure message@@integrations.card.syncError">
-                Last run failed:
-              </span>
-              {{ integration.sync_error }}
-            </p>
-          }
-
-          <div class="mt-auto flex flex-wrap gap-2 pt-1">
-            <app-button size="sm" [loading]="isSyncing(integration)" (pressed)="onSync(integration)">
+          <div class="flex flex-wrap items-center gap-2 lg:justify-end">
+            <app-button variant="secondary" size="sm" [loading]="isSyncing(integration)" (pressed)="onSync(integration)">
               {{ syncLabel }}
             </app-button>
-            <app-button variant="secondary" size="sm" (pressed)="openEdit(integration)">{{ editLabel }}</app-button>
+            <app-button variant="ghost" size="sm" (pressed)="openEdit(integration)">{{ editLabel }}</app-button>
             <app-button
               variant="ghost"
               size="sm"
@@ -87,6 +98,22 @@
               {{ removeLabel }}
             </app-button>
           </div>
+
+          @if (integration.sync_error) {
+            <p
+              class="flex items-start gap-2 rounded-control border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-xs text-[var(--sentiment-negative-text)] lg:col-span-3"
+              role="status"
+              data-testid="integration-sync-error"
+            >
+              <span class="mt-px flex"><app-icon name="alert-triangle" size="sm" /></span>
+              <span>
+                <span class="font-medium" i18n="Label above the last sync failure message@@integrations.card.syncError">
+                  Last run failed:
+                </span>
+                {{ integration.sync_error }}
+              </span>
+            </p>
+          }
         </li>
       }
     </ul>
