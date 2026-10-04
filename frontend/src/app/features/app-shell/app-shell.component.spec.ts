@@ -76,13 +76,59 @@ describe('AppShellComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const signOut = Array.from(element.querySelectorAll('button')).find(
+    // Sign out lives in the account dialog, at every width.
+    (element.querySelector('[data-testid="shell-account-trigger"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const signOut = Array.from(element.querySelectorAll('[data-testid="shell-account-sheet"] button')).find(
       (button) => button.getAttribute('aria-label') === 'Sign out'
     ) as HTMLButtonElement;
     signOut.click();
 
     expect(stop).toHaveBeenCalled();
     http.expectOne(LOGOUT).flush(null, { status: 204, statusText: 'No Content' });
+  });
+
+  /**
+   * The company name is drawn once. A second, CSS-hidden copy for another
+   * breakpoint made `getByText(company)` in the E2E journey resolve to two
+   * elements; responsive CSS now moves the single one instead.
+   */
+  it('renders the company name exactly once', async () => {
+    TestBed.inject(AuthStore).setSession('1|abc', makeUser(), makeCompany());
+    const fixture = TestBed.createComponent(AppShellComponent);
+    const element = fixture.nativeElement as HTMLElement;
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const name = makeCompany().name;
+    const holders = Array.from(element.querySelectorAll('*')).filter(
+      (node) => node.children.length === 0 && (node.textContent ?? '').includes(name)
+    );
+    expect(holders).toHaveLength(1);
+    expect(holders[0].getAttribute('data-testid')).toBe('shell-company');
+  });
+
+  it('marks the view you are on and offers search from the command bar', async () => {
+    TestBed.inject(AuthStore).setSession('1|abc', makeUser(), makeCompany());
+    const fixture = TestBed.createComponent(AppShellComponent);
+    const element = fixture.nativeElement as HTMLElement;
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const views = element.querySelector('[data-testid="shell-views"]');
+    expect(views?.getAttribute('aria-label')).toBe('Primary');
+    expect(Array.from(views?.querySelectorAll('a') ?? []).map((link) => link.getAttribute('href'))).toEqual([
+      '/app/inbox',
+      '/app/overview',
+      '/app/integrations',
+      '/app/settings'
+    ]);
+
+    const command = element.querySelector('[data-testid="shell-command"]');
+    expect(command?.getAttribute('aria-label')).toBe('Search comments');
+    expect(command?.getAttribute('aria-keyshortcuts')).toContain('Control+K');
   });
 
   describe('phone account sheet', () => {
@@ -111,7 +157,7 @@ describe('AppShellComponent', () => {
       expect(sheet.getAttribute('aria-modal')).toBe('true');
       expect(element.querySelector(`#${sheet.getAttribute('aria-labelledby')}`)?.textContent).toContain(makeUser().name);
       expect(sheet.contains(document.activeElement)).toBe(true);
-      for (const selector of ['main', 'header', '[data-testid="shell-tabbar"]', '[data-testid="shell-rail"]']) {
+      for (const selector of ['main', 'header', '[data-testid="shell-tabbar"]', '[data-testid="shell-views"]']) {
         expect(element.querySelector(selector)?.hasAttribute('inert')).toBe(true);
       }
 

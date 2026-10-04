@@ -62,6 +62,7 @@ type DialogMode = 'none' | 'create' | 'edit' | 'delete';
     ModalComponent
   ],
   templateUrl: './integrations.component.html',
+  styleUrls: ['./integrations.component.scss', './integrations-rows.scss', './integrations-extra.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IntegrationsComponent implements OnInit, OnDestroy {

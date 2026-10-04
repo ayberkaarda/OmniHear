@@ -1,26 +1,26 @@
 @if (limit() !== null && remaining() !== null) {
-  <div [class]="toneClasses() + ' flex flex-col gap-2'" data-testid="quota-meter">
-    <p class="flex items-baseline gap-1.5 text-xs">
-      <span class="flex self-center"><app-icon [name]="levelIcon()" size="sm" /></span>
-      <span class="font-medium" i18n="@@shell.quota.title">Analyses</span>
-      <span class="ml-auto font-mono tabular-nums">{{ used() }}<span class="text-[var(--text-muted)]"> / {{ limit() }}</span></span>
+  <div class="qm" [class.qm-compact]="compact()" [attr.data-level]="level()" data-testid="quota-meter">
+    <p class="qm-line">
+      @if (level() !== 'ok') {
+        <span class="qm-icon"><app-icon [name]="levelIcon()" size="sm" /></span>
+      }
+      <span class="qm-title" i18n="@@shell.quota.title">Analyses</span>
+      <span class="qm-num">{{ used() }}<span class="qm-of"> / {{ limit() }}</span></span>
     </p>
 
     <div
-      class="h-1 w-full overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]"
+      class="qm-track"
       role="progressbar"
       [attr.aria-label]="meterLabel"
       [attr.aria-valuenow]="percentUsed()"
       aria-valuemin="0"
       aria-valuemax="100"
     >
-      <div [class]="barClasses() + ' h-full rounded-full'" [style.width.%]="percentUsed()"></div>
+      <div class="qm-fill" [style.width.%]="percentUsed()"></div>
     </div>
 
-    <p class="text-xs text-[var(--text-muted)]">
-      <span i18n="@@shell.quota.remaining">Remaining:</span>&ngsp;<span class="font-mono font-medium tabular-nums text-[var(--text-secondary)]">{{
-        remaining()
-      }}</span>
+    <p class="qm-rest">
+      <span i18n="@@shell.quota.remaining">Remaining:</span>&ngsp;<span class="qm-rest-num">{{ remaining() }}</span>
     </p>
   </div>
 }

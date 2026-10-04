@@ -1,57 +1,52 @@
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
-  <h1 class="text-2xl font-semibold tracking-display text-[var(--text-primary)]" i18n="@@app.settings.title">Settings</h1>
+<div class="st">
+  <h1 class="st-title" i18n="@@app.settings.title">Settings</h1>
 
-  <!-- One strip of tabs under the title, lit with the same lamp as the rail.
-       On a phone it scrolls sideways rather than wrapping. -->
-  <nav class="-mx-4 flex gap-1 overflow-x-auto border-b border-[var(--border)] px-4 lg:mx-0 lg:px-0" [attr.aria-label]="navLabel">
+  <!-- Sections as text tabs, the same idiom as the views in the top bar; the
+       marker lands on the one you are in. On a phone they scroll sideways. -->
+  <nav class="st-tabs" [attr.aria-label]="navLabel">
     <a
       routerLink="/app/settings/profile"
-      routerLinkActive=""
+      routerLinkActive="st-tab-on"
       #profile="routerLinkActive"
       [attr.aria-current]="profile.isActive ? 'page' : null"
-      [class]="linkClasses(profile.isActive)"
-      ><span i18n="@@app.settings.nav.profile">Profile</span
-      ><span class="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[var(--signal)]" [class.opacity-0]="!profile.isActive" aria-hidden="true"></span
-    ></a>
+      class="st-tab"
+      ><span class="st-tab-text" i18n="@@app.settings.nav.profile">Profile</span></a
+    >
     <a
       routerLink="/app/settings/team"
-      routerLinkActive=""
+      routerLinkActive="st-tab-on"
       #team="routerLinkActive"
       [attr.aria-current]="team.isActive ? 'page' : null"
-      [class]="linkClasses(team.isActive)"
-      ><span i18n="@@app.settings.nav.team">Team</span
-      ><span class="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[var(--signal)]" [class.opacity-0]="!team.isActive" aria-hidden="true"></span
-    ></a>
+      class="st-tab"
+      ><span class="st-tab-text" i18n="@@app.settings.nav.team">Team</span></a
+    >
     <a
       routerLink="/app/settings/billing"
-      routerLinkActive=""
+      routerLinkActive="st-tab-on"
       #billing="routerLinkActive"
       [attr.aria-current]="billing.isActive ? 'page' : null"
-      [class]="linkClasses(billing.isActive)"
-      ><span i18n="@@app.settings.nav.billing">Billing</span
-      ><span class="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[var(--signal)]" [class.opacity-0]="!billing.isActive" aria-hidden="true"></span
-    ></a>
+      class="st-tab"
+      ><span class="st-tab-text" i18n="@@app.settings.nav.billing">Billing</span></a
+    >
     <a
       routerLink="/app/settings/api-keys"
-      routerLinkActive=""
+      routerLinkActive="st-tab-on"
       #apikeys="routerLinkActive"
       [attr.aria-current]="apikeys.isActive ? 'page' : null"
-      [class]="linkClasses(apikeys.isActive)"
-      ><span i18n="@@app.settings.nav.apiKeys">API keys</span
-      ><span class="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[var(--signal)]" [class.opacity-0]="!apikeys.isActive" aria-hidden="true"></span
-    ></a>
+      class="st-tab"
+      ><span class="st-tab-text" i18n="@@app.settings.nav.apiKeys">API keys</span></a
+    >
     <a
       routerLink="/app/settings/notifications"
-      routerLinkActive=""
+      routerLinkActive="st-tab-on"
       #notifications="routerLinkActive"
       [attr.aria-current]="notifications.isActive ? 'page' : null"
-      [class]="linkClasses(notifications.isActive)"
-      ><span i18n="@@app.settings.nav.notifications">Notifications</span
-      ><span class="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[var(--signal)]" [class.opacity-0]="!notifications.isActive" aria-hidden="true"></span
-    ></a>
+      class="st-tab"
+      ><span class="st-tab-text" i18n="@@app.settings.nav.notifications">Notifications</span></a
+    >
   </nav>
 
-  <div class="min-w-0 max-w-3xl">
+  <div class="st-body">
     <router-outlet />
   </div>
 </div>

@@ -1,0 +1,45 @@
+// Three flat segments on one hairline. The chosen one carries the marker.
+
+.tt {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.tt-opt {
+  height: 2.125rem;
+  padding-inline: 0.625rem;
+  border: 0;
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+
+  & + & {
+    border-left: 1px solid var(--border);
+  }
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring-focus);
+    outline-offset: 2px;
+  }
+
+  &[aria-pressed='true'] {
+    background-color: var(--brand);
+    color: var(--brand-on);
+  }
+}

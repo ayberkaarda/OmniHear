@@ -1,0 +1,40 @@
+// integrations: continued from integrations.component.scss, split so each
+// component stylesheet stays inside the per-file style budget.
+
+$md: 768px;
+$lg: 1024px;
+
+// ---- Dialog contents ------------------------------------------------------------
+
+.it-note {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.it-modal-alert {
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--sentiment-negative-fill);
+  background-color: var(--sentiment-negative-bg);
+  color: var(--sentiment-negative-text);
+  font-size: var(--font-size-sm);
+}
+
+.it-secrets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-surface-sunken);
+}
+
+.it-secrets-hint {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.it-prompt {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}

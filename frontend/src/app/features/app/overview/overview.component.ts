@@ -10,11 +10,9 @@ import {
 } from '../../../core/feedback/feedback.models';
 import { FeedbackListStore } from '../../../core/feedback/feedback-list.store';
 import { OverviewStore } from '../../../core/overview/overview.store';
-import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
-import { KpiCardComponent } from '../../../shared/ui/kpi-card/kpi-card.component';
-import { formatCount, formatPercent } from '../../../shared/format/format';
+import { formatCount, formatPercent, formatScore } from '../../../shared/format/format';
 import { categoryLabel, sentimentLabel } from '../../../shared/labels/domain-labels';
 import { SentimentTrendComponent } from './sentiment-trend.component';
 
@@ -39,7 +37,7 @@ const SENTIMENT_FILL: Readonly<Record<SentimentLabel, string>> = {
   positive: 'var(--sentiment-positive-fill)'
 };
 
-const NEUTRAL_FILL = 'var(--brand)';
+const NEUTRAL_FILL = 'var(--text-secondary)';
 
 /**
  * `/app/overview` — the KPI aggregate of `GET /api/v1/overview/kpis`.
@@ -48,17 +46,16 @@ const NEUTRAL_FILL = 'var(--brand)';
  * loading state and a single error state; a per-card spinner would suggest the
  * cards are independently refreshable, which they are not.
  *
- * The cards and the breakdown rows are navigation, not decoration: each one
+ * The figures and the breakdown rows are navigation, not decoration: each one
  * seeds `FeedbackListStore` with the matching filter and moves to the inbox.
- * `shared/ui/kpi-card` renders as a `<button>`, so a card that did nothing on
- * activation would be a focusable control with no behaviour.
+ * They are `<button>`s, so each one does exactly that on activation.
  */
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [KpiCardComponent, BadgeComponent, ButtonComponent, IconComponent, SentimentTrendComponent],
+  imports: [ButtonComponent, IconComponent, SentimentTrendComponent],
   templateUrl: './overview.component.html',
-  styleUrl: './overview.component.scss',
+  styleUrls: ['./overview.component.scss', './overview-figures.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OverviewComponent {
@@ -105,6 +102,32 @@ export class OverviewComponent {
     return FEEDBACK_CATEGORIES.map((key) => toSegment(key, categoryLabel(key), breakdown[key], total, NEUTRAL_FILL));
   });
 
+  /** The four figures across the top, already formatted. */
+  protected readonly figures = computed(() => {
+    const kpis = this.kpis();
+    return {
+      total: formatCount(kpis?.total_feedbacks),
+      analysed: formatCount(kpis?.analyzed_count),
+      pending: formatCount(kpis?.pending_analysis_count),
+      average: formatScore(kpis?.average_sentiment),
+      averageTone: toneOf(kpis?.average_sentiment ?? null)
+    };
+  });
+
+  /** Share of collected comments already analysed, for the bar under that figure. */
+  protected readonly analysedShare = computed(() => {
+    const kpis = this.kpis();
+    if (!kpis || kpis.total_feedbacks === 0) {
+      return 0;
+    }
+    return Math.min(100, (kpis.analyzed_count / kpis.total_feedbacks) * 100);
+  });
+
+  /** The largest category, which the bars are scaled against. */
+  protected readonly categoryMax = computed(() =>
+    Math.max(1, ...this.categorySegments().map((segment) => segment.count))
+  );
+
   protected readonly quotaUsedLabel = computed(() => {
     const quota = this.kpis()?.quota;
     if (!quota) {
@@ -150,6 +173,17 @@ export class OverviewComponent {
     this.inbox.setFilters({ category, sentiment: null, analysis_status: null });
     void this.router.navigate(['/app/inbox']);
   }
+}
+
+/** Same narrow neutral band the trend chart uses around zero. */
+function toneOf(score: number | null): SentimentLabel | 'pending' {
+  if (score === null) {
+    return 'pending';
+  }
+  if (score > 0.05) {
+    return 'positive';
+  }
+  return score < -0.05 ? 'negative' : 'neutral';
 }
 
 function toSegment<T extends string>(

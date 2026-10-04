@@ -160,6 +160,49 @@ describe('InboxComponent', () => {
     expect(row.getAttribute('href')).toBe('/app/inbox/42');
   });
 
+  it('marks the phrase the analyser keyed on, without changing the words', () => {
+    settle(makeFeedbackPage([makeFeedback()]));
+
+    const quote = element.querySelector('[data-testid="inbox-row"] mark.marker');
+    expect(quote?.textContent).toBe('crash');
+    expect(element.querySelector('[data-testid="inbox-row"]')?.textContent).toContain(
+      'The app crashes every time I try to sign in.'
+    );
+  });
+
+  it('turns a one-tap view into the same filter request, and back off', () => {
+    settle();
+
+    const bug = Array.from(element.querySelectorAll<HTMLButtonElement>('[data-testid="inbox-quick-views"] button')).find(
+      (button) => button.textContent?.trim() === 'Bug'
+    ) as HTMLButtonElement;
+    bug.click();
+    http.expectOne((candidate) => candidate.params.get('category') === 'bug').flush(makeFeedbackPage());
+    fixture.detectChanges();
+    expect(bug.getAttribute('aria-pressed')).toBe('true');
+
+    bug.click();
+    const cleared = http.expectOne((candidate) => candidate.url === FEEDBACKS);
+    expect(cleared.request.params.has('category')).toBe(false);
+    cleared.flush(makeFeedbackPage());
+    fixture.detectChanges();
+    expect(bug.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('walks the rows with J and K', () => {
+    document.body.appendChild(element);
+    settle(makeFeedbackPage([makeFeedback({ id: 1 }), makeFeedback({ id: 2 })]));
+    const rows = Array.from(element.querySelectorAll<HTMLElement>('[data-testid="inbox-row"]'));
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'j', bubbles: true }));
+    expect(document.activeElement).toBe(rows[0]);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'j', bubbles: true }));
+    expect(document.activeElement).toBe(rows[1]);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
+    expect(document.activeElement).toBe(rows[0]);
+    element.remove();
+  });
+
   it('walks pages through the contract meta', () => {
     settle(makeFeedbackPage([makeFeedback()], { current_page: 1, last_page: 3, total: 60 }));
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
@@ -18,7 +18,6 @@ import {
 import { FeedbackListStore } from '../../../core/feedback/feedback-list.store';
 import { PLATFORMS, Platform } from '../../../core/integrations/integration.models';
 import { IntegrationsStore } from '../../../core/integrations/integrations.store';
-import { BadgeComponent } from '../../../shared/ui/badge/badge.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { EmptyStateConfig } from '../../../shared/ui/data-table/data-table.types';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
@@ -26,13 +25,30 @@ import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { IconName } from '../../../shared/ui/icon/icon.types';
 import { InputComponent } from '../../../shared/ui/form-field/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/ui/form-field/select.component';
-import { EM_DASH, formatCount, formatDateTime, truncate } from '../../../shared/format/format';
+import { EM_DASH, formatCount, formatDateTime, formatScore, truncate } from '../../../shared/format/format';
 import {
   analysisStatusLabel,
   categoryLabel,
   platformLabel,
   sentimentLabel
 } from '../../../shared/labels/domain-labels';
+import { markRuns, TextRun } from '../marked-text';
+
+/** One bar of the voiceprint: a comment on this page, oldest to newest. */
+interface VoiceBar {
+  readonly id: number;
+  /** 0..1, |score|, with a floor so a near-zero score still draws. */
+  readonly height: number;
+  readonly tone: SentimentLabel | 'pending';
+}
+
+/** A one-tap view over the existing filters: sets one control, or clears it. */
+interface QuickView {
+  readonly key: string;
+  readonly control: 'sentiment' | 'category';
+  readonly value: string;
+  readonly label: string;
+}
 
 type ListState = 'loading' | 'empty' | 'error' | 'ready';
 
@@ -44,9 +60,14 @@ interface InboxRow {
   readonly published: string;
   readonly publishedIso: string | null;
   readonly body: string;
+  /** The body as runs, with the first phrase the analyser keyed on marked. */
+  readonly runs: readonly TextRun[];
   readonly sentiment: SentimentLabel | null;
+  readonly sentimentWord: string | null;
   readonly score: number | null;
+  readonly scoreText: string | null;
   readonly category: FeedbackCategory | null;
+  readonly categoryWord: string | null;
   /** Raw state, exposed as `data-status` so a test can count rows without reading copy. */
   readonly status: AnalysisStatus;
   /** Only read while there is no analysis to show instead. */
@@ -96,7 +117,6 @@ const BODY_PREVIEW_LENGTH = 280;
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    BadgeComponent,
     ButtonComponent,
     EmptyStateComponent,
     IconComponent,
@@ -104,13 +124,17 @@ const BODY_PREVIEW_LENGTH = 280;
     SelectComponent
   ],
   templateUrl: './inbox.component.html',
-  styleUrl: './inbox.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./inbox.component.scss', './inbox-rows.scss', './inbox-states.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:keydown)': 'onKeydown($event)'
+  }
 })
 export class InboxComponent implements OnInit, OnDestroy {
   private readonly store = inject(FeedbackListStore);
   private readonly integrations = inject(IntegrationsStore);
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   private readonly subscriptions = new Subscription();
   /** Guards the form -> store direction while the store is writing into the form. */
@@ -162,6 +186,54 @@ export class InboxComponent implements OnInit, OnDestroy {
   });
 
   protected readonly refreshing = computed(() => this.store.state() === 'loading' && this.items().length > 0);
+
+  /** The statement header's number: every comment the current filters match. */
+  protected readonly total = computed(() => this.meta().total);
+  protected readonly totalLabel = computed(() => formatCount(this.meta().total));
+
+  /**
+   * The voiceprint: one bar per comment on this page, oldest on the left,
+   * height |score|, colour = sentiment. Comments not analysed yet draw as a
+   * low muted tick, never as a neutral bar: no verdict is not a zero.
+   */
+  protected readonly voiceprint = computed<readonly VoiceBar[]>(() =>
+    [...this.items()]
+      .sort((a, b) => (a.published_at ?? '').localeCompare(b.published_at ?? ''))
+      .map((feedback) => {
+        const analysis = feedback.analysis;
+        return analysis === null
+          ? { id: feedback.id, height: 0.08, tone: 'pending' as const }
+          : {
+              id: feedback.id,
+              height: Math.max(0.1, Math.min(1, Math.abs(analysis.sentiment_score))),
+              tone: analysis.sentiment_label
+            };
+      })
+  );
+
+  /** Per-sentiment counts on this page, in the fixed negative, neutral, positive order. */
+  protected readonly mix = computed(() => {
+    const order: readonly SentimentLabel[] = ['negative', 'neutral', 'positive'];
+    return order.map((key) => ({
+      key,
+      label: sentimentLabel(key),
+      count: this.items().filter((feedback) => feedback.analysis?.sentiment_label === key).length
+    }));
+  });
+
+  /**
+   * One-tap views over the same filters the selects below drive. They write
+   * the form control, so the request goes out through the one existing path.
+   */
+  protected readonly quickViews: readonly QuickView[] = [
+    { key: 'negative', control: 'sentiment', value: 'negative', label: sentimentLabel('negative') },
+    { key: 'bug', control: 'category', value: 'bug', label: categoryLabel('bug') },
+    { key: 'complaint', control: 'category', value: 'complaint', label: categoryLabel('complaint') },
+    { key: 'feature_request', control: 'category', value: 'feature_request', label: categoryLabel('feature_request') },
+    { key: 'praise', control: 'category', value: 'praise', label: categoryLabel('praise') }
+  ];
+
+  protected readonly activeFilters = this.store.filters;
 
   protected readonly emptyState = computed<EmptyStateConfig>(() =>
     this.hasFilters()
@@ -294,6 +366,37 @@ export class InboxComponent implements OnInit, OnDestroy {
     this.store.load();
   }
 
+  protected isQuickViewOn(view: QuickView): boolean {
+    return this.activeFilters()[view.control] === view.value;
+  }
+
+  protected toggleQuickView(view: QuickView): void {
+    const control = this.form.controls[view.control];
+    control.setValue(control.value === view.value ? '' : view.value);
+  }
+
+  /**
+   * J and K walk the rows; Enter opens the focused one (it is a link). Only
+   * while focus is not in a field, and never with a modifier held.
+   */
+  protected onKeydown(event: KeyboardEvent): void {
+    if (event.ctrlKey || event.metaKey || event.altKey || isEditable(event.target)) {
+      return;
+    }
+    const key = event.key.toLowerCase();
+    if (key !== 'j' && key !== 'k') {
+      return;
+    }
+    const rows = Array.from(this.host.nativeElement.querySelectorAll<HTMLElement>('[data-testid="inbox-row"]'));
+    if (rows.length === 0) {
+      return;
+    }
+    const current = rows.indexOf(document.activeElement as HTMLElement);
+    const next = current === -1 ? 0 : Math.min(rows.length - 1, Math.max(0, current + (key === 'j' ? 1 : -1)));
+    event.preventDefault();
+    rows[next].focus();
+  }
+
   protected onClearFilters(): void {
     this.store.clearFilters();
     this.writeFormFromStore();
@@ -355,18 +458,23 @@ export class InboxComponent implements OnInit, OnDestroy {
 
 function toRow(feedback: Feedback): InboxRow {
   const analysis = feedback.analysis;
+  const body = truncate(feedback.body, BODY_PREVIEW_LENGTH);
   return {
     id: feedback.id,
     author: feedback.author ?? EM_DASH,
     source: feedback.platform === null ? EM_DASH : platformLabel(feedback.platform),
     published: formatDateTime(feedback.published_at),
     publishedIso: feedback.published_at,
-    body: truncate(feedback.body, BODY_PREVIEW_LENGTH),
-    // Label *and* score through the badge, never colour alone. No analysis
+    body,
+    runs: markRuns(body, analysis?.keywords ?? [], 1),
+    // Label *and* score in words and numbers, never colour alone. No analysis
     // means no verdict at all: a blank is not a neutral zero.
     sentiment: analysis === null ? null : analysis.sentiment_label,
+    sentimentWord: analysis === null ? null : sentimentLabel(analysis.sentiment_label),
     score: analysis === null ? null : analysis.sentiment_score,
+    scoreText: analysis === null ? null : formatScore(analysis.sentiment_score),
     category: analysis === null ? null : analysis.category,
+    categoryWord: analysis === null ? null : categoryLabel(analysis.category),
     status: feedback.analysis_status,
     statusLabel: analysisStatusLabel(feedback.analysis_status),
     statusIcon: STATUS_ICON[feedback.analysis_status] ?? 'info'
@@ -381,4 +489,11 @@ function toRow(feedback: Feedback): InboxRow {
 function blankToNull(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length === 0 ? null : trimmed;
+}
+
+function isEditable(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }
