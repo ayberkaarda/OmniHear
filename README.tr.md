@@ -26,8 +26,9 @@ bütçesinin arkasında lazy yüklenir. Tam diyagram ve veri akışı:
 
 ## Ekranlar
 
-Hepsi çalışan uygulamadan, aşağıda anlatılan demo verisine karşı alındı —
-maket değil.
+Hepsi çalışan frontend'den 1440 px genişlikte, güncel "switchboard"
+kimliğiyle (`docs/BRAND.md`) alındı; API yerine örnek bir şirketin verisi
+sunuldu — maket değil.
 
 **Genel bakış** — KPI kartları, 30 günlük duygu trendi, duygu ve kategori
 dağılımları. Kenar çubuğundaki kota paneli 60/75'te; paywall'ın bir senkron
@@ -52,8 +53,8 @@ kırmızı-yeşil renk körlüğünde okunabilir kalır (ADR-0006).
 
 ![Koyu temada genel bakış](docs/screenshots/overview-dark.png)
 
-**Entegrasyonlar ve açılış sayfası** — kanal başına sağlık durumu gösteren
-bağlantı kartları, ve herkese açık sayfa.
+**Entegrasyonlar ve açılış sayfası** — her bağlantı için sağlık durumu ve son
+senkronu gösteren bir satır, ve herkese açık sayfa.
 
 ![Entegrasyonlar](docs/screenshots/integrations.png)
 ![Açılış sayfası](docs/screenshots/landing.png)
