@@ -1,14 +1,14 @@
 <app-auth-layout [heading]="heading">
   @switch (state()) {
     @case ('loading') {
-      <p class="text-sm text-[var(--text-secondary)]" data-testid="invitation-loading" i18n="@@auth.invitation.loading">
+      <p class="auth-copy" data-testid="invitation-loading" i18n="@@auth.invitation.loading">
         Checking your invitation…
       </p>
     }
     @case ('invalid') {
-      <div class="flex flex-col gap-6" role="status" data-testid="invitation-invalid">
+      <div class="auth-stack" role="status" data-testid="invitation-invalid">
         <p
-          class="border-l-2 border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] p-4 text-sm text-[var(--sentiment-negative-text)]"
+          class="auth-notice auth-notice-error"
           i18n="@@auth.invitation.invalid"
         >
           This invitation link is no longer usable. Invitations expire, and each one can be accepted once. Ask a
@@ -18,27 +18,27 @@
     }
     @default {
       @if (invitation(); as pending) {
-        <div class="flex flex-col gap-6">
+        <div class="auth-stack">
           <div
-            class="flex flex-col gap-2 border-y border-[var(--border)] py-4 text-sm"
+            class="auth-summary"
             data-testid="invitation-summary"
           >
-            <p class="text-[var(--text-primary)]">
+            <p class="auth-copy">
               <span i18n="@@auth.invitation.company">You have been invited to</span>
-              <span class="font-semibold">{{ pending.company_name }}</span>
+              <span class="auth-emphasis">{{ pending.company_name }}</span>
             </p>
-            <p class="text-[var(--text-secondary)]">
+            <p class="auth-copy">
               <span i18n="@@auth.invitation.as">Joining as</span>
-              <span class="font-semibold">{{ roleLabel(pending.role) }}</span>
+              <span class="auth-emphasis">{{ roleLabel(pending.role) }}</span>
             </p>
-            <p class="text-[var(--text-secondary)]">{{ pending.email }}</p>
+            <p class="auth-copy">{{ pending.email }}</p>
           </div>
 
-          <p class="text-sm text-[var(--text-secondary)]" i18n="@@auth.invitation.lead">
+          <p class="auth-copy" i18n="@@auth.invitation.lead">
             Choose a password to finish setting up your account. Your email address is already confirmed.
           </p>
 
-          <form [formGroup]="form" class="flex flex-col gap-6" novalidate (ngSubmit)="onSubmit()">
+          <form [formGroup]="form" class="auth-stack" novalidate (ngSubmit)="onSubmit()">
             <app-input
               formControlName="name"
               type="text"
@@ -82,7 +82,7 @@
   <p authFooter>
     <a
       routerLink="/auth/login"
-      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+      class="auth-link"
       i18n="@@auth.invitation.backToLogin"
       >Already have an account? Sign in</a
     >

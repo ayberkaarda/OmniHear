@@ -1,22 +1,22 @@
 <div class="auth-shell">
-  <aside class="auth-brand">
+  <header class="auth-masthead">
     <a routerLink="/" class="brand-link"><app-logo variant="full" /></a>
-    <div class="brand-story">
-      <p class="brand-statement" i18n="@@landing.feature.collect.title">One inbox for every channel</p>
-      <div class="switchboard" aria-hidden="true">
-        <span></span><span></span><span class="signal-line"></span><span></span><span></span>
-      </div>
-    </div>
-    <div class="brand-rule" aria-hidden="true"></div>
-  </aside>
+    <p class="brand-statement" i18n="@@landing.feature.collect.title">One inbox for every channel</p>
+  </header>
   <main id="main-content" class="auth-main">
+    <header class="form-heading">
+      <h1>{{ heading() }}</h1>
+      @if (lead()) {
+        <p>{{ lead() }}</p>
+      }
+    </header>
+    <div class="voiceprint" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
     <div class="auth-form">
-      <header class="form-heading">
-        <h1>{{ heading() }}</h1>
-        @if (lead()) {
-          <p>{{ lead() }}</p>
-        }
-      </header>
       <div class="form-content"><ng-content></ng-content></div>
       <footer class="form-footer"><ng-content select="[authFooter]"></ng-content></footer>
     </div>

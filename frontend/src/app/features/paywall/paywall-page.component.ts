@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth/auth.store';
 import { QuotaStore } from '../../core/quota/quota.store';
 import { ButtonStyleDirective } from '../../shared/ui/button/button-style.directive';
-import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { LogoComponent } from '../../shared/ui/logo/logo.component';
 
 /**
@@ -16,7 +15,7 @@ import { LogoComponent } from '../../shared/ui/logo/logo.component';
  */
 @Component({
     selector: 'app-paywall-page',
-    imports: [RouterLink, ButtonStyleDirective, IconComponent, LogoComponent],
+    imports: [RouterLink, ButtonStyleDirective, LogoComponent],
     templateUrl: './paywall-page.component.html',
     styleUrl: './paywall-page.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

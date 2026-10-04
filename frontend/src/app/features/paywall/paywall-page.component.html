@@ -2,11 +2,7 @@
   <header class="page-masthead"><app-logo variant="full" /></header>
   <section class="quota-layout" aria-labelledby="paywall-title">
     <div class="quota-heading">
-      <span class="quota-icon" aria-hidden="true"><app-icon name="lock" size="md" /></span>
       <h1 id="paywall-title" i18n="@@paywallPage.title">Your analysis quota is full</h1>
-      <p class="quota-lead" i18n="@@paywallPage.body">
-        Every analysis included in your current plan has been used, so new feedback is no longer being analysed.
-      </p>
     </div>
     <div class="quota-details">
       @if (limit() !== null) {
@@ -18,17 +14,28 @@
           <div class="quota-meter" aria-hidden="true"></div>
         </div>
       }
-      <p class="quota-note" i18n="@@paywallPage.pendingKept">
-        Nothing is lost. Collection keeps running and the waiting comments are analysed automatically once the plan is
-        upgraded.
-      </p>
+      <div class="plan-comparison">
+        <section class="plan-row" aria-labelledby="current-plan-title">
+          <h2 id="current-plan-title" i18n="@@billing.currentPlan.heading">Current plan</h2>
+          <p i18n="@@paywallPage.body">
+            Every analysis included in your current plan has been used, so new feedback is no longer being analysed.
+          </p>
+        </section>
+        <section class="plan-row plan-next" aria-labelledby="upgraded-plan-title">
+          <h2 id="upgraded-plan-title" i18n="@@paywallPage.upgrade">Upgrade plan</h2>
+          <p i18n="@@paywallPage.pendingKept">
+            Nothing is lost. Collection keeps running and the waiting comments are analysed automatically once the plan is
+            upgraded.
+          </p>
+        </section>
+      </div>
       <div class="quota-actions">
         @if (isAuthenticated()) {
           <a routerLink="/app/settings/billing" appButtonStyle variant="primary" size="lg" i18n="@@paywallPage.upgrade">Upgrade plan</a>
-          <a routerLink="/app/overview" appButtonStyle variant="secondary" size="lg" i18n="@@paywallPage.backToApp">Back to the dashboard</a>
+          <a class="return-link" routerLink="/app/overview" i18n="@@paywallPage.backToApp">Back to the dashboard</a>
         } @else {
           <a routerLink="/auth/login" appButtonStyle variant="primary" size="lg" i18n="@@paywallPage.signIn">Sign in</a>
-          <a routerLink="/" appButtonStyle variant="secondary" size="lg" i18n="@@paywallPage.backHome">Back to the home page</a>
+          <a class="return-link" routerLink="/" i18n="@@paywallPage.backHome">Back to the home page</a>
         }
       </div>
     </div>

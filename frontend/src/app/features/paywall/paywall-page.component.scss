@@ -1,18 +1,21 @@
 :host { display: block; font-family: var(--font-sans); }
-.status-page { min-height: 100dvh; padding: 32px clamp(24px, 6vw, 64px) 64px; color: var(--text-primary); background: var(--bg-canvas); }
-.page-masthead { max-width: 72rem; margin-inline: auto; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-h1 { font-size: var(--font-size-4xl); line-height: var(--line-height-4xl); font-weight: 700; letter-spacing: var(--tracking-tight); text-wrap: balance; }
+.status-page { min-height: 100dvh; padding: 0 clamp(24px, 5vw, 72px) 64px; color: var(--text-primary); background: var(--bg-canvas); }
+.page-masthead { max-width: 80rem; min-height: 80px; display: flex; align-items: center; margin-inline: auto; border-bottom: 1px solid var(--border); }
+h1 { font-family: var(--font-display); font-stretch: var(--font-stretch-condensed); font-size: var(--font-size-display); line-height: var(--line-height-display); font-weight: 800; letter-spacing: var(--tracking-display); text-wrap: balance; overflow-wrap: anywhere; }
 a:focus-visible { outline: 2px solid var(--ring-focus); outline-offset: 2px; }
-@media (max-width: 640px) { h1 { font-size: var(--font-size-3xl); line-height: var(--line-height-3xl); } }
-.quota-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; max-width: 64rem; margin: clamp(64px, 12vh, 128px) auto 0; }
-.quota-icon { display: inline-flex; padding-bottom: 24px; color: var(--quota-exceeded-text); }
-h1 { max-width: 14ch; }
-.quota-lead { margin-top: 24px; color: var(--text-secondary); font-size: var(--font-size-base); line-height: var(--line-height-base); max-width: 45ch; }
-.quota-details { border-left: 1px solid var(--border); padding-left: 48px; align-self: stretch; }
-.quota-reading { padding-block: 24px 32px; border-block: 1px solid var(--border); }
-.quota-reading p { color: var(--text-secondary); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-.quota-count { display: block; margin-top: 16px; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--font-size-3xl); line-height: var(--line-height-3xl); font-variant-numeric: tabular-nums; color: var(--quota-exceeded-text); }
-.quota-meter { height: 4px; margin-top: 24px; background: var(--sentiment-negative-fill); }
-.quota-note { margin-block: 32px; color: var(--text-secondary); font-size: var(--font-size-base); line-height: var(--line-height-base); max-width: 45ch; }
-.quota-actions { display: flex; flex-wrap: wrap; gap: 16px; }
-@media (max-width: 767px) { .quota-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; margin-top: 48px; } .quota-details { border-left: 0; border-top: 1px solid var(--border); padding: 32px 0 0; } }
+@media (max-width: 640px) { h1 { font-size: clamp(48px, 13vw, 72px); } }
+.quota-layout { max-width: 80rem; margin: clamp(40px, 7vh, 80px) auto 0; }
+h1 { max-width: 16ch; }
+.quota-details { margin-top: 40px; }
+.quota-reading { padding-block: 24px; border-top: 1px solid var(--border); }
+.quota-reading p { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 24px; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--font-size-sm); line-height: var(--line-height-base); }
+.quota-count { color: var(--signal-ink); font-size: clamp(32px, 5vw, 64px); line-height: 1.2; letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums slashed-zero; overflow-wrap: anywhere; }
+.quota-meter { height: 12px; margin-top: 24px; background: var(--signal); }
+.plan-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 32px; padding-block: 28px; border-top: 1px solid var(--border); }
+.plan-row h2 { font-family: var(--font-display); font-stretch: var(--font-stretch-condensed); font-weight: 750; font-size: var(--font-size-3xl); line-height: var(--line-height-3xl); letter-spacing: var(--tracking-tight); }
+.plan-row p { max-width: 65ch; color: var(--text-secondary); font-size: var(--font-size-base); line-height: var(--line-height-base); }
+.plan-next h2 { color: var(--signal-ink); }
+.quota-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; border-top: 1px solid var(--border); padding-top: 28px; }
+.return-link { min-height: 44px; display: inline-flex; align-items: center; color: var(--text-secondary); text-decoration: underline; text-underline-offset: 4px; }
+.return-link:hover { color: var(--signal-ink); }
+@media (max-width: 640px) { .plan-row { grid-template-columns: minmax(0, 1fr); gap: 12px; } .quota-reading p { flex-direction: column; gap: 12px; } }

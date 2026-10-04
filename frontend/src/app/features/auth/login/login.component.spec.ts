@@ -59,7 +59,7 @@ describe('LoginComponent', () => {
 
     expect(element.querySelector('h1')?.textContent).toBeTruthy();
     expect(element.querySelectorAll('main')).toHaveLength(1);
-    expect(element.querySelector('.auth-brand app-logo')).toBeTruthy();
+    expect(element.querySelector('.auth-masthead app-logo')).toBeTruthy();
     expect(element.querySelector('main .auth-form form')).toBeTruthy();
     const inputs = Array.from(element.querySelectorAll('input'));
     expect(inputs).toHaveLength(2);
