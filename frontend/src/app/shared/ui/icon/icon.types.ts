@@ -36,7 +36,10 @@ export type IconName =
   | 'link'
   | 'x'
   | 'check'
-  | 'plus';
+  | 'plus'
+  | 'chevrons-up-down'
+  | 'inbox'
+  | 'refresh';
 
 export type IconShapeTag = 'path' | 'circle' | 'line' | 'polyline' | 'rect';
 
@@ -280,6 +283,34 @@ export const ICON_REGISTRY: Record<IconName, IconDef> = {
     shapes: [
       { tag: 'line', attrs: { x1: 12, y1: 5, x2: 12, y2: 19 } },
       { tag: 'line', attrs: { x1: 5, y1: 12, x2: 19, y2: 12 } }
+    ]
+  },
+  'chevrons-up-down': {
+    viewBox: '0 0 24 24',
+    shapes: [
+      { tag: 'polyline', attrs: { points: '7 15 12 20 17 15' } },
+      { tag: 'polyline', attrs: { points: '7 9 12 4 17 9' } }
+    ]
+  },
+  inbox: {
+    viewBox: '0 0 24 24',
+    shapes: [
+      { tag: 'polyline', attrs: { points: '22 12 16 12 14 15 10 15 8 12 2 12' } },
+      {
+        tag: 'path',
+        attrs: {
+          d: 'M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z'
+        }
+      }
+    ]
+  },
+  refresh: {
+    viewBox: '0 0 24 24',
+    shapes: [
+      { tag: 'path', attrs: { d: 'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8' } },
+      { tag: 'path', attrs: { d: 'M21 3v5h-5' } },
+      { tag: 'path', attrs: { d: 'M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16' } },
+      { tag: 'path', attrs: { d: 'M8 16H3v5' } }
     ]
   }
 };

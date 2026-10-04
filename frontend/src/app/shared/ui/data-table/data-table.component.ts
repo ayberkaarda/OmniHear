@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
+import { ButtonStyleDirective } from '../button/button-style.directive';
 import { IconComponent } from '../icon/icon.component';
 import { ColumnDef, DataTableState, EmptyStateConfig, SortDirection, SortState } from './data-table.types';
 
@@ -10,6 +11,15 @@ const ROW_HEIGHT_CLASSES: Record<40 | 44, string> = {
 
 const DEFAULT_MIN_WIDTH = 60;
 
+/** Fixed, varied widths so the loading skeleton reads as rows of text, not as stripes. */
+const SKELETON_ROWS: readonly { id: number; a: number; b: number }[] = [
+  { id: 0, a: 18, b: 42 },
+  { id: 1, a: 22, b: 34 },
+  { id: 2, a: 16, b: 48 },
+  { id: 3, a: 20, b: 30 },
+  { id: 4, a: 14, b: 38 }
+];
+
 function defaultRowId<T>(row: T): string {
   const candidate = (row as Record<string, unknown>)?.['id'];
   return candidate === undefined || candidate === null ? '' : String(candidate);
@@ -18,7 +28,7 @@ function defaultRowId<T>(row: T): string {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, ButtonStyleDirective],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -56,6 +66,8 @@ export class DataTableComponent<T> {
 
   /** NOT part of the mandated API — lets the empty-state action button do something. */
   readonly emptyStateAction = output<void>();
+
+  protected readonly skeletonRows = SKELETON_ROWS;
 
   protected readonly rowHeightClass = computed(() => ROW_HEIGHT_CLASSES[this.rowHeight()]);
 

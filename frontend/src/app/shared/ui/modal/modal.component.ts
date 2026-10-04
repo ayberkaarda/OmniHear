@@ -32,6 +32,8 @@ let uniqueModalId = 0;
     selector: 'app-modal',
     imports: [ButtonComponent, IconComponent],
     templateUrl: './modal.component.html',
+    styleUrl: './modal.component.scss',
+
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModalComponent {

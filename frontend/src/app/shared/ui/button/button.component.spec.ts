@@ -79,4 +79,32 @@ describe('ButtonComponent', () => {
     expect(warnSpy).toHaveBeenCalled();
     warnSpy.mockRestore();
   });
+
+  it('keeps the label in the layout while loading and does not paint the disabled look', async () => {
+    await TestBed.configureTestingModule({ imports: [ButtonComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(ButtonComponent);
+    fixture.componentRef.setInput('loading', true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const button = root.querySelector('button') as HTMLButtonElement;
+    expect(root.querySelector('[data-testid="button-spinner"]')).toBeTruthy();
+    expect(root.querySelector('button > span.invisible')).toBeTruthy();
+    expect(button.className).toContain('cursor-progress');
+    expect(button.className).not.toContain('text-disabled');
+  });
+
+  it('applies the sunken disabled look when disabled and not loading', async () => {
+    await TestBed.configureTestingModule({ imports: [ButtonComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(ButtonComponent);
+    fixture.componentRef.setInput('disabled', true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    expect(button.className).toContain('text-disabled');
+    expect(button.className).toContain('ring-[var(--ring-focus)]');
+  });
 });

@@ -1,0 +1,91 @@
+// Modal chrome is component-scoped (lazy) so it does not grow the global
+// stylesheet. Sheets use radius-xl and the ink-tinted float shadow; entering
+// surfaces use duration-slow + ease-emphasized (docs/BRAND.md sections 7 and 8).
+
+.modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+
+  @media (min-width: 640px) {
+    align-items: center;
+  }
+}
+
+.modal-backdrop {
+  animation: app-modal-fade var(--duration-base) var(--ease-standard);
+}
+
+.modal-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--shadow-md);
+  animation: app-modal-rise var(--duration-slow) var(--ease-emphasized);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.modal-title {
+  min-width: 0;
+  padding-top: 4px;
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-lg);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-surface);
+
+  &:empty {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+@keyframes app-modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes app-modal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal-sheet {
+    animation: none;
+  }
+}
