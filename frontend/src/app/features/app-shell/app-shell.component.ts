@@ -38,7 +38,7 @@ const RAIL_LINK =
 const TAB_LINK =
   'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px';
-const LINK_ACTIVE = 'bg-[var(--bg-surface-selected)] font-medium text-[var(--text-primary)]';
+const LINK_ACTIVE = 'shell-selected font-medium text-[var(--text-primary)]';
 
 const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/?#]+))?/;
 
@@ -66,6 +66,7 @@ const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/
     PaywallModalComponent
   ],
   templateUrl: './app-shell.component.html',
+  styleUrl: './app-shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '(document:keydown.escape)': 'closeAccount()' }
 })

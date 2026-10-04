@@ -15,6 +15,7 @@ import { IconName } from '../../shared/ui/icon/icon.types';
     selector: 'app-quota-meter',
     imports: [IconComponent],
     templateUrl: './quota-meter.component.html',
+    styleUrl: './quota-meter.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuotaMeterComponent {
@@ -34,9 +35,9 @@ export class QuotaMeterComponent {
     switch (this.level()) {
       // Quiet while there is room; a tinted plate only once it needs reading.
       case 'exceeded':
-        return '-mx-3 rounded-control bg-[var(--quota-exceeded-bg)] px-3 py-2.5 text-[var(--quota-exceeded-text)]';
+        return 'qm-plate qm-exceeded';
       case 'warning':
-        return '-mx-3 rounded-control bg-[var(--quota-warning-bg)] px-3 py-2.5 text-[var(--quota-warning-text)]';
+        return 'qm-plate qm-warning';
       default:
         return 'text-[var(--text-secondary)]';
     }
@@ -45,11 +46,11 @@ export class QuotaMeterComponent {
   protected readonly barClasses = computed(() => {
     switch (this.level()) {
       case 'exceeded':
-        return 'bg-[var(--sentiment-negative-fill)]';
+        return 'qm-bar-exceeded';
       case 'warning':
-        return 'bg-[var(--category-complaint-fill)]';
+        return 'qm-bar-warning';
       default:
-        return 'bg-[var(--sentiment-neutral-fill)]';
+        return 'qm-bar-ok';
     }
   });
 

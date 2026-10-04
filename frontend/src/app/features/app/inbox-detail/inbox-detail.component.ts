@@ -27,6 +27,7 @@ import { analysisStatusLabel, platformLabel } from '../../../shared/labels/domai
   standalone: true,
   imports: [RouterLink, BadgeComponent, ButtonComponent, IconComponent],
   templateUrl: './inbox-detail.component.html',
+  styleUrl: './inbox-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InboxDetailComponent {

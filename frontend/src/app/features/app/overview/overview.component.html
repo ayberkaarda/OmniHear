@@ -33,7 +33,7 @@
 
   @if (isEmpty()) {
     <div
-      class="flex items-start gap-3 rounded-card border border-dashed border-[var(--border-strong)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-secondary)]"
+      class="flex items-start gap-3 rounded-card border ov-dashed border-[var(--border-strong)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-secondary)]"
       data-testid="overview-empty"
     >
       <span class="mt-0.5 flex text-[var(--text-muted)]"><app-icon name="link" size="sm" /></span>
@@ -43,7 +43,7 @@
     </div>
   }
 
-  <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
+  <div class="ov-kpis grid grid-cols-2 gap-3">
     <app-kpi-card
       [title]="totalLabel"
       [value]="kpis()?.total_feedbacks ?? null"
@@ -74,7 +74,7 @@
 
   <!-- The trend is the reading; the two breakdowns sit beside it as its key. -->
   <div class="grid gap-6 xl:grid-cols-3">
-    <app-sentiment-trend class="block xl:col-span-2" [points]="trend()" [loading]="loading()" />
+    <app-sentiment-trend class="ov-wide block" [points]="trend()" [loading]="loading()" />
 
     <div class="flex flex-col gap-6">
       <section class="flex flex-col gap-5 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] p-5">
@@ -103,7 +103,7 @@
             }
           </div>
 
-          <ul class="-mx-2 flex flex-col">
+          <ul class="ov-list flex flex-col">
             @for (segment of sentimentSegments(); track segment.key) {
               <li>
                 <button
@@ -127,9 +127,9 @@
         </h2>
 
         @if (loading()) {
-          <div class="h-40 w-full animate-pulse rounded-control bg-[var(--bg-surface-sunken)]" aria-hidden="true"></div>
+          <div class="ov-skel w-full animate-pulse rounded-control bg-[var(--bg-surface-sunken)]" aria-hidden="true"></div>
         } @else {
-          <ul class="-mx-2 flex flex-col" data-testid="category-list">
+          <ul class="ov-list flex flex-col" data-testid="category-list">
             @for (segment of categorySegments(); track segment.key) {
               <li>
                 <button

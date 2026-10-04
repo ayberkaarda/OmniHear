@@ -46,6 +46,7 @@ export interface TrendMark {
   standalone: true,
   imports: [],
   templateUrl: './sentiment-trend.component.html',
+  styleUrl: './sentiment-trend.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SentimentTrendComponent {

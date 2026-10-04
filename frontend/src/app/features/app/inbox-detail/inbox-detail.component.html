@@ -2,7 +2,7 @@
   <header class="flex flex-col gap-3">
     <a
       routerLink="/app/inbox"
-      class="w-fit rounded-sm text-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+      class="dt-fit rounded-sm text-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
     >
       <span i18n="@@app.inboxDetail.back">Back to the inbox</span>
     </a>
@@ -29,34 +29,34 @@
   } @else if (loading()) {
     <div class="grid gap-6 lg:grid-cols-3" data-testid="detail-skeleton" aria-busy="true">
       <span class="sr-only" i18n="Feedback detail loading announcement@@inboxDetail.loading">Loading this comment…</span>
-      <div class="flex flex-col gap-4 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] p-6 lg:col-span-2" aria-hidden="true">
-        <span class="h-4 w-48 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+      <div class="flex flex-col gap-4 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] dt-pad dt-wide" aria-hidden="true">
+        <span class="dt-w-a h-4 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
         <span class="h-4 w-full animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-        <span class="h-4 w-11/12 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-        <span class="h-4 w-2/3 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+        <span class="dt-w-b h-4 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+        <span class="dt-w-c h-4 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
       </div>
-      <div class="h-72 animate-pulse rounded-card bg-[var(--bg-surface-sunken)]" aria-hidden="true"></div>
+      <div class="dt-skel-aside animate-pulse rounded-card bg-[var(--bg-surface-sunken)]" aria-hidden="true"></div>
     </div>
   } @else if (feedback(); as record) {
     <div class="grid items-start gap-6 lg:grid-cols-3">
       <!-- The customer's words, as they wrote them. -->
-      <article class="flex min-w-0 flex-col rounded-card border border-[var(--border)] bg-[var(--bg-surface)] lg:col-span-2">
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--border)] px-5 py-4 sm:px-6">
+      <article class="flex min-w-0 flex-col rounded-card border border-[var(--border)] bg-[var(--bg-surface)] dt-wide">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--border)] dt-gutter py-4">
           <app-badge kind="source" [value]="sourceLabel()" size="sm" />
           <span class="text-sm font-medium text-[var(--text-primary)]">{{ authorName() }}</span>
-          <time class="font-mono text-xs tabular-nums text-[var(--text-muted)] sm:ml-auto" [attr.datetime]="record.published_at">{{
+          <time class="font-mono text-xs tabular-nums text-[var(--text-muted)] dt-time" [attr.datetime]="record.published_at">{{
             publishedAt()
           }}</time>
         </div>
 
         <p
-          class="max-w-[65ch] whitespace-pre-line px-5 py-6 text-base leading-relaxed text-[var(--text-primary)] sm:px-6"
+          class="dt-body dt-gutter max-w-[65ch] text-base leading-relaxed text-[var(--text-primary)]"
           data-testid="detail-body"
         >
           {{ record.body }}
         </p>
 
-        <div class="flex flex-col gap-3 border-t border-[var(--border)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div class="dt-foot dt-gutter flex flex-col gap-3 border-t border-[var(--border)] py-4">
           <dl class="flex flex-wrap gap-x-6 gap-y-1 text-xs">
             <div class="flex min-w-0 gap-2">
               <dt class="text-[var(--text-muted)]" i18n="Feedback metadata label@@inboxDetail.meta.externalId">Source ID</dt>
@@ -73,7 +73,7 @@
               [href]="record.source_url"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-fit shrink-0 rounded-sm text-sm font-medium text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+              class="dt-fit shrink-0 rounded-sm text-sm font-medium text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
               >{{ openSourceLabel }}</a
             >
           }
@@ -81,7 +81,7 @@
       </article>
 
       <section
-        class="flex flex-col rounded-card border border-[var(--border)] bg-[var(--bg-surface)] lg:sticky lg:top-20"
+        class="flex flex-col rounded-card border border-[var(--border)] bg-[var(--bg-surface)] dt-aside"
         aria-labelledby="detail-analysis-heading"
       >
         <h2
@@ -112,11 +112,11 @@
                 </span>
                 <!-- Position on the scale, drawn in ink: where the marker sits says
                      what the colour of a sentiment badge says, without the colour. -->
-                <span class="relative block h-3" aria-hidden="true">
-                  <span class="absolute inset-x-0 top-1.5 h-px bg-[var(--border-strong)]"></span>
-                  <span class="absolute left-1/2 top-0 h-3 w-px bg-[var(--border-strong)]"></span>
+                <span class="dt-scale relative block" aria-hidden="true">
+                  <span class="dt-axis absolute inset-x-0"></span>
+                  <span class="dt-mid absolute top-0"></span>
                   <span
-                    class="absolute top-0 -ml-0.5 h-3 w-1 rounded-full bg-[var(--text-primary)]"
+                    class="dt-pin absolute top-0 rounded-full"
                     [style.left.%]="scorePosition()"
                   ></span>
                 </span>

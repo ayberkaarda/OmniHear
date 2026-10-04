@@ -1,0 +1,95 @@
+// Detail-only layout, moved out of global Tailwind utilities so it ships in
+// this route's lazy chunk rather than the initial stylesheet.
+
+$sm: 640px;
+$lg: 1024px;
+
+.dt-fit {
+  width: fit-content;
+}
+
+.dt-pad {
+  padding: 1.5rem;
+}
+
+.dt-wide {
+  @media (min-width: $lg) {
+    grid-column: span 2 / span 2;
+  }
+}
+
+// Skeleton line lengths.
+.dt-w-a {
+  width: 12rem;
+}
+
+.dt-w-b {
+  width: 91.666667%;
+}
+
+.dt-w-c {
+  width: 66.666667%;
+}
+
+.dt-skel-aside {
+  height: 18rem;
+}
+
+.dt-gutter {
+  padding-inline: 1.25rem;
+
+  @media (min-width: $sm) {
+    padding-inline: 1.5rem;
+  }
+}
+
+.dt-time {
+  @media (min-width: $sm) {
+    margin-left: auto;
+  }
+}
+
+.dt-body {
+  padding-block: 1.5rem;
+  white-space: pre-line;
+}
+
+.dt-foot {
+  @media (min-width: $sm) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.dt-aside {
+  @media (min-width: $lg) {
+    position: sticky;
+    top: 5rem;
+  }
+}
+
+// Sentiment scale: hairline axis, centre tick, ink marker.
+.dt-scale {
+  height: 0.75rem;
+}
+
+.dt-axis {
+  top: 0.375rem;
+  height: 1px;
+  background-color: var(--border-strong);
+}
+
+.dt-mid {
+  left: 50%;
+  width: 1px;
+  height: 0.75rem;
+  background-color: var(--border-strong);
+}
+
+.dt-pin {
+  width: 0.25rem;
+  height: 0.75rem;
+  margin-left: -0.125rem;
+  background-color: var(--text-primary);
+}

@@ -4,6 +4,44 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 module.exports = {
   darkMode: 'class',
   content: ['./src/**/*.{html,ts}'],
+
+  // The content scan reads every .ts and .html file, so plain English words in
+  // comments, i18n meanings and code ("filter", "table", "transition") were
+  // being emitted as utilities that no template uses. None of these is a class
+  // in any template; blocking them keeps them out of the initial stylesheet.
+  blocklist: ['container', 'transition', 'blur', 'filter', 'table', 'static', 'visible', 'invisible', 'grow'],
+
+  // Utility families no template uses. Each one also adds its --tw-* reset
+  // variables to the `*, ::before, ::after` and `::backdrop` preflight blocks,
+  // so disabling them shrinks every page's initial CSS, not just the utilities.
+  corePlugins: {
+    borderSpacing: false,
+    touchAction: false,
+    scrollSnapType: false,
+    gradientColorStops: false,
+    blur: false,
+    brightness: false,
+    contrast: false,
+    grayscale: false,
+    hueRotate: false,
+    invert: false,
+    saturate: false,
+    sepia: false,
+    dropShadow: false,
+    filter: false,
+    backdropBlur: false,
+    backdropBrightness: false,
+    backdropContrast: false,
+    backdropGrayscale: false,
+    backdropHueRotate: false,
+    backdropInvert: false,
+    backdropOpacity: false,
+    backdropSaturate: false,
+    backdropSepia: false,
+    backdropFilter: false,
+    contain: false,
+  },
+
   theme: {
     extend: {
       // Brand faces (docs/BRAND.md, "Typography"). Declared in styles/fonts.css,

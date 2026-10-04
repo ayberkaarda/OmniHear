@@ -58,6 +58,7 @@ const NEUTRAL_FILL = 'var(--brand)';
   standalone: true,
   imports: [KpiCardComponent, BadgeComponent, ButtonComponent, IconComponent, SentimentTrendComponent],
   templateUrl: './overview.component.html',
+  styleUrl: './overview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OverviewComponent {
