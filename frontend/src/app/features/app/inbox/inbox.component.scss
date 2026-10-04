@@ -152,17 +152,15 @@ $xl: 1280px;
 }
 
 // One-tap views: condensed words; the marker lands on the one that is on.
+// They wrap rather than run off the edge, so every view is visible at once.
 .ib-views {
   display: flex;
-  gap: 1.25rem;
-  margin-inline: -1rem;
-  padding: 0 1rem 0.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.25rem;
+  padding-bottom: 0.25rem;
 
   @media (min-width: $lg) {
-    margin: 0;
-    padding: 0 0 0.25rem;
+    flex-wrap: nowrap;
   }
 }
 
@@ -213,19 +211,14 @@ $xl: 1280px;
   }
 }
 
+// Every other choice: two columns on a phone, four from tablet, one row wide.
 .ib-strip {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
-  margin-inline: -1rem;
-  padding: 0 1rem 0.25rem;
-  overflow-x: auto;
 
-  @media (min-width: $lg) {
-    display: grid;
+  @media (min-width: $md) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: 0;
-    padding: 0;
-    overflow: visible;
   }
 
   @media (min-width: $xl) {
@@ -234,23 +227,13 @@ $xl: 1280px;
 }
 
 .ib-field {
-  flex-shrink: 0;
-  width: 10rem;
-
-  @media (min-width: $lg) {
-    width: auto;
-  }
+  min-width: 0;
 }
 
 .ib-date {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  width: 9rem;
-
-  @media (min-width: $lg) {
-    width: auto;
-  }
 }
 
 .ib-date-label {

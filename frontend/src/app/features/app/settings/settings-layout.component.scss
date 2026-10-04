@@ -23,13 +23,13 @@ $md: 768px;
   }
 }
 
+// The tabs wrap on a narrow screen instead of running off the right edge.
 .st-tabs {
   display: flex;
-  gap: 1.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
   padding: 0 1rem;
-  overflow-x: auto;
   border-bottom: 1px solid var(--border);
-  scrollbar-width: none;
 
   @media (min-width: $md) {
     padding-inline: 1.5rem;
@@ -84,6 +84,11 @@ $md: 768px;
   max-width: 48rem;
   min-width: 0;
   padding: 2rem 1rem 0;
+  // Sections keep wide tables in their own scrollers, but a visually hidden
+  // label inside one is positioned against the page and would widen it.
+  // `relative` makes this box its containing block, so the clip reaches it.
+  position: relative;
+  overflow-x: clip;
 
   @media (min-width: $md) {
     padding-inline: 1.5rem;

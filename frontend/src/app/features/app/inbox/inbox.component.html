@@ -36,7 +36,7 @@
   </header>
 
   <!-- Filters: search and the one-tap views on one line, every other choice on
-       a strip below. On a phone the strip scrolls sideways. -->
+       a grid below: two columns on a phone, four from tablet, one row wide. -->
   <form [formGroup]="form" class="ib-filters" [attr.aria-label]="searchLabel" (submit)="$event.preventDefault()">
     <div class="ib-filters-top">
       <div class="ib-search" data-testid="inbox-search">
