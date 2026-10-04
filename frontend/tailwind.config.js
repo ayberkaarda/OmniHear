@@ -48,14 +48,16 @@ module.exports = {
       // self-hosted. The first entries mirror --font-sans / --font-mono in
       // tokens.json; Tailwind's defaults stay as the tail of the chain.
       fontFamily: {
-        sans: ['"Schibsted Grotesk"', '"Schibsted Grotesk Fallback"', ...defaultTheme.fontFamily.sans],
-        mono: ['"Spline Sans Mono"', ...defaultTheme.fontFamily.mono],
+        sans: ['"Bricolage Grotesque"', '"Bricolage Grotesque Fallback"', ...defaultTheme.fontFamily.sans],
+        display: ['"Bricolage Grotesque"', '"Bricolage Grotesque Fallback"', '"Arial Narrow"', ...defaultTheme.fontFamily.sans],
+        mono: ['"Martian Mono"', ...defaultTheme.fontFamily.mono],
       },
 
       // New names only: Tailwind's own `tight` / `rounded-*` scales are left as
       // they are so existing components do not shift under this change.
       letterSpacing: {
         display: 'var(--tracking-tight)',
+        poster: 'var(--tracking-display)',
         label: 'var(--tracking-label)',
       },
 
@@ -63,6 +65,10 @@ module.exports = {
         control: 'var(--radius-md)',
         card: 'var(--radius-lg)',
         sheet: 'var(--radius-xl)',
+      },
+
+      fontSize: {
+        poster: ['var(--font-size-display)', { lineHeight: 'var(--line-height-display)' }],
       },
 
       transitionDuration: {
@@ -82,8 +88,10 @@ module.exports = {
       },
 
       colors: {
-        // Signal: the cobalt "lamp" (selection, focus, links). See docs/BRAND.md.
+        // Signal: the marker (highlighter yellow). A fill, never text on light
+        // paper; use signal-ink for marker-coloured text and icons. See docs/BRAND.md.
         signal: 'var(--signal)',
+        'signal-ink': 'var(--signal-ink)',
         'signal-soft': 'var(--signal-soft)',
 
         // Surfaces / structure
