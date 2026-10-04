@@ -1,41 +1,23 @@
-<div class="dt-frame">
+<div class="dt" [class.dt--roomy]="rowHeight() === 44">
   @switch (state()) {
     @case ('loading') {
-      <div class="flex flex-col" data-testid="data-table-loading" aria-busy="true">
+      <div data-testid="data-table-loading" aria-busy="true">
         <span class="sr-only" i18n="Data table loading announcement@@dataTable.loading">Loading data…</span>
-        <div class="flex h-9 items-center gap-6 border-b border-[var(--border)] px-4" aria-hidden="true">
-          <span class="h-2 w-16 rounded bg-[var(--bg-surface-sunken)]"></span>
-          <span class="h-2 w-24 rounded bg-[var(--bg-surface-sunken)]"></span>
-          <span class="h-2 w-12 rounded bg-[var(--bg-surface-sunken)]"></span>
-        </div>
         @for (row of skeletonRows; track row.id) {
-          <div
-            [class]="rowHeightClass() + ' flex items-center gap-6 border-b border-[var(--border)] px-4 last:border-b-0'"
-            aria-hidden="true"
-          >
-            <span class="h-2.5 animate-pulse rounded bg-[var(--bg-surface-sunken)]" [style.width.%]="row.a"></span>
-            <span class="h-2.5 animate-pulse rounded bg-[var(--bg-surface-sunken)]" [style.width.%]="row.b"></span>
-            <span class="ml-auto h-2.5 w-10 animate-pulse rounded bg-[var(--bg-surface-sunken)]"></span>
+          <div class="dt-skel" aria-hidden="true">
+            <i></i>
+            <span class="animate-pulse" [style.width.%]="row.a"></span>
+            <span class="animate-pulse" [style.width.%]="row.b"></span>
           </div>
         }
       </div>
     }
     @case ('error') {
-      <div
-        class="dt-error"
-        data-testid="data-table-error"
-        role="alert"
-      >
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-[var(--sentiment-negative-bg)] text-[var(--status-error)]"
-        >
-          <app-icon name="alert-triangle" size="md" />
-        </span>
-        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p class="text-sm font-semibold text-[var(--text-primary)]" i18n="Data table error title@@dataTable.error.title">
-            Something went wrong
-          </p>
-          <p class="text-sm text-[var(--text-secondary)]" i18n="Data table error description@@dataTable.error.description">
+      <div class="dt-msg dt-msg--error" data-testid="data-table-error" role="alert">
+        <app-icon name="alert-triangle" size="lg" />
+        <div class="dt-msg-copy">
+          <p class="dt-msg-title" i18n="Data table error title@@dataTable.error.title">Something went wrong</p>
+          <p i18n="Data table error description@@dataTable.error.description">
             We couldn't load this data. Please try again.
           </p>
         </div>
@@ -46,24 +28,21 @@
       </div>
     }
     @case ('empty') {
-      <div class="flex flex-col items-center gap-2 px-6 py-12 text-center" data-testid="data-table-empty">
-        <span
-          class="mb-1 flex h-10 w-10 items-center justify-center rounded-control bg-[var(--bg-surface-sunken)] text-[var(--text-muted)]"
-        >
-          <app-icon name="inbox" size="lg" />
-        </span>
-        <p class="text-sm font-semibold text-[var(--text-primary)]">
-          @if (emptyState()?.title) {
-            {{ emptyState()!.title }}
-          } @else {
-            <span i18n="Data table default empty title@@dataTable.empty.title">No data yet</span>
+      <div class="dt-msg" data-testid="data-table-empty">
+        <div class="dt-msg-copy">
+          <p class="dt-msg-title">
+            @if (emptyState()?.title) {
+              {{ emptyState()!.title }}
+            } @else {
+              <span i18n="Data table default empty title@@dataTable.empty.title">No data yet</span>
+            }
+          </p>
+          @if (emptyState()?.description) {
+            <p>{{ emptyState()!.description }}</p>
           }
-        </p>
-        @if (emptyState()?.description) {
-          <p class="max-w-[46ch] text-sm text-[var(--text-secondary)]">{{ emptyState()!.description }}</p>
-        }
+        </div>
         @if (emptyState()?.actionLabel) {
-          <button type="button" class="mt-3" appButtonStyle variant="primary" size="sm" (click)="onEmptyStateAction()">
+          <button type="button" appButtonStyle variant="primary" size="sm" (click)="onEmptyStateAction()">
             {{ emptyState()!.actionLabel }}
           </button>
         }
@@ -73,6 +52,9 @@
       <table class="dt-table" data-testid="data-table-ready">
         <thead [class.dt-sticky]="stickyHeader()">
           <tr>
+            @if (rowTone()) {
+              <th class="dt-edge" aria-hidden="true"></th>
+            }
             @if (selectable()) {
               <th scope="col" class="dt-head dt-select">
                 <input
@@ -86,10 +68,9 @@
                 />
               </th>
             }
-            @for (column of columns(); track column.key; let first = $first) {
+            @for (column of columns(); track column.key) {
               <th
                 class="dt-head"
-                [class.dt-first]="first && !selectable()"
                 scope="col"
                 [style.width.px]="columnWidth(column)"
                 [style.minWidth.px]="column.min ?? null"
@@ -98,11 +79,11 @@
                 <button
                   type="button"
                   class="dt-sort"
-                  [class.cursor-default]="!column.sortable"
+                  [class.is-static]="!column.sortable"
                   [class.is-sorted]="ariaSort(column) !== 'none'"
                   (click)="onHeaderClick(column)"
                 >
-                  <span class="truncate">{{ column.header }}</span>
+                  <span class="dt-trunc">{{ column.header }}</span>
                   @if (column.sortable) {
                     @if (ariaSort(column) !== 'none') {
                       <app-icon [name]="ariaSort(column) === 'ascending' ? 'chevron-up' : 'chevron-down'" size="sm" />
@@ -128,14 +109,15 @@
         <tbody>
           @for (row of rows(); track rowId()(row)) {
             <tr
-              [class]="
-                rowHeightClass() + ' dt-row' + (isSelected(row) ? ' is-selected' : '') + (isHighlighted(row) ? ' row-highlight' : '')
-              "
+              [class]="'dt-row' + (isSelected(row) ? ' is-selected' : '') + (isHighlighted(row) ? ' row-highlight' : '')"
               [attr.aria-selected]="selectable() ? isSelected(row) : null"
               tabindex="0"
               (click)="onRowActivate(row)"
               (keydown.enter)="onRowActivate(row)"
             >
+              @if (rowTone()) {
+                <td class="dt-edge" [attr.data-tone]="toneOf(row)" aria-hidden="true"></td>
+              }
               @if (selectable()) {
                 <td class="dt-cell dt-select">
                   <input
@@ -149,10 +131,9 @@
                   />
                 </td>
               }
-              @for (column of columns(); track column.key; let first = $first) {
+              @for (column of columns(); track column.key) {
                 <td
                   class="dt-cell dt-data"
-                  [class.dt-first]="first && !selectable()"
                   [style.width.px]="columnWidth(column)"
                   [style.minWidth.px]="column.min ?? null"
                   [attr.title]="cellValue(column, row) || null"

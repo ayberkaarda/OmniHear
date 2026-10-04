@@ -8,15 +8,10 @@
   (click)="onClick($event)"
 >
   @if (loading()) {
-    <span class="absolute inset-0 flex items-center justify-center" data-testid="button-spinner" aria-hidden="true">
-      <svg [class]="spinnerClasses()" class="animate-spin" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
-        <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-opacity="0.25" stroke-width="1.5" />
-        <path d="M14.25 8A6.25 6.25 0 0 0 8 1.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-    </span>
+    <span class="ui-btn-wave" data-testid="button-spinner" aria-hidden="true"><i></i><i></i><i></i></span>
   }
   <!-- Hidden by paint only (not visibility/display), so the label still names the button while it is busy. -->
-  <span class="inline-flex items-center justify-center gap-[inherit]" [class.opacity-0]="loading()" data-testid="button-label">
+  <span class="ui-btn-label" [class.opacity-0]="loading()" data-testid="button-label">
     <ng-content></ng-content>
   </span>
 </button>

@@ -166,4 +166,38 @@ describe('DataTableComponent', () => {
     expect(emitted).toBeTruthy();
     expect(Array.from(emitted as ReadonlySet<string>)).toEqual(['r1']);
   });
+
+  it('draws a sentiment edge per row only when rowTone is given', async () => {
+    await TestBed.configureTestingModule({ imports: [DataTableComponent] }).compileComponents();
+    const fixture = TestBed.createComponent<DataTableComponent<Row>>(DataTableComponent);
+    fixture.componentRef.setInput('columns', COLUMNS);
+    fixture.componentRef.setInput('rows', ROWS);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('.dt-edge')).toBeNull();
+
+    fixture.componentRef.setInput('rowTone', (row: Row) => (row.score > 4 ? 'positive' : 'negative'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const edges = Array.from(root.querySelectorAll('tbody td.dt-edge'));
+    expect(edges.map((edge) => edge.getAttribute('data-tone'))).toEqual(['negative', 'positive']);
+    expect(edges.every((edge) => edge.getAttribute('aria-hidden') === 'true')).toBe(true);
+    // The header gets a matching empty edge cell so the columns stay aligned.
+    expect(root.querySelectorAll('thead th.dt-edge').length).toBe(1);
+  });
+
+  it('switches row density with rowHeight', async () => {
+    await TestBed.configureTestingModule({ imports: [DataTableComponent] }).compileComponents();
+    const fixture = TestBed.createComponent<DataTableComponent<Row>>(DataTableComponent);
+    fixture.componentRef.setInput('columns', COLUMNS);
+    fixture.componentRef.setInput('rows', ROWS);
+    fixture.componentRef.setInput('rowHeight', 44);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('.dt')?.classList.contains('dt--roomy')).toBe(true);
+  });
 });

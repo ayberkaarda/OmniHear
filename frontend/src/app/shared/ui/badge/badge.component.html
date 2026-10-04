@@ -1,6 +1,9 @@
-<span [class]="classes()" [attr.data-kind]="kind()" [attr.data-value]="value()">
-  @if (shouldShowIcon() && iconName()) {
-    <app-icon [name]="iconName()!" [size]="size()" />
+<span class="bdg" [class.bdg--sm]="size() === 'sm'" [attr.data-kind]="kind()" [attr.data-value]="value()">
+  @if (hasSquare()) {
+    <span class="bdg-sq" data-part="square" aria-hidden="true"></span>
+  }
+  @if (shouldShowIcon()) {
+    <app-icon [name]="iconName()!" size="sm" />
   }
 
   @switch (kind()) {
@@ -70,6 +73,6 @@
   }
 
   @if (formattedScore()) {
-    <span class="font-mono tabular-nums opacity-80">{{ formattedScore() }}</span>
+    <span class="bdg-score tabular-nums">{{ formattedScore() }}</span>
   }
 </span>

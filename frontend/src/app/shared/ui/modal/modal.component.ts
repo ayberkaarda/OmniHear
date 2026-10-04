@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   effect,
   ElementRef,
   input,
@@ -17,20 +16,19 @@ export type ModalSize = 'sm' | 'md' | 'lg';
 export type ModalRole = 'dialog' | 'alertdialog';
 export type ModalCloseReason = 'esc' | 'backdrop' | 'button';
 
-const SIZE_CLASSES: Record<ModalSize, string> = {
-  sm: 'w-[400px] max-w-[calc(100vw-2rem)]',
-  md: 'w-[520px] max-w-[calc(100vw-2rem)]',
-  lg: 'w-[720px] max-w-[calc(100vw-2rem)]'
-};
-
 let uniqueModalId = 0;
 
+/**
+ * Dialog sheet (docs/BRAND.md section 7). Focus moves to the title on open,
+ * Tab is trapped inside (`focus-trap.ts`, shared with the app shell's sheet),
+ * Escape and the backdrop close it when `dismissible`, and focus returns to
+ * whatever opened it. Widths per `size` live in `modal.component.scss`.
+ */
 @Component({
     selector: 'app-modal',
     imports: [ButtonComponent, IconComponent],
     templateUrl: './modal.component.html',
     styleUrl: './modal.component.scss',
-
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModalComponent {
@@ -46,7 +44,6 @@ export class ModalComponent {
   private readonly titleEl = viewChild<ElementRef<HTMLElement>>('titleEl');
 
   protected readonly titleId = `app-modal-title-${++uniqueModalId}`;
-  protected readonly sizeClasses = computed(() => SIZE_CLASSES[this.size()]);
 
   private previouslyFocused: HTMLElement | null = null;
 

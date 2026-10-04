@@ -1,7 +1,7 @@
 @if (open()) {
   <div class="modal-layer">
     <div
-      class="modal-backdrop fixed inset-0 bg-[var(--bg-overlay)]"
+      class="modal-backdrop fixed inset-0"
       tabindex="-1"
       (click)="onBackdropClick()"
       aria-hidden="true"
@@ -9,7 +9,7 @@
 
     <div
       #dialogEl
-      [class]="sizeClasses() + ' modal-sheet'"
+      [class]="'modal-sheet modal-sheet--' + size()"
       [attr.role]="role()"
       [attr.data-role]="role()"
       aria-modal="true"
@@ -17,17 +17,12 @@
       tabindex="-1"
       (keydown)="onKeydown($event)"
     >
-      <div class="flex items-start justify-between gap-4 px-6 pb-2 pt-5">
-        <h2
-          #titleEl
-          [id]="titleId"
-          tabindex="-1"
-          class="modal-title"
-        >
+      <div class="modal-head">
+        <h2 #titleEl [id]="titleId" tabindex="-1" class="modal-title">
           {{ title() }}
         </h2>
         <app-button
-          class="-mr-2 shrink-0"
+          class="modal-close"
           variant="ghost"
           size="sm"
           [iconOnly]="true"
@@ -39,7 +34,7 @@
         </app-button>
       </div>
 
-      <div class="flex-1 overflow-y-auto px-6 pb-5 pt-1 text-sm leading-6 text-[var(--text-secondary)]">
+      <div class="modal-body">
         <ng-content select="[modalBody]"></ng-content>
       </div>
 

@@ -123,8 +123,9 @@ describe('ButtonComponent', () => {
     const button = root.querySelector('button') as HTMLButtonElement;
     expect(root.querySelector('[data-testid="button-spinner"]')).toBeTruthy();
     expect(root.querySelector('button > span[data-testid="button-label"].opacity-0')).toBeTruthy();
-    expect(button.className).toContain('cursor-progress');
-    expect(button.className).not.toContain('text-disabled');
+    expect(button.classList.contains('ui-btn--busy')).toBe(true);
+    expect(button.classList.contains('ui-btn--off')).toBe(false);
+    expect(button.classList.contains('ui-btn--primary')).toBe(true);
   });
 
   it('applies the sunken disabled look when disabled and not loading', async () => {
@@ -136,7 +137,23 @@ describe('ButtonComponent', () => {
 
     const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
     expect(button.disabled).toBe(true);
-    expect(button.className).toContain('text-disabled');
-    expect(button.className).toContain('ring-[var(--ring-focus)]');
+    expect(button.classList.contains('ui-btn--off')).toBe(true);
+    expect(button.classList.contains('ui-btn--busy')).toBe(false);
+  });
+
+  it('maps variant and size to the shared ui-btn classes, square for iconOnly', async () => {
+    await TestBed.configureTestingModule({ imports: [ButtonComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(ButtonComponent);
+    fixture.componentRef.setInput('variant', 'secondary');
+    fixture.componentRef.setInput('size', 'lg');
+    fixture.componentRef.setInput('iconOnly', true);
+    fixture.componentRef.setInput('ariaLabel', 'Close');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
+    expect(Array.from(button.classList)).toEqual(
+      expect.arrayContaining(['ui-btn', 'ui-btn--secondary', 'ui-btn--lg', 'ui-btn--square'])
+    );
   });
 });

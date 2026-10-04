@@ -3,15 +3,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { IconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon.types';
-import {
-  controlClasses,
-  ERROR_CLASSES,
-  FormFieldSize,
-  HELPER_CLASSES,
-  LABEL_CLASSES,
-  nextFieldId,
-  SIZE_INPUT_CLASSES
-} from './form-field-base';
+import { controlClasses, FormFieldSize, nextFieldId } from './form-field-base';
 
 export type InputType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
 
@@ -19,6 +11,7 @@ export type InputType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url'
     selector: 'app-input',
     imports: [IconComponent],
     templateUrl: './input.component.html',
+    styleUrl: './form-field.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
@@ -37,7 +30,7 @@ export class InputComponent implements ControlValueAccessor {
   readonly size = input<FormFieldSize>('md');
   readonly required = input(false);
   readonly disabled = input(false);
-  /** Not part of the mandated API — added so the field can back email/password/etc. inputs. Defaults to 'text'. */
+  /** Not part of the mandated API: added so the field can back email/password/etc. inputs. Defaults to 'text'. */
   readonly type = input<InputType>('text');
   /**
    * Browser autofill hint. Added for the two-factor code field, where
@@ -45,14 +38,10 @@ export class InputComponent implements ControlValueAccessor {
    * instead of making the user copy it by hand.
    */
   readonly autocomplete = input<string | undefined>(undefined);
-  /** On-screen keyboard hint — `numeric` for the six-digit code field. */
+  /** On-screen keyboard hint: `numeric` for the six-digit code field. */
   readonly inputMode = input<string | undefined>(undefined);
 
   readonly blurred = output<void>();
-
-  protected readonly labelClasses = LABEL_CLASSES;
-  protected readonly helperClasses = HELPER_CLASSES;
-  protected readonly errorClasses = ERROR_CLASSES;
 
   protected readonly fieldId = nextFieldId('app-input');
   protected readonly errorId = `${this.fieldId}-error`;
@@ -94,10 +83,14 @@ export class InputComponent implements ControlValueAccessor {
     return null;
   }
 
-  protected readonly inputClasses = computed(() => {
-    const padding = this.prefixIcon() ? 'pl-9' : this.suffixIcon() ? 'pr-9' : '';
-    return [controlClasses(!!this.error()), SIZE_INPUT_CLASSES[this.size()], padding].join(' ');
-  });
+  protected readonly inputClasses = computed(() =>
+    controlClasses({
+      size: this.size(),
+      hasError: !!this.error(),
+      hasPrefix: !!this.prefixIcon(),
+      hasSuffix: !!this.suffixIcon()
+    })
+  );
 
   protected readonly prefixIconName = computed(() => this.prefixIcon() as IconName | undefined);
   protected readonly suffixIconName = computed(() => this.suffixIcon() as IconName | undefined);

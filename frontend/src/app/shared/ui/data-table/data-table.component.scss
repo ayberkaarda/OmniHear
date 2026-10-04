@@ -1,25 +1,25 @@
-// Scoped to app-data-table. Dense and calm: 14 px text, hairline dividers
-// between rows only, no zebra, no vertical rules. The one colour in a resting
-// table is the signal bar on a selected row (docs/BRAND.md: "one lamp lit").
-// Table-only styling lives here (lazy, component-scoped) rather than in
-// utility classes, so it does not grow the global stylesheet.
+// Full-bleed rows, no card (docs/BRAND.md section 7): rows run edge to edge,
+// one hairline between them, an optional 6 px sentiment edge on the left,
+// mono labels in the header. The marker is the selected row.
 
-.dt-frame {
+.dt {
   position: relative;
   width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  --pad: 14px;
+}
+
+.dt--roomy {
+  --pad: 19px;
 }
 
 .dt-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  line-height: 22px;
 }
 
 .dt-sticky {
@@ -28,77 +28,80 @@
   z-index: var(--z-sticky);
 }
 
-.dt-error {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 40px 24px;
-
-  @media (min-width: 640px) {
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-  }
-}
-
 .dt-head {
   position: relative;
-  height: 36px;
-  text-align: left;
-  padding: 0 12px;
+  height: 40px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-surface);
+  background: var(--bg-canvas);
   color: var(--text-muted);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-  font-weight: 500;
+  font: 500 10.5px/16px var(--font-mono);
+  font-stretch: 87.5%;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  text-align: left;
   white-space: nowrap;
-  vertical-align: middle;
 }
 
 .dt-sort {
   display: inline-flex;
   max-width: 100%;
   align-items: center;
-  gap: 4px;
-  margin: 0 -4px;
-  padding: 2px 4px;
-  border-radius: var(--radius-sm);
+  gap: 6px;
   color: inherit;
   font: inherit;
-  transition: color var(--duration-fast) var(--ease-standard);
+  text-transform: inherit;
+  letter-spacing: inherit;
 
-  &:hover:not(.cursor-default),
+  &:hover:not(.is-static),
   &.is-sorted {
     color: var(--text-primary);
   }
 
+  &.is-static {
+    cursor: default;
+  }
+
   &:focus-visible {
     outline: 2px solid var(--ring-focus);
-    outline-offset: 1px;
+    outline-offset: 2px;
   }
+}
+
+.dt-trunc {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dt-sort-hint {
   display: inline-flex;
   opacity: 0;
-  transition: opacity var(--duration-fast) var(--ease-standard);
 
   .dt-sort:hover > &,
   .dt-sort:focus-visible > & {
-    opacity: 0.6;
+    opacity: 0.7;
   }
 }
 
-:is(.dt-head, .dt-cell).dt-select {
-  width: 40px;
-  padding-left: 16px;
-  padding-right: 4px;
+.dt-resize {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  bottom: 10px;
+  width: 5px;
+  border-right: 1px solid var(--border-strong);
+  cursor: col-resize;
+  opacity: 0;
+
+  .dt-head:hover > & {
+    opacity: 1;
+  }
 }
 
-:is(.dt-head, .dt-cell).dt-first {
-  padding-left: 16px;
+.dt-cell {
+  padding: var(--pad) 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
 }
 
 .dt-data {
@@ -109,49 +112,47 @@
   color: var(--text-primary);
 }
 
-.dt-resize {
-  position: absolute;
-  top: 8px;
-  right: 0;
-  bottom: 8px;
-  width: 5px;
-  cursor: col-resize;
-  user-select: none;
-  border-right: 1px solid transparent;
-  transition: border-color var(--duration-fast) var(--ease-standard);
-
-  &:hover {
-    border-right-color: var(--signal);
-  }
+.dt-select {
+  width: 48px;
+  padding-right: 0;
 }
 
-.dt-head:hover > .dt-resize:not(:hover) {
-  border-right-color: var(--border-strong);
-}
-
-.dt-cell {
-  padding: 0 12px;
+.dt-edge {
+  width: 6px;
+  padding: 0;
   border-bottom: 1px solid var(--border);
-  vertical-align: middle;
+  background: var(--tone, transparent);
+}
+
+[data-tone='positive'] {
+  --tone: var(--sentiment-positive-fill);
+}
+
+[data-tone='neutral'] {
+  --tone: var(--sentiment-neutral-fill);
+}
+
+[data-tone='negative'] {
+  --tone: var(--sentiment-negative-fill);
+}
+
+[data-tone='pending'] {
+  --tone: var(--border-strong);
 }
 
 .dt-row {
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-standard);
 
-  &:last-child > .dt-cell {
-    border-bottom: 0;
-  }
-
   &:hover {
-    background-color: var(--bg-surface-hover);
+    background: var(--bg-surface-hover);
   }
 
   &.is-selected {
-    background-color: var(--bg-surface-selected);
+    background: var(--bg-surface-selected);
 
-    > .dt-cell:first-child {
-      box-shadow: inset 2px 0 0 var(--signal);
+    > :first-child {
+      box-shadow: inset 6px 0 0 var(--signal);
     }
   }
 
@@ -161,13 +162,40 @@
   }
 }
 
+// Square, 1.5 px edge; checked is the marker with an ink tick.
 .dt-check {
+  appearance: none;
+  display: grid;
+  place-content: center;
   width: 16px;
   height: 16px;
   margin: 0;
-  vertical-align: middle;
-  accent-color: var(--signal);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 0;
+  background: transparent;
   cursor: pointer;
+
+  &:checked,
+  &:indeterminate {
+    border-color: var(--signal);
+    background: var(--signal);
+  }
+
+  &:checked::before,
+  &:indeterminate::before {
+    content: '';
+    width: 8px;
+    height: 4px;
+    border: solid var(--brand-on);
+    border-width: 0 0 2px 2px;
+    transform: translateY(-1px) rotate(-45deg);
+  }
+
+  &:indeterminate::before {
+    height: 0;
+    border-left: 0;
+    transform: none;
+  }
 
   &:focus-visible {
     outline: 2px solid var(--ring-focus);
@@ -175,25 +203,67 @@
   }
 }
 
-// Transient real-time row highlight: one flash of --highlight that fades out.
-// Skipped entirely under prefers-reduced-motion.
+.dt-skel {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+
+  i {
+    align-self: stretch;
+    width: 6px;
+    background: var(--border);
+  }
+
+  span {
+    height: 10px;
+    background: var(--bg-surface-sunken);
+  }
+}
+
+.dt-msg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 20px;
+  padding: 32px 24px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.dt-msg--error {
+  box-shadow: inset 6px 0 0 var(--sentiment-negative-fill);
+  color: var(--status-error);
+}
+
+.dt-msg-copy {
+  display: grid;
+  flex: 1 1 280px;
+  gap: 4px;
+  max-width: 60ch;
+  color: var(--text-secondary);
+}
+
+.dt-msg-title {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-stretch: 75%;
+  font-weight: 750;
+  line-height: 28px;
+}
+
+// A new row over the realtime channel: one sweep of --highlight, then gone.
 .row-highlight {
-  animation: app-data-table-highlight-fade 1.6s var(--ease-standard);
+  animation: dt-flash 1.6s var(--ease-emphasized);
 }
 
-@keyframes app-data-table-highlight-fade {
+@keyframes dt-flash {
   0%,
-  20% {
-    background-color: var(--highlight);
-  }
-
-  100% {
-    background-color: transparent;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .row-highlight {
-    animation: none;
+  25% {
+    background: var(--highlight);
   }
 }

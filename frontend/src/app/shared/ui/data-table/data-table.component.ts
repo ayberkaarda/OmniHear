@@ -2,12 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 
 import { ButtonStyleDirective } from '../button/button-style.directive';
 import { IconComponent } from '../icon/icon.component';
-import { ColumnDef, DataTableState, EmptyStateConfig, SortDirection, SortState } from './data-table.types';
-
-const ROW_HEIGHT_CLASSES: Record<40 | 44, string> = {
-  40: 'h-10',
-  44: 'h-11'
-};
+import { ColumnDef, DataTableRowTone, DataTableState, EmptyStateConfig, SortDirection, SortState } from './data-table.types';
 
 const DEFAULT_MIN_WIDTH = 60;
 
@@ -25,6 +20,17 @@ function defaultRowId<T>(row: T): string {
   return candidate === undefined || candidate === null ? '' : String(candidate);
 }
 
+/**
+ * Full-bleed list of rows (docs/BRAND.md section 7): no card, one hairline per
+ * row, mono header labels, the marker on selected rows.
+ *
+ * `rowHeight` keeps its 40 / 44 contract as a density switch: 40 is the
+ * compact list, 44 the roomy one with the 18 to 22 px row padding of v2.
+ *
+ * `rowTone` (optional) maps a row to its sentiment and draws the 6 px edge on
+ * the left. The edge is decoration: the row must still state the sentiment in
+ * text (a score or label column), since colour is never the only carrier.
+ */
 @Component({
   selector: 'app-data-table',
   standalone: true,
@@ -44,6 +50,8 @@ export class DataTableComponent<T> {
   readonly sort = input<SortState | undefined>(undefined);
   readonly stickyHeader = input(true);
   readonly highlightIds = input<ReadonlySet<string>>(new Set());
+  /** Optional sentiment edge per row; omit for a table without the edge column. */
+  readonly rowTone = input<((row: T) => DataTableRowTone | null | undefined) | undefined>(undefined);
 
   /**
    * NOT part of the mandated API. Generic rows need a stable string id for
@@ -53,7 +61,7 @@ export class DataTableComponent<T> {
 
   /**
    * Reserved for a future virtualized rendering mode. Deliberately NOT
-   * implemented in this pass — see SPEC: "sanal scroll bu turda kurma".
+   * implemented in this pass, see SPEC: "sanal scroll bu turda kurma".
    * TODO: wire up viewport-windowed rendering (e.g. CDK virtual scroll or a
    * hand-rolled windowing strategy) when the inbox table needs it at scale.
    */
@@ -64,12 +72,10 @@ export class DataTableComponent<T> {
   readonly rowActivate = output<T>();
   readonly retry = output<void>();
 
-  /** NOT part of the mandated API — lets the empty-state action button do something. */
+  /** NOT part of the mandated API: lets the empty-state action button do something. */
   readonly emptyStateAction = output<void>();
 
   protected readonly skeletonRows = SKELETON_ROWS;
-
-  protected readonly rowHeightClass = computed(() => ROW_HEIGHT_CLASSES[this.rowHeight()]);
 
   private readonly resizedWidths = signal<Record<string, number>>({});
 
@@ -114,6 +120,10 @@ export class DataTableComponent<T> {
       return 'none';
     }
     return current.dir === 'asc' ? 'ascending' : 'descending';
+  }
+
+  protected toneOf(row: T): DataTableRowTone | null {
+    return this.rowTone()?.(row) ?? null;
   }
 
   protected isSelected(row: T): boolean {

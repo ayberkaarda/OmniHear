@@ -23,3 +23,6 @@ export interface EmptyStateConfig {
 }
 
 export type DataTableState = 'ready' | 'loading' | 'empty' | 'error';
+
+/** Sentiment of a row, drawn as the 6 px edge; `pending` is a comment not read yet. */
+export type DataTableRowTone = 'positive' | 'neutral' | 'negative' | 'pending';

@@ -17,6 +17,9 @@ describe('IconComponent', () => {
     expect(svg).toBeTruthy();
     expect(svg?.getAttribute('aria-hidden')).toBe('true');
     expect(svg?.getAttribute('stroke')).toBe('currentColor');
+    // Brand v2: square caps and mitred joins, cut like the logo's chisel stroke.
+    expect(svg?.getAttribute('stroke-linecap')).toBe('square');
+    expect(svg?.getAttribute('stroke-linejoin')).toBe('miter');
     expect(svg?.querySelectorAll('circle, path, line, polyline, rect').length).toBeGreaterThan(0);
   });
 
