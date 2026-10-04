@@ -34,7 +34,7 @@
   }
 
   <!-- The four figures: huge, mono, each one a way into the inbox. -->
-  <div class="ov-figures" [attr.aria-busy]="loading() ? 'true' : null">
+  <div class="ov-figures" data-testid="overview-figures" [attr.aria-busy]="loading() ? 'true' : null">
     <button type="button" class="ov-figure" (click)="goToInbox()">
       <span class="ov-figure-label">{{ totalLabel }}</span>
       @if (loading()) {

@@ -192,7 +192,7 @@ describe('ThemeService', () => {
     beforeEach(() => {
       // The canvas token as tokens.css declares it, per theme.
       style = document.createElement('style');
-      style.textContent = ':root { --bg-canvas: #f1f3f1; } :root.dark { --bg-canvas: #101210; }';
+      style.textContent = ':root { --bg-canvas: #ecebf3; } :root.dark { --bg-canvas: #0e0d14; }';
       document.head.appendChild(style);
       metas = ['(prefers-color-scheme: light)', '(prefers-color-scheme: dark)'].map((media) => {
         const meta = document.createElement('meta');
@@ -216,13 +216,13 @@ describe('ThemeService', () => {
       TestBed.flushEffects();
 
       expect(document.documentElement.style.colorScheme).toBe('dark');
-      expect(metas.map((meta) => meta.content)).toEqual(['#101210', '#101210']);
+      expect(metas.map((meta) => meta.content)).toEqual(['#0e0d14', '#0e0d14']);
 
       service.setPreference('light');
       TestBed.flushEffects();
 
       expect(document.documentElement.style.colorScheme).toBe('light');
-      expect(metas.map((meta) => meta.content)).toEqual(['#f1f3f1', '#f1f3f1']);
+      expect(metas.map((meta) => meta.content)).toEqual(['#ecebf3', '#ecebf3']);
     });
 
     it('pins them to a manual dark choice while the OS is light', () => {
@@ -234,7 +234,7 @@ describe('ThemeService', () => {
       TestBed.flushEffects();
 
       expect(document.documentElement.style.colorScheme).toBe('dark');
-      expect(metas.map((meta) => meta.content)).toEqual(['#101210', '#101210']);
+      expect(metas.map((meta) => meta.content)).toEqual(['#0e0d14', '#0e0d14']);
     });
   });
 });
