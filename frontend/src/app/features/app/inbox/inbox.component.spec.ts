@@ -203,6 +203,42 @@ describe('InboxComponent', () => {
     element.remove();
   });
 
+  /** The paywall's buttons keep focus; the rows behind it are not reachable. */
+  it('leaves J and K alone while a dialog is open', () => {
+    document.body.appendChild(element);
+    settle(makeFeedbackPage([makeFeedback({ id: 1 }), makeFeedback({ id: 2 })]));
+    const dialog = document.createElement('div');
+    dialog.setAttribute('aria-modal', 'true');
+    const upgrade = document.createElement('button');
+    dialog.appendChild(upgrade);
+    document.body.appendChild(dialog);
+    upgrade.focus();
+
+    const event = new KeyboardEvent('keydown', { key: 'j', bubbles: true, cancelable: true });
+    upgrade.dispatchEvent(event);
+    expect(document.activeElement).toBe(upgrade);
+    expect(event.defaultPrevented).toBe(false);
+
+    dialog.remove();
+    element.remove();
+  });
+
+  it('keeps the voiceprint legend readable and hides only the bars', () => {
+    settle(
+      makeFeedbackPage([
+        makeFeedback({ id: 1 }),
+        makeFeedback({ id: 2 }),
+        makeFeedback({ id: 3, analysis_status: 'pending_analysis', analysis: null })
+      ])
+    );
+
+    const legend = element.querySelector('[data-testid="inbox-print-legend"]') as HTMLElement;
+    expect(legend.closest('[aria-hidden="true"]')).toBeNull();
+    const parts = Array.from(legend.children).map((part) => part.textContent?.replace(/\s+/g, ' ').trim());
+    expect(parts).toEqual(['Negative 2', 'Neutral 0', 'Positive 0']);
+    expect(element.querySelector('.ib-print-bars')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('walks pages through the contract meta', () => {
     settle(makeFeedbackPage([makeFeedback()], { current_page: 1, last_page: 3, total: 60 }));
 

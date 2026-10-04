@@ -24,6 +24,7 @@ import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { IconName } from '../../../shared/ui/icon/icon.types';
 import { InputComponent } from '../../../shared/ui/form-field/input.component';
+import { shortcutBlocked } from '../../../shared/ui/modal/modal-scope';
 import { SelectComponent, SelectOption } from '../../../shared/ui/form-field/select.component';
 import { EM_DASH, formatCount, formatDateTime, formatScore, truncate } from '../../../shared/format/format';
 import {
@@ -377,10 +378,11 @@ export class InboxComponent implements OnInit, OnDestroy {
 
   /**
    * J and K walk the rows; Enter opens the focused one (it is a link). Only
-   * while focus is not in a field, and never with a modifier held.
+   * while focus is not in a field and no dialog is open, and never with a
+   * modifier held.
    */
   protected onKeydown(event: KeyboardEvent): void {
-    if (event.ctrlKey || event.metaKey || event.altKey || isEditable(event.target)) {
+    if (event.ctrlKey || event.metaKey || event.altKey || shortcutBlocked(event)) {
       return;
     }
     const key = event.key.toLowerCase();
@@ -489,11 +491,4 @@ function toRow(feedback: Feedback): InboxRow {
 function blankToNull(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length === 0 ? null : trimmed;
-}
-
-function isEditable(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }

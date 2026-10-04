@@ -651,6 +651,15 @@
           <context context-type="linenumber">3,4</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="inbox.statement.unit" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {comment.} other {comments.}}</source>
+        <target>{VAR_PLURAL, plural, =1 {yorum.} other {yorum.}}</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.html</context>
+          <context context-type="linenumber">13,17</context>
+        </context-group>
+        <note priority="1" from="description">Unit after the comment count in the inbox statement header</note>
+      </trans-unit>
       <trans-unit id="app.inbox.subtitle" datatype="html">
         <source> Every collected comment with its sentiment, category and source. </source>
         <target>Toplanan her yorum; duygusu, kategorisi ve kaynağıyla birlikte.</target>
@@ -3397,7 +3406,7 @@
           <context context-type="linenumber">46,47</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.feed.sample" datatype="html">
+      <trans-unit id="landing.preview.sample" datatype="html">
         <source>Sample data</source>
         <target>Örnek veri</target>
         <context-group purpose="location">

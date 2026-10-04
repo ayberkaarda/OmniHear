@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { environment } from '../../../environments/environment';
 import { makeCompany, makeUser } from '../../core/auth/auth.fixtures';
@@ -129,6 +129,79 @@ describe('AppShellComponent', () => {
     const command = element.querySelector('[data-testid="shell-command"]');
     expect(command?.getAttribute('aria-label')).toBe('Search comments');
     expect(command?.getAttribute('aria-keyshortcuts')).toContain('Control+K');
+  });
+
+  describe('search shortcuts', () => {
+    async function mount() {
+      TestBed.inject(AuthStore).setSession('1|abc', makeUser(), makeCompany());
+      const fixture = TestBed.createComponent(AppShellComponent);
+      document.body.appendChild(fixture.nativeElement);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const navigate = jest.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+      return { fixture, navigate };
+    }
+
+    function press(target: EventTarget, init: KeyboardEventInit): KeyboardEvent {
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
+      target.dispatchEvent(event);
+      return event;
+    }
+
+    it('takes / and Ctrl K to the inbox from the page', async () => {
+      const { fixture, navigate } = await mount();
+
+      press(document.body, { key: '/' });
+      press(document.body, { key: 'k', ctrlKey: true });
+      expect(navigate).toHaveBeenCalledTimes(2);
+      expect(navigate).toHaveBeenCalledWith('/app/inbox');
+
+      fixture.destroy();
+    });
+
+    /** A half-filled "Connect a channel" form must survive a stray key. */
+    it('stands down while a dialog is open, with focus inside it or not', async () => {
+      const { fixture, navigate } = await mount();
+      const dialog = document.createElement('div');
+      dialog.setAttribute('role', 'dialog');
+      dialog.setAttribute('aria-modal', 'true');
+      const save = document.createElement('button');
+      dialog.appendChild(save);
+      document.body.appendChild(dialog);
+      save.focus();
+
+      const slash = press(save, { key: '/' });
+      press(save, { key: 'k', ctrlKey: true });
+      press(document.body, { key: 'k', metaKey: true });
+      expect(navigate).not.toHaveBeenCalled();
+      expect(slash.defaultPrevented).toBe(false);
+
+      dialog.remove();
+      fixture.destroy();
+    });
+
+    it('leaves Ctrl K and / to a text field, a select or contenteditable', async () => {
+      const { fixture, navigate } = await mount();
+      const field = document.createElement('input');
+      const select = document.createElement('select');
+      const editable = document.createElement('div');
+      editable.contentEditable = 'true';
+      // jsdom does not derive isContentEditable from the attribute.
+      Object.defineProperty(editable, 'isContentEditable', { value: true });
+      document.body.append(field, select, editable);
+
+      for (const target of [field, select, editable]) {
+        const commandK = press(target, { key: 'k', ctrlKey: true });
+        press(target, { key: '/' });
+        expect(commandK.defaultPrevented).toBe(false);
+      }
+      expect(navigate).not.toHaveBeenCalled();
+
+      field.remove();
+      select.remove();
+      editable.remove();
+      fixture.destroy();
+    });
   });
 
   describe('phone account sheet', () => {

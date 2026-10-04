@@ -29,6 +29,7 @@ import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { IconName } from '../../shared/ui/icon/icon.types';
 import { LogoComponent } from '../../shared/ui/logo/logo.component';
 import { trapTabKey } from '../../shared/ui/modal/focus-trap';
+import { shortcutBlocked } from '../../shared/ui/modal/modal-scope';
 import { QuotaMeterComponent } from './quota-meter.component';
 import { ThemeToggleComponent } from './theme-toggle.component';
 
@@ -116,6 +117,8 @@ export class AppShellComponent implements OnDestroy {
   protected readonly company = this.authStore.company;
   protected readonly emailVerified = this.authStore.isEmailVerified;
   protected readonly signingOut = signal(false);
+
+  private destroyed = false;
 
   /** The account dialog behind the avatar button. */
   protected readonly accountOpen = signal(false);
@@ -212,6 +215,7 @@ export class AppShellComponent implements OnDestroy {
 
   /** Leaving `/app/**` (sign-out, a dead token, or a plain navigation) closes the socket. */
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.realtime.stop();
   }
 
@@ -220,19 +224,21 @@ export class AppShellComponent implements OnDestroy {
   }
 
   /**
-   * `Ctrl K` (or `Cmd K`) from anywhere, `/` from anywhere that is not a text
-   * field: both go to the inbox search. Escape closes the account dialog.
+   * `Ctrl K` (or `Cmd K`) and `/` go to the inbox search. Neither fires while
+   * a dialog is open or focus is in a field, the inbox search included: a
+   * dialog keeps the keyboard, and a field keeps its own keys (`Ctrl K` is
+   * left to the field and the browser there). Escape closes the account dialog.
    */
   protected onDocumentKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       this.dismissAccount();
       return;
     }
-    if (this.accountOpen()) {
+    if (this.accountOpen() || shortcutBlocked(event)) {
       return;
     }
     const commandK = (event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k';
-    const slash = event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !isEditable(event.target);
+    const slash = event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey;
     if (commandK || slash) {
       event.preventDefault();
       this.openSearch();
@@ -248,7 +254,8 @@ export class AppShellComponent implements OnDestroy {
       return;
     }
     void this.router.navigateByUrl('/app/inbox').then((moved) => {
-      if (moved !== false) {
+      // The shell can be gone by the time the navigation settles.
+      if (moved !== false && !this.destroyed) {
         afterNextRender(() => document.querySelector<HTMLInputElement>(SEARCH_INPUT)?.focus(), {
           injector: this.injector
         });
@@ -308,11 +315,4 @@ export class AppShellComponent implements OnDestroy {
       }
     });
   }
-}
-
-function isEditable(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }

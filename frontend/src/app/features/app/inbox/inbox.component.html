@@ -18,13 +18,15 @@
     </div>
 
     @if (voiceprint().length > 0) {
-      <figure class="ib-print" aria-hidden="true">
-        <div class="ib-print-legend">
+      <!-- Only the bars are hidden: the legend is the same mix in words and
+           numbers, and a screen reader reads it like anyone else. -->
+      <figure class="ib-print">
+        <div class="ib-print-legend" data-testid="inbox-print-legend">
           @for (part of mix(); track part.key) {
             <span class="ib-print-key" [attr.data-tone]="part.key">{{ part.label }} {{ part.count }}</span>
           }
         </div>
-        <div class="ib-print-bars">
+        <div class="ib-print-bars" aria-hidden="true">
           @for (bar of voiceprint(); track bar.id) {
             <i class="ib-bar" [attr.data-tone]="bar.tone" [style.height.%]="bar.height * 100"></i>
           }

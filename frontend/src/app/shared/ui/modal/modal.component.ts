@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   effect,
   ElementRef,
+  inject,
   input,
   output,
   viewChild
@@ -11,6 +13,7 @@ import {
 import { ButtonComponent } from '../button/button.component';
 import { IconComponent } from '../icon/icon.component';
 import { trapTabKey } from './focus-trap';
+import { registerOpenModal } from './modal-scope';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
 export type ModalRole = 'dialog' | 'alertdialog';
@@ -47,14 +50,24 @@ export class ModalComponent {
 
   private previouslyFocused: HTMLElement | null = null;
 
+  /** Undoes this sheet's entry in `modal-scope` while it is open. */
+  private releaseScope: (() => void) | null = null;
+
   constructor() {
+    inject(DestroyRef).onDestroy(() => this.releaseScope?.());
+
     effect(() => {
       if (this.open()) {
+        this.releaseScope ??= registerOpenModal();
         this.previouslyFocused = (document.activeElement as HTMLElement | null) ?? null;
         queueMicrotask(() => this.titleEl()?.nativeElement.focus());
-      } else if (this.previouslyFocused) {
-        this.previouslyFocused.focus();
-        this.previouslyFocused = null;
+      } else {
+        this.releaseScope?.();
+        this.releaseScope = null;
+        if (this.previouslyFocused) {
+          this.previouslyFocused.focus();
+          this.previouslyFocused = null;
+        }
       }
     });
   }
