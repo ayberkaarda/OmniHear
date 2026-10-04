@@ -161,7 +161,7 @@ describe('application route tree', () => {
    * only the honest answer has changed for those four.
    */
   const LIVE_SCREEN_BUSY_SELECTOR: Readonly<Record<string, string>> = {
-    'app/overview': '[data-testid="kpi-skeleton"]',
+    'app/overview': '[data-testid="overview-figures"][aria-busy="true"]',
     'app/inbox': '[data-testid="inbox-results"][aria-busy="true"]',
     'app/inbox/:id': '[data-testid="detail-skeleton"]',
     'app/integrations': '[data-testid="integrations-skeleton"]',

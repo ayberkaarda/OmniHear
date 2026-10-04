@@ -1,178 +1,157 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
-  <header class="flex flex-col gap-3">
-    <a
-      routerLink="/app/inbox"
-      class="dt-fit rounded-sm text-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-    >
-      <span i18n="@@app.inboxDetail.back">Back to the inbox</span>
-    </a>
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-semibold tracking-display text-[var(--text-primary)]" i18n="@@app.inboxDetail.title">
-        Feedback detail
-      </h1>
-      <p class="max-w-[65ch] text-sm text-[var(--text-secondary)]" i18n="@@app.inboxDetail.subtitle">
-        The comment itself, next to the reasoning behind its analysis.
-      </p>
-    </div>
-  </header>
-
-  @if (errorMessage(); as message) {
-    <div
-      class="flex flex-wrap items-center gap-3 rounded-card border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
-      role="alert"
-      data-testid="detail-error"
-    >
-      <app-icon name="alert-triangle" size="sm" />
-      <span class="flex-1">{{ message }}</span>
-      <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
-    </div>
-  } @else if (loading()) {
-    <div class="grid gap-6 lg:grid-cols-3" data-testid="detail-skeleton" aria-busy="true">
-      <span class="sr-only" i18n="Feedback detail loading announcement@@inboxDetail.loading">Loading this comment…</span>
-      <div class="flex flex-col gap-4 rounded-card border border-[var(--border)] bg-[var(--bg-surface)] dt-pad dt-wide" aria-hidden="true">
-        <span class="dt-w-a h-4 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-        <span class="h-4 w-full animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-        <span class="dt-w-b h-4 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-        <span class="dt-w-c h-4 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+<div class="dt" [class.dt-with-pane]="pane().length > 0">
+  <!-- The inbox page you came from, so the next comment is one click away. -->
+  @if (pane().length > 0) {
+    <aside class="dt-pane" aria-labelledby="detail-pane-title">
+      <div class="dt-pane-head">
+        <h2 id="detail-pane-title" class="dt-pane-title" i18n="@@shell.nav.inbox">Inbox</h2>
       </div>
-      <div class="dt-skel-aside animate-pulse rounded-card bg-[var(--bg-surface-sunken)]" aria-hidden="true"></div>
-    </div>
-  } @else if (feedback(); as record) {
-    <div class="grid items-start gap-6 lg:grid-cols-3">
-      <!-- The customer's words, as they wrote them. -->
-      <article class="flex min-w-0 flex-col rounded-card border border-[var(--border)] bg-[var(--bg-surface)] dt-wide">
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--border)] dt-gutter py-4">
-          <app-badge kind="source" [value]="sourceLabel()" size="sm" />
-          <span class="text-sm font-medium text-[var(--text-primary)]">{{ authorName() }}</span>
-          <time class="font-mono text-xs tabular-nums text-[var(--text-muted)] dt-time" [attr.datetime]="record.published_at">{{
-            publishedAt()
-          }}</time>
-        </div>
-
-        <p
-          class="dt-body dt-gutter max-w-[65ch] text-base leading-relaxed text-[var(--text-primary)]"
-          data-testid="detail-body"
-        >
-          {{ record.body }}
-        </p>
-
-        <div class="dt-foot dt-gutter flex flex-col gap-3 border-t border-[var(--border)] py-4">
-          <dl class="flex flex-wrap gap-x-6 gap-y-1 text-xs">
-            <div class="flex min-w-0 gap-2">
-              <dt class="text-[var(--text-muted)]" i18n="Feedback metadata label@@inboxDetail.meta.externalId">Source ID</dt>
-              <dd class="min-w-0 truncate font-mono text-[var(--text-secondary)]">{{ record.external_id }}</dd>
-            </div>
-            <div class="flex gap-2">
-              <dt class="text-[var(--text-muted)]" i18n="Feedback metadata label@@inboxDetail.meta.status">Status</dt>
-              <dd class="text-[var(--text-secondary)]">{{ statusLabel() }}</dd>
-            </div>
-          </dl>
-
-          @if (record.source_url) {
+      <ol class="dt-pane-list">
+        @for (row of pane(); track row.id) {
+          <li>
             <a
-              [href]="record.source_url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="dt-fit shrink-0 rounded-sm text-sm font-medium text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-              >{{ openSourceLabel }}</a
+              [routerLink]="['/app/inbox', row.id]"
+              class="dt-pane-row"
+              [class.dt-pane-on]="row.id === currentId()"
+              [attr.aria-current]="row.id === currentId() ? 'page' : null"
+              [attr.data-tone]="row.tone"
             >
-          }
-        </div>
-      </article>
+              <span class="dt-pane-who">
+                <span class="dt-pane-author">{{ row.author }}</span>
+                <span class="dt-pane-source">{{ row.source }}</span>
+                @if (row.score) {
+                  <span class="dt-pane-score">{{ row.score }}</span>
+                }
+              </span>
+              <span class="dt-pane-text">{{ row.preview }}</span>
+            </a>
+          </li>
+        }
+      </ol>
+    </aside>
+  }
 
-      <section
-        class="flex flex-col rounded-card border border-[var(--border)] bg-[var(--bg-surface)] dt-aside"
-        aria-labelledby="detail-analysis-heading"
-      >
-        <h2
-          id="detail-analysis-heading"
-          class="border-b border-[var(--border)] px-5 py-4 text-sm font-semibold text-[var(--text-primary)]"
-          i18n="Analysis panel heading@@inboxDetail.analysis.title"
-        >
-          What the analyser found
-        </h2>
+  <section class="dt-main">
+    <header class="dt-head">
+      <a routerLink="/app/inbox" class="dt-back">
+        <span aria-hidden="true">←</span>&ngsp;<span i18n="@@app.inboxDetail.back">Back to the inbox</span>
+      </a>
+      <h1 class="dt-title" i18n="@@app.inboxDetail.title">Feedback detail</h1>
+      <p class="dt-subtitle" i18n="@@app.inboxDetail.subtitle">The comment itself, next to the reasoning behind its analysis.</p>
+    </header>
 
-        @if (analysis(); as result) {
-          <div class="flex flex-wrap items-center gap-2 px-5 pt-4" data-testid="detail-analysis">
-            <app-badge kind="sentiment" [value]="result.sentiment_label" [score]="result.sentiment_score" />
-            <app-badge kind="category" [value]="result.category" />
+    @if (errorMessage(); as message) {
+      <div class="dt-alert" role="alert" data-testid="detail-error">
+        <app-icon name="alert-triangle" size="sm" />
+        <span class="dt-alert-text">{{ message }}</span>
+        <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
+      </div>
+    } @else if (loading()) {
+      <div class="dt-skeleton" data-testid="detail-skeleton" aria-busy="true">
+        <span class="sr-only" i18n="Feedback detail loading announcement@@inboxDetail.loading">Loading this comment…</span>
+        <span class="dt-skel dt-skel-meta" aria-hidden="true"></span>
+        <span class="dt-skel dt-skel-quote" aria-hidden="true"></span>
+        <span class="dt-skel dt-skel-quote dt-skel-short" aria-hidden="true"></span>
+      </div>
+    } @else if (feedback(); as record) {
+      <div class="dt-body">
+        <!-- The customer's words, as they wrote them, with what the analyser keyed on marked. -->
+        <article class="dt-read">
+          <p class="dt-meta">
+            <span class="dt-source">{{ sourceLabel() }}</span>
+            <time class="dt-time" [attr.datetime]="record.published_at">{{ publishedAt() }}</time>
+          </p>
+
+          <span class="dt-quotemark" aria-hidden="true">“</span>
+          <p class="dt-quote" [attr.data-size]="quoteSize()" data-testid="detail-body"
+            >@for (run of bodyRuns(); track $index) {@if (run.marked) {<mark class="marker">{{ run.text }}</mark>} @else {<span>{{ run.text }}</span>}}</p
+          >
+
+          <p class="dt-author">{{ authorName() }}</p>
+
+          <div class="dt-foot">
+            @if (record.source_url) {
+              <a [href]="record.source_url" target="_blank" rel="noopener noreferrer" class="dt-open">{{ openSourceLabel }}</a>
+            }
+            <dl class="dt-facts">
+              <div class="dt-fact">
+                <dt i18n="Feedback metadata label@@inboxDetail.meta.externalId">Source ID</dt>
+                <dd class="dt-mono">{{ record.external_id }}</dd>
+              </div>
+              <div class="dt-fact">
+                <dt i18n="Feedback metadata label@@inboxDetail.meta.status">Status</dt>
+                <dd>{{ statusLabel() }}</dd>
+              </div>
+            </dl>
           </div>
+        </article>
 
-          <dl class="flex flex-col divide-y divide-[var(--border)] px-5 text-sm">
-            <div class="flex flex-col gap-2 py-4">
-              <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.score">
-                Sentiment score
-              </dt>
-              <dd class="flex flex-col gap-2">
-                <span class="flex items-baseline gap-2">
-                  <span class="font-mono text-2xl font-medium tabular-nums text-[var(--text-primary)]">{{ sentimentScore() }}</span>
-                  <span class="text-xs text-[var(--text-muted)]" i18n="Scale note next to the sentiment score@@inboxDetail.analysis.scoreScale">
+        <!-- The reasoning: a thin ruled panel beside the quote. -->
+        <section class="dt-analysis" aria-labelledby="detail-analysis-heading">
+          <h2 id="detail-analysis-heading" class="dt-analysis-title" i18n="Analysis panel heading@@inboxDetail.analysis.title">
+            What the analyser found
+          </h2>
+
+          @if (analysis(); as result) {
+            <dl class="dt-readings" data-testid="detail-analysis" [attr.data-tone]="result.sentiment_label">
+              <div class="dt-reading">
+                <dt class="dt-label" i18n="Analysis field label@@inboxDetail.analysis.score">Sentiment score</dt>
+                <dd>
+                  <span class="dt-score">{{ sentimentScore() }}</span>
+                  <span class="dt-word">{{ sentimentWord() }}</span>
+                  <!-- Position on the scale, drawn in ink: where the pin sits says
+                       what the colour says, without the colour. -->
+                  <span class="dt-scale" aria-hidden="true">
+                    <span class="dt-axis"></span>
+                    <span class="dt-mid"></span>
+                    <span class="dt-pin" [style.left.%]="scorePosition()"></span>
+                  </span>
+                  <span class="dt-scale-note" i18n="Scale note next to the sentiment score@@inboxDetail.analysis.scoreScale">
                     on a scale from −1 to +1
                   </span>
-                </span>
-                <!-- Position on the scale, drawn in ink: where the marker sits says
-                     what the colour of a sentiment badge says, without the colour. -->
-                <span class="dt-scale relative block" aria-hidden="true">
-                  <span class="dt-axis absolute inset-x-0"></span>
-                  <span class="dt-mid absolute top-0"></span>
-                  <span
-                    class="dt-pin absolute top-0 rounded-full"
-                    [style.left.%]="scorePosition()"
-                  ></span>
-                </span>
-              </dd>
-            </div>
-
-            <div class="flex flex-col gap-2 py-4">
-              <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.confidence">
-                Confidence
-              </dt>
-              <dd class="flex items-center gap-3">
-                <span class="w-12 font-mono tabular-nums text-[var(--text-primary)]">{{ confidencePercent() }}</span>
-                <!-- Deliberately colourless: confidence is a magnitude, not a
-                     verdict, and a red-to-green bar here would read as sentiment. -->
-                <span class="h-1 flex-1 overflow-hidden rounded-full bg-[var(--bg-surface-sunken)]" aria-hidden="true">
-                  <span class="block h-full rounded-full bg-[var(--brand)]" [style.width.%]="confidenceWidth()"></span>
-                </span>
-              </dd>
-            </div>
-
-            @if (result.keywords.length > 0) {
-              <div class="flex flex-col gap-2 py-4">
-                <dt class="text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.keywords">
-                  Keywords it keyed on
-                </dt>
-                <dd class="flex flex-wrap gap-1.5">
-                  @for (keyword of result.keywords; track keyword) {
-                    <span
-                      class="rounded-sm border border-[var(--border)] bg-[var(--bg-surface-sunken)] px-1.5 py-0.5 font-mono text-xs text-[var(--text-secondary)]"
-                      >{{ keyword }}</span
-                    >
-                  }
                 </dd>
               </div>
-            }
 
-            <div class="flex items-baseline justify-between gap-4 py-3">
-              <dt class="shrink-0 text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.model">
-                Model version
-              </dt>
-              <dd class="min-w-0 break-all text-right font-mono text-xs text-[var(--text-secondary)]">{{ result.model_version }}</dd>
-            </div>
-            <div class="flex items-baseline justify-between gap-4 py-3">
-              <dt class="shrink-0 text-xs text-[var(--text-muted)]" i18n="Analysis field label@@inboxDetail.analysis.analysedAt">
-                Analysed at
-              </dt>
-              <dd class="text-right font-mono text-xs tabular-nums text-[var(--text-secondary)]">{{ analyzedAt() }}</dd>
-            </div>
-          </dl>
-        } @else {
-          <p class="flex items-start gap-2 px-5 py-5 text-sm text-[var(--text-secondary)]" data-testid="detail-no-analysis">
-            <span class="mt-0.5 flex text-[var(--text-muted)]"><app-icon name="info" size="sm" /></span>
-            <span>{{ pendingExplanation() }}</span>
-          </p>
-        }
-      </section>
-    </div>
-  }
-</section>
+              <div class="dt-reading">
+                <dt class="dt-label" i18n="Inbox table column@@inbox.column.category">Category</dt>
+                <dd>
+                  <span class="dt-category" [attr.data-category]="result.category">{{ categoryWord() }}</span>
+                </dd>
+                <dt class="dt-label dt-label-sub" i18n="Analysis field label@@inboxDetail.analysis.confidence">Confidence</dt>
+                <dd class="dt-confidence">
+                  <span class="dt-mono">{{ confidencePercent() }}</span>
+                  <!-- Deliberately colourless: confidence is a magnitude, not a verdict. -->
+                  <span class="dt-conf-bar" aria-hidden="true"><span [style.width.%]="confidenceWidth()"></span></span>
+                </dd>
+              </div>
+
+              @if (result.keywords.length > 0) {
+                <div class="dt-reading">
+                  <dt class="dt-label" i18n="Analysis field label@@inboxDetail.analysis.keywords">Keywords it keyed on</dt>
+                  <dd class="dt-keywords">
+                    @for (keyword of result.keywords; track keyword) {
+                      <span class="dt-keyword">{{ keyword }}</span>
+                    }
+                  </dd>
+                </div>
+              }
+
+              <div class="dt-reading dt-reading-row">
+                <dt class="dt-label" i18n="Analysis field label@@inboxDetail.analysis.model">Model version</dt>
+                <dd class="dt-mono dt-break">{{ result.model_version }}</dd>
+              </div>
+              <div class="dt-reading dt-reading-row">
+                <dt class="dt-label" i18n="Analysis field label@@inboxDetail.analysis.analysedAt">Analysed at</dt>
+                <dd class="dt-mono">{{ analyzedAt() }}</dd>
+              </div>
+            </dl>
+          } @else {
+            <p class="dt-none" data-testid="detail-no-analysis">
+              <app-icon name="info" size="sm" />
+              <span>{{ pendingExplanation() }}</span>
+            </p>
+          }
+        </section>
+      </div>
+    }
+  </section>
+</div>

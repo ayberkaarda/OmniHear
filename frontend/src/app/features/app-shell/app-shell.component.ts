@@ -18,13 +18,18 @@ import { filter, map } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { AuthStore } from '../../core/auth/auth.store';
+import { FeedbackListStore } from '../../core/feedback/feedback-list.store';
+import { IntegrationsStore } from '../../core/integrations/integrations.store';
 import { PaywallModalComponent } from '../../core/paywall/paywall-modal.component';
 import { RealtimeBridge } from '../../core/realtime/realtime.bridge';
+import { formatCount } from '../../shared/format/format';
+import { analysisStatusLabel, categoryLabel, platformLabel, sentimentLabel } from '../../shared/labels/domain-labels';
 import { ButtonComponent } from '../../shared/ui/button/button.component';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { IconName } from '../../shared/ui/icon/icon.types';
 import { LogoComponent } from '../../shared/ui/logo/logo.component';
 import { trapTabKey } from '../../shared/ui/modal/focus-trap';
+import { shortcutBlocked } from '../../shared/ui/modal/modal-scope';
 import { QuotaMeterComponent } from './quota-meter.component';
 import { ThemeToggleComponent } from './theme-toggle.component';
 
@@ -36,36 +41,42 @@ interface NavItem {
   readonly icon: IconName;
 }
 
-/** Order is the order on screen, in the rail and in the phone tab bar alike. */
+/** One filter that is narrowing the inbox, as the command bar shows it. */
+interface CommandToken {
+  readonly key: string;
+  readonly text: string;
+}
+
+/**
+ * Order is the order on screen: the view tabs on wide screens and the tab bar
+ * on phones. The inbox leads because it is where the work is.
+ */
 const NAV: readonly NavItem[] = [
+  { section: 'inbox', link: '/app/inbox', icon: 'inbox' },
   { section: 'overview', link: '/app/overview', icon: 'eye' },
-  { section: 'inbox', link: '/app/inbox', icon: 'mail' },
   { section: 'integrations', link: '/app/integrations', icon: 'link' },
   { section: 'settings', link: '/app/settings', icon: 'user' }
 ];
 
-const RAIL_LINK =
-  'relative flex h-9 items-center gap-3 rounded-control px-3 text-sm transition-colors duration-fast ease-standard ' +
-  'hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]';
-const TAB_LINK =
-  'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px';
-const LINK_ACTIVE = 'shell-selected font-medium text-[var(--text-primary)]';
-
-/** Tailwind `lg`: from here up the rail carries the account block and the sheet is hidden. */
-const WIDE_QUERY = '(min-width: 1024px)';
-
-const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/?#]+))?/;
+/** Where the inbox search field lives; the command bar hands focus to it. */
+const SEARCH_INPUT = '[data-testid="inbox-search"] input';
 
 /**
- * Chrome for every `/app/**` screen: skip link, primary navigation landmark,
- * identity/quota rail and the single `<main>` the child routes render into.
+ * Chrome for every `/app/**` screen: skip link, the command bar, the view tabs
+ * and the single `<main>` the child routes render into.
  *
- * Wide screens get a quiet rail on the left; phones get a sticky top bar and a
- * tab bar along the bottom edge, where a thumb reaches it. Both carry the same
- * four destinations. The account block (quota, theme, sign out) sits at the
- * foot of the rail and, on phones, behind the avatar button in the top bar.
+ * There is no sidebar. One bar runs across the top: the lockup, a command line
+ * that shows what is narrowing the inbox and takes `Ctrl K` or `/`, the quota,
+ * the company and the account button. Under it sit the views as large text
+ * tabs. Phones keep the top bar (lockup, company, search, account) and move
+ * the views to a tab bar along the bottom edge, where a thumb reaches it.
+ *
+ * The company name is rendered once, in the top bar, at every width. CSS
+ * places it; nothing is duplicated and hidden.
+ *
+ * The account button opens a small modal dialog at every width (quota, theme,
+ * sign out). It shares `trapTabKey` with the shared modal, makes the page
+ * behind it inert, closes on Escape or a tap outside and hands focus back.
  */
 @Component({
   selector: 'app-app-shell',
@@ -82,11 +93,10 @@ const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/
     PaywallModalComponent
   ],
   templateUrl: './app-shell.component.html',
-  styleUrl: './app-shell.component.scss',
+  styleUrls: ['./app-shell.component.scss', './app-shell-views.scss', './app-shell-sheet.scss', './app-shell-foot.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '(document:keydown.escape)': 'dismissAccount()',
-    '(window:resize)': 'closeAccountIfWide()'
+    '(document:keydown)': 'onDocumentKeydown($event)'
   }
 })
 export class AppShellComponent implements OnDestroy {
@@ -95,6 +105,8 @@ export class AppShellComponent implements OnDestroy {
   private readonly realtime = inject(RealtimeBridge);
   private readonly router = inject(Router);
   private readonly injector = inject(Injector);
+  private readonly feedbackList = inject(FeedbackListStore);
+  private readonly integrations = inject(IntegrationsStore);
 
   private readonly accountTrigger = viewChild<ElementRef<HTMLButtonElement>>('accountTrigger');
   private readonly accountSheet = viewChild<ElementRef<HTMLElement>>('accountSheet');
@@ -106,10 +118,63 @@ export class AppShellComponent implements OnDestroy {
   protected readonly emailVerified = this.authStore.isEmailVerified;
   protected readonly signingOut = signal(false);
 
-  /** Phone-only account sheet behind the avatar button. */
+  private destroyed = false;
+
+  /** The account dialog behind the avatar button. */
   protected readonly accountOpen = signal(false);
 
-  protected readonly userInitial = computed(() => this.user()?.name.trim().charAt(0).toUpperCase() ?? '?');
+  protected readonly userInitials = computed(() => {
+    const parts = (this.user()?.name ?? '').trim().split(/\s+/).filter((part) => part.length > 0);
+    if (parts.length === 0) {
+      return '?';
+    }
+    const first = parts[0].charAt(0);
+    const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+    return `${first}${last}`.toUpperCase();
+  });
+
+  /**
+   * Counts beside the view tabs. Read from what the stores already hold; the
+   * shell never fetches a list just to count it.
+   */
+  protected readonly counts = computed<Partial<Record<Section, string>>>(() => {
+    const result: Partial<Record<Section, string>> = {};
+    if (this.feedbackList.state() === 'ready') {
+      result.inbox = formatCount(this.feedbackList.meta().total);
+    }
+    if (this.integrations.state() === 'ready') {
+      result.integrations = formatCount(this.integrations.items().length);
+    }
+    return result;
+  });
+
+  /** The filters narrowing the inbox right now, as plain values. */
+  protected readonly tokens = computed<readonly CommandToken[]>(() => {
+    const filters = this.feedbackList.filters();
+    const tokens: CommandToken[] = [];
+    if (filters.sentiment) {
+      tokens.push({ key: 'sentiment', text: sentimentLabel(filters.sentiment) });
+    }
+    if (filters.category) {
+      tokens.push({ key: 'category', text: categoryLabel(filters.category) });
+    }
+    if (filters.platform) {
+      tokens.push({ key: 'platform', text: platformLabel(filters.platform) });
+    }
+    if (filters.analysis_status) {
+      tokens.push({ key: 'status', text: analysisStatusLabel(filters.analysis_status) });
+    }
+    if (filters.integration_id !== null) {
+      tokens.push({ key: 'integration', text: `#${filters.integration_id}` });
+    }
+    if (filters.from || filters.to) {
+      tokens.push({ key: 'dates', text: `${filters.from ?? '…'} → ${filters.to ?? '…'}` });
+    }
+    return tokens;
+  });
+
+  /** What was typed into the inbox search, shown in place of the placeholder. */
+  protected readonly query = computed(() => this.feedbackList.filters().q ?? '');
 
   private readonly url = toSignal(
     this.router.events.pipe(
@@ -119,21 +184,10 @@ export class AppShellComponent implements OnDestroy {
     { initialValue: this.router.url }
   );
 
-  /** Where the user is, for the breadcrumb in the top bar. */
-  protected readonly location = computed(() => {
-    const match = SECTION_PATTERN.exec(this.url());
-    if (!match) {
-      return null;
-    }
-    const section = match[1] as Section;
-    // Only the inbox has a record level worth naming; settings sub-pages carry their own nav.
-    const record = section === 'inbox' && match[2] && /^\d+$/.test(match[2]) ? match[2] : null;
-    return { section, record };
-  });
-
   protected readonly primaryNavLabel = $localize`:Primary navigation landmark label@@shell.nav.primary:Primary`;
   protected readonly themeGroupHeading = $localize`:Theme switch group label@@shell.theme.label:Colour theme`;
   protected readonly signOutLabel = $localize`:Sign out button label@@shell.signOut:Sign out`;
+  protected readonly searchLabel = $localize`:Inbox search field label@@inbox.filters.search:Search comments`;
 
   /**
    * The only place realtime is started, and the reason it is here rather than
@@ -152,7 +206,7 @@ export class AppShellComponent implements OnDestroy {
       }
     });
 
-    // A navigation always lands on a fresh screen, never under an open sheet.
+    // A navigation always lands on a fresh screen, never under an open dialog.
     effect(() => {
       this.url();
       this.accountOpen.set(false);
@@ -161,19 +215,56 @@ export class AppShellComponent implements OnDestroy {
 
   /** Leaving `/app/**` (sign-out, a dead token, or a plain navigation) closes the socket. */
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.realtime.stop();
   }
 
-  protected railLinkClasses(active: boolean): string {
-    return `${RAIL_LINK} ${active ? LINK_ACTIVE : 'text-[var(--text-secondary)]'}`;
-  }
-
-  protected tabClasses(active: boolean): string {
-    return `${TAB_LINK} ${active ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`;
+  protected countFor(section: Section): string | null {
+    return this.counts()[section] ?? null;
   }
 
   /**
-   * The sheet behaves like the shared modal: focus moves into it on open, Tab
+   * `Ctrl K` (or `Cmd K`) and `/` go to the inbox search. Neither fires while
+   * a dialog is open or focus is in a field, the inbox search included: a
+   * dialog keeps the keyboard, and a field keeps its own keys (`Ctrl K` is
+   * left to the field and the browser there). Escape closes the account dialog.
+   */
+  protected onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.dismissAccount();
+      return;
+    }
+    if (this.accountOpen() || shortcutBlocked(event)) {
+      return;
+    }
+    const commandK = (event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k';
+    const slash = event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey;
+    if (commandK || slash) {
+      event.preventDefault();
+      this.openSearch();
+    }
+  }
+
+  /** Focuses the inbox search, moving to the inbox first when needed. */
+  protected openSearch(): void {
+    const field = document.querySelector<HTMLInputElement>(SEARCH_INPUT);
+    if (field) {
+      field.focus();
+      field.select();
+      return;
+    }
+    void this.router.navigateByUrl('/app/inbox').then((moved) => {
+      // The shell can be gone by the time the navigation settles.
+      if (moved !== false && !this.destroyed) {
+        afterNextRender(() => document.querySelector<HTMLInputElement>(SEARCH_INPUT)?.focus(), {
+          injector: this.injector
+        });
+      }
+    });
+  }
+
+  /**
+   * The dialog behaves like the shared modal: focus moves into it on open, Tab
    * is contained by the same `trapTabKey`, and the page behind it is `inert`.
    */
   protected toggleAccount(): void {
@@ -185,7 +276,7 @@ export class AppShellComponent implements OnDestroy {
     afterNextRender(() => this.accountSheet()?.nativeElement.focus(), { injector: this.injector });
   }
 
-  /** Escape or a tap on the scrim: close and hand focus back to the avatar that opened it. */
+  /** Escape or a tap outside: close and hand focus back to the button that opened it. */
   protected dismissAccount(): void {
     if (!this.accountOpen()) {
       return;
@@ -199,13 +290,6 @@ export class AppShellComponent implements OnDestroy {
     const sheet = this.accountSheet()?.nativeElement;
     if (event.key === 'Tab' && sheet) {
       trapTabKey(sheet, event);
-    }
-  }
-
-  /** Widening past `lg` hides the sheet; it must not leave an inert page with nothing open. */
-  protected closeAccountIfWide(): void {
-    if (this.accountOpen() && typeof matchMedia === 'function' && matchMedia(WIDE_QUERY).matches) {
-      this.accountOpen.set(false);
     }
   }
 

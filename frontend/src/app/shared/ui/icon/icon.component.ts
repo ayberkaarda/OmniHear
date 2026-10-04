@@ -11,9 +11,11 @@ const SIZE_CLASSES: Record<IconSize, string> = {
 };
 
 /**
- * Decorative inline icon (Lucide-style, stroke-based, `stroke="currentColor"`).
- * Drawn at a 1.75 stroke so glyphs sit at the same visual weight as
- * Schibsted Grotesk medium text beside them.
+ * Decorative inline icon (stroke-based, `stroke="currentColor"`).
+ * Brand v2: square caps and mitred joins, the same cut as the chisel-tip
+ * stroke in the logo, at a 1.75 stroke so glyphs sit at the weight of
+ * Bricolage Grotesque 500 to 600 text beside them. Colour is inherited, so on
+ * light paper an icon that should read as the marker uses `--signal-ink`.
  * Always `aria-hidden="true"` — any accessible name must live on the
  * consuming element (a visible label, or an explicit `aria-label`).
  */

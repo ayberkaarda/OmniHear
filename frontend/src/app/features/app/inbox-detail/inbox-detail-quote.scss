@@ -1,0 +1,133 @@
+// inbox-detail: continued from inbox-detail.component.scss, split so each
+// component stylesheet stays inside the per-file style budget.
+
+$md: 768px;
+$lg: 1024px;
+$xl: 1280px;
+
+// ---- Main -------------------------------------------------------------------
+
+.dt-main {
+  min-width: 0;
+  padding: 1.25rem 1rem 0;
+
+  @media (min-width: $md) {
+    padding: 1.75rem 1.5rem 0;
+  }
+
+  @media (min-width: $xl) {
+    padding-inline: 3.5rem;
+  }
+}
+
+.dt-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.dt-back {
+  order: 3;
+  margin-left: auto;
+  border-radius: var(--radius-md);
+  color: var(--brand-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring-focus);
+    outline-offset: 2px;
+  }
+}
+
+// The page title is a label here: the quote below is the headline.
+.dt-title {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-stretch: 87.5%;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.dt-subtitle {
+  display: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+
+  @media (min-width: $lg) {
+    display: block;
+  }
+}
+
+.dt-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--sentiment-negative-fill);
+  background-color: var(--sentiment-negative-bg);
+  color: var(--sentiment-negative-text);
+  font-size: var(--font-size-sm);
+}
+
+.dt-alert-text {
+  flex: 1 1 auto;
+}
+
+.dt-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.dt-skel {
+  display: block;
+  background-color: var(--bg-surface-sunken);
+  animation: dt-pulse 1.4s var(--ease-standard) infinite alternate;
+}
+
+@keyframes dt-pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.dt-skel-meta {
+  width: 14rem;
+  height: 1.25rem;
+}
+
+.dt-skel-quote {
+  width: 100%;
+  max-width: 44rem;
+  height: 3rem;
+}
+
+.dt-skel-short {
+  max-width: 28rem;
+}
+
+.dt-body {
+  display: grid;
+  gap: 2.5rem;
+  padding-bottom: 2rem;
+
+  @media (min-width: $lg) {
+    grid-template-columns: minmax(0, 1fr) 18.5rem;
+    align-items: start;
+    gap: 3rem;
+  }
+}
+

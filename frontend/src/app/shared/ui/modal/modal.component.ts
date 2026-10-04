@@ -1,9 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  DestroyRef,
   effect,
   ElementRef,
+  inject,
   input,
   output,
   viewChild
@@ -12,25 +13,25 @@ import {
 import { ButtonComponent } from '../button/button.component';
 import { IconComponent } from '../icon/icon.component';
 import { trapTabKey } from './focus-trap';
+import { registerOpenModal } from './modal-scope';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
 export type ModalRole = 'dialog' | 'alertdialog';
 export type ModalCloseReason = 'esc' | 'backdrop' | 'button';
 
-const SIZE_CLASSES: Record<ModalSize, string> = {
-  sm: 'w-[400px] max-w-[calc(100vw-2rem)]',
-  md: 'w-[520px] max-w-[calc(100vw-2rem)]',
-  lg: 'w-[720px] max-w-[calc(100vw-2rem)]'
-};
-
 let uniqueModalId = 0;
 
+/**
+ * Dialog sheet (docs/BRAND.md section 7). Focus moves to the title on open,
+ * Tab is trapped inside (`focus-trap.ts`, shared with the app shell's sheet),
+ * Escape and the backdrop close it when `dismissible`, and focus returns to
+ * whatever opened it. Widths per `size` live in `modal.component.scss`.
+ */
 @Component({
     selector: 'app-modal',
     imports: [ButtonComponent, IconComponent],
     templateUrl: './modal.component.html',
     styleUrl: './modal.component.scss',
-
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModalComponent {
@@ -46,18 +47,27 @@ export class ModalComponent {
   private readonly titleEl = viewChild<ElementRef<HTMLElement>>('titleEl');
 
   protected readonly titleId = `app-modal-title-${++uniqueModalId}`;
-  protected readonly sizeClasses = computed(() => SIZE_CLASSES[this.size()]);
 
   private previouslyFocused: HTMLElement | null = null;
 
+  /** Undoes this sheet's entry in `modal-scope` while it is open. */
+  private releaseScope: (() => void) | null = null;
+
   constructor() {
+    inject(DestroyRef).onDestroy(() => this.releaseScope?.());
+
     effect(() => {
       if (this.open()) {
+        this.releaseScope ??= registerOpenModal();
         this.previouslyFocused = (document.activeElement as HTMLElement | null) ?? null;
         queueMicrotask(() => this.titleEl()?.nativeElement.focus());
-      } else if (this.previouslyFocused) {
-        this.previouslyFocused.focus();
-        this.previouslyFocused = null;
+      } else {
+        this.releaseScope?.();
+        this.releaseScope = null;
+        if (this.previouslyFocused) {
+          this.previouslyFocused.focus();
+          this.previouslyFocused = null;
+        }
       }
     });
   }

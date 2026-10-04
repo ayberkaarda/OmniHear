@@ -5,13 +5,14 @@ import { ThemePreference, ThemeService } from '../../core/theme/theme.service';
 /**
  * Light / dark / system switch. Rendered as a `role="group"` of toggle buttons
  * with `aria-pressed`, so the active choice is announced rather than implied by
- * the highlight colour alone.
+ * the marker fill alone.
  */
 @Component({
-    selector: 'app-theme-toggle',
-    imports: [],
-    templateUrl: './theme-toggle.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-theme-toggle',
+  imports: [],
+  templateUrl: './theme-toggle.component.html',
+  styleUrl: './theme-toggle.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThemeToggleComponent {
   private readonly theme = inject(ThemeService);
@@ -25,14 +26,5 @@ export class ThemeToggleComponent {
 
   protected select(preference: ThemePreference): void {
     this.theme.setPreference(preference);
-  }
-
-  protected classesFor(preference: ThemePreference): string {
-    const base =
-      'h-full rounded px-2.5 text-xs font-medium transition-colors duration-fast ease-standard ' +
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px';
-    return this.preference() === preference
-      ? `${base} bg-[var(--bg-surface-raised)] text-[var(--text-primary)] shadow-brand-sm`
-      : `${base} text-[var(--text-muted)] hover:text-[var(--text-primary)]`;
   }
 }

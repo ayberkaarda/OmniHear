@@ -5,65 +5,53 @@
  * inside an `<a>`: that produces invalid HTML and two focus stops for one
  * control. Single source of truth: `app-button` imports these too.
  *
- * Brand rules (docs/BRAND.md): primary is ink, never a hue; keyboard focus is
- * drawn in the signal colour (2 px, 2 px offset on the surface behind it);
- * pressed controls move 1 px down and nothing scales; colour changes use
- * `duration-fast` + `ease-standard`.
+ * Brand v2 (docs/BRAND.md section 7): primary is the marker, a yellow fill
+ * with ink text in both themes; secondary is a 1.5 px ink outline; ghost is
+ * text only; destructive is the negative fill. Corners are radius-md (2 px),
+ * never a pill. Keyboard focus is a 2 px ring-focus ring with a 2 px offset;
+ * pressed controls move 1 px down and nothing scales.
  *
- * Every class here lands in the global (initial) stylesheet, so the set is
- * kept to utilities other components already generate wherever possible.
+ * The rules live in `button.scss`, attached without view encapsulation by both
+ * `app-button` and `[appButtonStyle]`, so they load with the first button on a
+ * page instead of growing the global (initial) stylesheet.
  */
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export const BUTTON_BASE_CLASSES =
-  'relative inline-flex select-none items-center justify-center whitespace-nowrap rounded-control font-medium leading-none ' +
-  'transition-[color,background-color,border-color,box-shadow,transform] duration-fast ease-standard ' +
-  'enabled:active:translate-y-px ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ' +
-  'focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)] ' +
-  'disabled:cursor-not-allowed';
+export const BUTTON_BASE_CLASSES = 'ui-btn';
 
 export const BUTTON_VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary:
-    'border border-transparent bg-[var(--brand)] text-[var(--brand-on)] ' +
-    'hover:bg-[var(--brand-hover)] active:bg-[var(--brand-active)]',
-  secondary:
-    'border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--text-primary)] ' +
-    'hover:bg-[var(--bg-surface-hover)] active:bg-[var(--bg-surface-sunken)]',
-  ghost:
-    'border border-transparent bg-transparent text-[var(--text-secondary)] ' +
-    'hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] active:bg-[var(--bg-surface-sunken)]',
-  destructive:
-    'border border-transparent bg-[var(--sentiment-negative-fill)] text-[var(--text-inverse)] ' +
-    'hover:opacity-90 active:opacity-80'
+  primary: 'ui-btn--primary',
+  secondary: 'ui-btn--secondary',
+  ghost: 'ui-btn--ghost',
+  destructive: 'ui-btn--destructive'
 };
 
 /**
  * Disabled look, applied by `app-button` only when the control is disabled and
  * not loading. A loading button is also `disabled` (no double submit) but keeps
- * its variant colours so the spinner reads as progress, not as unavailable.
+ * its variant colours so the progress mark reads as work, not as unavailable.
  */
 export const BUTTON_DISABLED_CLASSES: Record<ButtonVariant, string> = {
-  primary: '!border-transparent !bg-[var(--bg-surface-sunken)] !text-[var(--text-disabled)]',
-  secondary: '!border-[var(--border)] !bg-transparent !text-[var(--text-disabled)]',
-  ghost: '!bg-transparent !text-[var(--text-disabled)]',
-  destructive: '!border-transparent !bg-[var(--bg-surface-sunken)] !text-[var(--text-disabled)] !opacity-100'
+  primary: 'ui-btn--off',
+  secondary: 'ui-btn--off',
+  ghost: 'ui-btn--off',
+  destructive: 'ui-btn--off'
 };
 
-export const BUTTON_LOADING_CLASSES = 'cursor-progress';
+export const BUTTON_LOADING_CLASSES = 'ui-btn--busy';
 
 export const BUTTON_SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-xs gap-1.5',
-  md: 'h-9 px-3.5 text-sm gap-2',
-  lg: 'h-11 px-5 text-base gap-2.5'
+  sm: 'ui-btn--sm',
+  md: 'ui-btn--md',
+  lg: 'ui-btn--lg'
 };
 
 export const BUTTON_ICON_ONLY_SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'h-8 w-8 p-0',
-  md: 'h-9 w-9 p-0',
-  lg: 'h-11 w-11 p-0'
+  sm: 'ui-btn--sm ui-btn--square',
+  md: 'ui-btn--md ui-btn--square',
+  lg: 'ui-btn--lg ui-btn--square'
 };
 
 export function buttonClasses(variant: ButtonVariant, size: ButtonSize): string {

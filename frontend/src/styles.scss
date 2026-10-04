@@ -32,6 +32,43 @@
     background-color: var(--highlight);
     color: var(--text-primary);
   }
+
+  /* Brand v2: headings are condensed and heavy; body text stays at full width. */
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-stretch: var(--font-stretch-condensed);
+    letter-spacing: var(--tracking-tight);
+  }
+}
+
+/*
+ * The marker: a highlighter stroke behind a run of text. It is the brand's
+ * one gesture (docs/BRAND.md, "The marker"). Text on it is always ink
+ * (--brand-on), in both themes. Under reduced motion the sweep is instant.
+ */
+@layer components {
+  .marker {
+    background-image: linear-gradient(var(--signal), var(--signal));
+    background-repeat: no-repeat;
+    background-size: 100% 78%;
+    background-position: 0 60%;
+    color: var(--brand-on);
+    padding-inline: 0.12em;
+    margin-inline: -0.12em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .marker-sweep {
+    animation: marker-sweep var(--duration-slow) var(--ease-emphasized) both;
+  }
+
+  @keyframes marker-sweep {
+    from {
+      background-size: 0% 78%;
+    }
+  }
 }
 
 /* Motion is feedback, never decoration: under reduced motion it collapses. */

@@ -4,8 +4,7 @@
  * Built on `Intl`, never on `DatePipe`/`DecimalPipe`. That is a budget
  * decision as much as a style one: the `@angular/common` pipes drag the
  * framework's own formatting and locale-data machinery into the bundle, while
- * `Intl` is already in the browser and costs nothing. `kpi-card` set the
- * precedent with `Intl.NumberFormat`.
+ * `Intl` is already in the browser and costs nothing.
  *
  * The locale comes from `<html lang>`, which the localized build writes per
  * locale (`lang="en"` / `lang="tr"`, verified in the localized dist output).

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, ViewEncapsulation } from '@angular/core';
 
 import {
   BUTTON_BASE_CLASSES,
@@ -14,17 +14,21 @@ import {
 export type { ButtonSize, ButtonVariant } from './button.styles';
 export type ButtonType = 'button' | 'submit';
 
-const SPINNER_SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'w-3.5 h-3.5',
-  md: 'w-4 h-4',
-  lg: 'w-[18px] h-[18px]'
-};
-
+/**
+ * Brand v2 button (docs/BRAND.md section 7). Styles come from `button.scss`,
+ * shared with `[appButtonStyle]` and attached without view encapsulation.
+ *
+ * While `loading`, the control is disabled and `aria-busy`; the projected label
+ * stays in the accessibility tree (painted out with opacity only) so the busy
+ * button keeps its name, and a three-bar voiceprint stands in for a spinner.
+ */
 @Component({
-    selector: 'app-button',
-    imports: [],
-    templateUrl: './button.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-button',
+  imports: [],
+  templateUrl: './button.component.html',
+  styleUrl: './button.scss',
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ButtonComponent {
   readonly variant = input<ButtonVariant>('primary');
@@ -48,8 +52,6 @@ export class ButtonComponent {
         : '';
     return [BUTTON_BASE_CLASSES, BUTTON_VARIANT_CLASSES[this.variant()], sizeClasses, stateClasses].join(' ').trim();
   });
-
-  protected readonly spinnerClasses = computed(() => SPINNER_SIZE_CLASSES[this.size()]);
 
   constructor() {
     effect(() => {

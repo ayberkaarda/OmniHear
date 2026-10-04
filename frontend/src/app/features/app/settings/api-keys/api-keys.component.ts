@@ -37,6 +37,7 @@ type Dialog = 'none' | 'create' | 'reveal' | 'revokeKey' | 'revokeSession';
   standalone: true,
   imports: [ReactiveFormsModule, ButtonComponent, EmptyStateComponent, InputComponent, ModalComponent],
   templateUrl: './api-keys.component.html',
+  styleUrls: ['./api-keys.component.scss', './api-keys.fields.scss', './api-keys.layout.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ApiKeysComponent implements OnInit {

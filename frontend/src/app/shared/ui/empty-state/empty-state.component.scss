@@ -1,0 +1,70 @@
+// No card: a ruled band on the ground, left-aligned, with the flat line of a
+// voiceprint that has heard nothing yet running under the heading.
+
+:host {
+  display: block;
+}
+
+.es {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 32px 24px 36px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.es-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-muted);
+}
+
+.es-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+}
+
+.es-title {
+  padding-bottom: 12px;
+  background: linear-gradient(var(--border-strong), var(--border-strong)) 0 100% / 100% 1px no-repeat;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-stretch: 75%;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  line-height: 32px;
+}
+
+.es-desc {
+  max-width: 60ch;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.es-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+
+  &:empty {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .es {
+    flex-direction: column;
+    gap: 16px;
+    padding-inline: 16px;
+  }
+}

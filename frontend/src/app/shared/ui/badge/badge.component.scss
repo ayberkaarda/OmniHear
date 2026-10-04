@@ -1,0 +1,79 @@
+// Square marker plus word (docs/BRAND.md sections 6 and 7). No pill, no chip
+// background: the square carries the data colour, the word its text tone.
+
+:host {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.bdg {
+  --sq: var(--border-strong);
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.bdg--sm {
+  gap: 6px;
+  font-size: 12px;
+}
+
+.bdg-sq {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--sq);
+}
+
+.bdg--sm .bdg-sq {
+  width: 7px;
+  height: 7px;
+}
+
+.bdg-score {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-stretch: 87.5%;
+  font-weight: 600;
+}
+
+@each $name in positive, neutral, negative {
+  [data-kind='sentiment'][data-value='#{$name}'] {
+    --sq: var(--sentiment-#{$name}-fill);
+    color: var(--sentiment-#{$name}-text);
+  }
+}
+
+@each $name, $token in (complaint: complaint, praise: praise, bug: bug, feature_request: feature-request) {
+  [data-kind='category'][data-value='#{$name}'] {
+    --sq: var(--category-#{$token}-fill);
+    color: var(--category-#{$token}-text);
+  }
+}
+
+@each $name, $token in (active: success, success: success, warning: warning, error: error, info: info, paused: paused) {
+  [data-kind='status'][data-value='#{$name}'] {
+    color: var(--status-#{$token});
+  }
+}
+
+// A stamp: mono, uppercase, hairline box, square corners.
+[data-kind='source'] {
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--source-border);
+  color: var(--source-text);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}

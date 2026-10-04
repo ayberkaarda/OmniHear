@@ -1,27 +1,212 @@
-// Overview-only layout, kept in this lazy chunk instead of the global stylesheet.
+// Overview (brand v2, "Marker"): giant mono figures on one ruled row, the
+// trend as the reading, the breakdowns as its key. Lines, not cards.
 
+$md: 768px;
+$lg: 1024px;
 $xl: 1280px;
 
-.ov-kpis {
-  @media (min-width: $xl) {
+:host {
+  display: block;
+}
+
+[data-tone='negative'] {
+  --tone: var(--sentiment-negative-fill);
+  --tone-text: var(--sentiment-negative-text);
+}
+
+[data-tone='neutral'] {
+  --tone: var(--sentiment-neutral-fill);
+  --tone-text: var(--sentiment-neutral-text);
+}
+
+[data-tone='positive'] {
+  --tone: var(--sentiment-positive-fill);
+  --tone-text: var(--sentiment-positive-text);
+}
+
+[data-tone='pending'] {
+  --tone: var(--border-strong);
+  --tone-text: var(--text-muted);
+}
+
+.ov {
+  display: flex;
+  flex-direction: column;
+}
+
+.ov-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 1.75rem 1rem 1.5rem;
+
+  @media (min-width: $md) {
+    padding: 2.25rem 1.5rem 1.75rem;
+  }
+}
+
+.ov-title {
+  font-size: clamp(3.25rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: var(--line-height-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.ov-lede {
+  max-width: 52ch;
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ov-quota {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.ov-mono {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.ov-alert,
+.ov-empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 1rem 1.25rem;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-sm);
+
+  @media (min-width: $md) {
+    margin-inline: 1.5rem;
+  }
+}
+
+.ov-alert {
+  border-left: 4px solid var(--sentiment-negative-fill);
+  background-color: var(--sentiment-negative-bg);
+  color: var(--sentiment-negative-text);
+}
+
+.ov-alert-text {
+  flex: 1 1 auto;
+}
+
+.ov-empty {
+  border-left: 4px solid var(--signal);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+// ---- Figures ----------------------------------------------------------------
+
+.ov-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+
+  @media (min-width: $lg) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-.ov-wide {
-  @media (min-width: $xl) {
-    grid-column: span 2 / span 2;
+.ov-figure {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.25rem 1rem 1.5rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:nth-child(even) {
+    border-left: 1px solid var(--border);
+  }
+
+  &:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  &:hover {
+    background-color: var(--bg-surface-hover);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring-focus);
+    outline-offset: -2px;
+  }
+
+  @media (min-width: $md) {
+    padding: 1.5rem 1.5rem 1.75rem;
+  }
+
+  @media (min-width: $lg) {
+    &:nth-child(n + 2) {
+      border-left: 1px solid var(--border);
+    }
+
+    &:nth-child(n + 3) {
+      border-top: 0;
+    }
   }
 }
 
-.ov-dashed {
-  border-style: dashed;
+.ov-figure-label {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-stretch: 87.5%;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
-.ov-list {
-  margin-inline: -0.5rem;
+.ov-figure-num {
+  font-family: var(--font-mono);
+  font-size: clamp(2.5rem, 6vw, 5.25rem);
+  font-stretch: 75%;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums slashed-zero;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
 }
 
-.ov-skel {
-  height: 10rem;
+// Comments still waiting for a person to pay for them: marked.
+.ov-figure-mark {
+  padding-inline: 0.08em;
+  background-color: var(--signal);
+  color: var(--brand-on);
 }
+
+.ov-figure-tone {
+  color: var(--tone-text);
+}
+
+.ov-figure-bar {
+  width: 100%;
+  max-width: 12rem;
+  height: 3px;
+  background-color: var(--border);
+
+  > span {
+    display: block;
+    height: 100%;
+    background-color: var(--text-primary);
+  }
+}
+

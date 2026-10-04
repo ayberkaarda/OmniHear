@@ -1,0 +1,217 @@
+// overview: continued from overview.component.scss, split so each
+// component stylesheet stays inside the per-file style budget.
+
+$md: 768px;
+$lg: 1024px;
+$xl: 1280px;
+
+// ---- Trend and breakdowns ---------------------------------------------------
+
+.ov-grid {
+  display: grid;
+  align-items: start;
+
+  @media (min-width: $xl) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.ov-trend {
+  display: block;
+  min-width: 0;
+  padding: 1.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+
+  @media (min-width: $md) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: $xl) {
+    border-right: 1px solid var(--border);
+    border-bottom: 0;
+  }
+}
+
+.ov-side {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.ov-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.75rem 1rem;
+
+  & + & {
+    border-top: 1px solid var(--border);
+  }
+
+  @media (min-width: $md) {
+    padding-inline: 1.5rem;
+  }
+}
+
+.ov-block-title {
+  font-size: 1.5rem;
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.ov-quiet {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.ov-stack {
+  display: flex;
+  gap: 2px;
+  height: 0.875rem;
+
+  > span {
+    height: 100%;
+  }
+}
+
+.ov-rows {
+  margin: 0 -0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 3.5rem;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  width: 100%;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background-color: var(--bg-surface-hover);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring-focus);
+    outline-offset: 0;
+  }
+}
+
+.ov-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+
+  &::before {
+    content: '';
+    width: 0.625rem;
+    height: 0.625rem;
+    flex-shrink: 0;
+    background-color: var(--tone, var(--text-secondary));
+  }
+
+  &[data-category='bug'] {
+    color: var(--category-bug-text);
+
+    &::before {
+      background-color: var(--category-bug-fill);
+    }
+  }
+
+  &[data-category='complaint'] {
+    color: var(--category-complaint-text);
+
+    &::before {
+      background-color: var(--category-complaint-fill);
+    }
+  }
+
+  &[data-category='praise'] {
+    color: var(--category-praise-text);
+
+    &::before {
+      background-color: var(--category-praise-fill);
+    }
+  }
+
+  &[data-category='feature_request'] {
+    color: var(--category-feature-request-text);
+
+    &::before {
+      background-color: var(--category-feature-request-fill);
+    }
+  }
+}
+
+.ov-count {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums slashed-zero;
+  text-align: right;
+}
+
+.ov-share {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums slashed-zero;
+  text-align: right;
+}
+
+.ov-catbar {
+  grid-column: 1 / -1;
+  height: 3px;
+
+  > span {
+    display: block;
+    height: 100%;
+    background-color: var(--text-secondary);
+    transform-origin: left;
+    animation: ov-grow var(--duration-slow) var(--ease-emphasized) both;
+  }
+}
+
+@keyframes ov-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+// ---- Skeletons ----------------------------------------------------------------
+
+.ov-skel {
+  display: block;
+  background-color: var(--bg-surface-sunken);
+  animation: ov-pulse 1.4s var(--ease-standard) infinite alternate;
+}
+
+@keyframes ov-pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.ov-skel-num {
+  width: 60%;
+  height: clamp(2.5rem, 6vw, 5rem);
+}
+
+.ov-skel-block {
+  height: 8rem;
+}

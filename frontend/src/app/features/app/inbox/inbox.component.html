@@ -1,49 +1,77 @@
-<section class="mx-auto flex w-full max-w-[90rem] flex-col gap-5">
-  <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-semibold tracking-display text-[var(--text-primary)]" i18n="@@app.inbox.title">Inbox</h1>
-      <p class="max-w-[65ch] text-sm text-[var(--text-secondary)]" i18n="@@app.inbox.subtitle">
-        Every collected comment with its sentiment, category and source.
-      </p>
+<section class="ib">
+  <!-- Statement header: the one number that says how much is waiting, and the
+       voiceprint of the page you are reading. -->
+  <header class="ib-head">
+    <div class="ib-statement">
+      <h1 class="ib-poster">
+        <span class="sr-only" i18n="@@app.inbox.title">Inbox</span>
+        @if (listState() === 'loading') {
+          <span class="ib-poster-wait" aria-hidden="true"></span>
+        } @else {
+          <span class="marker">{{ totalLabel() }}</span>&ngsp;<span
+            i18n="Unit after the comment count in the inbox statement header@@inbox.statement.unit"
+            >{total(), plural, =1 {comment.} other {comments.}}</span
+          >
+        }
+      </h1>
+      <p class="ib-lede" i18n="@@app.inbox.subtitle">Every collected comment with its sentiment, category and source.</p>
     </div>
+
+    @if (voiceprint().length > 0) {
+      <!-- Only the bars are hidden: the legend is the same mix in words and
+           numbers, and a screen reader reads it like anyone else. -->
+      <figure class="ib-print">
+        <div class="ib-print-legend" data-testid="inbox-print-legend">
+          @for (part of mix(); track part.key) {
+            <span class="ib-print-key" [attr.data-tone]="part.key">{{ part.label }} {{ part.count }}</span>
+          }
+        </div>
+        <div class="ib-print-bars" aria-hidden="true">
+          @for (bar of voiceprint(); track bar.id) {
+            <i class="ib-bar" [attr.data-tone]="bar.tone" [style.height.%]="bar.height * 100"></i>
+          }
+        </div>
+      </figure>
+    }
   </header>
 
-  <!-- Filters: search on its own line, every discrete choice on one strip
-       below it. On a phone the strip scrolls sideways instead of stacking
-       eight fields above the first comment. -->
-  <form
-    [formGroup]="form"
-    class="flex flex-col gap-3 border-b border-[var(--border)] pb-4"
-    [attr.aria-label]="searchLabel"
-    (submit)="$event.preventDefault()"
-  >
-    <div class="max-w-xl">
-      <app-input
-        formControlName="q"
-        type="search"
-        prefixIcon="search"
-        [label]="searchLabel"
-        [helper]="searchHelper"
-      />
+  <!-- Filters: search and the one-tap views on one line, every other choice on
+       a grid below: two columns on a phone, four from tablet, one row wide. -->
+  <form [formGroup]="form" class="ib-filters" [attr.aria-label]="searchLabel" (submit)="$event.preventDefault()">
+    <div class="ib-filters-top">
+      <div class="ib-search" data-testid="inbox-search">
+        <app-input formControlName="q" type="search" prefixIcon="search" [label]="searchLabel" [helper]="searchHelper" />
+      </div>
+
+      <div class="ib-views" data-testid="inbox-quick-views">
+        @for (view of quickViews; track view.key) {
+          <button
+            type="button"
+            class="ib-view"
+            [class.ib-view-on]="isQuickViewOn(view)"
+            [attr.aria-pressed]="isQuickViewOn(view)"
+            (click)="toggleQuickView(view)"
+          >
+            <span class="ib-view-text">{{ view.label }}</span>
+          </button>
+        }
+      </div>
     </div>
 
-    <div
-      class="ib-filters flex gap-3 overflow-x-auto"
-      data-testid="inbox-filters"
-    >
-      <div class="ib-filter shrink-0">
+    <div class="ib-strip" data-testid="inbox-filters">
+      <div class="ib-field">
         <app-select formControlName="sentiment" size="sm" [label]="sentimentFilterLabel" [options]="sentimentOptions()" />
       </div>
-      <div class="ib-filter shrink-0">
+      <div class="ib-field">
         <app-select formControlName="category" size="sm" [label]="categoryFilterLabel" [options]="categoryOptions()" />
       </div>
-      <div class="ib-filter shrink-0">
+      <div class="ib-field">
         <app-select formControlName="platform" size="sm" [label]="platformFilterLabel" [options]="platformOptions()" />
       </div>
-      <div class="ib-filter shrink-0">
+      <div class="ib-field">
         <app-select formControlName="analysis_status" size="sm" [label]="statusFilterLabel" [options]="statusOptions()" />
       </div>
-      <div class="ib-filter shrink-0">
+      <div class="ib-field">
         <app-select
           formControlName="integration_id"
           size="sm"
@@ -51,108 +79,75 @@
           [options]="integrationOptions()"
         />
       </div>
-
-      <div class="ib-filter-date flex shrink-0 flex-col gap-1">
-        <label
-          for="inbox-filter-from"
-          class="text-sm font-medium leading-5 text-[var(--text-primary)]"
-          i18n="Inbox date filter label@@inbox.filters.from"
-        >
+      <div class="ib-field ib-date">
+        <label for="inbox-filter-from" class="ib-date-label" i18n="Inbox date filter label@@inbox.filters.from">
           Published from
         </label>
-        <input id="inbox-filter-from" type="date" formControlName="from" [class]="dateInputClasses" />
+        <input id="inbox-filter-from" type="date" formControlName="from" class="ib-date-input" />
       </div>
-
-      <div class="ib-filter-date flex shrink-0 flex-col gap-1">
-        <label
-          for="inbox-filter-to"
-          class="text-sm font-medium leading-5 text-[var(--text-primary)]"
-          i18n="Inbox date filter label@@inbox.filters.to"
-        >
+      <div class="ib-field ib-date">
+        <label for="inbox-filter-to" class="ib-date-label" i18n="Inbox date filter label@@inbox.filters.to">
           Published until
         </label>
-        <input id="inbox-filter-to" type="date" formControlName="to" [class]="dateInputClasses" />
+        <input id="inbox-filter-to" type="date" formControlName="to" class="ib-date-input" />
       </div>
     </div>
   </form>
 
   @if (errorMessage(); as message) {
-    <div
-      class="flex flex-wrap items-center gap-3 rounded-card border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
-      role="alert"
-      data-testid="inbox-error"
-    >
+    <div class="ib-alert" role="alert" data-testid="inbox-error">
       <app-icon name="alert-triangle" size="sm" />
-      <span class="flex-1">{{ message }}</span>
+      <span class="ib-alert-text">{{ message }}</span>
       <app-button variant="secondary" size="sm" (pressed)="onRetry()">{{ retryLabel }}</app-button>
     </div>
   }
 
   <div
-    class="overflow-hidden rounded-card border border-[var(--border)] bg-[var(--bg-surface)]"
+    class="ib-results"
     [attr.aria-busy]="listState() === 'loading' || refreshing() ? 'true' : null"
     [attr.data-state]="listState()"
     data-testid="inbox-results"
   >
-    <!-- List head: the count you are reading, and what changed it. -->
-    <div class="ib-bar flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--border)] px-4 py-2">
-      <p class="text-xs tabular-nums text-[var(--text-secondary)]" data-testid="inbox-pagination-summary">
-        {{ pageSummary() }}
-      </p>
+    <!-- List head: where you are in the list, and what changed it. -->
+    <div class="ib-listhead">
+      <p class="ib-summary" data-testid="inbox-pagination-summary">{{ pageSummary() }}</p>
 
       @if (refreshing()) {
-        <p
-          class="text-xs text-[var(--text-muted)]"
-          role="status"
-          data-testid="inbox-refreshing"
-          i18n="Inbox background refresh notice@@inbox.refreshing"
-        >
+        <p class="ib-refreshing" role="status" data-testid="inbox-refreshing" i18n="Inbox background refresh notice@@inbox.refreshing">
           Updating the list…
         </p>
       }
 
       @if (hasFilters() && listState() !== 'empty') {
-        <app-button class="ml-auto" variant="ghost" size="sm" (pressed)="onClearFilters()">
+        <app-button class="ib-clear" variant="ghost" size="sm" (pressed)="onClearFilters()">
           <app-icon name="x" size="sm" />
           {{ clearFiltersLabel }}
         </app-button>
       }
     </div>
 
-    <!-- Column guide, wide screens only: the row grid below uses the same tracks. -->
-    <div
-      class="hidden gap-x-6 border-b border-[var(--border)] bg-[var(--bg-surface-sunken)] px-4 py-2 text-xs font-semibold text-[var(--text-muted)] ib-head ib-grid"
-      aria-hidden="true"
-    >
-      <span>{{ sentimentHeader }}</span>
-      <span>{{ commentHeader }}</span>
-      <span>{{ categoryHeader }}</span>
-      <span class="text-right">{{ publishedHeader }}</span>
-    </div>
-
     @switch (listState()) {
       @case ('loading') {
         <!-- The skeleton is decoration; this is what a screen reader hears while the first page loads. -->
         <p class="sr-only" role="status" data-testid="inbox-loading" i18n="Data table loading announcement@@dataTable.loading">Loading data…</p>
-        <ul class="divide-y divide-[var(--border)]" aria-hidden="true">
+        <ul class="ib-list" aria-hidden="true">
           @for (placeholder of skeletonRows; track placeholder) {
-            <li class="ib-row ib-grid flex flex-col gap-2.5 px-4">
-              <span class="h-5 w-24 animate-pulse rounded-full bg-[var(--bg-surface-sunken)]"></span>
-              <span class="flex flex-col gap-2">
-                <span class="h-3.5 w-40 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-                <span class="h-3.5 w-full max-w-xl animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+            <li class="ib-row ib-row-skel">
+              <span class="ib-edge"></span>
+              <span class="ib-score"><span class="ib-skel ib-skel-score"></span></span>
+              <span class="ib-body">
+                <span class="ib-skel ib-skel-who"></span>
+                <span class="ib-skel ib-skel-line"></span>
               </span>
-              <span class="hidden h-5 w-24 animate-pulse rounded-full bg-[var(--bg-surface-sunken)] lg:block"></span>
-              <span class="hidden h-3.5 w-24 animate-pulse ib-end rounded-sm bg-[var(--bg-surface-sunken)] lg:block"></span>
             </li>
           }
         </ul>
       }
 
       @case ('empty') {
-        <div class="flex flex-col items-center gap-4 px-4 py-12" data-testid="inbox-empty">
+        <div class="ib-empty" data-testid="inbox-empty">
           <app-empty-state
-            class="ib-narrow w-full"
+            class="ib-empty-card"
             [icon]="hasFilters() ? 'search' : 'mail'"
             [heading]="emptyState().title"
             [description]="emptyState().description"
@@ -164,66 +159,54 @@
       }
 
       @case ('error') {
-        <p class="px-4 py-12 text-center text-sm text-[var(--text-muted)]" data-testid="inbox-unavailable">
-          {{ errorMessage() }}
-        </p>
+        <p class="ib-unavailable" data-testid="inbox-unavailable">{{ errorMessage() }}</p>
       }
 
       @default {
-        <ol class="divide-y divide-[var(--border)]" data-testid="inbox-list">
+        <ol class="ib-list" data-testid="inbox-list">
           @for (row of rows(); track row.id) {
             <li>
               <a
                 [routerLink]="['/app/inbox', row.id]"
-                class="ib-row ib-grid ib-top flex flex-col gap-2 px-4 transition-colors duration-fast ease-standard hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+                class="ib-row"
                 data-testid="inbox-row"
                 [attr.data-status]="row.status"
+                [attr.data-tone]="row.sentiment ?? 'pending'"
               >
-                <!-- Verdict first: what a triage pass reads down the left edge. -->
-                <span class="ib-meta flex flex-wrap items-center gap-2">
-                  @if (row.sentiment) {
-                    <app-badge kind="sentiment" size="sm" [value]="row.sentiment" [score]="row.score ?? undefined" />
+                <!-- The sentiment edge: colour, with the number and the word beside it. -->
+                <span class="ib-edge" aria-hidden="true"></span>
+
+                <span class="ib-score" [attr.title]="sentimentHeader">
+                  @if (row.scoreText) {
+                    <span class="ib-score-num">{{ row.scoreText }}</span>
+                    <span class="ib-score-word">{{ row.sentimentWord }}</span>
                   } @else {
-                    <span class="inline-flex items-center gap-1.5 text-xs text-[var(--text-muted)]" [attr.title]="statusHeader">
-                      <app-icon [name]="row.statusIcon" size="sm" />
-                      {{ row.statusLabel }}
-                    </span>
-                  }
-                  @if (row.category) {
-                    <span class="lg:hidden">
-                      <app-badge kind="category" size="sm" [value]="row.category" />
-                    </span>
+                    <span class="ib-score-wait"><app-icon [name]="row.statusIcon" size="sm" /></span>
+                    <span class="ib-score-word">{{ row.statusLabel }}</span>
                   }
                 </span>
 
-                <span class="ib-main flex min-w-0 flex-col gap-1">
-                  <span class="flex min-w-0 items-baseline gap-2 text-sm">
-                    <span class="truncate font-medium text-[var(--text-primary)]" [attr.title]="authorHeader">{{
-                      row.author
-                    }}</span>
-                    <span class="shrink-0 text-xs text-[var(--text-muted)]" [attr.title]="platformHeader">{{ row.source }}</span>
-                    <time
-                      class="ml-auto shrink-0 font-mono text-[11px] tabular-nums text-[var(--text-muted)] lg:hidden"
-                      [attr.datetime]="row.publishedIso"
-                      >{{ row.published }}</time
-                    >
+                <span class="ib-body">
+                  <span class="ib-who">
+                    <span class="ib-author" [attr.title]="authorHeader">{{ row.author }}</span>
+                    <span class="ib-source" [attr.title]="platformHeader">{{ row.source }}</span>
+                    <time class="ib-time-inline" [attr.datetime]="row.publishedIso">{{ row.published }}</time>
                   </span>
-                  <span class="ib-text text-sm leading-relaxed text-[var(--text-secondary)]">{{
-                    row.body
-                  }}</span>
-                </span>
-
-                <span class="ib-nudge hidden lg:block">
-                  @if (row.category) {
-                    <app-badge kind="category" size="sm" [value]="row.category" />
+                  <span class="ib-quote" [attr.title]="commentHeader"
+                    >@for (run of row.runs; track $index) {@if (run.marked) {<mark class="marker">{{ run.text }}</mark>} @else {<span>{{ run.text }}</span>}}</span
+                  >
+                  @if (row.categoryWord) {
+                    <span class="ib-cat ib-cat-inline" [attr.data-category]="row.category">{{ row.categoryWord }}</span>
                   }
                 </span>
 
-                <time
-                  class="hidden font-mono text-xs tabular-nums text-[var(--text-muted)] lg:block ib-date"
-                  [attr.datetime]="row.publishedIso"
-                  >{{ row.published }}</time
-                >
+                <span class="ib-catcol" [attr.title]="categoryHeader">
+                  @if (row.categoryWord) {
+                    <span class="ib-cat" [attr.data-category]="row.category">{{ row.categoryWord }}</span>
+                  }
+                </span>
+
+                <time class="ib-time" [attr.datetime]="row.publishedIso" [attr.title]="publishedHeader">{{ row.published }}</time>
               </a>
             </li>
           }
@@ -232,18 +215,27 @@
     }
   </div>
 
-  <nav class="flex flex-wrap items-end justify-between gap-3" [attr.aria-label]="paginationLabel">
-    <form [formGroup]="paginationForm" class="ib-page">
-      <app-select formControlName="perPage" [label]="perPageLabel" size="sm" [options]="perPageOptions" />
-    </form>
+  <div class="ib-foot">
+    <nav class="ib-pages" [attr.aria-label]="paginationLabel">
+      <form [formGroup]="paginationForm" class="ib-perpage">
+        <app-select formControlName="perPage" [label]="perPageLabel" size="sm" [options]="perPageOptions" />
+      </form>
 
-    <div class="flex items-center gap-2">
-      <app-button variant="secondary" size="sm" [disabled]="!canPrevious()" (pressed)="onPreviousPage()">
-        <span i18n="Pagination control@@inbox.pagination.previous">Previous</span>
-      </app-button>
-      <app-button variant="secondary" size="sm" [disabled]="!canNext()" (pressed)="onNextPage()">
-        <span i18n="Pagination control@@inbox.pagination.next">Next</span>
-      </app-button>
-    </div>
-  </nav>
+      <div class="ib-pagebtns">
+        <app-button variant="secondary" size="sm" [disabled]="!canPrevious()" (pressed)="onPreviousPage()">
+          <span i18n="Pagination control@@inbox.pagination.previous">Previous</span>
+        </app-button>
+        <app-button variant="secondary" size="sm" [disabled]="!canNext()" (pressed)="onNextPage()">
+          <span i18n="Pagination control@@inbox.pagination.next">Next</span>
+        </app-button>
+      </div>
+    </nav>
+
+    <!-- Keyboard: only the keys this screen really answers to. -->
+    <p class="ib-keys" aria-hidden="true">
+      <kbd class="ib-kbd">J</kbd><span i18n="Pagination control@@inbox.pagination.next">Next</span>
+      <kbd class="ib-kbd">K</kbd><span i18n="Pagination control@@inbox.pagination.previous">Previous</span>
+      <kbd class="ib-kbd">Ctrl K</kbd><span>{{ searchLabel }}</span>
+    </p>
+  </div>
 </section>

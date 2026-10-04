@@ -1,0 +1,5 @@
+.sheet-placeholder { display:block; height:3rem; background:var(--bg-surface-sunken); }
+.sheet-band > app-input,.sheet-band form > app-input { display:block; padding-block:1rem; border-top:1px solid var(--border); }
+.sheet-checkbox:focus-visible,.sheet-select:focus-visible { outline:2px solid var(--ring-focus); outline-offset:2px; }
+.sheet-select { min-height:2.75rem; border:1px solid var(--border-strong); border-radius:var(--radius-md); background:var(--bg-surface); color:var(--text-primary); padding:.5rem; font:inherit; }
+.sheet-select:disabled,.sheet-checkbox:disabled { cursor:not-allowed; opacity:.5; }

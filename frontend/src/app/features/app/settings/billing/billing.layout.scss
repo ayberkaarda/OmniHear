@@ -1,0 +1,7 @@
+.sheet-figure { font-family:var(--font-mono); font-size:clamp(2.5rem,6vw,5rem); font-weight:700; line-height:1.1; overflow-wrap:anywhere; }
+.sheet-meter { display:block; height:8px; background:var(--bg-surface-sunken); overflow:hidden; }
+.sheet-meter-fill { display:block; height:100%; }
+dl { margin:0; } dl > div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:1rem; padding:.75rem 0; border-bottom:1px solid var(--border); }
+dd { margin:0; font-family:var(--font-mono); }
+
+.sheet-intro { min-width:0; flex:1 1 22rem; }

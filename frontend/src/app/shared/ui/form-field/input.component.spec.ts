@@ -101,4 +101,23 @@ describe('InputComponent', () => {
     expect(touched).toBe(true);
     expect(blurred).toBe(true);
   });
+
+  it('draws the ruled well: size, error and icon padding come from the shared field classes', async () => {
+    await TestBed.configureTestingModule({
+      imports: [InputComponent]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(InputComponent);
+    fixture.componentRef.setInput('label', 'Search');
+    fixture.componentRef.setInput('size', 'lg');
+    fixture.componentRef.setInput('prefixIcon', 'search');
+    fixture.componentRef.setInput('error', 'Too short');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const input = (fixture.nativeElement as HTMLElement).querySelector('input') as HTMLInputElement;
+    expect(Array.from(input.classList).sort()).toEqual(
+      ['ff-control', 'ff-control--error', 'ff-control--lg', 'ff-control--prefix'].sort()
+    );
+  });
 });

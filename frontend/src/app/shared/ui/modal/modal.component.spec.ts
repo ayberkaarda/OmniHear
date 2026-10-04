@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { ModalComponent, ModalCloseReason } from './modal.component';
+import { isEditableTarget, isModalOpen, shortcutBlocked } from './modal-scope';
 
 @Component({
   selector: 'app-modal-host',
@@ -86,5 +87,54 @@ describe('ModalComponent', () => {
 
     expect(fixture.componentInstance.lastReason()).toBeNull();
     expect(fixture.componentInstance.isOpen()).toBe(true);
+  });
+
+  /** Page-wide shortcuts read this to stand down while a dialog owns the keyboard. */
+  it('reports its open state to the shortcut scope, and releases it on close and on destroy', async () => {
+    await TestBed.configureTestingModule({ imports: [HostComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(HostComponent);
+    // Out of the document, so no DOM query can see the sheet: only the registry can.
+    (fixture.nativeElement as HTMLElement).remove();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(isModalOpen()).toBe(false);
+
+    fixture.componentInstance.isOpen.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(isModalOpen()).toBe(true);
+    expect(shortcutBlocked(new KeyboardEvent('keydown', { key: '/' }))).toBe(true);
+
+    fixture.componentInstance.isOpen.set(false);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(isModalOpen()).toBe(false);
+
+    fixture.componentInstance.isOpen.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.destroy();
+    expect(isModalOpen()).toBe(false);
+  });
+});
+
+describe('shortcut scope', () => {
+  it('treats text fields, selects and contenteditable as input, not as shortcut targets', () => {
+    const input = document.createElement('input');
+    const select = document.createElement('select');
+    const button = document.createElement('button');
+    expect(isEditableTarget(input)).toBe(true);
+    expect(isEditableTarget(select)).toBe(true);
+    expect(isEditableTarget(button)).toBe(false);
+    expect(isEditableTarget(null)).toBe(false);
+  });
+
+  it('sees any other aria-modal surface in the document', () => {
+    const sheet = document.createElement('div');
+    sheet.setAttribute('aria-modal', 'true');
+    document.body.appendChild(sheet);
+    expect(isModalOpen()).toBe(true);
+    sheet.remove();
+    expect(isModalOpen()).toBe(false);
   });
 });

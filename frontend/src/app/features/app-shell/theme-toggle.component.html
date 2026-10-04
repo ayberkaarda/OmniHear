@@ -1,31 +1,11 @@
-<div
-  class="inline-flex h-8 items-center gap-0.5 rounded-control border border-[var(--border)] bg-[var(--bg-surface-sunken)] p-0.5"
-  role="group"
-  [attr.aria-label]="groupLabel"
-  data-testid="theme-toggle"
->
-  <button
-    type="button"
-    [class]="classesFor('light')"
-    [attr.aria-pressed]="preference() === 'light'"
-    (click)="select('light')"
-  >
+<div class="tt" role="group" [attr.aria-label]="groupLabel" data-testid="theme-toggle">
+  <button type="button" class="tt-opt" [attr.aria-pressed]="preference() === 'light'" (click)="select('light')">
     {{ lightLabel }}
   </button>
-  <button
-    type="button"
-    [class]="classesFor('dark')"
-    [attr.aria-pressed]="preference() === 'dark'"
-    (click)="select('dark')"
-  >
+  <button type="button" class="tt-opt" [attr.aria-pressed]="preference() === 'dark'" (click)="select('dark')">
     {{ darkLabel }}
   </button>
-  <button
-    type="button"
-    [class]="classesFor('system')"
-    [attr.aria-pressed]="preference() === 'system'"
-    (click)="select('system')"
-  >
+  <button type="button" class="tt-opt" [attr.aria-pressed]="preference() === 'system'" (click)="select('system')">
     {{ systemLabel }}
   </button>
 </div>

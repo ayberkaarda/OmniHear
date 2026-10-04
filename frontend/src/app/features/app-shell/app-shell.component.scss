@@ -1,94 +1,42 @@
-// Shell-only layout. These rules lived as Tailwind utilities no other template
-// used, which put them in the global (initial) stylesheet for every visitor,
-// signed in or not. Here they ship in the shell's lazy chunk instead.
+// Shell layout (brand v2, "Marker": docs/BRAND.md section 7). Everything here
+// ships in the shell's lazy chunk; none of it reaches the initial stylesheet.
 
+$md: 768px;
 $lg: 1024px;
 
-.shell {
-  min-height: 100vh;
+:host {
+  display: block;
 }
 
-.shell-skip:focus {
-  z-index: var(--z-sticky);
+.sh {
+  min-height: 100dvh;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
 }
 
-.shell-rail {
-  height: 100vh;
-  border-right-width: 1px;
+// One focus treatment for every control the shell draws.
+.sh-focus:focus-visible {
+  outline: 2px solid var(--ring-focus);
+  outline-offset: 2px;
 }
 
-.shell-rail-logo {
-  margin-inline: -0.375rem;
-}
+.sh-skip {
+  position: absolute;
+  left: 1rem;
+  top: 0.75rem;
+  z-index: var(--z-toast);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-md);
+  background-color: var(--brand);
+  color: var(--brand-on);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transform: translateY(-200%);
 
-.shell-mark {
-  margin-left: -0.25rem;
-}
-
-// The lamp beside the active rail link.
-.shell-lamp {
-  top: 0.5rem;
-  bottom: 0.5rem;
-  left: 0;
-  width: 3px;
-  transition-property: opacity;
-  transition-duration: var(--duration-fast);
-  transition-timing-function: var(--ease-standard);
-}
-
-// Hover keeps winning over the selected fill, as it did with utilities.
-.shell-selected:not(:hover) {
-  background-color: var(--bg-surface-selected);
-}
-
-.shell-avatar {
-  background-color: var(--brand-soft);
-}
-
-.shell-ident {
-  line-height: 1.25;
-}
-
-.shell-sep {
-  color: var(--border-strong);
-}
-
-.shell-gutter {
-  padding-inline: 1rem;
-
-  @media (min-width: $lg) {
-    padding-inline: 2rem;
+  &:focus {
+    transform: none;
+    outline: 2px solid var(--ring-focus);
+    outline-offset: 2px;
   }
 }
 
-.shell-banner-link {
-  text-decoration-line: underline;
-}
-
-.shell-overlay {
-  z-index: var(--z-overlay);
-}
-
-.shell-sheet {
-  inset-inline: 0.75rem;
-  top: 4rem;
-  z-index: var(--z-modal);
-  border-radius: var(--radius-xl);
-}
-
-.shell-main {
-  padding: 1.5rem 1rem 7rem;
-
-  @media (min-width: $lg) {
-    padding: 2rem 2rem 3rem;
-  }
-}
-
-.shell-tabbar {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.shell-tablamp {
-  height: 3px;
-}

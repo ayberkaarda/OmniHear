@@ -3,15 +3,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { IconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon.types';
-import {
-  controlClasses,
-  ERROR_CLASSES,
-  FormFieldSize,
-  HELPER_CLASSES,
-  LABEL_CLASSES,
-  nextFieldId,
-  SIZE_INPUT_CLASSES
-} from './form-field-base';
+import { controlClasses, FormFieldSize, nextFieldId } from './form-field-base';
 
 export interface SelectOption {
   value: string;
@@ -24,6 +16,7 @@ export interface SelectOption {
   standalone: true,
   imports: [IconComponent],
   templateUrl: './select.component.html',
+  styleUrl: './form-field.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -42,15 +35,11 @@ export class SelectComponent implements ControlValueAccessor {
   readonly size = input<FormFieldSize>('md');
   readonly required = input(false);
   readonly disabled = input(false);
-  /** Not part of the mandated shared API — a select needs its option list. */
+  /** Not part of the mandated shared API: a select needs its option list. */
   readonly options = input<SelectOption[]>([]);
   readonly placeholder = input<string | undefined>(undefined);
 
   readonly blurred = output<void>();
-
-  protected readonly labelClasses = LABEL_CLASSES;
-  protected readonly helperClasses = HELPER_CLASSES;
-  protected readonly errorClasses = ERROR_CLASSES;
 
   protected readonly fieldId = nextFieldId('app-select');
   protected readonly errorId = `${this.fieldId}-error`;
@@ -92,10 +81,10 @@ export class SelectComponent implements ControlValueAccessor {
     return null;
   }
 
-  protected readonly selectClasses = computed(() => {
-    const padding = this.prefixIcon() ? 'pl-9' : '';
-    return [controlClasses(!!this.error()), 'appearance-none cursor-pointer pr-9', SIZE_INPUT_CLASSES[this.size()], padding].join(' ');
-  });
+  /** The chevron always sits at the end, so a select is always padded for a suffix. */
+  protected readonly selectClasses = computed(() =>
+    controlClasses({ size: this.size(), hasError: !!this.error(), hasPrefix: !!this.prefixIcon(), hasSuffix: true })
+  );
 
   protected readonly prefixIconName = computed(() => this.prefixIcon() as IconName | undefined);
 

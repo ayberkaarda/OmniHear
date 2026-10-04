@@ -582,6 +582,14 @@
           <context context-type="linenumber">3,4</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="inbox.statement.unit" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {comment.} other {comments.}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.html</context>
+          <context context-type="linenumber">13,17</context>
+        </context-group>
+        <note priority="1" from="description">Unit after the comment count in the inbox statement header</note>
+      </trans-unit>
       <trans-unit id="app.inbox.subtitle" datatype="html">
         <source> Every collected comment with its sentiment, category and source. </source>
         <context-group purpose="location">
@@ -2907,557 +2915,660 @@
         <source>Page sections</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">15,17</context>
+          <context context-type="linenumber">12,13</context>
         </context-group>
         <note priority="1" from="description">Landing section nav label</note>
       </trans-unit>
-      <trans-unit id="landing.nav.sources" datatype="html">
-        <source>Sources</source>
+      <trans-unit id="landing.nav.channels" datatype="html">
+        <source>Channels</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">17,18</context>
+          <context context-type="linenumber">13,14</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">338,339</context>
+          <context context-type="linenumber">264,265</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.analysis" datatype="html">
         <source>How it reads</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">18,19</context>
+          <context context-type="linenumber">14,15</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.pricing" datatype="html">
         <source>Pricing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">19,20</context>
+          <context context-type="linenumber">15,16</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">339,340</context>
+          <context context-type="linenumber">265,266</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.faq" datatype="html">
         <source>Questions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">20,23</context>
+          <context context-type="linenumber">16,19</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.nav.signIn" datatype="html">
         <source>Sign in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">24,25</context>
+          <context context-type="linenumber">20,21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">340,341</context>
+          <context context-type="linenumber">266,267</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.cta.start" datatype="html">
         <source>Start free</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">25,28</context>
+          <context context-type="linenumber">21,24</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">46,48</context>
+          <context context-type="linenumber">39,40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">238,242</context>
+          <context context-type="linenumber">179,181</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">319,322</context>
+          <context context-type="linenumber">248,249</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">341,344</context>
+          <context context-type="linenumber">267,270</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.hero.titleLine1" datatype="html">
         <source>Every voice.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">38,39</context>
+          <context context-type="linenumber">32,33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.hero.titleLine2" datatype="html">
         <source>One inbox.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">39,41</context>
+          <context context-type="linenumber">33,35</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.hero.subtitle" datatype="html">
-        <source> Reviews, tickets, e-mails and posts from six channels land in one list, each one read, scored and sorted. </source>
+      <trans-unit id="landing.hero.lede" datatype="html">
+        <source> Reviews, tickets, e-mails and posts from six channels land in one list. Each one read, scored and sorted. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">42,44</context>
+          <context context-type="linenumber">36,38</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.hero.secondaryCta" datatype="html">
-        <source>See how it reads</source>
+      <trans-unit id="landing.hero.howLink" datatype="html">
+        <source>See how a comment is read</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">49,52</context>
+          <context context-type="linenumber">40,42</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.preview.label" datatype="html">
-        <source>Example of the OmniHear inbox</source>
+      <trans-unit id="landing.feed.label" datatype="html">
+        <source>Sample comments arriving in the inbox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">57,59</context>
+          <context context-type="linenumber">44,45</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.preview.title" datatype="html">
-        <source>Inbox</source>
+      <trans-unit id="landing.feed.title" datatype="html">
+        <source>Heard this morning</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">62,63</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.preview.today" datatype="html">
-        <source>Today</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">63,65</context>
+          <context context-type="linenumber">46,47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.preview.sample" datatype="html">
         <source>Sample data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">67,69</context>
+          <context context-type="linenumber">47,49</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.preview.pulled" datatype="html">
-        <source>Needs a reply</source>
+      <trans-unit id="landing.strip.label" datatype="html">
+        <source>Channels</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">93,95</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.voiceprint.label" datatype="html">
+        <source>Voiceprint of sample comments: one bar per comment, height is the strength of the sentiment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">79,80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.sources.title" datatype="html">
         <source>Six channels. One list.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">116,117</context>
+          <context context-type="linenumber">92,93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.sources.body" datatype="html">
         <source> Connect a channel once. Collection then runs on a schedule and fetches only what is new. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">118,120</context>
+          <context context-type="linenumber">94,96</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.analysis.title" datatype="html">
         <source>How a comment is read</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">139,140</context>
+          <context context-type="linenumber">113,114</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.analysis.body" datatype="html">
-        <source> Every comment gets the same three passes. The result is stored with its confidence and the model version, so any label can be traced. </source>
+      <trans-unit id="landing.analysis.lede" datatype="html">
+        <source>One comment from the inbox above, read the way every comment is read.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">141,145</context>
+          <context context-type="linenumber">114,116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.analysis.language.term" datatype="html">
         <source>Language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">162,163</context>
+          <context context-type="linenumber">128,129</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.analysis.language.value" datatype="html">
-        <source>English, detected</source>
+      <trans-unit id="landing.read.language.value" datatype="html">
+        <source>English</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">163,165</context>
+          <context context-type="linenumber">129,131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.analysis.sentiment.term" datatype="html">
         <source>Sentiment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">166,168</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.analysis.sentiment.scale" datatype="html">
-        <source>On a scale from −1 to +1</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">172,175</context>
+          <context context-type="linenumber">132,133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.analysis.category.term" datatype="html">
         <source>Category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">177,179</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.analysis.category.note" datatype="html">
-        <source>One of complaint, praise, bug or feature request</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">181,184</context>
+          <context context-type="linenumber">136,137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.analysis.keywords.term" datatype="html">
         <source>Keywords</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">186,187</context>
+          <context context-type="linenumber">140,141</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.title" datatype="html">
         <source>Pricing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">200,202</context>
+          <context context-type="linenumber">165,166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.name" datatype="html">
         <source>Free</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">204,205</context>
+          <context context-type="linenumber">168,169</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.unit" datatype="html">
         <source>analyses, no card required</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">207,209</context>
+          <context context-type="linenumber">171,173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item1" datatype="html">
         <source>All six channels</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">212,215</context>
+          <context context-type="linenumber">174,175</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item2" datatype="html">
         <source>Sentiment and category on every comment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">217,220</context>
+          <context context-type="linenumber">175,176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item3" datatype="html">
         <source>Unlimited team members</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">222,225</context>
+          <context context-type="linenumber">176,177</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.free.item4" datatype="html">
         <source>Each comment counted once, never twice</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">227,230</context>
+          <context context-type="linenumber">177,179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.name" datatype="html">
         <source>Pro</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">182,183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.price" datatype="html">
         <source>Price announced at launch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">244,245</context>
+          <context context-type="linenumber">183,184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.item1" datatype="html">
         <source>A larger analysis allowance</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">246,247</context>
+          <context context-type="linenumber">185,186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.item2" datatype="html">
         <source>Waiting comments analysed right after the upgrade</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">247,248</context>
+          <context context-type="linenumber">186,187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.item3" datatype="html">
         <source>Everything in Free</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">248,250</context>
+          <context context-type="linenumber">187,189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.pricing.pro.note" datatype="html">
         <source> Billing is not open yet. Free accounts hear about it first. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">251,253</context>
+          <context context-type="linenumber">190,192</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.title" datatype="html">
         <source>Questions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">261,263</context>
+          <context context-type="linenumber">200,201</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q1" datatype="html">
         <source>Which channels can I connect?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">265,266</context>
+          <context context-type="linenumber">203,204</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a1" datatype="html">
         <source> App Store, Google Play, Zendesk, Trustpilot, a JMAP e-mail inbox and a Mastodon hashtag. Each connection can be paused without losing the comments already collected. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">267,269</context>
+          <context context-type="linenumber">205,207</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q2" datatype="html">
         <source>Can another company see my feedback?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">272,273</context>
+          <context context-type="linenumber">210,211</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a2" datatype="html">
         <source> No. Every record carries your company identifier and every query is filtered by it, so a request for a record that belongs to someone else is answered as if it did not exist. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">274,276</context>
+          <context context-type="linenumber">212,214</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q3" datatype="html">
         <source>Where are channel credentials kept?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">279,280</context>
+          <context context-type="linenumber">217,218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a3" datatype="html">
         <source> Encrypted in the database. They are never written to a log or an error message. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">281,283</context>
+          <context context-type="linenumber">219,220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q4" datatype="html">
         <source>What happens when the allowance runs out?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">285,286</context>
+          <context context-type="linenumber">223,224</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a4" datatype="html">
         <source> Collection continues and new comments are kept, waiting to be analysed. Nothing is deleted; once the plan is upgraded the waiting comments are analysed automatically. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">287,289</context>
+          <context context-type="linenumber">225,227</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.q5" datatype="html">
         <source>Which languages are supported?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">292,293</context>
+          <context context-type="linenumber">230,231</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.faq.a5" datatype="html">
         <source> Comments are analysed in the language they were written in, detected automatically. The interface itself is available in Turkish and English. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">294,296</context>
+          <context context-type="linenumber">232,234</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="landing.closing.title" datatype="html">
-        <source>Start with the channel you read least.</source>
+      <trans-unit id="landing.closing.titleLead" datatype="html">
+        <source>Start with the channel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">307,308</context>
+          <context context-type="linenumber">244,245</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.closing.titleMark" datatype="html">
+        <source>you read least.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
+          <context context-type="linenumber">245,247</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.closing.body" datatype="html">
         <source> Connect it in a few minutes and see what customers have already said there. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">309,311</context>
+          <context context-type="linenumber">250,252</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.footer.tagline" datatype="html">
         <source>Every voice. One inbox.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">331,334</context>
+          <context context-type="linenumber">261,263</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.footer.navLabel" datatype="html">
         <source>Footer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.html</context>
-          <context context-type="linenumber">337,338</context>
+          <context context-type="linenumber">263,264</context>
         </context-group>
         <note priority="1" from="description">Footer nav label</note>
+      </trans-unit>
+      <trans-unit id="landing.source.email.name" datatype="html">
+        <source>E-mail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="landing.preview.sentiment.negative" datatype="html">
         <source>Negative</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">33</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.preview.sentiment.neutral" datatype="html">
-        <source>Neutral</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">34</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.preview.sentiment.positive" datatype="html">
-        <source>Positive</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">35</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.preview.category.complaint" datatype="html">
-        <source>Complaint</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">39</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.preview.category.praise" datatype="html">
-        <source>Praise</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.preview.category.bug" datatype="html">
         <source>Bug</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">41</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.preview.category.featureRequest" datatype="html">
-        <source>Feature request</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="landing.source.email.name" datatype="html">
-        <source>E-mail</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.appStore.what" datatype="html">
         <source>Customer reviews and star ratings from the public review feed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">141</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.appStore.how" datatype="html">
         <source>No credentials</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">142</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.googlePlay.what" datatype="html">
         <source>Reviews of your Android app, newest first.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">146</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.googlePlay.how" datatype="html">
         <source>Package name and service account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">147</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.zendesk.what" datatype="html">
         <source>Support tickets, read from the incremental export.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.zendesk.how" datatype="html">
         <source>Subdomain and API token</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">152</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.trustpilot.what" datatype="html">
         <source>Reviews written about your business unit.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">156</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.trustpilot.how" datatype="html">
         <source>Business unit ID and API key</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">157</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.email.what" datatype="html">
         <source>Messages sent to a shared support address.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.email.how" datatype="html">
         <source>Any JMAP mailbox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">162</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.mastodon.what" datatype="html">
         <source>Public posts under a hashtag you choose.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landing.source.mastodon.how" datatype="html">
         <source>A hashtag, no account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">167</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.mark.title" datatype="html">
+        <source>Mark the phrase</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.mark.body" datatype="html">
+        <source>The marker lands on the words that drove the score, so you see why before you read the rest.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">175</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.language.title" datatype="html">
+        <source>Detect the language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.language.body" datatype="html">
+        <source>Each comment is read in the language it was written in. Turkish stays Turkish.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
           <context context-type="linenumber">179</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="landing.read.sentiment.title" datatype="html">
+        <source>Score the feeling</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">182</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.sentiment.body" datatype="html">
+        <source>A number from −1 to +1, stored with its confidence and the model version.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.category.title" datatype="html">
+        <source>Sort it</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.category.body" datatype="html">
+        <source>Complaint, praise, bug or feature request. One per comment.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">187</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.keywords.title" datatype="html">
+        <source>Pull the keywords</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">190</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="landing.read.keywords.body" datatype="html">
+        <source>The words the reading keyed on, so the same problem can be found across channels.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/features/landing/landing.component.ts</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      </trans-unit>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <trans-unit id="notFound.title" datatype="html">
         <source>This page does not exist</source>
         <context-group purpose="location">
@@ -3866,74 +3977,10 @@
       <trans-unit id="dataTable.loading" datatype="html">
         <source>Loading data…</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">5,7</context>
+          <context context-type="sourcefile">src/app/features/app/inbox/inbox.component.html</context>
+          <context context-type="linenumber">132</context>
         </context-group>
         <note priority="1" from="description">Data table loading announcement</note>
-      </trans-unit>
-      <trans-unit id="dataTable.error.title" datatype="html">
-        <source> Something went wrong </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">14,16</context>
-        </context-group>
-        <note priority="1" from="description">Data table error title</note>
-      </trans-unit>
-      <trans-unit id="dataTable.error.description" datatype="html">
-        <source> We couldn&apos;t load this data. Please try again. </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">17,21</context>
-        </context-group>
-        <note priority="1" from="description">Data table error description</note>
-      </trans-unit>
-      <trans-unit id="dataTable.error.retry" datatype="html">
-        <source>Retry</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">24,28</context>
-        </context-group>
-        <note priority="1" from="description">Data table retry action</note>
-      </trans-unit>
-      <trans-unit id="dataTable.empty.title" datatype="html">
-        <source>No data yet</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">34,37</context>
-        </context-group>
-        <note priority="1" from="description">Data table default empty title</note>
-      </trans-unit>
-      <trans-unit id="dataTable.selectAll" datatype="html">
-        <source>Select all rows</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">62,63</context>
-        </context-group>
-        <note priority="1" from="description">Select-all checkbox label</note>
-      </trans-unit>
-      <trans-unit id="dataTable.selectRow" datatype="html">
-        <source>Select row</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/data-table/data-table.component.html</context>
-          <context context-type="linenumber">113,114</context>
-        </context-group>
-        <note priority="1" from="description">Row selection checkbox label</note>
-      </trans-unit>
-      <trans-unit id="kpiCard.delta.increase" datatype="html">
-        <source>Increased</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
-          <context context-type="linenumber">29,32</context>
-        </context-group>
-        <note priority="1" from="description">Screen-reader only KPI delta direction</note>
-      </trans-unit>
-      <trans-unit id="kpiCard.delta.decrease" datatype="html">
-        <source>Decreased</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/shared/ui/kpi-card/kpi-card.component.html</context>
-          <context context-type="linenumber">32,38</context>
-        </context-group>
-        <note priority="1" from="description">Screen-reader only KPI delta direction</note>
       </trans-unit>
       <trans-unit id="modal.close" datatype="html">
         <source>Close</source>

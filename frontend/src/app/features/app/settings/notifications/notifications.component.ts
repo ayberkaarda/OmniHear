@@ -31,6 +31,7 @@ interface PreferenceRow {
   standalone: true,
   imports: [ButtonComponent, EmptyStateComponent],
   templateUrl: './notifications.component.html',
+  styleUrls: ['./notifications.component.scss', './notifications.fields.scss', './notifications.layout.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotificationsComponent implements OnInit {

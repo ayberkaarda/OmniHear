@@ -1,6 +1,6 @@
 /**
  * Small, static registry of inline icon glyphs shared by the design-system
- * components (badge, kpi-card, form-field, data-table, modal, ...).
+ * components (badge, button, form-field, empty-state, modal, ...).
  *
  * All icons are decorative (aria-hidden) — any accessible name is carried by
  * surrounding text or an explicit aria-label on the consuming element, never

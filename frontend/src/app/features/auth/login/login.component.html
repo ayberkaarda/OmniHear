@@ -2,7 +2,7 @@
   @if (step() === 'credentials') {
     @if (challengeExpired()) {
       <p
-        class="mb-4 border-l-2 border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-sm text-[var(--sentiment-negative-text)]"
+        class="auth-notice auth-notice-error"
         role="alert"
         data-testid="two-factor-expired"
         i18n="Notice when the two-factor challenge could not be completed@@auth.twoFactor.expired"
@@ -11,7 +11,7 @@
       </p>
     }
 
-    <form [formGroup]="form" class="flex flex-col gap-6" novalidate (ngSubmit)="onSubmit()">
+    <form [formGroup]="form" class="auth-stack" novalidate (ngSubmit)="onSubmit()">
       <app-input
         formControlName="email"
         type="email"
@@ -32,10 +32,10 @@
         (blurred)="onFieldBlur()"
       />
 
-      <div class="flex justify-end">
+      <div class="auth-support">
         <a
           routerLink="/auth/forgot-password"
-          class="rounded-sm text-xs text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+          class="auth-link"
           i18n="@@auth.login.forgotLink"
           >Forgot your password?</a
         >
@@ -48,7 +48,7 @@
   } @else {
     <form
       [formGroup]="challengeForm"
-      class="flex flex-col gap-6"
+      class="auth-stack"
       novalidate
       data-testid="two-factor-form"
       (ngSubmit)="onChallengeSubmit()"
@@ -82,11 +82,11 @@
         <span i18n="@@auth.twoFactor.submit">Confirm and sign in</span>
       </app-button>
 
-      <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="auth-options">
         @if (usingRecoveryCode()) {
           <button
             type="button"
-            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+            class="auth-link"
             data-testid="two-factor-use-app"
             i18n="@@auth.twoFactor.useApp"
             (click)="useRecoveryCode(false)"
@@ -96,7 +96,7 @@
         } @else {
           <button
             type="button"
-            class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+            class="auth-link"
             data-testid="two-factor-use-recovery"
             i18n="@@auth.twoFactor.useRecovery"
             (click)="useRecoveryCode(true)"
@@ -107,7 +107,7 @@
 
         <button
           type="button"
-          class="rounded-sm text-[var(--text-secondary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+          class="auth-link"
           data-testid="two-factor-cancel"
           i18n="@@auth.twoFactor.back"
           (click)="cancelChallenge()"
@@ -123,7 +123,7 @@
       <span i18n="@@auth.login.noAccount">Do not have an account yet?</span>
       <a
         routerLink="/auth/register"
-        class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+        class="auth-link"
         i18n="@@auth.login.registerLink"
         >Create one</a
       >

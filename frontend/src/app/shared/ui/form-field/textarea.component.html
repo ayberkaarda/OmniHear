@@ -1,8 +1,8 @@
-<div class="flex flex-col gap-1.5">
-  <label [for]="fieldId" [class]="labelClasses">
+<div class="ff">
+  <label [for]="fieldId" class="ff-label">
     {{ label() }}
     @if (required()) {
-      <span class="ml-0.5 text-[var(--status-error)]" aria-hidden="true">*</span>
+      <span class="ff-req" aria-hidden="true">*</span>
     }
   </label>
 
@@ -20,11 +20,11 @@
   >
 
   @if (error()) {
-    <p [id]="errorId" [class]="errorClasses">
-      <app-icon class="mt-px" name="alert-triangle" size="sm" />
+    <p [id]="errorId" class="ff-error">
+      <app-icon name="alert-triangle" size="sm" />
       <span>{{ error() }}</span>
     </p>
   } @else if (helper()) {
-    <p [id]="helperId" [class]="helperClasses">{{ helper() }}</p>
+    <p [id]="helperId" class="ff-help">{{ helper() }}</p>
   }
 </div>

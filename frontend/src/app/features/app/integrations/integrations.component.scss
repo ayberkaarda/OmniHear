@@ -1,0 +1,67 @@
+// Integrations (brand v2, "Marker"): one full-bleed row per connection, a
+// status lamp at its left edge. Lines between rows, no cards.
+
+$md: 768px;
+$lg: 1024px;
+
+:host {
+  display: block;
+}
+
+.it-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  padding: 1.75rem 1rem 1.5rem;
+
+  @media (min-width: $md) {
+    padding: 2.25rem 1.5rem 1.75rem;
+  }
+}
+
+.it-title {
+  font-size: clamp(3.25rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: var(--line-height-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.it-lede {
+  max-width: 52ch;
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.it-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 1rem 1.25rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--sentiment-negative-fill);
+  background-color: var(--sentiment-negative-bg);
+  color: var(--sentiment-negative-text);
+  font-size: var(--font-size-sm);
+
+  @media (min-width: $md) {
+    margin-inline: 1.5rem;
+  }
+}
+
+.it-alert-text {
+  flex: 1 1 auto;
+}
+
+.it-empty {
+  padding: 2.5rem 1rem;
+  border-top: 1px solid var(--border);
+
+  @media (min-width: $md) {
+    padding-inline: 1.5rem;
+  }
+}
+

@@ -1,9 +1,4 @@
-<a
-  href="#main-content"
-  class="sr-only shell-skip focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded-md focus:bg-[var(--bg-surface-raised)] focus:px-3 focus:py-2 focus:text-sm focus:text-[var(--text-primary)] focus:shadow-[var(--shadow-md)]"
-  i18n="Skip link@@common.skipToContent"
-  >Skip to main content</a
->
+<a href="#main-content" class="sh-skip" i18n="Skip link@@common.skipToContent">Skip to main content</a>
 
 <ng-template #navLabel let-section>
   @switch (section) {
@@ -22,214 +17,149 @@
   }
 </ng-template>
 
-<ng-template #account let-withTheme="withTheme">
-  <div class="flex flex-col gap-4">
-    <app-quota-meter />
+<div class="sh">
+  <!-- While the account dialog is open, everything behind it is inert: no Tab, no click, no reading. -->
+  <header class="sh-top" [attr.inert]="accountOpen() ? '' : null" data-testid="shell-top">
+    <a routerLink="/app/inbox" class="sh-lockup sh-focus">
+      <span class="sh-lockup-full"><app-logo variant="full" [size]="24" /></span>
+      <span class="sh-lockup-mark"><app-logo variant="mark" [size]="26" /></span>
+    </a>
 
-    @if (withTheme) {
-      <div class="flex flex-col gap-2">
-        <span class="text-xs font-medium text-[var(--text-muted)]" aria-hidden="true">{{ themeGroupHeading }}</span>
-        <app-theme-toggle />
-      </div>
-    }
-
-    @if (user(); as activeUser) {
-      <div class="flex items-center gap-3 border-t border-[var(--border)] pt-4">
-        <span
-          class="shell-avatar flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-[var(--brand-text)]"
-          aria-hidden="true"
-          >{{ userInitial() }}</span
-        >
-        <span class="shell-ident min-w-0 flex-1">
-          <span class="block truncate text-sm font-medium text-[var(--text-primary)]">{{ activeUser.name }}</span>
-          <span class="block truncate text-xs text-[var(--text-muted)]">{{ activeUser.email }}</span>
-        </span>
-      </div>
-      <app-button
-        variant="secondary"
-        size="sm"
-        [ariaLabel]="signOutLabel"
-        [loading]="signingOut()"
-        (pressed)="onSignOut()"
-        >{{ signOutLabel }}</app-button
-      >
-    }
-  </div>
-</ng-template>
-
-<div class="shell bg-[var(--bg-canvas)] lg:flex">
-  <!-- Rail: wide screens only. Same canvas as the page, one hairline between them. -->
-  <aside
-    class="shell-rail sticky top-0 hidden w-64 shrink-0 flex-col border-[var(--border)] bg-[var(--bg-canvas)] lg:flex"
-    data-testid="shell-rail"
-    [attr.inert]="accountOpen() ? '' : null"
-  >
-    <div class="flex h-14 shrink-0 items-center px-5">
-      <a
-        routerLink="/app/overview"
-        class="shell-rail-logo rounded-control px-1.5 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-      >
-        <app-logo variant="full" [size]="22" />
-      </a>
-    </div>
-
-    @if (company(); as activeCompany) {
-      <p class="truncate px-5 pb-4 pt-1 text-xs font-medium text-[var(--text-muted)]" data-testid="shell-company">
-        {{ activeCompany.name }}
-      </p>
-    }
-
-    <nav class="flex flex-col gap-0.5 px-3" [attr.aria-label]="primaryNavLabel">
-      @for (item of nav; track item.section) {
-        <a
-          [routerLink]="item.link"
-          routerLinkActive=""
-          #rla="routerLinkActive"
-          [attr.aria-current]="rla.isActive ? 'page' : null"
-          [class]="railLinkClasses(rla.isActive)"
-        >
-          <!-- The lamp: lit only on the line you are on. -->
-          <span
-            class="shell-lamp absolute rounded-full bg-[var(--signal)]"
-            [class.opacity-0]="!rla.isActive"
-            aria-hidden="true"
-          ></span>
-          <span class="flex text-[var(--text-muted)]" [style.color]="rla.isActive ? 'var(--signal)' : null">
-            <app-icon [name]="item.icon" size="sm" />
-          </span>
-          <ng-container *ngTemplateOutlet="navLabel; context: { $implicit: item.section }" />
-        </a>
-      }
-    </nav>
-
-    <div class="mt-auto px-5 pb-5 pt-6">
-      <ng-container *ngTemplateOutlet="account; context: { withTheme: false }" />
-    </div>
-  </aside>
-
-  <div class="flex min-w-0 flex-1 flex-col">
-    <!-- While the phone account sheet is open, everything behind it is inert: no Tab, no click, no reading. -->
-    <header
-      [attr.inert]="accountOpen() ? '' : null"
-      class="sticky top-0 z-[var(--z-sticky)] flex h-14 shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--bg-canvas)] shell-gutter"
+    <!-- The command line: what narrows the inbox now, and the way into its search. -->
+    <button
+      type="button"
+      class="sh-cmd sh-focus"
+      [attr.aria-label]="searchLabel"
+      aria-keyshortcuts="Control+K /"
+      data-testid="shell-command"
+      (click)="openSearch()"
     >
-      <a
-        routerLink="/app/overview"
-        class="shell-mark rounded-control p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] lg:hidden"
-      >
-        <app-logo variant="mark" [size]="24" />
-      </a>
-
-      <p class="flex min-w-0 flex-1 items-center gap-2 text-sm" data-testid="shell-breadcrumb">
-        @if (company(); as activeCompany) {
-          <span class="truncate text-[var(--text-muted)]">{{ activeCompany.name }}</span>
+      <span class="sh-cmd-slash" aria-hidden="true">/</span>
+      <span class="sh-cmd-icon" aria-hidden="true"><app-icon name="search" size="sm" /></span>
+      @for (token of tokens(); track token.key) {
+        <span class="sh-token" aria-hidden="true">{{ token.text }}</span>
+      }
+      <span class="sh-cmd-text" aria-hidden="true">
+        @if (query()) {
+          <span class="sh-cmd-query">“{{ query() }}”</span>
+        } @else {
+          {{ searchLabel }}
         }
-        @if (location(); as here) {
-          <span class="shell-sep" aria-hidden="true">/</span>
-          @if (here.record) {
-            <a
-              [routerLink]="'/app/' + here.section"
-              class="shrink-0 rounded-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-            >
-              <ng-container *ngTemplateOutlet="navLabel; context: { $implicit: here.section }" />
-            </a>
-            <span class="shell-sep" aria-hidden="true">/</span>
-            <span class="shrink-0 font-mono text-xs text-[var(--text-primary)]">#{{ here.record }}</span>
-          } @else {
-            <span class="shrink-0 font-medium text-[var(--text-primary)]">
-              <ng-container *ngTemplateOutlet="navLabel; context: { $implicit: here.section }" />
-            </span>
-          }
-        }
-      </p>
+      </span>
+      <kbd class="sh-kbd sh-cmd-kbd" aria-hidden="true">Ctrl K</kbd>
+    </button>
 
-      <div class="hidden lg:block">
-        <app-theme-toggle />
-      </div>
+    <div class="sh-who">
+      <div class="sh-quota"><app-quota-meter [compact]="true" /></div>
 
-      <!-- Phones: the account block lives behind the avatar. -->
+      @if (company(); as activeCompany) {
+        <p class="sh-company" data-testid="shell-company">{{ activeCompany.name }}</p>
+      }
+
       @if (user(); as activeUser) {
         <button
           #accountTrigger
           type="button"
+          class="sh-avatar sh-focus"
           aria-haspopup="dialog"
-          class="shell-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 lg:hidden"
+          aria-controls="shell-account-sheet"
+          data-testid="shell-account-trigger"
           [attr.aria-label]="activeUser.name"
           [attr.aria-expanded]="accountOpen()"
-          aria-controls="shell-account-sheet"
           (click)="toggleAccount()"
         >
-          {{ userInitial() }}
+          {{ userInitials() }}
         </button>
       }
-    </header>
+    </div>
+  </header>
 
-    @if (accountOpen()) {
-      <div class="shell-overlay fixed inset-0 bg-[var(--bg-overlay)] lg:hidden" aria-hidden="true" (click)="dismissAccount()"></div>
-      <div
-        #accountSheet
-        id="shell-account-sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="shell-account-title"
-        tabindex="-1"
-        (keydown)="onSheetKeydown($event)"
-        class="shell-sheet fixed border border-[var(--border)] bg-[var(--bg-surface-raised)] p-4 shadow-[var(--shadow-md)] lg:hidden"
-        data-testid="shell-account-sheet"
-      >
-        @if (user(); as activeUser) {
-          <p id="shell-account-title" class="sr-only">{{ activeUser.name }}</p>
-        }
-        <ng-container *ngTemplateOutlet="account; context: { withTheme: true }" />
-      </div>
-    }
-
-    @if (user() && !emailVerified()) {
-      <div
-        class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[var(--category-complaint-border)] bg-[var(--category-complaint-bg)] shell-gutter py-2.5 text-sm text-[var(--category-complaint-text)]"
-        role="status"
-        data-testid="verify-banner"
-        [attr.inert]="accountOpen() ? '' : null"
-      >
-        <app-icon name="alert-triangle" size="sm" />
-        <span i18n="@@shell.verifyBanner">Your email address is not confirmed yet.</span>
-        <a
-          routerLink="/auth/verify-email"
-          class="shell-banner-link rounded-sm font-medium underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-          i18n="@@shell.verifyBannerAction"
-          >Confirm now</a
-        >
-      </div>
-    }
-
-    <main id="main-content" tabindex="-1" [attr.inert]="accountOpen() ? '' : null" class="shell-main flex-1 focus:outline-none">
-      <router-outlet />
-    </main>
-  </div>
-
-  <!-- Phones: four destinations along the bottom edge. -->
-  <nav
-    class="shell-tabbar fixed inset-x-0 bottom-0 z-[var(--z-sticky)] grid border-t border-[var(--border)] bg-[var(--bg-surface)] lg:hidden"
-    [attr.aria-label]="primaryNavLabel"
-    data-testid="shell-tabbar"
-    [attr.inert]="accountOpen() ? '' : null"
-  >
+  <!-- Views: large text tabs on wide screens. The active one carries the marker. -->
+  <nav class="sh-views" [attr.aria-label]="primaryNavLabel" data-testid="shell-views" [attr.inert]="accountOpen() ? '' : null">
     @for (item of nav; track item.section) {
       <a
         [routerLink]="item.link"
-        routerLinkActive=""
+        routerLinkActive="sh-view-on"
+        #rla="routerLinkActive"
+        [attr.aria-current]="rla.isActive ? 'page' : null"
+        class="sh-view sh-focus"
+      >
+        <span class="sh-view-text"><ng-container *ngTemplateOutlet="navLabel; context: { $implicit: item.section }" /></span>
+        @if (countFor(item.section); as count) {
+          <span class="sh-view-count">{{ count }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  @if (accountOpen()) {
+    <div class="sh-scrim" aria-hidden="true" (click)="dismissAccount()"></div>
+    <div
+      #accountSheet
+      id="shell-account-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="shell-account-title"
+      tabindex="-1"
+      class="sh-sheet"
+      data-testid="shell-account-sheet"
+      (keydown)="onSheetKeydown($event)"
+    >
+      @if (user(); as activeUser) {
+        <div class="sh-sheet-who">
+          <span class="sh-sheet-initials" aria-hidden="true">{{ userInitials() }}</span>
+          <span class="sh-sheet-ident">
+            <span id="shell-account-title" class="sh-sheet-name">{{ activeUser.name }}</span>
+            <span class="sh-sheet-mail">{{ activeUser.email }}</span>
+          </span>
+        </div>
+      }
+
+      <div class="sh-sheet-block sh-sheet-quota">
+        <app-quota-meter />
+      </div>
+
+      <div class="sh-sheet-block">
+        <span class="sh-label" aria-hidden="true">{{ themeGroupHeading }}</span>
+        <app-theme-toggle />
+      </div>
+
+      <div class="sh-sheet-foot">
+        <app-button
+          variant="secondary"
+          size="sm"
+          [ariaLabel]="signOutLabel"
+          [loading]="signingOut()"
+          (pressed)="onSignOut()"
+          >{{ signOutLabel }}</app-button
+        >
+      </div>
+    </div>
+  }
+
+  @if (user() && !emailVerified()) {
+    <div class="sh-verify" role="status" data-testid="verify-banner" [attr.inert]="accountOpen() ? '' : null">
+      <app-icon name="alert-triangle" size="sm" />
+      <span i18n="@@shell.verifyBanner">Your email address is not confirmed yet.</span>
+      <a routerLink="/auth/verify-email" class="sh-verify-link sh-focus" i18n="@@shell.verifyBannerAction">Confirm now</a>
+    </div>
+  }
+
+  <main id="main-content" tabindex="-1" class="sh-main" [attr.inert]="accountOpen() ? '' : null">
+    <router-outlet />
+  </main>
+
+  <!-- Phones: the same views along the bottom edge. -->
+  <nav class="sh-tabbar" [attr.aria-label]="primaryNavLabel" data-testid="shell-tabbar" [attr.inert]="accountOpen() ? '' : null">
+    @for (item of nav; track item.section) {
+      <a
+        [routerLink]="item.link"
+        routerLinkActive="sh-tab-on"
         #tab="routerLinkActive"
         [attr.aria-current]="tab.isActive ? 'page' : null"
-        [class]="tabClasses(tab.isActive)"
+        class="sh-tab sh-focus"
       >
-        <span
-          class="shell-tablamp absolute inset-x-0 top-0 mx-auto w-8 rounded-full bg-[var(--signal)]"
-          [class.opacity-0]="!tab.isActive"
-          aria-hidden="true"
-        ></span>
-        <span class="flex" [style.color]="tab.isActive ? 'var(--signal)' : null">
-          <app-icon [name]="item.icon" size="md" />
-        </span>
+        <span class="sh-tab-icon"><app-icon [name]="item.icon" size="md" /></span>
         <ng-container *ngTemplateOutlet="navLabel; context: { $implicit: item.section }" />
       </a>
     }

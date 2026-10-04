@@ -4,6 +4,7 @@ import { expect, Page, test } from '@playwright/test';
 
 import { API_URL, COMPOSE_FILE, FIXTURE_COMMENTS, PASSWORD, QUOTA_LIMIT, uniqueEmail } from './support/env';
 import { waitForVerificationLink } from './support/mailpit';
+import { expectSignedInAs, signOut } from './support/shell';
 import { setQuotaLimit } from './support/stack';
 import { freshTotpCode } from './support/totp';
 
@@ -36,7 +37,7 @@ import { freshTotpCode } from './support/totp';
 const ANALYSED = 'analyzed';
 const WAITING = 'pending_analysis';
 
-const tableRows = (page: Page) => page.locator('[data-testid="inbox-row"]');
+const tableRows = (page: Page) => page.getByTestId('inbox-row');
 
 /**
  * Reloads until `read` settles on the expected value.
@@ -203,8 +204,7 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
     // is the UI half of the verification having taken.
     await expect(page.getByTestId('verify-banner')).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'Sign out' }).click();
-    await expect(page).toHaveURL(/\/$/);
+    await signOut(page);
 
     await page.goto('/auth/login');
     await page.getByLabel('Email address').fill(email);
@@ -212,7 +212,8 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
     await page.getByRole('button', { name: 'Sign in' }).click();
 
     await expect(page).toHaveURL(/\/app\/overview$/);
-    await expect(page.getByText(companyName)).toBeVisible();
+    // The shell names the company once, in the top bar, at every width.
+    await expectSignedInAs(page, companyName);
   });
 
   await test.step('switch on two-step verification and sign in through it', async () => {
@@ -263,8 +264,7 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
     expect(recoveryCodes).toHaveLength(8);
     await expect(page.getByTestId('two-factor-on')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Sign out' }).click();
-    await expect(page).toHaveURL(/\/$/);
+    await signOut(page);
 
     // ---- the password alone is no longer enough --------------------------
     await page.goto('/auth/login');
@@ -292,11 +292,11 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
     await page.getByRole('button', { name: 'Confirm and sign in' }).click();
 
     await expect(page).toHaveURL(/\/app\/overview$/);
-    await expect(page.getByText(companyName)).toBeVisible();
+    // The shell names the company once, in the top bar, at every width.
+    await expectSignedInAs(page, companyName);
 
     // ---- a recovery code is the way back in without the phone ------------
-    await page.getByRole('button', { name: 'Sign out' }).click();
-    await expect(page).toHaveURL(/\/$/);
+    await signOut(page);
 
     await page.goto('/auth/login');
     await page.getByLabel('Email address').fill(email);
@@ -358,7 +358,7 @@ test('a new company registers, confirms its mailbox, connects a channel and hits
 
   await test.step('connect a fixture channel', async () => {
     await page.goto('/app/integrations');
-    await expect(page.getByText('No channel is connected yet')).toBeVisible();
+    await expect(page.getByTestId('empty-state')).toContainText('No channel is connected yet');
 
     await page.getByRole('button', { name: 'Connect a channel' }).click();
     // The platform list is served by GET /integrations/platforms, so this select

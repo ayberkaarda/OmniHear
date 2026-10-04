@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { LogoComponent } from '../../../shared/ui/logo/logo.component';
 
 /**
- * Shared chrome for `/auth/*` screens: brand panel, form column,
+ * Shared chrome for `/auth/*` screens: masthead, poster heading, open form,
  * heading and lead paragraph. The pages differ only in their form, so the
  * landmark structure (one `<main>`, one `<h1>`) lives here and is guaranteed to
  * be identical everywhere.

@@ -1,0 +1,9 @@
+.sheet-table-wrap { overflow-x:auto; }
+table { width:100%; min-width:36rem; border-collapse:collapse; text-align:left; }
+th { font-family:var(--font-mono); font-size:var(--font-size-xs); color:var(--text-muted); font-weight:500; }
+th,td { padding:1.25rem .75rem; border-bottom:1px solid var(--border); }
+th:first-child,td:first-child { padding-left:0; } th:last-child,td:last-child { text-align:right; padding-right:0; }
+tbody tr:hover { background:var(--bg-surface-hover); }
+
+.sheet-intro { min-width:0; flex:1 1 22rem; }
+.sheet-select { font-family:var(--font-mono); font-size:var(--font-size-xs); }

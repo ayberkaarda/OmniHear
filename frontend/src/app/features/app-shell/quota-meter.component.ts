@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 
 import { QuotaStore } from '../../core/quota/quota.store';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
@@ -10,16 +10,21 @@ import { IconName } from '../../shared/ui/icon/icon.types';
  * Colour is never the only signal: the level carries its own icon and the exact
  * numbers are written out, so the warning state survives a monochrome or
  * colour-blind reading (`omnihear-tokens` rule 4).
+ *
+ * `compact` is the top-bar form: one mono label line and a hairline bar. The
+ * "Remaining" line is still in the text, for screen readers, just not drawn.
  */
 @Component({
-    selector: 'app-quota-meter',
-    imports: [IconComponent],
-    templateUrl: './quota-meter.component.html',
-    styleUrl: './quota-meter.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-quota-meter',
+  imports: [IconComponent],
+  templateUrl: './quota-meter.component.html',
+  styleUrl: './quota-meter.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuotaMeterComponent {
   private readonly quota = inject(QuotaStore);
+
+  readonly compact = input(false);
 
   protected readonly limit = this.quota.limit;
   protected readonly remaining = this.quota.remaining;
@@ -29,29 +34,6 @@ export class QuotaMeterComponent {
   protected readonly percentUsed = computed(() => {
     const ratio = this.quota.usedRatio();
     return ratio === null ? null : Math.round(ratio * 100);
-  });
-
-  protected readonly toneClasses = computed(() => {
-    switch (this.level()) {
-      // Quiet while there is room; a tinted plate only once it needs reading.
-      case 'exceeded':
-        return 'qm-plate qm-exceeded';
-      case 'warning':
-        return 'qm-plate qm-warning';
-      default:
-        return 'text-[var(--text-secondary)]';
-    }
-  });
-
-  protected readonly barClasses = computed(() => {
-    switch (this.level()) {
-      case 'exceeded':
-        return 'qm-bar-exceeded';
-      case 'warning':
-        return 'qm-bar-warning';
-      default:
-        return 'qm-bar-ok';
-    }
   });
 
   protected readonly levelIcon = computed<IconName>(() => {

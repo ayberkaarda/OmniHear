@@ -1,18 +1,18 @@
 <app-auth-layout [heading]="heading">
   @switch (state()) {
     @case ('verifying') {
-      <p class="text-sm text-[var(--text-secondary)]" data-testid="verify-pending" i18n="@@auth.verify.pending">
+      <p class="auth-copy" data-testid="verify-pending" i18n="@@auth.verify.pending">
         Checking your confirmation link…
       </p>
     }
     @case ('verified') {
       <div
-        class="flex flex-col gap-6"
+        class="auth-stack"
         role="status"
         data-testid="verify-success"
       >
         <p
-          class="border-l-2 border-[var(--sentiment-positive-border)] bg-[var(--sentiment-positive-bg)] p-4 text-sm text-[var(--sentiment-positive-text)]"
+          class="auth-notice"
           i18n="@@auth.verify.success"
         >
           Your email address is confirmed. Everything is ready.
@@ -23,9 +23,9 @@
       </div>
     }
     @case ('failed') {
-      <div class="flex flex-col gap-6" role="status" data-testid="verify-failed">
+      <div class="auth-stack" role="status" data-testid="verify-failed">
         <p
-          class="border-l-2 border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] p-4 text-sm text-[var(--sentiment-negative-text)]"
+          class="auth-notice auth-notice-error"
           i18n="@@auth.verify.failed"
         >
           This confirmation link is no longer valid. Links expire after a while, and each one can be used once.
@@ -38,17 +38,17 @@
       </div>
     }
     @default {
-      <div class="flex flex-col gap-6" data-testid="verify-awaiting">
-        <p class="text-sm text-[var(--text-secondary)]" i18n="@@auth.verify.awaiting">
+      <div class="auth-stack" data-testid="verify-awaiting">
+        <p class="auth-copy" i18n="@@auth.verify.awaiting">
           We sent you a confirmation link. Open it to activate your account.
         </p>
         @if (email()) {
-          <p class="border-y border-[var(--border)] py-4 font-mono break-all text-sm text-[var(--text-primary)]">
+          <p class="auth-data">
             {{ email() }}
           </p>
         }
         @if (canResend()) {
-          <app-button variant="secondary" size="lg" [loading]="resending()" (pressed)="onResend()">
+          <app-button variant="primary" size="lg" [loading]="resending()" (pressed)="onResend()">
             <span i18n="@@auth.verify.resend">Send a new confirmation email</span>
           </app-button>
         }
@@ -59,7 +59,7 @@
   <p authFooter>
     <a
       routerLink="/auth/login"
-      class="rounded-sm text-[var(--brand-text)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-surface)]"
+      class="auth-link"
       i18n="@@auth.verify.backToLogin"
       >Back to sign in</a
     >

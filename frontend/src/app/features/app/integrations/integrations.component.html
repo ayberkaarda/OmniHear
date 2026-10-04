@@ -1,12 +1,8 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
-  <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-semibold tracking-display text-[var(--text-primary)]" i18n="@@app.integrations.title">
-        Integrations
-      </h1>
-      <p class="max-w-[65ch] text-sm text-[var(--text-secondary)]" i18n="@@app.integrations.subtitle">
-        Connect a channel and follow the health of each connection.
-      </p>
+<section class="it">
+  <header class="it-head">
+    <div>
+      <h1 class="it-title" i18n="@@app.integrations.title">Integrations</h1>
+      <p class="it-lede" i18n="@@app.integrations.subtitle">Connect a channel and follow the health of each connection.</p>
     </div>
     <app-button (pressed)="openCreate()">
       <app-icon name="plus" size="sm" />
@@ -15,76 +11,67 @@
   </header>
 
   @if (errorMessage(); as message) {
-    <div
-      class="flex flex-wrap items-center gap-3 rounded-card border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-4 py-3 text-sm text-[var(--sentiment-negative-text)]"
-      role="alert"
-      data-testid="integrations-error"
-    >
+    <div class="it-alert" role="alert" data-testid="integrations-error">
       <app-icon name="alert-triangle" size="sm" />
-      <span class="flex-1">{{ message }}</span>
+      <span class="it-alert-text">{{ message }}</span>
       <app-button variant="secondary" size="sm" (pressed)="reload()">{{ retryLabel }}</app-button>
     </div>
   }
 
   @if (loading()) {
-    <div
-      class="divide-y divide-[var(--border)] rounded-card border border-[var(--border)] bg-[var(--bg-surface)]"
-      data-testid="integrations-skeleton"
-      aria-busy="true"
-    >
+    <div class="it-list" data-testid="integrations-skeleton" aria-busy="true">
       <span class="sr-only" i18n="Integrations loading announcement@@integrations.loading">Loading connections…</span>
       @for (placeholder of [0, 1]; track placeholder) {
-        <div class="flex flex-col gap-3 px-5 py-5" aria-hidden="true">
-          <span class="h-4 w-32 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
-          <span class="h-3.5 w-64 animate-pulse rounded-sm bg-[var(--bg-surface-sunken)]"></span>
+        <div class="it-row it-row-skel" aria-hidden="true">
+          <span class="it-lamp"></span>
+          <span class="it-skel it-skel-name"></span>
+          <span class="it-skel it-skel-line"></span>
         </div>
       }
     </div>
   } @else if (isEmpty()) {
-    <app-empty-state icon="link" [heading]="emptyHeading" [description]="emptyDescription" />
+    <div class="it-empty">
+      <app-empty-state icon="link" [heading]="emptyHeading" [description]="emptyDescription" />
+    </div>
   } @else {
     <!-- One line per connection: who it is, how it is doing, what you can do to it. -->
-    <ul class="divide-y divide-[var(--border)] rounded-card border border-[var(--border)] bg-[var(--bg-surface)]">
+    <ul class="it-list">
       @for (integration of items(); track integration.id) {
-        <li
-          class="flex flex-col gap-4 px-5 py-5 lg:grid lg:grid-cols-3 lg:items-center lg:gap-x-8"
-          data-testid="integration-row"
-        >
-          <div class="flex min-w-0 flex-col gap-2">
-            <div class="flex flex-wrap items-center gap-2">
-              <h2 class="text-base font-semibold text-[var(--text-primary)]">{{ platformLabelOf(integration) }}</h2>
-              <span class="font-mono text-xs text-[var(--text-muted)]">#{{ integration.id }}</span>
+        <li class="it-row" data-testid="integration-row" [attr.data-status]="integration.status">
+          <!-- The lamp: lit while it syncs on schedule, amber when paused, red when it failed. -->
+          <span class="it-lamp" aria-hidden="true"></span>
+
+          <div class="it-who">
+            <div class="it-name">
+              <h2 class="it-platform">{{ platformLabelOf(integration) }}</h2>
+              <span class="it-id">#{{ integration.id }}</span>
               <app-badge kind="status" [value]="integration.status" size="sm" />
             </div>
 
             @if (settingsOf(integration).length > 0) {
-              <dl class="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+              <dl class="it-settings">
                 @for (setting of settingsOf(integration); track setting.key) {
-                  <div class="flex min-w-0 gap-1.5">
-                    <dt class="shrink-0 text-[var(--text-muted)]">{{ setting.label }}</dt>
-                    <dd class="min-w-0 truncate font-mono text-[var(--text-secondary)]">{{ setting.value }}</dd>
+                  <div class="it-setting">
+                    <dt>{{ setting.label }}</dt>
+                    <dd>{{ setting.value }}</dd>
                   </div>
                 }
               </dl>
             }
           </div>
 
-          <dl class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
-            <div class="flex flex-col gap-1">
-              <dt class="text-[var(--text-muted)]" i18n="Integration card field@@integrations.card.lastSynced">
-                Last sync
-              </dt>
-              <dd class="font-mono tabular-nums text-[var(--text-primary)]">{{ lastSynced(integration) }}</dd>
+          <dl class="it-stats">
+            <div class="it-stat">
+              <dt i18n="Integration card field@@integrations.card.lastSynced">Last sync</dt>
+              <dd>{{ lastSynced(integration) }}</dd>
             </div>
-            <div class="flex flex-col gap-1">
-              <dt class="text-[var(--text-muted)]" i18n="Integration card field@@integrations.card.collected">
-                Comments collected
-              </dt>
-              <dd class="font-mono tabular-nums text-[var(--text-primary)]">{{ feedbackCount(integration) }}</dd>
+            <div class="it-stat">
+              <dt i18n="Integration card field@@integrations.card.collected">Comments collected</dt>
+              <dd class="it-stat-big">{{ feedbackCount(integration) }}</dd>
             </div>
           </dl>
 
-          <div class="flex flex-wrap items-center gap-2 lg:justify-end">
+          <div class="it-actions">
             <app-button variant="secondary" size="sm" [loading]="isSyncing(integration)" (pressed)="onSync(integration)">
               {{ syncLabel }}
             </app-button>
@@ -100,14 +87,10 @@
           </div>
 
           @if (integration.sync_error) {
-            <p
-              class="flex items-start gap-2 rounded-control border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-xs text-[var(--sentiment-negative-text)] lg:col-span-3"
-              role="status"
-              data-testid="integration-sync-error"
-            >
-              <span class="mt-px flex"><app-icon name="alert-triangle" size="sm" /></span>
+            <p class="it-error" role="status" data-testid="integration-sync-error">
+              <app-icon name="alert-triangle" size="sm" />
               <span>
-                <span class="font-medium" i18n="Label above the last sync failure message@@integrations.card.syncError">
+                <span class="it-error-label" i18n="Label above the last sync failure message@@integrations.card.syncError">
                   Last run failed:
                 </span>
                 {{ integration.sync_error }}
@@ -129,12 +112,12 @@
   <div modalBody class="flex flex-col gap-4">
     @if (dialog() === 'create') {
       @if (platformsLoading()) {
-        <p class="text-sm text-[var(--text-muted)]" i18n="Connector registry is loading@@integrations.platforms.loading">
+        <p class="it-note" i18n="Connector registry is loading@@integrations.platforms.loading">
           Loading the channels we can connect to…
         </p>
       } @else if (platformsUnavailable()) {
         <p
-          class="rounded-md border border-[var(--sentiment-negative-border)] bg-[var(--sentiment-negative-bg)] px-3 py-2 text-sm text-[var(--sentiment-negative-text)]"
+          class="it-modal-alert"
           role="alert"
           data-testid="platforms-unavailable"
           i18n="Connector registry could not be read@@integrations.platforms.unavailable"
@@ -163,8 +146,8 @@
       }
 
       @if (credentialFields().length > 0) {
-        <div class="flex flex-col gap-3 rounded-md border border-[var(--border)] bg-[var(--bg-surface-sunken)] p-3">
-          <p class="text-xs text-[var(--text-muted)]">
+        <div class="it-secrets">
+          <p class="it-secrets-hint">
             {{ dialog() === 'edit' ? credentialsKeepHint : credentialsWriteOnlyHint }}
           </p>
           @for (field of credentialFields(); track field.control) {
@@ -197,7 +180,7 @@
 </app-modal>
 
 <app-modal [open]="dialog() === 'delete'" [title]="deleteTitle" role="alertdialog" (closed)="closeDialog()">
-  <p modalBody class="text-sm text-[var(--text-primary)]">{{ deletePrompt() }}</p>
+  <p modalBody class="it-prompt">{{ deletePrompt() }}</p>
   <ng-container modalFooter>
     <app-button variant="ghost" (pressed)="closeDialog()">{{ cancelLabel }}</app-button>
     <app-button variant="destructive" [loading]="deletingId() !== null" (pressed)="confirmDelete()">

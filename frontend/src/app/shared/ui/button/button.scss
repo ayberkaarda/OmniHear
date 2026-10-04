@@ -1,0 +1,171 @@
+// Shared by app-button and [appButtonStyle], attached without view
+// encapsulation so an anchor and a button get the same rules. Prefixed
+// `ui-btn` to stay out of every feature's class names.
+
+.ui-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  user-select: none;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring-focus);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.ui-btn--sm {
+  height: 32px;
+  padding: 0 12px;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.ui-btn--lg {
+  height: 48px;
+  padding: 0 22px;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.ui-btn--square {
+  width: 40px;
+  padding: 0;
+
+  &.ui-btn--sm {
+    width: 32px;
+  }
+
+  &.ui-btn--lg {
+    width: 48px;
+  }
+}
+
+// The marker: yellow fill, ink text, both themes.
+.ui-btn--primary {
+  background: var(--brand);
+  color: var(--brand-on);
+
+  &:hover {
+    background: var(--brand-hover);
+  }
+
+  &:active {
+    background: var(--brand-active);
+  }
+}
+
+.ui-btn--secondary {
+  border-color: var(--text-primary);
+  background: transparent;
+  color: var(--text-primary);
+
+  &:hover {
+    background: var(--bg-surface-hover);
+  }
+
+  &:active {
+    background: var(--bg-surface-sunken);
+  }
+}
+
+.ui-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+
+  &:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+}
+
+.ui-btn--destructive {
+  background: var(--sentiment-negative-fill);
+  color: var(--text-inverse);
+
+  &:hover {
+    background: var(--status-error);
+  }
+}
+
+.ui-btn--off,
+.ui-btn--off:hover {
+  border-color: var(--border);
+  background: var(--bg-surface-sunken);
+  color: var(--text-disabled);
+}
+
+.ui-btn--ghost.ui-btn--off {
+  border-color: transparent;
+  background: transparent;
+}
+
+.ui-btn--busy {
+  cursor: progress;
+}
+
+.ui-btn-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+// Busy mark: three bars of a voiceprint, not a spinner.
+.ui-btn-wave {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+
+  i {
+    width: 3px;
+    height: 14px;
+    background: currentColor;
+    animation: ui-btn-wave 900ms var(--ease-standard) infinite alternate;
+    transform-origin: center;
+
+    &:nth-child(2) {
+      animation-delay: 150ms;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 300ms;
+    }
+  }
+}
+
+@keyframes ui-btn-wave {
+  from {
+    transform: scaleY(0.3);
+  }
+}

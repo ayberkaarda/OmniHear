@@ -45,6 +45,7 @@ import {
   standalone: true,
   imports: [ReactiveFormsModule, ButtonComponent, InputComponent],
   templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss', './profile.fields.scss', './profile.layout.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileComponent implements OnInit {
