@@ -37,12 +37,32 @@ describe('LandingComponent', () => {
     expect(element.querySelector('#main-content')).toBeTruthy();
   });
 
-  it('renders every section the spec asks for', () => {
-    for (const id of ['features', 'integrations', 'pricing', 'faq']) {
-      expect(element.querySelector(`#${id}`)).toBeTruthy();
+  it('renders every section the header links to', () => {
+    const targets = Array.from(element.querySelectorAll('header nav a')).map((a) => a.getAttribute('href'));
+    expect(targets).toEqual(['#sources', '#analysis', '#pricing', '#faq']);
+    for (const href of targets) {
+      expect(element.querySelector(href as string)).toBeTruthy();
     }
-    // Closing CTA + footer.
     expect(element.querySelector('footer')).toBeTruthy();
+  });
+
+  it('uses the brand logo component in the header and footer', () => {
+    expect(element.querySelector('header app-logo')).toBeTruthy();
+    expect(element.querySelector('footer app-logo')).toBeTruthy();
+  });
+
+  it('names all six sources', () => {
+    const sources = element.querySelector('#sources') as HTMLElement;
+    for (const name of ['App Store', 'Google Play', 'Zendesk', 'Trustpilot', 'E-mail', 'Mastodon']) {
+      expect(sources.textContent).toContain(name);
+    }
+  });
+
+  it('marks the inbox preview as sample data and lifts exactly one row out of it', () => {
+    const preview = element.querySelector('figure[aria-label]') as HTMLElement;
+    expect(preview.textContent).toContain('Sample data');
+    expect(preview.querySelectorAll('li.lp-pulled')).toHaveLength(1);
+    expect(preview.querySelectorAll('li').length).toBe(5);
   });
 
   it('states the free-plan allowance from the spec instead of a made-up number', () => {
@@ -50,9 +70,11 @@ describe('LandingComponent', () => {
     expect(pricing.textContent).toContain('200');
   });
 
-  it('points both primary calls to action at the registration route', () => {
-    const registerLinks = Array.from(element.querySelectorAll('a[href="/auth/register"]'));
+  it('uses one label for the sign-up action and points every instance at registration', () => {
+    const registerLinks = Array.from(element.querySelectorAll<HTMLAnchorElement>('a[href="/auth/register"]'));
     expect(registerLinks.length).toBeGreaterThanOrEqual(3);
+    const labels = new Set(registerLinks.map((a) => a.textContent?.trim()));
+    expect(labels.size).toBe(1);
     expect(element.querySelector('a[href="/auth/login"]')).toBeTruthy();
   });
 
@@ -71,5 +93,9 @@ describe('LandingComponent', () => {
     for (const nav of navs) {
       expect(nav.getAttribute('aria-label')).toBeTruthy();
     }
+  });
+
+  it('keeps em and en dashes out of the copy', () => {
+    expect(element.textContent).not.toMatch(/[–—]/);
   });
 });

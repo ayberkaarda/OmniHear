@@ -1,0 +1,50 @@
+:host { display: block; }
+
+.lp-display { font-size: clamp(2.75rem, 1.6rem + 3.6vw, 4.5rem); line-height: 1.02; letter-spacing: var(--tracking-tight); text-wrap: balance; }
+.lp-heading { font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem); line-height: 1.1; letter-spacing: var(--tracking-tight); text-wrap: balance; }
+.lp-quote { font-size: clamp(1.5rem, 1.05rem + 1.6vw, 2.5rem); line-height: 1.22; letter-spacing: -0.01em; text-wrap: pretty; }
+.lp-figure { font-size: clamp(3.5rem, 2.6rem + 3vw, 5.5rem); line-height: 1; letter-spacing: var(--tracking-tight); }
+.lp-mark { background: var(--highlight); color: inherit; border-radius: var(--radius-sm); padding: 0 0.12em; }
+
+.lp-focus:focus-visible { outline: 2px solid var(--ring-focus); outline-offset: 2px; }
+.lp-navlink { border-radius: var(--radius-md); padding: 6px 10px; font-size: var(--font-size-sm); color: var(--text-secondary); transition: color var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard); }
+.lp-navlink:hover { color: var(--text-primary); background: var(--bg-surface-hover); }
+.lp-footlink:hover { color: var(--text-primary); }
+.lp-press { transition: transform var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard); }
+.lp-press:active { transform: translateY(1px); }
+
+.lp-chip { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; border-width: 1px; border-radius: var(--radius-sm); padding: 1px 6px; font-size: var(--font-size-xs); line-height: var(--line-height-xs); font-weight: 500; }
+
+/* Phone: three rows around the pulled one. */
+@media (max-width: 767px) { .lp-wide { display: none; } }
+
+/* The pulled row: the signal slice of the mark, as an inbox row. */
+.lp-pulled {
+  --pull: 12px;
+  z-index: 1;
+  margin: 4px 0;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--signal);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--shadow-md);
+  transform: translateX(var(--pull));
+}
+@media (min-width: 768px) { .lp-pulled { --pull: 28px; } }
+
+.lp-rows > li + li:not(.lp-pulled):not(.lp-pulled + li) { border-top: 1px solid var(--border); }
+
+/* Rows arrive once, then the one that matters is lifted out. Nothing loops. */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-row { animation: lp-in var(--duration-slow) var(--ease-emphasized) both; animation-delay: calc(var(--i) * 70ms + 100ms); }
+  .lp-row.lp-pulled { animation: lp-fade var(--duration-slow) var(--ease-standard) both, lp-pull 480ms var(--ease-emphasized) 720ms both; animation-delay: 240ms, 720ms; }
+}
+@keyframes lp-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes lp-fade { from { opacity: 0; } }
+@keyframes lp-pull { from { transform: translateX(0); box-shadow: none; } }
+
+.lp-faq > summary { display: flex; cursor: pointer; list-style: none; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; font-size: var(--font-size-lg); font-weight: 600; }
+.lp-faq > summary::-webkit-details-marker { display: none; }
+.lp-faq > summary::after { content: '+'; font-family: var(--font-mono); font-weight: 400; color: var(--text-muted); transition: transform var(--duration-base) var(--ease-standard); }
+.lp-faq[open] > summary::after { transform: rotate(45deg); }
+.lp-faq > p { max-width: 65ch; padding-bottom: 20px; color: var(--text-secondary); }
