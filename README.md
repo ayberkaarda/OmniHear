@@ -24,24 +24,28 @@ initial bundle budget. Full diagram and data flow: **`docs/ARCHITECTURE.md`**.
 
 ## Screens
 
-All captured from the running frontend at 1440 px, in the current
-"switchboard" identity (`docs/BRAND.md`), with a sample company's data served
-in place of the API — not mockups.
+All captured from the running frontend at 1440 px (the phone view at 390 px),
+in the current "Marker" identity (`docs/BRAND.md`): dark-first, one highlighter
+yellow, a command bar and text tabs instead of a sidebar. A sample company's
+data is served in place of the API — not mockups. Each caption names the theme.
 
-**Overview** — KPI cards, the 30-day sentiment trend, and the sentiment and
-category breakdowns. The quota panel in the sidebar is at 60/75, which is why
-the paywall is one sync away.
+**Overview** (light theme) — the four headline figures, the 30-day sentiment
+trend, and the sentiment and category breakdowns. The analysis meter in the
+command bar is at 60/75, which is why the paywall is one sync away.
 
 ![Overview](docs/screenshots/overview.png)
 
-**Inbox** — every collected comment with its AI label, source, sentiment score
-and analysis status, behind sentiment/category/source/date filters.
+**Inbox** (dark theme, full page) — every collected comment as a full-width
+row with its sentiment score, AI category, source and the keyword the analysis
+keyed on marked in the text, behind sentiment/category/source/status/date
+filters.
 
 ![Inbox](docs/screenshots/inbox.png)
 
-**Comment detail** — the analysis and its reasoning: score, category,
-confidence, extracted keywords, and the `model_version` that produced them, so
-an old analysis can be told apart from a current one.
+**Comment detail** (dark theme) — the customer's words as the largest thing on
+screen, with the keywords marked, next to the analysis: score, category,
+confidence, keywords, and the `model_version` that produced them, so an old
+analysis can be told apart from a current one.
 
 ![Comment detail](docs/screenshots/inbox-detail.png)
 
@@ -51,11 +55,21 @@ readable in both themes and for red-green colour blindness (ADR-0006).
 
 ![Overview in dark theme](docs/screenshots/overview-dark.png)
 
-**Integrations and landing** — one row per connection with its health and
-last sync, and the public page.
+**Integrations** (light theme) and **landing** (dark theme, full page) — one
+row per connection with its health and last sync, and the public page.
 
 ![Integrations](docs/screenshots/integrations.png)
 ![Landing](docs/screenshots/landing.png)
+
+**Settings and sign-in** — the profile settings page (light theme) and the
+sign-in page (dark theme).
+
+![Settings](docs/screenshots/settings.png)
+![Sign in](docs/screenshots/login.png)
+
+**Phone** (dark theme, 390 px) — the inbox with the bottom tab bar.
+
+![Inbox on a phone](docs/screenshots/inbox-mobile.png)
 
 ## Setup
 

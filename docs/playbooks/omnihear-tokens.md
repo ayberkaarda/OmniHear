@@ -93,7 +93,7 @@ Rozette ikon+etiket var, grafikte yok. Bu yüzden:
 - `darkMode: 'class'`. **`prefers-color-scheme` CSS bloğu YOK** — sistem tercihi TS'te sınıfa çözülür.
 - `ThemeService` (`core/theme/`): `preference` signal (`light`/`dark`/`system`, localStorage'da), `resolved` computed, `effect()` ile `documentElement.classList.toggle('dark')`. `system` seçiliyken `matchMedia` değişimi canlı dinlenir. `localStorage` erişimi try/catch'li (gizli sekmede patlar).
 - FOUC: `index.html` `<head>`'inde inline script ilk paint öncesi sınıfı basar; `ThemeService` ile **aynı anahtarı ve aynı çözümleme mantığını** kullanır — ikisi ayrışırsa tema açılışta zıplar.
-- Font: **IBM Plex Sans** (400/500/600) + **IBM Plex Mono** (400/500). Sayı sütunlarında `tabular-nums` zorunlu.
+- Font: **Bricolage Grotesque** (değişken; başlıklar dar kesim, metin tam genişlik) + **Martian Mono** (her sayı). Ayrıntı `docs/BRAND.md`. Sayı sütunlarında `tabular-nums` zorunlu.
 
 ## 8. Bileşen bitiş kontrol listesi
 

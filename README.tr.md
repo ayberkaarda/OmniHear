@@ -26,24 +26,29 @@ bütçesinin arkasında lazy yüklenir. Tam diyagram ve veri akışı:
 
 ## Ekranlar
 
-Hepsi çalışan frontend'den 1440 px genişlikte, güncel "switchboard"
-kimliğiyle (`docs/BRAND.md`) alındı; API yerine örnek bir şirketin verisi
-sunuldu — maket değil.
+Hepsi çalışan frontend'den 1440 px genişlikte (telefon görünümü 390 px),
+güncel "Marker" kimliğiyle (`docs/BRAND.md`) alındı: önce koyu tema, tek bir
+fosforlu kalem sarısı, kenar çubuğu yerine komut çubuğu ve metin sekmeleri.
+API yerine örnek bir şirketin verisi sunuldu — maket değil. Her alt yazı
+temayı belirtir.
 
-**Genel bakış** — KPI kartları, 30 günlük duygu trendi, duygu ve kategori
-dağılımları. Kenar çubuğundaki kota paneli 60/75'te; paywall'ın bir senkron
-uzakta olmasının sebebi bu.
+**Genel bakış** (açık tema) — dört ana rakam, 30 günlük duygu trendi, duygu ve
+kategori dağılımları. Komut çubuğundaki analiz sayacı 60/75'te; paywall'ın bir
+senkron uzakta olmasının sebebi bu.
 
 ![Genel bakış](docs/screenshots/overview.png)
 
-**Gelen kutusu** — toplanan her yorum; AI etiketi, kaynağı, duygu skoru ve
-analiz durumuyla, duygu/kategori/kaynak/tarih filtrelerinin arkasında.
+**Gelen kutusu** (koyu tema, tam sayfa) — toplanan her yorum tam genişlikte
+bir satır; duygu skoru, AI kategorisi, kaynağı ve analizin dayandığı anahtar
+kelime metnin içinde işaretli, duygu/kategori/kaynak/durum/tarih filtrelerinin
+arkasında.
 
 ![Gelen kutusu](docs/screenshots/inbox.png)
 
-**Yorum detayı** — analiz ve gerekçesi: skor, kategori, güven, çıkarılan
-anahtar kelimeler, ve bunları üreten `model_version` — böylece eski bir analiz
-güncel olandan ayırt edilebilir.
+**Yorum detayı** (koyu tema) — müşterinin sözleri ekrandaki en büyük şey,
+anahtar kelimeler işaretli; yanında analiz: skor, kategori, güven, anahtar
+kelimeler ve bunları üreten `model_version` — böylece eski bir analiz güncel
+olandan ayırt edilebilir.
 
 ![Yorum detayı](docs/screenshots/inbox-detail.png)
 
@@ -53,11 +58,22 @@ kırmızı-yeşil renk körlüğünde okunabilir kalır (ADR-0006).
 
 ![Koyu temada genel bakış](docs/screenshots/overview-dark.png)
 
-**Entegrasyonlar ve açılış sayfası** — her bağlantı için sağlık durumu ve son
-senkronu gösteren bir satır, ve herkese açık sayfa.
+**Entegrasyonlar** (açık tema) ve **açılış sayfası** (koyu tema, tam sayfa) —
+her bağlantı için sağlık durumu ve son senkronu gösteren bir satır, ve herkese
+açık sayfa.
 
 ![Entegrasyonlar](docs/screenshots/integrations.png)
 ![Açılış sayfası](docs/screenshots/landing.png)
+
+**Ayarlar ve giriş** — profil ayarları sayfası (açık tema) ve giriş sayfası
+(koyu tema).
+
+![Ayarlar](docs/screenshots/settings.png)
+![Giriş](docs/screenshots/login.png)
+
+**Telefon** (koyu tema, 390 px) — alt sekme çubuğuyla gelen kutusu.
+
+![Telefonda gelen kutusu](docs/screenshots/inbox-mobile.png)
 
 ## Kurulum
 
