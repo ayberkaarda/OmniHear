@@ -62,6 +62,7 @@
   <aside
     class="shell-rail sticky top-0 hidden w-64 shrink-0 flex-col border-[var(--border)] bg-[var(--bg-canvas)] lg:flex"
     data-testid="shell-rail"
+    [attr.inert]="accountOpen() ? '' : null"
   >
     <div class="flex h-14 shrink-0 items-center px-5">
       <a
@@ -107,7 +108,9 @@
   </aside>
 
   <div class="flex min-w-0 flex-1 flex-col">
+    <!-- While the phone account sheet is open, everything behind it is inert: no Tab, no click, no reading. -->
     <header
+      [attr.inert]="accountOpen() ? '' : null"
       class="sticky top-0 z-[var(--z-sticky)] flex h-14 shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--bg-canvas)] shell-gutter"
     >
       <a
@@ -147,7 +150,9 @@
       <!-- Phones: the account block lives behind the avatar. -->
       @if (user(); as activeUser) {
         <button
+          #accountTrigger
           type="button"
+          aria-haspopup="dialog"
           class="shell-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 lg:hidden"
           [attr.aria-label]="activeUser.name"
           [attr.aria-expanded]="accountOpen()"
@@ -160,14 +165,20 @@
     </header>
 
     @if (accountOpen()) {
-      <div class="shell-overlay fixed inset-0 bg-[var(--bg-overlay)] lg:hidden" aria-hidden="true" (click)="closeAccount()"></div>
+      <div class="shell-overlay fixed inset-0 bg-[var(--bg-overlay)] lg:hidden" aria-hidden="true" (click)="dismissAccount()"></div>
       <div
+        #accountSheet
         id="shell-account-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="shell-account-title"
+        tabindex="-1"
+        (keydown)="onSheetKeydown($event)"
         class="shell-sheet fixed border border-[var(--border)] bg-[var(--bg-surface-raised)] p-4 shadow-[var(--shadow-md)] lg:hidden"
         data-testid="shell-account-sheet"
       >
         @if (user(); as activeUser) {
-          <p class="sr-only">{{ activeUser.name }}</p>
+          <p id="shell-account-title" class="sr-only">{{ activeUser.name }}</p>
         }
         <ng-container *ngTemplateOutlet="account; context: { withTheme: true }" />
       </div>
@@ -178,6 +189,7 @@
         class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[var(--category-complaint-border)] bg-[var(--category-complaint-bg)] shell-gutter py-2.5 text-sm text-[var(--category-complaint-text)]"
         role="status"
         data-testid="verify-banner"
+        [attr.inert]="accountOpen() ? '' : null"
       >
         <app-icon name="alert-triangle" size="sm" />
         <span i18n="@@shell.verifyBanner">Your email address is not confirmed yet.</span>
@@ -190,7 +202,7 @@
       </div>
     }
 
-    <main id="main-content" tabindex="-1" class="shell-main flex-1 focus:outline-none">
+    <main id="main-content" tabindex="-1" [attr.inert]="accountOpen() ? '' : null" class="shell-main flex-1 focus:outline-none">
       <router-outlet />
     </main>
   </div>
@@ -200,6 +212,7 @@
     class="shell-tabbar fixed inset-x-0 bottom-0 z-[var(--z-sticky)] grid border-t border-[var(--border)] bg-[var(--bg-surface)] lg:hidden"
     [attr.aria-label]="primaryNavLabel"
     data-testid="shell-tabbar"
+    [attr.inert]="accountOpen() ? '' : null"
   >
     @for (item of nav; track item.section) {
       <a

@@ -11,6 +11,7 @@ import {
 
 import { ButtonComponent } from '../button/button.component';
 import { IconComponent } from '../icon/icon.component';
+import { trapTabKey } from './focus-trap';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
 export type ModalRole = 'dialog' | 'alertdialog';
@@ -21,10 +22,6 @@ const SIZE_CLASSES: Record<ModalSize, string> = {
   md: 'w-[520px] max-w-[calc(100vw-2rem)]',
   lg: 'w-[720px] max-w-[calc(100vw-2rem)]'
 };
-
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), ' +
-  'select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 let uniqueModalId = 0;
 
@@ -94,24 +91,8 @@ export class ModalComponent {
 
   private trapFocus(event: KeyboardEvent): void {
     const container = this.dialogEl()?.nativeElement;
-    if (!container) {
-      return;
-    }
-    const focusable = Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-    if (focusable.length === 0) {
-      event.preventDefault();
-      return;
-    }
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    const active = document.activeElement;
-
-    if (event.shiftKey && active === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
+    if (container) {
+      trapTabKey(container, event);
     }
   }
 }

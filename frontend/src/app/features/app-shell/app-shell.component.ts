@@ -1,4 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Injector,
+  OnDestroy,
+  signal,
+  viewChild
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -12,6 +24,7 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { IconName } from '../../shared/ui/icon/icon.types';
 import { LogoComponent } from '../../shared/ui/logo/logo.component';
+import { trapTabKey } from '../../shared/ui/modal/focus-trap';
 import { QuotaMeterComponent } from './quota-meter.component';
 import { ThemeToggleComponent } from './theme-toggle.component';
 
@@ -39,6 +52,9 @@ const TAB_LINK =
   'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] active:translate-y-px';
 const LINK_ACTIVE = 'shell-selected font-medium text-[var(--text-primary)]';
+
+/** Tailwind `lg`: from here up the rail carries the account block and the sheet is hidden. */
+const WIDE_QUERY = '(min-width: 1024px)';
 
 const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/?#]+))?/;
 
@@ -68,13 +84,20 @@ const SECTION_PATTERN = /^\/app\/(overview|inbox|integrations|settings)(?:\/([^/
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown.escape)': 'closeAccount()' }
+  host: {
+    '(document:keydown.escape)': 'dismissAccount()',
+    '(window:resize)': 'closeAccountIfWide()'
+  }
 })
 export class AppShellComponent implements OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly authStore = inject(AuthStore);
   private readonly realtime = inject(RealtimeBridge);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
+
+  private readonly accountTrigger = viewChild<ElementRef<HTMLButtonElement>>('accountTrigger');
+  private readonly accountSheet = viewChild<ElementRef<HTMLElement>>('accountSheet');
 
   protected readonly nav = NAV;
 
@@ -149,12 +172,41 @@ export class AppShellComponent implements OnDestroy {
     return `${TAB_LINK} ${active ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`;
   }
 
+  /**
+   * The sheet behaves like the shared modal: focus moves into it on open, Tab
+   * is contained by the same `trapTabKey`, and the page behind it is `inert`.
+   */
   protected toggleAccount(): void {
-    this.accountOpen.update((open) => !open);
+    if (this.accountOpen()) {
+      this.dismissAccount();
+      return;
+    }
+    this.accountOpen.set(true);
+    afterNextRender(() => this.accountSheet()?.nativeElement.focus(), { injector: this.injector });
   }
 
-  protected closeAccount(): void {
+  /** Escape or a tap on the scrim: close and hand focus back to the avatar that opened it. */
+  protected dismissAccount(): void {
+    if (!this.accountOpen()) {
+      return;
+    }
     this.accountOpen.set(false);
+    // The trigger sits in the header, which is inert until this render lands.
+    afterNextRender(() => this.accountTrigger()?.nativeElement.focus(), { injector: this.injector });
+  }
+
+  protected onSheetKeydown(event: KeyboardEvent): void {
+    const sheet = this.accountSheet()?.nativeElement;
+    if (event.key === 'Tab' && sheet) {
+      trapTabKey(sheet, event);
+    }
+  }
+
+  /** Widening past `lg` hides the sheet; it must not leave an inert page with nothing open. */
+  protected closeAccountIfWide(): void {
+    if (this.accountOpen() && typeof matchMedia === 'function' && matchMedia(WIDE_QUERY).matches) {
+      this.accountOpen.set(false);
+    }
   }
 
   protected onSignOut(): void {
