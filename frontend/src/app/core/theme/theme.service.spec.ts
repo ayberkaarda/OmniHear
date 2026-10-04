@@ -36,6 +36,7 @@ describe('ThemeService', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.classList.remove('dark', 'theme-changing');
+    document.documentElement.style.colorScheme = '';
   });
 
   it('defaults to "system" preference when nothing is stored', () => {
@@ -182,5 +183,58 @@ describe('ThemeService', () => {
         Object.defineProperty(window, 'localStorage', original);
       }
     }
+  });
+
+  describe('browser chrome', () => {
+    let style: HTMLStyleElement;
+    let metas: HTMLMetaElement[];
+
+    beforeEach(() => {
+      // The canvas token as tokens.css declares it, per theme.
+      style = document.createElement('style');
+      style.textContent = ':root { --bg-canvas: #f1f3f1; } :root.dark { --bg-canvas: #101210; }';
+      document.head.appendChild(style);
+      metas = ['(prefers-color-scheme: light)', '(prefers-color-scheme: dark)'].map((media) => {
+        const meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.media = media;
+        meta.content = 'unset';
+        document.head.appendChild(meta);
+        return meta;
+      });
+    });
+
+    afterEach(() => {
+      style.remove();
+      metas.forEach((meta) => meta.remove());
+    });
+
+    it('pins color-scheme and theme-color to a manual light choice while the OS is dark', () => {
+      installFakeMatchMedia(true);
+      TestBed.configureTestingModule({});
+      const service = TestBed.inject(ThemeService);
+      TestBed.flushEffects();
+
+      expect(document.documentElement.style.colorScheme).toBe('dark');
+      expect(metas.map((meta) => meta.content)).toEqual(['#101210', '#101210']);
+
+      service.setPreference('light');
+      TestBed.flushEffects();
+
+      expect(document.documentElement.style.colorScheme).toBe('light');
+      expect(metas.map((meta) => meta.content)).toEqual(['#f1f3f1', '#f1f3f1']);
+    });
+
+    it('pins them to a manual dark choice while the OS is light', () => {
+      installFakeMatchMedia(false);
+      TestBed.configureTestingModule({});
+      const service = TestBed.inject(ThemeService);
+
+      service.setPreference('dark');
+      TestBed.flushEffects();
+
+      expect(document.documentElement.style.colorScheme).toBe('dark');
+      expect(metas.map((meta) => meta.content)).toEqual(['#101210', '#101210']);
+    });
   });
 });

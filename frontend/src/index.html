@@ -7,6 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Every voice. One inbox. App Store, Google Play, Zendesk, Trustpilot, e-mail and Mastodon feedback in one list, each comment read, scored and sorted.">
   <meta name="color-scheme" content="light dark">
+  <!-- Literal hexes for the first paint; must equal bg-canvas in styles/tokens.json
+       (npm run tokens:check enforces it). ThemeService repaints both from the
+       token once the app resolves a manual theme choice. -->
   <meta name="theme-color" content="#f1f3f1" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#101210" media="(prefers-color-scheme: dark)">
 
@@ -53,6 +56,8 @@
         if (isDark) {
           document.documentElement.classList.add('dark');
         }
+        // Native controls follow the resolved theme, not only the OS one.
+        document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
       } catch (e) {
         // Ignore: worst case is a light-theme first paint that ThemeService corrects.
       }
